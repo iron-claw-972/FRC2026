@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 /**
  * Runs the given command when this command is initialized, and ends when it ends.
  * Useful for commands that are not created yet because the constructor parameters are not available until initialization.
+ * This is very similar to WPILib's DeferredCommand
  */
 public class SupplierCommand extends Command {
 

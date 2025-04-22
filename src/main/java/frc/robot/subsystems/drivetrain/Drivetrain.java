@@ -197,11 +197,16 @@ public class Drivetrain extends SubsystemBase {
         double[] sampleTimestamps =
             gyroInputs.odometryYawTimestamps; // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
+        SwerveModulePosition[][] positions = new SwerveModulePosition[4][];
+        for(int i = 0; i < modules.length; i++){
+            positions[i] = modules[i].getOdometryPositions();
+            sampleCount = Math.min(sampleCount, positions[i].length);
+        }
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
             for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
-                modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
+                modulePositions[moduleIndex] = positions[moduleIndex][i];
             } 
             // Use the real gyro angle
             rawGyroRotation = gyroInputs.odometryYawPositions[i];
@@ -282,7 +287,9 @@ public class Drivetrain extends SubsystemBase {
 
         // Even if vision is disabled, it should still update inputs
         // This prevents it from storing a lot of unread results, and it could be useful for replays
-        vision.updateInputs();
+        if(vision != null){
+            vision.updateInputs();
+        }
 
         if(VisionConstants.ENABLED){
             if(vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)){
@@ -685,7 +692,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void alignWheels(){
-        SwerveModuleState state = new SwerveModuleState(0, new Rotation2d(1.465));
+        SwerveModuleState state = new SwerveModuleState(0, new Rotation2d(0));
         setModuleStates(new SwerveModuleState[]{
             state, state, state, state
         }, false);
