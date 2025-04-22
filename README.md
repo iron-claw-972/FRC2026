@@ -1,6 +1,5 @@
-# Code-Structure-2023
+# FRC2026
 
-[![CI](https://github.com/iron-claw-972/Code-Structure-2023/actions/workflows/main.yml/badge.svg)](https://github.com/iron-claw-972/Code-Structure-2023/actions/workflows/main.yml)
+[![CI](https://github.com/iron-claw-972/FRC2025/actions/workflows/main.yml/badge.svg)](https://github.com/iron-claw-972/FRC2025/actions/workflows/main.yml)
 
-
-Code Structure for our future 2023 repository.
+Code for the 2025-2026 FRC Season.
