@@ -26,6 +26,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
  * This is necessary because PathPlanner tends to crash into things and can't be controlled as easily
  * This algorithm is designed to approach the pose from a specific angle. Use a different one or set endDerivative to 0 if you want to approach from any angle
  * TODO: Test on a real robot. If it works as intended, delete GoToPose and GoToPose2 and rename this to GoToPose
+ * If it doesn't work, try switching to a Trajectory instead of a Spline
  */
 public class GoToPose3 extends Command {
     // If this is true, the robot's speed will be normalized to 1, which will make the same trajectory with any velocity
@@ -241,51 +242,16 @@ public class GoToPose3 extends Command {
     public double getT(){
         Pose2d drivePose = drive.getPose();
         // The robot won't be behind its previous point
-        double min = prevT;
-        // Use 2*speed*dt as the maximum distance the robot can travel in a frame; this is intentionally more than the speed so the algorithm can catch up to the robot
-        ChassisSpeeds speeds = drive.getChassisSpeeds();
-        double max = Math.min(prevT+2*Math.max(Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond), 1)*Constants.LOOP_TIME/length, 1);
-        var minOptional = getSplinePoint(min);
-        var maxOptional = getSplinePoint(max);
-        Pose2d minPose, maxPose;
-        // If the poses exist, which they should, assign them normally
-        // Otherwise, interpolate over the entire spline to prevent errors
-        if(minOptional.isPresent()){
-            minPose = minOptional.get();
-        }else{
-            min = 0;
-            minPose = getSplinePoint(0).get();
-        }
-        if(maxOptional.isPresent()){
-            maxPose = maxOptional.get();
-        }else{
-            max = 1;
-            maxPose = getSplinePoint(1).get();
-        }
-        double t = 0;
+        double t = prevT;
+        Pose2d minPose = getSplinePoint(t).get();
         error = 0;
-        for(int i = 0; i < 10; i++){
-            double driveX = getX(drivePose, minPose, maxPose);
-            // This guess for t is the average of the results of binary search and using the drivetrain's estimated position
-            t = MathUtil.clamp((min+max)/4+(min+driveX/length)/2, min, max);
-            var optional = getSplinePoint(t);
-            // If the optional doesn't exist, it will never exist, so this should return early with the previous guess
-            if(optional.isEmpty()){
-                error = drivePose.relativeTo(minPose).getY();
-                return min;
-            }
-            Pose2d p = optional.get();
-            if(getX(p, minPose, maxPose) < driveX){
-                min = t;
-                minPose = p;
-            }else{
-                max = t;
-                maxPose = p;
-            }
-            // If max and min are too close to each other, break
-            if(max - min < 0.0001){
+        for(int i = 0; i < 15; i++){
+            double driveX = getX(drivePose, minPose);
+            if(Math.abs(driveX) < 0.001){
                 break;
             }
+            t = MathUtil.clamp(t+driveX/length, 0, 1);
+            minPose = getSplinePoint(t).get();
         }
         error = drivePose.relativeTo(minPose).getY();
         return t;
@@ -296,12 +262,10 @@ public class GoToPose3 extends Command {
      * This is named getX because x is defined as the distance along the spline while y is perpendicular to it
      * @param pose The pose to find the position of
      * @param start The start pose; poses at this point will return 0
-     * @param end The end pose; poses at this point will return the linear distance between start and end
      * @return The x position, in meters
      */
-    public static double getX(Pose2d pose, Pose2d start, Pose2d end){
-        Rotation2d angle = end.getTranslation().minus(start.getTranslation()).getAngle();
-        return pose.getTranslation().minus(start.getTranslation()).rotateBy(angle.unaryMinus()).getX();
+    public static double getX(Pose2d pose, Pose2d start){
+        return pose.relativeTo(start).getX();
     }
 
     /**
