@@ -13,11 +13,11 @@ import frc.robot.util.Vision.Vision;
  * Calculates standard deviations for vision
  */
 public class CalculateStdDevs extends Command {
-  private final Vision m_vision;
-  private ArrayList<Pose2d> m_poses;
-  private int m_arrayLength;
-  private Timer m_endTimer;
-  private Drivetrain m_drive;
+  private final Vision vision;
+  private ArrayList<Pose2d> poses;
+  private int arrayLength;
+  private Timer endTimer;
+  private Drivetrain drive;
 
   /**
    * Constructor for CalculateStdDevs
@@ -25,10 +25,10 @@ public class CalculateStdDevs extends Command {
    * @param vision The vision
    */
   public CalculateStdDevs(int posesToUse, Vision vision, Drivetrain drive) {
-    m_vision = vision;
-    m_drive = drive;
-    m_arrayLength = posesToUse;
-    m_endTimer = new Timer();
+    this.vision = vision;
+    this.drive = drive;
+    arrayLength = posesToUse;
+    endTimer = new Timer();
   }
 
   /**
@@ -38,9 +38,9 @@ public class CalculateStdDevs extends Command {
   public void initialize() {
     // create the ArrayList of poses to store
     // an ArrayList prevents issues if the command ends early, and makes checking if the command has finished easy
-    m_poses = new ArrayList<Pose2d>();
+    poses = new ArrayList<Pose2d>();
 
-    m_drive.setVisionEnabled(false);
+    drive.setVisionEnabled(false);
   }
 
   /**
@@ -48,22 +48,22 @@ public class CalculateStdDevs extends Command {
    */
   @Override
   public void execute() {
-    Pose2d pose = m_vision.getPose2d(m_drive.getPose());
+    Pose2d pose = vision.getPose2d(drive.getPose());
     // If the pose exists, add it to the first open spot in the array
     if (pose != null) {
       // if we see a pose, reset the timer (it will be started the next time it doesn't get a pose)
-      m_endTimer.stop();
-      m_endTimer.reset();
+      endTimer.stop();
+      endTimer.reset();
       // add the pose to our data
-      m_poses.add(pose);
-      if(m_poses.size()%10==0){
-        System.out.printf("%.0f%% done\n", ((double)m_poses.size())/m_arrayLength * 100);
+      poses.add(pose);
+      if(poses.size()%10==0){
+        System.out.printf("%.0f%% done\n", ((double)poses.size())/arrayLength * 100);
       }
     } else {
-      m_endTimer.start();
+      endTimer.start();
       // If kStdDevCommandEndTime seconds have passed since it saw an April tag, stop the command
       // Prevents it from running forever
-      if (m_endTimer.hasElapsed(10)) {
+      if (endTimer.hasElapsed(10)) {
         cancel();
       }
     }
@@ -74,24 +74,24 @@ public class CalculateStdDevs extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    m_drive.setVisionEnabled(true);
+    drive.setVisionEnabled(true);
 
     // If the array is empty, don't try to calculate std devs
-    if (m_poses.size() == 0) {
+    if (poses.size() == 0) {
       System.out.println("There are no poses in the array\nTry again where the robot can see an April tag.");
       return;
     }
     
     // create arrays of the poses by X, Y, and Rotation for calculations
-    double[] xArray = new double[m_poses.size()];
-    double[] yArray = new double[m_poses.size()];
-    double[] rotArray = new double[m_poses.size()];
+    double[] xArray = new double[poses.size()];
+    double[] yArray = new double[poses.size()];
+    double[] rotArray = new double[poses.size()];
 
     // copy the values into the arrays
-    for (int i = 0; i < m_poses.size(); i++) {
-      xArray[i] = m_poses.get(i).getX();
-      yArray[i] = m_poses.get(i).getY();
-      rotArray[i] = m_poses.get(i).getRotation().getRadians();
+    for (int i = 0; i < poses.size(); i++) {
+      xArray[i] = poses.get(i).getX();
+      yArray[i] = poses.get(i).getY();
+      rotArray[i] = poses.get(i).getRotation().getRadians();
     }
 
     // Calculate the standard deviations
@@ -102,7 +102,7 @@ public class CalculateStdDevs extends Command {
     // Find distance to tag
     double distance;
     try{
-      distance = m_vision.getEstimatedPoses(m_drive.getPose()).get(0).targetsUsed.get(0).getBestCameraToTarget().getTranslation().getNorm();
+      distance = vision.getEstimatedPoses(drive.getPose()).get(0).targetsUsed.get(0).getBestCameraToTarget().getTranslation().getNorm();
     }catch(Exception e){
         System.out.println("Could not see a target");
         distance = -1;
@@ -119,6 +119,6 @@ public class CalculateStdDevs extends Command {
    */
   @Override
   public boolean isFinished() {
-    return m_poses.size() >= m_arrayLength;
+    return poses.size() >= arrayLength;
   }
 }

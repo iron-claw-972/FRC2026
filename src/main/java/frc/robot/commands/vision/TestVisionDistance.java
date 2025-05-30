@@ -12,23 +12,23 @@ import frc.robot.util.Vision.Vision;
  * Gathers data on the distance limits of the camera used for vision.
  */
 public class TestVisionDistance extends Command {
-  private final Drivetrain m_drive;
-  private final Vision m_vision;
-  private Translation2d m_visionStartTranslation, m_driveStartTranslation;
-  private Pose2d m_currentPose = null;
-  private double m_driveDistance;
-  private double m_visionDistance;
+  private final Drivetrain drive;
+  private final Vision vision;
+  private Translation2d visionStartTranslation, driveStartTranslation;
+  private Pose2d currentPose = null;
+  private double driveDistance;
+  private double visionDistance;
 
-  private double m_speed;
+  private double speed;
 
-  private final Timer m_endTimer = new Timer();
-  private final Timer m_printTimer = new Timer();
+  private final Timer endTimer = new Timer();
+  private final Timer printTimer = new Timer();
 
   // How many seconds of not seeing april tag before ending the command
-  private static final double kEndDelay = 0.25;
+  private static final double END_DELAY = 0.25;
 
   // How many seconds between each data print
-  private static final double kPrintDelay = 1;
+  private static final double PRINT_DELAY = 1;
 
   /**
    * Constructor for TestVisionDistance
@@ -38,9 +38,9 @@ public class TestVisionDistance extends Command {
    */
   public TestVisionDistance(double speed, Drivetrain drive, Vision vision){
     addRequirements(drive);
-    m_drive = drive;
-    m_speed = speed;
-    m_vision = vision;
+    this.drive = drive;
+    this.speed = speed;
+    this.vision = vision;
   }
 
   /**
@@ -49,16 +49,16 @@ public class TestVisionDistance extends Command {
   @Override
   public void initialize() {
 
-    m_endTimer.reset();
-    m_printTimer.restart();
+    endTimer.reset();
+    printTimer.restart();
 
-    m_drive.setVisionEnabled(false);
+    drive.setVisionEnabled(false);
 
-    m_currentPose = m_vision.getPose2d(m_drive.getPose());
-    m_visionStartTranslation = m_currentPose.getTranslation();
-    m_driveStartTranslation = m_drive.getPose().getTranslation();
-    m_driveDistance = 0;
-    m_visionDistance = 0;
+    currentPose = vision.getPose2d(drive.getPose());
+    visionStartTranslation = currentPose.getTranslation();
+    driveStartTranslation = drive.getPose().getTranslation();
+    driveDistance = 0;
+    visionDistance = 0;
   }
 
   /**
@@ -66,30 +66,30 @@ public class TestVisionDistance extends Command {
    */
   @Override
   public void execute() {
-    m_drive.drive(m_speed, 0, 0, false, false);
-    Pose2d newestPose = m_vision.getPose2d(m_currentPose, m_drive.getPose());
+    drive.drive(speed, 0, 0, false, false);
+    Pose2d newestPose = vision.getPose2d(currentPose, drive.getPose());
 
     // If the camera can see the apriltag
     if (newestPose != null) {
       //update current pose
-      m_currentPose = newestPose;
+      currentPose = newestPose;
       // reset the timer
-      m_endTimer.reset();
-      m_driveDistance = m_drive.getPose().getTranslation().getDistance(m_driveStartTranslation);
-      m_visionDistance = m_currentPose.getTranslation().getDistance(m_visionStartTranslation);
-      SmartDashboard.putNumber("Vision test drive distance", m_driveDistance);
-      SmartDashboard.putNumber("Vision test vision distnace", m_visionDistance);
-      SmartDashboard.putNumber("Vision test error", m_visionDistance - m_driveDistance);
-      SmartDashboard.putNumber("Vision test % error", (m_visionDistance-m_driveDistance) / m_driveDistance * 100);
+      endTimer.reset();
+      driveDistance = drive.getPose().getTranslation().getDistance(driveStartTranslation);
+      visionDistance = currentPose.getTranslation().getDistance(visionStartTranslation);
+      SmartDashboard.putNumber("Vision test drive distance", driveDistance);
+      SmartDashboard.putNumber("Vision test vision distnace", visionDistance);
+      SmartDashboard.putNumber("Vision test error", visionDistance - driveDistance);
+      SmartDashboard.putNumber("Vision test % error", (visionDistance-driveDistance) / driveDistance * 100);
       // If kPrintDelay seconds have passed, print the data
-      if (m_printTimer.advanceIfElapsed(kPrintDelay)) {
+      if (printTimer.advanceIfElapsed(PRINT_DELAY)) {
         System.out.printf("\nDrive dist: %.2f\nVision dist: %.2f\nError: %.2f\n %% error: %.2f\n",
-          m_driveDistance, m_visionDistance,
-          m_visionDistance-m_driveDistance, (m_visionDistance-m_driveDistance) / m_driveDistance * 100
+          driveDistance, visionDistance,
+          visionDistance-driveDistance, (visionDistance-driveDistance) / driveDistance * 100
         );
       }
     } else {
-      m_endTimer.start();
+      endTimer.start();
     }
   }
 
@@ -98,8 +98,8 @@ public class TestVisionDistance extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    m_drive.setVisionEnabled(true);
-    m_drive.stop();
+    drive.setVisionEnabled(true);
+    drive.stop();
   }
 
   /**
@@ -108,6 +108,6 @@ public class TestVisionDistance extends Command {
    */
   @Override
   public boolean isFinished() {
-    return m_endTimer.hasElapsed(kEndDelay);
+    return endTimer.hasElapsed(END_DELAY);
   }
 }

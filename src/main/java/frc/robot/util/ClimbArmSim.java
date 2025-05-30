@@ -10,11 +10,15 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
+/**
+ * Similar to SingleJointedArmSim, except it simulates an upward normal force on the end of the arm equal to the weight of the robot
+ * Use setIsClimbing() to change whether this normal force should be simulated
+ */
 public class ClimbArmSim extends SingleJointedArmSim {
-  private boolean m_simulateGravity;
-  private double m_armLenMeters;
-  private double m_minAngle;
-  private double m_maxAngle;
+  private boolean simulateGravity;
+  private double armLenMeters;
+  private double minAngle;
+  private double maxAngle;
   private double mass;
   private double momentOfInertia;
   private boolean isClimbing;
@@ -49,10 +53,10 @@ public class ClimbArmSim extends SingleJointedArmSim {
       double armMassKilograms,
       double... measurementStdDevs) {
     super(plant, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, simulateGravity, startingAngleRads, measurementStdDevs);
-    m_armLenMeters = armLengthMeters;
-    m_minAngle = minAngleRads;
-    m_maxAngle = maxAngleRads;
-    m_simulateGravity = simulateGravity;
+    armLenMeters = armLengthMeters;
+    minAngle = minAngleRads;
+    maxAngle = maxAngleRads;
+    this.simulateGravity = simulateGravity;
     mass = robotMasKilograms;
     momentOfInertia = 1.0/3.0 * armMassKilograms * armLengthMeters * armLengthMeters;
     isClimbing = false;
@@ -143,8 +147,8 @@ public class ClimbArmSim extends SingleJointedArmSim {
         NumericalIntegration.rkdp(
             (Matrix<N2, N1> x, Matrix<N1, N1> _u) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(_u));
-              if (m_simulateGravity) {
-                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / m_armLenMeters + (isClimbing ? mass * 9.8 * Math.cos(x.get(0, 0)) * m_armLenMeters / momentOfInertia : 0);
+              if (simulateGravity) {
+                double alphaGrav = 3.0 / 2.0 * -9.8 * Math.cos(x.get(0, 0)) / armLenMeters + (isClimbing ? mass * 9.8 * Math.cos(x.get(0, 0)) * armLenMeters / momentOfInertia : 0);
                 xdot = xdot.plus(VecBuilder.fill(0, alphaGrav));
               }
               return xdot;
@@ -155,10 +159,10 @@ public class ClimbArmSim extends SingleJointedArmSim {
 
     // We check for collision after updating xhat
     if (wouldHitLowerLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_minAngle, 0);
+      return VecBuilder.fill(minAngle, 0);
     }
     if (wouldHitUpperLimit(updatedXhat.get(0, 0))) {
-      return VecBuilder.fill(m_maxAngle, 0);
+      return VecBuilder.fill(maxAngle, 0);
     }
     return updatedXhat;
   }

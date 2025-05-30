@@ -11,7 +11,7 @@ import frc.robot.util.Vision.Vision;
  * Adds data from object detection vision to SmartDashboard
  */
 public class ReturnData extends Command{
-  private final Vision m_vision; 
+  private final Vision vision; 
   private final Timer timer = new Timer();
 
   /**
@@ -19,7 +19,7 @@ public class ReturnData extends Command{
    * @param vision The vision
    */
   public ReturnData(Vision vision){
-    m_vision = vision;
+    this.vision = vision;
   }
 
   @Override
@@ -34,16 +34,16 @@ public class ReturnData extends Command{
   @Override
   public void execute() {
     if(timer.advanceIfElapsed(2)){
-        double[] xOffset = m_vision.getHorizontalOffset();
-        double[] yOffset = m_vision.getVerticalOffset();
-        // long[] objectClass = m_vision.getDetectedObjectClass();
+        double[] xOffset = vision.getHorizontalOffset();
+        double[] yOffset = vision.getVerticalOffset();
+        // long[] objectClass = vision.getDetectedObjectClass();
 
         // //put the offsets and area on SmartDashboard for testing 
         // SmartDashboard.putNumberArray("Object X offsets degrees", xOffset); 
         // SmartDashboard.putNumberArray("Object Y offsets degrees", yOffset); 
-        // SmartDashboard.putNumberArray("Object Distances", m_vision.getDistance()); 
+        // SmartDashboard.putNumberArray("Object Distances", vision.getDistance()); 
 
-        DetectedObject bestGamePiece = m_vision.getBestGamePiece(Math.PI, false);
+        DetectedObject bestGamePiece = vision.getBestGamePiece(Math.PI, false);
         if(bestGamePiece!=null){
           // SmartDashboard.putString("Vision best game piece", bestGamePiece.toString());
           System.out.println("\n\nBest game piece: "+bestGamePiece);

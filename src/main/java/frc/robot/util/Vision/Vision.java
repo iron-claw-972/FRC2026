@@ -39,7 +39,7 @@ import frc.robot.util.MathUtils;
 
 // Vision and it's commands are adapted from Iron Claw's FRC2023
 public class Vision {
-  private NetworkTable m_objectDetectionTable;
+  private NetworkTable objectDetectionTable;
 
   private NetworkTableEntry xOffset;
   private NetworkTableEntry yOffset;
@@ -64,14 +64,14 @@ public class Vision {
    */
   public Vision(ArrayList<Pair<String, Transform3d>> camList) {
     // Initialize object_detection NetworkTable
-    m_objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
+    objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
 
     // From the object detection NetworkTable, get the entries
-    objectDistance = m_objectDetectionTable.getEntry("distance");
-    xOffset = m_objectDetectionTable.getEntry("x_offset");
-    yOffset = m_objectDetectionTable.getEntry("y_offset");
-    objectClass = m_objectDetectionTable.getEntry("class");
-    cameraIndex = m_objectDetectionTable.getEntry("index");
+    objectDistance = objectDetectionTable.getEntry("distance");
+    xOffset = objectDetectionTable.getEntry("x_offset");
+    yOffset = objectDetectionTable.getEntry("y_offset");
+    objectClass = objectDetectionTable.getEntry("class");
+    cameraIndex = objectDetectionTable.getEntry("index");
 
     // Start NetworkTables server
     NetworkTableInstance.getDefault().startServer();

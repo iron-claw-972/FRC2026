@@ -12,22 +12,22 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
  * Aims the robot at the closest April tag
  */
 public class AimAtTag extends Command {
-  Drivetrain m_drive;
-  PIDController m_pid;
+  private Drivetrain drive;
+  private PIDController pid;
 
   /**
    * Aims the robot at the closest April tag
    * @param drive The drivetrain
    */
   public AimAtTag(Drivetrain drive){
-    m_drive = drive;
+    this.drive = drive;
     // Copy drive PID and changetolerance
-    m_pid = new PIDController(
-      m_drive.getRotationController().getP(),
-      m_drive.getRotationController().getI(),
-      m_drive.getRotationController().getD()
+    pid = new PIDController(
+      drive.getRotationController().getP(),
+      drive.getRotationController().getI(),
+      drive.getRotationController().getD()
     );
-    m_pid.setTolerance(Units.degreesToRadians(1));
+    pid.setTolerance(Units.degreesToRadians(1));
     addRequirements(drive);
   }
 
@@ -38,7 +38,7 @@ public class AimAtTag extends Command {
   public void initialize(){
     double dist = Double.POSITIVE_INFINITY;
     Translation2d closest = new Translation2d();
-    Translation2d driveTranslation = m_drive.getPose().getTranslation();
+    Translation2d driveTranslation = drive.getPose().getTranslation();
     for(AprilTag tag : FieldConstants.APRIL_TAGS){
       Translation2d translation = tag.pose.toPose2d().getTranslation();
       double dist2 = driveTranslation.getDistance(translation);
@@ -47,8 +47,8 @@ public class AimAtTag extends Command {
         closest = translation;
       }
     }
-    m_pid.reset();
-    m_pid.setSetpoint(Math.atan2(closest.getY() - driveTranslation.getY(), closest.getX() - driveTranslation.getX()));
+    pid.reset();
+    pid.setSetpoint(Math.atan2(closest.getY() - driveTranslation.getY(), closest.getX() - driveTranslation.getX()));
   }
   
   /**
@@ -56,15 +56,15 @@ public class AimAtTag extends Command {
    */
   @Override
   public void execute() {
-    double angle = m_drive.getPose().getRotation().getRadians();
+    double angle = drive.getPose().getRotation().getRadians();
     // If the distance between the angles is more than 180 degrees, use an identical angle ±360 degrees
-    if(angle - m_pid.getSetpoint() > Math.PI){
+    if(angle - pid.getSetpoint() > Math.PI){
       angle -= 2*Math.PI;
-    }else if(angle - m_pid.getSetpoint() < -Math.PI){
+    }else if(angle - pid.getSetpoint() < -Math.PI){
       angle += 2*Math.PI;
     }
-    double speed = m_pid.calculate(angle);
-    m_drive.drive(0, 0, speed, true, false);
+    double speed = pid.calculate(angle);
+    drive.drive(0, 0, speed, true, false);
   }
 
   /**
@@ -73,7 +73,7 @@ public class AimAtTag extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    m_drive.stop();
+    drive.stop();
   }
 
   /**
@@ -82,7 +82,7 @@ public class AimAtTag extends Command {
    */
   @Override
   public boolean isFinished() {
-    return m_pid.atSetpoint();
+    return pid.atSetpoint();
   }
 }
 
