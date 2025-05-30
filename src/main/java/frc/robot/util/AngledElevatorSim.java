@@ -8,6 +8,9 @@ import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
+/**
+ * Exactly the same as ElevatorSim, except it can be angled and have a constant force spring
+ */
 public class AngledElevatorSim extends ElevatorSim {
     private double angle;
     private boolean simulateGravity;
