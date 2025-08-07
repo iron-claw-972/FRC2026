@@ -156,6 +156,7 @@ wpi.java.configureTestTasks(test)
 
 // Configure string concat to always inline compile
 tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8' // prevent breaks in CI
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
