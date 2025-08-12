@@ -196,6 +196,7 @@ public class DriveConstants {
      */
     public static void update(RobotId robotId) {
         if(robotId == RobotId.BetaBot) {
+            //AAA: how is this calculated?
             STEER_OFFSET_FRONT_LEFT = 193.884-180;
             STEER_OFFSET_FRONT_RIGHT = 110.914;
             STEER_OFFSET_BACK_LEFT = 128.054+180;

@@ -140,6 +140,7 @@ public class Arm extends SubsystemBase implements ArmIO {
         return inputs.measuredAngle;
     }
 
+    //didn't use this
     public void resetAbsolute(){
         if(RobotBase.isSimulation()){
             motor.setPosition(Units.degreesToRotations(ArmConstants.START_ANGLE)*ArmConstants.GEAR_RATIO);

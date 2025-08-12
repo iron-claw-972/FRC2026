@@ -353,7 +353,7 @@ public class VisionConstants {
     
                 // Convert the calculated branch Pose3d to Pose2d
                 return branchPose3d.toPose2d().transformBy(new Transform2d(0, 0, new Rotation2d(Math.PI/2)));
-            }
+        }
     
         /**
          * Finds the appropriate reef branch based on the AprilTag ID and whether the

@@ -87,8 +87,8 @@ public class Module implements ModuleIO{
     protected final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
 
     private ModuleConstants moduleConstants;
-      private final MotionMagicVelocityVoltage velocityRequest =
-      new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
+    private final MotionMagicVelocityVoltage velocityRequest =
+    new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
 
     public Module(ModuleConstants moduleConstants) {

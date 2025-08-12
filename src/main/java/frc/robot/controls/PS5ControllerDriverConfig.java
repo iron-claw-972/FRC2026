@@ -89,6 +89,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             new MoveArm(arm, ArmConstants.L1_SETPOINT),
                             new DriveToPose(getDrivetrain(), ()->alignmentPose)
                         ),
+                        // idt this comment is accurate kyle
                         // This is instant so it doesn't requre the drivetrain for more than 1 frame
                         new InstantCommand(()->{
                             elevator.setSetpoint(ElevatorConstants.L1_SETPOINT);
@@ -216,6 +217,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Command l3Algae = new ParallelCommandGroup(
                 new MoveElevator(elevator, ElevatorConstants.TOP_ALGAE_SETPOINT),
                 new MoveArm(arm, ArmConstants.ALGAE_SETPOINT)).andThen(new IntakeAlgaeArm(outtake));
+            
             driver.get(PS5Button.RB).whileTrue(new ConditionalCommand(l2Algae, new InstantCommand(l2Coral::schedule), menu));
             driver.get(PS5Button.LB).whileTrue(new ConditionalCommand(l3Algae, new InstantCommand(l3Coral::schedule), menu));
     
@@ -237,7 +239,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Command intakeCoral = new IntakeCoral(intake, indexer, elevator, outtake, arm);
             Command intakeAlgae = new IntakeAlgae(intake);
             driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()->{
-                if(r3.getAsBoolean()) return;
+                if(r3.getAsBoolean()){
+                    return;
+                }
                 if(menu.getAsBoolean()){
                     intakeAlgae.schedule();
                 }else{
@@ -298,7 +302,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Command coral = new OuttakeCoral(outtake, elevator, arm).alongWith(new InstantCommand(()->getDrivetrain().setDesiredPose(()->null)))
                 .andThen(
                     new ConditionalCommand(
-                        new SequentialCommandGroup(new MoveArm(arm, ArmConstants.INTAKE_SETPOINT), new MoveElevator(elevator, ElevatorConstants.STOW_SETPOINT), new InstantCommand(()->selectedDirection = 0)),
+                        new SequentialCommandGroup(
+                            new MoveArm(arm, ArmConstants.INTAKE_SETPOINT), 
+                            new MoveElevator(elevator, ElevatorConstants.STOW_SETPOINT), 
+                            new InstantCommand(()->selectedDirection = 0)
+                        ),
                         new DoNothing(),
                         ()->!arm.canMoveElevator()
                     ));
@@ -334,6 +342,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(DPad.RIGHT).toggleOnTrue(new InstantCommand(()->{
             selectedDirection = 1;
         }));
+        //what is this for?
         driver.get(PS5Button.TOUCHPAD).toggleOnTrue(new InstantCommand(()->{
             setAlignmentPose(true, false, false, false);
         }).andThen(new DriveToPose(getDrivetrain(), ()->alignmentPose)));

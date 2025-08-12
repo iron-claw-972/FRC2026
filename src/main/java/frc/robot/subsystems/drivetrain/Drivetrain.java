@@ -70,7 +70,6 @@ public class Drivetrain extends SubsystemBase {
     // Vision
     private final Vision vision;
 
-
     // PID Controllers for chassis movement
     private final PIDController xController;
     private final PIDController yController;
@@ -163,7 +162,6 @@ public class Drivetrain extends SubsystemBase {
 
         modulePoses = new SwerveModulePose(this, DriveConstants.MODULE_LOCATIONS);
         
-
         PathPlannerLogging.setLogActivePathCallback(
             (activePath) -> {
             Logger.recordOutput(

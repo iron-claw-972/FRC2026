@@ -81,7 +81,6 @@ public class Climb extends SubsystemBase {
 
         motor.setPosition(Units.degreesToRotations(startingPosition)*totalGearRatio);
         motor.setNeutralMode(NeutralModeValue.Brake);
-        //SmartDashboard.putData("Climb PID", pid);
     }
 
     @Override
@@ -160,8 +159,7 @@ public class Climb extends SubsystemBase {
         this.resetting = resetting;
         if(!resetting){
             motor.setPosition(climbPosition*totalGearRatio);
-            pid.setSetpoint(Units.degreesToRadians(startingPosition));
-            pid.reset();
+            setAngle(climbPosition);
         }
     }
 

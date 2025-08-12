@@ -47,10 +47,20 @@ public class DriveToPose extends Command {
 
   private final ProfiledPIDController driveController =
       new ProfiledPIDController(
-          drivekP, 0.0, drivekD, new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration), Constants.LOOP_TIME);
+          drivekP, 
+          0.0, 
+          drivekD, 
+          new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration), 
+          Constants.LOOP_TIME
+        );
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
-          thetakP, 0.0, thetakD, new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration), Constants.LOOP_TIME);
+          thetakP, 
+          0.0, 
+          thetakD, 
+          new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration), 
+          Constants.LOOP_TIME
+        );
 
   private Translation2d lastSetpointTranslation = new Translation2d();
   private double driveErrorAbs = 0.0;
@@ -99,8 +109,9 @@ public class DriveToPose extends Command {
         new Translation2d(fieldVelocity.vxMetersPerSecond, fieldVelocity.vyMetersPerSecond);
     
     thetaController.reset(
-        currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond);
-        lastSetpointTranslation = currentPose.getTranslation();
+        currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond
+        );
+    lastSetpointTranslation = currentPose.getTranslation();
     
     if(targetPose != null){
         driveController.reset(
