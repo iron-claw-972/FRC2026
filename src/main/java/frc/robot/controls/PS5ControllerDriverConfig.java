@@ -19,7 +19,6 @@ import lib.controllers.PS5Controller.PS5Button;
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->false;
 
     public PS5ControllerDriverConfig(Drivetrain drive) {
         super(drive);
@@ -73,7 +72,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public boolean getIsSlowMode() {
-        return slowModeSupplier.getAsBoolean();
+        return driver.get(PS5Button.TOUCHPAD).getAsBoolean(); 
     }
 
     @Override
