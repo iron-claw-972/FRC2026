@@ -72,7 +72,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public boolean getIsSlowMode() {
-        return false; 
+        return driver.get(PS5Button.TOUCHPAD).getAsBoolean(); 
     }
 
     @Override
