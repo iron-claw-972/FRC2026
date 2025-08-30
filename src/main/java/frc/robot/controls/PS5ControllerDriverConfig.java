@@ -66,6 +66,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     // 0 == not selected, -1 == left, 1 == right
     private byte selectedDirection = 0;
 
+    boolean coralIntakeToggle = true;
+
     public PS5ControllerDriverConfig(Drivetrain drive, Elevator elevator, Intake intake, Indexer indexer, Outtake outtake, Climb climb, Arm arm) {
         super(drive);
         this.elevator = elevator;
@@ -238,9 +240,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         Trigger r3 = driver.get(PS5Button.RIGHT_JOY);
 
         if(intake != null && indexer != null && elevator != null && outtake != null && arm != null){
-            boolean toggle = true;
-            Command intakeCoral = new IntakeCoral(intake, indexer, elevator, outtake, arm);
             Command intakeAlgae = new IntakeAlgae(intake);
+            Command intakeCoral = new IntakeCoral(intake, indexer, elevator, outtake, arm);
             driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(()->{
                 if(r3.getAsBoolean()){
                     return;
@@ -248,7 +249,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 if(menu.getAsBoolean()){
                     intakeAlgae.schedule();
                 }else{
-                    if(toggle){
+                    if(coralIntakeToggle){
                         if(intakeCoral.isScheduled()){
                             intakeCoral.cancel();
                         }else{
@@ -259,7 +260,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     }
                 }
             })).onFalse(new InstantCommand(()->{
-                if(!toggle){
+                if(!coralIntakeToggle){
                     intakeCoral.cancel();
                 }
                 intakeAlgae.cancel();
@@ -316,15 +317,50 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Command cancelAlign = new InstantCommand(()->{}, getDrivetrain());
 
             // Outtake
-            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
-                if(menu.getAsBoolean()){
+            Command outtakeCoralAlgae = new InstantCommand(() -> {
+                if (menu.getAsBoolean()) {
                     algae.schedule();
-                }else{
+                } 
+                else if (outtake.coralLoaded()) {
                     coral.schedule();
                 }
                 cancelAlign.schedule();
+            });
+
+            //Right trigger - intake/outtake for coral & outtake for algae
+            Command intakeCoral = new IntakeCoral(intake, indexer, elevator, outtake, arm);
+
+            //Intake coral toggle
+            Command intakeCoralToggle = new InstantCommand(() -> {
+                if (coralIntakeToggle) {
+                    if (intakeCoral.isScheduled()) {
+                        intakeCoral.cancel();
+                    } else {
+                        intakeCoral.schedule();
+                    }
+                } else {
+                    intakeCoral.schedule();
+                }
+            });
+
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+                if (menu.getAsBoolean()) {
+                    outtakeCoralAlgae.schedule();
+                } 
+                else if (!outtake.coralLoaded()) {
+                    intakeCoralToggle.schedule();
+                } 
+                else {
+                    outtakeCoralAlgae.schedule();
+                }
+            })).onFalse(new InstantCommand(() -> {
+                if (!coralIntakeToggle) {
+                    intakeCoral.cancel();
+                }
             }));
         }
+
+        //Reverse Motors
         if(intake != null && indexer != null && outtake != null){
             driver.get(PS5Button.OPTIONS).and(menu.negate()).whileTrue(new ReverseMotors(intake, indexer, outtake));
         }
