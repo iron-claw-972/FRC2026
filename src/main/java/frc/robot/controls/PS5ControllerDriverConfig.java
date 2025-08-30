@@ -61,6 +61,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final Climb climb;
     private final Arm arm;
     private final BooleanSupplier slowModeSupplier = ()->false;
+    private boolean slowMode = false;
     private Pose2d alignmentPose = null;
     // 0 == not selected, -1 == left, 1 == right
     private byte selectedDirection = 0;
@@ -346,9 +347,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             selectedDirection = 1;
         }));
         //what is this for?
-        driver.get(PS5Button.TOUCHPAD).toggleOnTrue(new InstantCommand(()->{
-            setAlignmentPose(true, false, false, false);
-        }).andThen(new DriveToPose(getDrivetrain(), ()->alignmentPose)));
+        // driver.get(PS5Button.TOUCHPAD).toggleOnTrue(new InstantCommand(()->{
+        //     setAlignmentPose(true, false, false, false);
+        // }).andThen(new DriveToPose(getDrivetrain(), ()->alignmentPose)));
 
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).and(menu.negate()).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
@@ -394,11 +395,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             CommandScheduler.getInstance().cancelAll();
         }));
 
+        //Straighten wheels
         driver.get(PS5Button.MUTE).and(menu).onTrue(new FunctionalCommand(
             ()->getDrivetrain().setStateDeadband(false),
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+
+        //Slow mode
+        driver.get(PS5Button.TOUCHPAD).toggleOnTrue(
+            new InstantCommand(() -> slowMode = !slowMode)
+        );
     }
 
     /**
@@ -480,7 +487,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public boolean getIsSlowMode() {
-        return slowModeSupplier.getAsBoolean();
+        return slowMode;
     }
 
     @Override
