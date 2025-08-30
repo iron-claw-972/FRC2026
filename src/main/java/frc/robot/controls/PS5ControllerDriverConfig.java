@@ -80,7 +80,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Elevator setpoints
         if(elevator != null && arm != null && outtake != null) {
-            driver.get(PS5Button.OPTIONS).and(menu.negate()).onTrue(
+            //L1 setpoint
+            driver.get(PS5Button.CROSS).and(menu.negate()).onTrue(
                 new SequentialCommandGroup(
                     new InstantCommand(()->setAlignmentPose(false, true)),
                     new ConditionalCommand(
@@ -114,7 +115,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 )
             );
 
-            driver.get(PS5Button.LEFT_TRIGGER).onTrue(
+            driver.get(PS5Button.TRIANGLE).onTrue(
                 new SequentialCommandGroup(
                     new InstantCommand(()->setAlignmentPose(true)),
                     new ConditionalCommand(
@@ -218,16 +219,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new MoveElevator(elevator, ElevatorConstants.TOP_ALGAE_SETPOINT),
                 new MoveArm(arm, ArmConstants.ALGAE_SETPOINT)).andThen(new IntakeAlgaeArm(outtake));
             
-            driver.get(PS5Button.RB).whileTrue(new ConditionalCommand(l2Algae, new InstantCommand(l2Coral::schedule), menu));
-            driver.get(PS5Button.LB).whileTrue(new ConditionalCommand(l3Algae, new InstantCommand(l3Coral::schedule), menu));
+            driver.get(PS5Button.SQUARE).whileTrue(new ConditionalCommand(l2Algae, new InstantCommand(l2Coral::schedule), menu));
+            driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(l3Algae, new InstantCommand(l3Coral::schedule), menu));
     
             //Processor setpoint
-            driver.get(PS5Button.TRIANGLE).and(menu.negate()).onTrue(
+            driver.get(DPad.DOWN).and(menu.negate()).onTrue(
                 new ParallelCommandGroup(
                     new MoveElevator(elevator, ElevatorConstants.SAFE_SETPOINT + 0.001),
                     new MoveArm(arm, ArmConstants.PROCESSOR_SETPOINT)
                 )
             );
+            //barge setpoint
             driver.get(DPad.UP).onTrue(new NetSetpoint(elevator, arm, getDrivetrain()));
         }
 
@@ -238,7 +240,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             boolean toggle = true;
             Command intakeCoral = new IntakeCoral(intake, indexer, elevator, outtake, arm);
             Command intakeAlgae = new IntakeAlgae(intake);
-            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()->{
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(()->{
                 if(r3.getAsBoolean()){
                     return;
                 }
@@ -312,7 +314,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     ));
             Command cancelAlign = new InstantCommand(()->{}, getDrivetrain());
 
-            driver.get(DPad.DOWN).onTrue(new InstantCommand(()->{
+            // Outtake
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
                 if(menu.getAsBoolean()){
                     algae.schedule();
                 }else{
@@ -322,17 +325,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
         }
         if(intake != null && indexer != null && outtake != null){
-            driver.get(PS5Button.CIRCLE).and(menu.negate()).whileTrue(new ReverseMotors(intake, indexer, outtake));
+            driver.get(PS5Button.OPTIONS).and(menu.negate()).whileTrue(new ReverseMotors(intake, indexer, outtake));
         }
 
         // Climb
         if(climb != null){
-            driver.get(PS5Button.SQUARE).and(menu.negate()).toggleOnTrue(new StartEndCommand(()->climb.extend(), ()->climb.climb(), climb));
+            driver.get(PS5Button.RB).and(menu.negate()).toggleOnTrue(new StartEndCommand(()->climb.extend(), ()->climb.climb(), climb));
             if(intake != null){
-                driver.get(PS5Button.SQUARE).and(menu.negate()).onTrue(new InstantCommand(()->intake.setAngle(65), intake));
+                driver.get(PS5Button.RB).and(menu.negate()).onTrue(new InstantCommand(()->intake.setAngle(65), intake));
             }
             driver.get(PS5Button.PS).and(menu).whileTrue(new ResetClimb(climb));
-            driver.get(PS5Button.RIGHT_TRIGGER).and(menu).onTrue(new InstantCommand(()->climb.stow(), climb));
+            driver.get(PS5Button.RB).and(menu).onTrue(new InstantCommand(()->climb.stow(), climb));
         }
 
         // Alignment
@@ -356,7 +359,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         )));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).and(menu.negate()).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.LB).and(menu.negate()).onTrue(new InstantCommand(()->{
             if(elevator != null){
                 if(outtake != null && outtake.coralLoaded()){
                     elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT);
