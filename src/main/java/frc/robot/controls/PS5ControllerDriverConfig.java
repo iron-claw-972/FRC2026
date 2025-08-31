@@ -215,6 +215,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     )
                 )
             );
+
             Command l2Algae = new ParallelCommandGroup(
                 new MoveElevator(elevator, ElevatorConstants.BOTTOM_ALGAE_SETPOINT),
                 new MoveArm(arm, ArmConstants.ALGAE_SETPOINT)).andThen(new IntakeAlgaeArm(outtake));
@@ -222,13 +223,21 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new MoveElevator(elevator, ElevatorConstants.TOP_ALGAE_SETPOINT),
                 new MoveArm(arm, ArmConstants.ALGAE_SETPOINT)).andThen(new IntakeAlgaeArm(outtake));
             
+            // Not sure if menuIsOn will get set back to false because l2Algae will never end, instead I will put them into a parallel command group 
+            // (it was sequential before)
             driver.get(PS5Button.SQUARE).whileTrue(new ConditionalCommand(
-                new SequentialCommandGroup(
+                new ParallelCommandGroup(
                     l2Algae, 
-                    new InstantCommand(()-> menuIsOn = ()-> false)),
+                    new InstantCommand(()-> menuIsOn = ()-> false)
+                ),
                  new InstantCommand(l2Coral::schedule), 
                 menuIsOn));
-            driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(l3Algae, new InstantCommand(l3Coral::schedule), menuIsOn));
+            driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(
+                new ParallelCommandGroup(
+                    l3Algae,
+                    new InstantCommand(()-> menuIsOn = ()-> false)), 
+                new InstantCommand(l3Coral::schedule), 
+                menuIsOn));
     
             //Processor setpoint
             driver.get(PS5Button.RIGHT_JOY).and(menu.negate()).onTrue(
@@ -267,6 +276,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             //             startIntake.cancel();
             //         }
             // }));
+
+            // Do we ever use this?? 
             driver.get(PS5Button.CROSS).and(r3).onTrue(
             new SequentialCommandGroup(
             new MoveElevator(elevator, ElevatorConstants.STATION_INTAKE_SETPOINT),
@@ -293,7 +304,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     () -> elevator.getSetpoint() > 1
                 )
             );
-            Command coral = new OuttakeCoral(outtake, elevator, arm).alongWith(new InstantCommand(()->getDrivetrain().setDesiredPose(()->null)))
+            Command coral = new OuttakeCoral(outtake, elevator, arm).alongWith(new InstantCommand(()-> getDrivetrain().setDesiredPose(()->null)))
                 .andThen(
                     new ConditionalCommand(
                         new SequentialCommandGroup(
@@ -302,6 +313,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             new InstantCommand(()->selectedDirection = 0)
                         ),
                         new DoNothing(),
+                        // Returns true if arm is within 5 deg of start angle or L1 angle
                         ()->!arm.canMoveElevator()
                     ));
             Command cancelAlign = new InstantCommand(()->{}, getDrivetrain());
@@ -439,7 +451,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         //     new InstantCommand(() -> slowMode = !slowMode)
         // );
 
-        driver.get(PS5Button.LEFT_JOY).whileTrue(new InstantCommand(() -> menuIsOn = () -> true));
+        // Not sure if this is supposed to be a toggle or not 
+        // driver.get(PS5Button.LEFT_JOY).whileTrue(new InstantCommand(() -> menuIsOn = () -> !(()-> menuIsOn)));
+        driver.get(PS5Button.LEFT_JOY).onTrue(new InstantCommand(() -> menuIsOn = ()-> !menuIsOn.getAsBoolean()));
     }
 
     /**
