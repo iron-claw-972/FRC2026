@@ -239,12 +239,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             //     new InstantCommand(l3Coral::schedule), 
             //     menuIsOn));
             
-            // Do I have to use InstantCommand for these if they are not using whileTrue??
-            driver.get(PS5Button.SQUARE).and(menu.negate()).onTrue(new InstantCommand(l2Coral::schedule)); 
-            driver.get(PS5Button.SQUARE).and(menu).whileTrue(l2Algae);
-            
-            driver.get(PS5Button.CIRCLE).and(menu.negate()).onTrue(new InstantCommand(l3Coral::schedule)); 
-            driver.get(PS5Button.CIRCLE).and(menu).whileTrue(l3Algae);
+            // Make so when letting go of square or circle, arm should remain in the same point 
+            driver.get(PS5Button.SQUARE).whileTrue(new ConditionalCommand(
+                l2Algae,
+                new InstantCommand(l2Coral::schedule),
+                menu
+            ));
+            driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(
+                l3Algae,
+                new InstantCommand(l3Coral::schedule),
+                menu
+            ));
 
             //Processor setpoint
             driver.get(DPad.DOWN).and(menu.negate()).onTrue(
