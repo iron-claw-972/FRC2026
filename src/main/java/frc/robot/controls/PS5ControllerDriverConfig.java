@@ -80,7 +80,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     }
 
     public void configureControls() {
-        Trigger menu = driver.get(PS5Button.LEFT_JOY);
+        Trigger menu = driver.get(DPad.UP);
         // Elevator setpoints
         if(elevator != null && arm != null && outtake != null) {
             //L1 setpoint
@@ -225,22 +225,29 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             
             // Not sure if menuIsOn will get set back to false because l2Algae will never end, instead I will put them into a parallel command group 
             // (it was sequential before)
-            driver.get(PS5Button.SQUARE).whileTrue(new ConditionalCommand(
-                new ParallelCommandGroup(
-                    l2Algae, 
-                    new InstantCommand(()-> menuIsOn = ()-> false)
-                ),
-                 new InstantCommand(l2Coral::schedule), 
-                menuIsOn));
-            driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(
-                new ParallelCommandGroup(
-                    l3Algae,
-                    new InstantCommand(()-> menuIsOn = ()-> false)), 
-                new InstantCommand(l3Coral::schedule), 
-                menuIsOn));
-    
+            // driver.get(PS5Button.SQUARE).whileTrue(new ConditionalCommand(
+            //     new ParallelCommandGroup(
+            //         l2Algae, 
+            //         new InstantCommand(()-> menuIsOn = ()-> false)
+            //     ),
+            //      new InstantCommand(l2Coral::schedule), 
+            //     menuIsOn));
+            // driver.get(PS5Button.CIRCLE).whileTrue(new ConditionalCommand(
+            //     new ParallelCommandGroup(
+            //         l3Algae,
+            //         new InstantCommand(()-> menuIsOn = ()-> false)), 
+            //     new InstantCommand(l3Coral::schedule), 
+            //     menuIsOn));
+            
+            // Do I have to use InstantCommand for these if they are not using whileTrue??
+            driver.get(PS5Button.SQUARE).and(menu.negate()).onTrue(new InstantCommand(l2Coral::schedule)); 
+            driver.get(PS5Button.SQUARE).and(menu).whileTrue(l2Algae);
+            
+            driver.get(PS5Button.CIRCLE).and(menu.negate()).onTrue(new InstantCommand(l3Coral::schedule)); 
+            driver.get(PS5Button.CIRCLE).and(menu).whileTrue(l3Algae);
+
             //Processor setpoint
-            driver.get(PS5Button.RIGHT_JOY).and(menu.negate()).onTrue(
+            driver.get(DPad.DOWN).and(menu.negate()).onTrue(
                 new ParallelCommandGroup(
                     new MoveElevator(elevator, ElevatorConstants.SAFE_SETPOINT + 0.001),
                     new MoveArm(arm, ArmConstants.PROCESSOR_SETPOINT)
@@ -451,9 +458,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         //     new InstantCommand(() -> slowMode = !slowMode)
         // );
 
-        // Not sure if this is supposed to be a toggle or not 
-        // driver.get(PS5Button.LEFT_JOY).whileTrue(new InstantCommand(() -> menuIsOn = () -> !(()-> menuIsOn)));
-        driver.get(PS5Button.LEFT_JOY).onTrue(new InstantCommand(() -> menuIsOn = ()-> !menuIsOn.getAsBoolean()));
+        // Only use this if you want TOGGLE for menu 
+        // driver.get(DPad.UP).whileTrue(new InstantCommand(() -> menuIsOn = () -> false));
     }
 
     /**
