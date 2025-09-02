@@ -1,0 +1,24 @@
+public class ArmComp extends ArmBase {
+
+    private TalonFX motor = new TalonFX(IdConstants.ARM_MOTOR);
+
+    public ArmComp(){
+
+    }
+
+    @Override
+    public void setSetpoint(double setpoint){
+
+    }
+
+    @Override
+    public double getAngle(){
+
+    }
+
+    @Override
+    public boolean atSetpoint(){
+        return 
+    }
+
+}
