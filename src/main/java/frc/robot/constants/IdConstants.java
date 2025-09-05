@@ -18,4 +18,8 @@ public class IdConstants {
 
     // LEDs
     public static final int CANDLE_ID = 1;
+
+    // Outtake
+    // TODO: change to proper values
+    public static final int OUTTAKE_MOTOR = 0;
 }
