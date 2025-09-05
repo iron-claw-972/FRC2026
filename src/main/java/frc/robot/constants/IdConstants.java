@@ -16,6 +16,9 @@ public class IdConstants {
     public static final int ENCODER_BACK_RIGHT_ID = 6;
     public static final int PIGEON = 13;
 
+    // Ultimate Turret
+    public static final int Base_ID = 7;
+
     // LEDs
     public static final int CANDLE_ID = 1;
 }
