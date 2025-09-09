@@ -10,19 +10,6 @@ public abstract class ArmBase extends SubsystemBase {
 
     public abstract boolean atSetpoint();
 
-    // periodic()?
-
-    public double getAppliedVoltage(){
-         
-    }
-
-    public void resetAbsolute(){
-
-    }
-
-    public boolean canMoveElevator(){
-
-    }
-
+    public abstract void periodic();
 
 }
