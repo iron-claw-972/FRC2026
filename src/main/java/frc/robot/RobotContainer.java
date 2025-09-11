@@ -22,6 +22,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.ArmComp;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -42,6 +43,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing();
+  private ArmComp arm = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -54,7 +56,9 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     // dispatch on the robot
+    
     switch (robotId) {
+       
       case TestBed1:
         break;
 
@@ -63,6 +67,7 @@ public class RobotContainer {
 
       default:
       case SwerveCompetition:
+        
 
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
@@ -71,6 +76,7 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
+        arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
