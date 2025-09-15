@@ -60,10 +60,10 @@ public class ArmComp extends ArmBase {
         ligament2d = new MechanismLigament2d("Arm", 25, ArmConstants.START_ANGLE);
         mechanism2d.getRoot("pivot", 50, 50).append(ligament2d);
         SmartDashboard.putData("Arm Display", mechanism2d);
-        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        SmartDashboard.putData("Set 67 degrees", new InstantCommand(() -> setSetpoint(67)));
+        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        // SmartDashboard.putData("Set 67 degrees", new InstantCommand(() -> setSetpoint(67)));
     }
 
     @Override
@@ -85,8 +85,10 @@ public class ArmComp extends ArmBase {
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * gearRatio; 
         encoderSim.setRawRotorPosition(motorRotations);
-        ligament2d.setAngle(Units.radiansToDegrees(simAngle));
-       
+        // Can this go in periodic? 
+
+        // Do we base of sim angle or real angle? 
+        ligament2d.setAngle(Units.radiansToDegrees(Units.rotationsToDegrees(motor.getPosition().getValueAsDouble())) / gearRatio);
     }
 
     /**
