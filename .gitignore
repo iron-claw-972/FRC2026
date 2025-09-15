@@ -179,3 +179,7 @@ logs/
 
 # IntelliJ IDEA files
 .idea/
+
+# I don't know what this is but it has local paths in it
+.factorypath
+
