@@ -13,12 +13,18 @@ import frc.robot.constants.VisionConstants;
  * Uses the username and password set in {@link frc.robot.constantsVisionConstants}.
  */
 public class ShutdownOrangePi extends Command {
+	private String hostname;
 	private Process process;
 	private boolean passwordTyped;
 	private Pattern promptMatcher;
 
-	public ShutdownOrangePi() {
+	/**
+	 * @param hostname The hostname or IP of the orangepi to shut down.
+	 */
+	public ShutdownOrangePi(String hostname) {
 		promptMatcher = Pattern.compile("password: ?$");
+		assert hostname != null;
+		this.hostname = hostname;
 	}
 
 	@Override
@@ -31,14 +37,15 @@ public class ShutdownOrangePi extends Command {
 		passwordTyped = false;
 		if (Robot.isSimulation()) {
 			// this will probably break on Windows systems so...
-			System.out.println("What OrangePi? This is simulation!");
+			System.out.println("Would shut down OrangePi at " + hostname + " if this was real.");
 			return;
+		}
 
 		try {
 			String[] commandString = new String[] { "ssh",
 					"-o", "UserKnownHostsFile /dev/null",
 					"-o", "StrictHostKeyChecking no",
-					VisionConstants.ORANGEPI_USERNAME + "@" + VisionConstants.ORANGEPI_IP,
+					VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
 					"sudo", "shutdown", "now" };
 			this.process = Runtime.getRuntime().exec(commandString);
 		} catch (Exception e) {
