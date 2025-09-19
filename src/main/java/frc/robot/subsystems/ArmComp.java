@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.vision.ReturnData;
@@ -25,15 +26,19 @@ public class ArmComp extends ArmBase {
 
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
     private TalonFX motor = new TalonFX(IdConstants.ARM_MOTOR);
-    private PIDController pid = new PIDController(0.1, 0, 0);
+    private PIDController pid = new PIDController(10, 0, 0);
     private TalonFXSimState encoderSim = motor.getSimState(); 
 
     private SingleJointedArmSim armSim;
 
     // sim? motor idk which one to use
     // simulation Objects
-    Mechanism2d mechanism2d;
-    MechanismLigament2d ligament2d;
+    Mechanism2d mechanism2d = new Mechanism2d(100, 100);
+    MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
+    MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("arm", 25, ArmConstants.START_ANGLE));
+        
+    
+
 
     // TODO: fix gear ratio
     double gearRatio = 27.5;
@@ -50,20 +55,22 @@ public class ArmComp extends ArmBase {
             simMotor, 
             gearRatio,
             0.1, 
-            0.05,
-            Double.POSITIVE_INFINITY, 
-            Double.NEGATIVE_INFINITY,
-            false, 
-            Units.degreesToRadians(ArmConstants.START_ANGLE));
+            0.3,
 
-        mechanism2d = new Mechanism2d(100, 100);
-        ligament2d = new MechanismLigament2d("Arm", 25, ArmConstants.START_ANGLE);
-        mechanism2d.getRoot("pivot", 50, 50).append(ligament2d);
-        SmartDashboard.putData("Arm Display", mechanism2d);
-        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        // SmartDashboard.putData("Set 67 degrees", new InstantCommand(() -> setSetpoint(67)));
+            0, 
+            Units.degreesToRadians(300),
+            false,
+            Units.degreesToRadians(ArmConstants.START_ANGLE));
+            
+
+        SmartDashboard.putData("arm", mechanism2d);
+        SmartDashboard.putData("PID", pid);
+
+        
+        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        SmartDashboard.putData("Set 67 degrees", new InstantCommand(() -> setSetpoint(67)));
     }
 
     @Override
@@ -73,22 +80,30 @@ public class ArmComp extends ArmBase {
         // PID calculation
         double power = pid.calculate(Units.degreesToRadians(position));
         motor.set(power);
+
+        ligament2d.setAngle(position);
     }
 
     @Override
     public void simulationPeriodic() {
         // Get the drive to the motor (motor voltage)
-        armSim.setInput(motor.get() * 12); 
+        double voltsMotor = motor.get() * 12; 
+        // tell simulation motor what the applied motor voltage is
+        armSim.setInputVoltage(voltsMotor);
+
         // Simulate the system for one time step 
         armSim.update(Constants.LOOP_TIME);
+
+        // Get the arm angle after simulation is done
         double simAngle = armSim.getAngleRads(); 
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * gearRatio; 
+        // Turning the encoder by the set rotations
         encoderSim.setRawRotorPosition(motorRotations);
         // Can this go in periodic? 
 
         // Do we base of sim angle or real angle? 
-        ligament2d.setAngle(Units.radiansToDegrees(Units.rotationsToDegrees(motor.getPosition().getValueAsDouble())) / gearRatio);
+        //ligament2d.setAngle(Units.radiansToDegrees(Units.rotationsToDegrees(motor.getPosition().getValueAsDouble())) / gearRatio);
     }
 
     /**
