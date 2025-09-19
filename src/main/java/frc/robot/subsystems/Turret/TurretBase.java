@@ -15,40 +15,48 @@ import frc.robot.Robot;
 import frc.robot.constants.IdConstants;
 
 public class TurretBase extends SubsystemBase {
-    private TalonFX motor;
-    private final DigitalInput sensor = new DigitalInput(0);
+    private TalonFX motor; 
+    private final DigitalInput sensor = new DigitalInput(0); 
     private double position;
     private double velocity;
     private PIDController pid = new PIDController(0.02, 0, 0);
     private boolean sensorTriggered;
     private boolean motorCalibrated;
-    public TurretBase(){
+
+    public TurretBase(){ 
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
         position = 0;
         velocity = 0;
-        pid.setTolerance(0.2);
+        pid.setTolerance(Units.degreesToRadians(2));
         sensorTriggered = false;
         motorCalibrated = false;
     }
+
     public double getPosition(){
         return position;
     }
+
     public void spinTo(double setPoint){
         pid.reset();
-        pid.setSetpoint(setPoint);
+        pid.setSetpoint(Units.degreesToRadians(setPoint));
     }
+
     public boolean atSetPoint(){
         return pid.atSetpoint();
     }
+
     public double getVelocity(){
         return velocity;
     }
+
     public boolean isSensorTriggered(){
         return sensorTriggered;
     }
+
     public boolean isMotorCalibrated(){
         return motorCalibrated;
     }
+
     public void calibrate(){
         if(!sensorTriggered){
             motor.set(0.02);
@@ -56,8 +64,10 @@ public class TurretBase extends SubsystemBase {
         else{
             motor.stopMotor();
             motorCalibrated = true;
+            position = 0;
         }
     }
+
     @Override
     public void periodic(){
         if(!motorCalibrated){
@@ -65,7 +75,7 @@ public class TurretBase extends SubsystemBase {
         }
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
         velocity = motor.getVelocity().getValueAsDouble();
-        pid.calculate(Units.degreesToRadians(getPosition()));
+        motor.set(pid.calculate(Units.degreesToRadians(getPosition())));
         sensorTriggered = sensor.get();
     }
 }
