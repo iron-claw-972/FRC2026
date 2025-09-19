@@ -22,6 +22,10 @@ public class TurretBase extends SubsystemBase {
     private PIDController pid = new PIDController(0.02, 0, 0);
     private boolean sensorTriggered;
     private boolean motorCalibrated;
+    private double versaPlanetaryGearRatio = 5.0;
+    private double turretGearRatio = 140/10;
+    private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
+    private double calibrationOffset = 0;
 
     public TurretBase(){ 
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
@@ -33,12 +37,12 @@ public class TurretBase extends SubsystemBase {
     }
 
     public double getPosition(){
-        return position;
+        return position/gearRatio;
     }
 
     public void spinTo(double setPoint){
         pid.reset();
-        pid.setSetpoint(Units.degreesToRadians(setPoint));
+        pid.setSetpoint(Units.degreesToRadians(setPoint * gearRatio));
     }
 
     public boolean atSetPoint(){
@@ -46,7 +50,7 @@ public class TurretBase extends SubsystemBase {
     }
 
     public double getVelocity(){
-        return velocity;
+        return velocity/gearRatio;
     }
 
     public boolean isSensorTriggered(){
@@ -58,23 +62,23 @@ public class TurretBase extends SubsystemBase {
     }
 
     public void calibrate(){
-        if(!sensorTriggered){
-            motor.set(0.02);
-        }
-        else{
-            motor.stopMotor();
-            motorCalibrated = true;
-            position = 0;
+        if(sensorTriggered){
+            if(velocity > 0){
+                position = 0 - calibrationOffset;
+            }
+            else{
+                position = 360 + calibrationOffset;
+            }
         }
     }
 
     @Override
     public void periodic(){
-        if(!motorCalibrated){
+        if(!isMotorCalibrated()){
             calibrate();
         }
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
-        velocity = motor.getVelocity().getValueAsDouble();
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         motor.set(pid.calculate(Units.degreesToRadians(getPosition())));
         sensorTriggered = sensor.get();
     }
