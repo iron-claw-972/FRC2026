@@ -260,7 +260,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             );
 
             //barge setpoint
-            driver.get(PS5Button.TOUCHPAD).onTrue(new NetSetpoint(elevator, arm, getDrivetrain()));
+            driver.get(PS5Button.TOUCHPAD).onTrue(new ParallelCommandGroup(
+                new NetSetpoint(elevator, arm, getDrivetrain()),
+                new InstantCommand(() -> slowMode = true)
+            ));
         }
 
         // Intake/outtake
@@ -369,9 +372,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Outtake Algae 
-            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(() -> {
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new ParallelCommandGroup(
+                new InstantCommand(() -> {
                 algae.schedule(); 
-            }));
+                }),
+                new InstantCommand(() -> slowMode = false)
+            ));
         }
 
         //Reverse Motors
