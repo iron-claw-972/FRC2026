@@ -11,27 +11,34 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "Drive to 10/21 Right"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "OuttakeCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveElevator"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Lower Elevator"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Drive to 10/21 Right"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveElevator"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "OuttakeCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Lower Elevator"
+                }
+              }
+            ]
           }
         }
       ]
