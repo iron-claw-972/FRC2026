@@ -25,6 +25,12 @@
         {
           "type": "named",
           "data": {
+            "name": "MoveElevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Lower Elevator"
           }
         }
