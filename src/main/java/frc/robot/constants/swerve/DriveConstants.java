@@ -186,7 +186,8 @@ public class DriveConstants {
 
     public static final boolean INVERT_GYRO = false; // Make sure gyro is CCW+ CW-
 
-    public static final double SLOW_DRIVE_FACTOR = 0.2;
+    public static final double SLOW_DRIVE_FACTOR = 0.1;
+    //Changed from 0.2 to 0.1 (only used for barge outtake)
     public static final double SLOW_ROT_FACTOR = 0.1;
 
     public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
