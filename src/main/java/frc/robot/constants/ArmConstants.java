@@ -3,7 +3,8 @@ package frc.robot.constants;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class ArmConstants {
-    public static final double START_ANGLE = -86.5;
+    // public static final double START_ANGLE = -86.5;
+    public static final double START_ANGLE = 0;
     public static final double MIN_ANGLE = -86.5;
     public static final double MAX_ANGLE = 180;
 

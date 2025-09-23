@@ -26,22 +26,21 @@ public class ArmComp extends ArmBase {
 
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
     private TalonFX motor = new TalonFX(IdConstants.ARM_MOTOR);
-    private PIDController pid = new PIDController(10, 0, 0);
+    private PIDController pid = new PIDController(0.1, 0, 0);
     private TalonFXSimState encoderSim = motor.getSimState(); 
 
     private SingleJointedArmSim armSim;
+
+    private double setpoint;
 
     // sim? motor idk which one to use
     // simulation Objects
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("arm", 25, ArmConstants.START_ANGLE));
-        
-    
-
 
     // TODO: fix gear ratio
-    double gearRatio = 27.5;
+    double gearRatio = 14;
 
     public ArmComp() {
         // Tell the PID object what the setpoint is
@@ -56,15 +55,17 @@ public class ArmComp extends ArmBase {
             gearRatio,
             0.1, 
             0.3,
-
             0, 
-            Units.degreesToRadians(300),
-            false,
+            Units.degreesToRadians(360),
+            true,
             Units.degreesToRadians(ArmConstants.START_ANGLE));
             
 
         SmartDashboard.putData("arm", mechanism2d);
         SmartDashboard.putData("PID", pid);
+
+        SmartDashboard.putNumber("Setpoint", setpoint);
+        SmartDashboard.putNumber("Angle", Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio);
 
         
         SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
@@ -113,10 +114,11 @@ public class ArmComp extends ArmBase {
      */
     @Override
     public void setSetpoint(double setpoint) {
+        this.setpoint = setpoint;
         // Tell the PID object what thsete setpoint is
         // PID is using radians
-        pid.setSetpoint(Units.degreesToRadians(setpoint * gearRatio));
-        }
+        pid.setSetpoint(Units.degreesToRadians(setpoint));
+    }
 
     /** Gets the arm angle in degrees */
     @Override
