@@ -35,11 +35,11 @@ public class ShutdownOrangePi extends Command {
 	@Override
 	public void initialize() {
 		passwordTyped = false;
-		// if (Robot.isSimulation()) {
-		// 	// this will probably break on Windows systems so...
-		// 	System.out.println("Would shut down OrangePi at " + hostname + " if this was real.");
-		// 	return;
-		// }
+		if (Robot.isSimulation()) {
+			// this will probably break on Windows systems so...
+			System.out.println("Would shut down OrangePi at " + hostname + " if this was real.");
+			return;
+		}
 
 		try {
 			String[] commandString = new String[] { "ssh",
