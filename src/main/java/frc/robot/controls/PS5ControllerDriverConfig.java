@@ -261,8 +261,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             //barge setpoint
             driver.get(PS5Button.TOUCHPAD).onTrue(new ParallelCommandGroup(
-                new NetSetpoint(elevator, arm, getDrivetrain()),
-                new InstantCommand(() -> slowMode = true)
+                new NetSetpoint(elevator, arm, getDrivetrain())
+                // new InstantCommand(() -> slowMode = true)
             ));
         }
 
