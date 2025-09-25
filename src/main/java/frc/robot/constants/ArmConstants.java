@@ -4,7 +4,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 
 public class ArmConstants {
     // public static final double START_ANGLE = -86.5;
-    public static final double START_ANGLE = 0;
+    public static final double START_ANGLE = -86.5;
     public static final double MIN_ANGLE = -86.5;
     public static final double MAX_ANGLE = 180;
 
@@ -22,6 +22,7 @@ public class ArmConstants {
     public static final double INTAKE_SETPOINT = START_ANGLE;
     public static final double STATION_INTAKE_SETPOINT = 75.5;
 
+    /**  Tolerance in Degrees */
     public static final double TOLERANCE = 3.0;      
 
      //Dunk L4 = 6.4

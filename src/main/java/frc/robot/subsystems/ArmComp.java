@@ -31,8 +31,6 @@ public class ArmComp extends ArmBase {
 
     private SingleJointedArmSim armSim;
 
-    private double setpoint;
-
     // sim? motor idk which one to use
     // simulation Objects
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
@@ -43,6 +41,9 @@ public class ArmComp extends ArmBase {
     double gearRatio = 14;
 
     public ArmComp() {
+        // tell the PID object the tolerance
+        pid.setTolerance(Units.degreesToRadians(ArmConstants.TOLERANCE));
+
         // Tell the PID object what the setpoint is
         // Note: at power on, the encoder will be zero
         // Ideally, the PID target value should also be zero
@@ -55,19 +56,17 @@ public class ArmComp extends ArmBase {
             gearRatio,
             0.1, 
             0.3,
-            0, 
+            Units.degreesToRadians(-110), 
             Units.degreesToRadians(360),
-            true,
+            false,
             Units.degreesToRadians(ArmConstants.START_ANGLE));
             
-
+        // Puts the mechanism on the smartdashboard
         SmartDashboard.putData("arm", mechanism2d);
+        // Puts the PID tuner
         SmartDashboard.putData("PID", pid);
-
-        SmartDashboard.putNumber("Setpoint", setpoint);
-        SmartDashboard.putNumber("Angle", Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio);
-
         
+        // InsantCommands to set the different setpoints
         SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
         SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
@@ -80,8 +79,10 @@ public class ArmComp extends ArmBase {
         double position = getAngle();
         // PID calculation
         double power = pid.calculate(Units.degreesToRadians(position));
-        motor.set(power);
 
+        // set motor power to the result of the PID calculation
+        motor.set(power);
+        // display the current position of the arm
         ligament2d.setAngle(position);
     }
 
@@ -97,15 +98,17 @@ public class ArmComp extends ArmBase {
 
         // Get the arm angle after simulation is done
         double simAngle = armSim.getAngleRads(); 
-        double simRotations = Units.radiansToRotations(simAngle);
-        double motorRotations = simRotations * gearRatio; 
+        double simAngleDegrees = Units.radiansToDegrees(simAngle);
+
+        // adjust angle offset
+        double armAngleWithOffset = simAngleDegrees - ArmConstants.START_ANGLE;
+        double simRotations = Units.degreesToRotations(armAngleWithOffset);
+
+        double motorRotations = simRotations * gearRatio;
+
         // Turning the encoder by the set rotations
         encoderSim.setRawRotorPosition(motorRotations);
-        // Can this go in periodic? 
-
-        // Do we base of sim angle or real angle? 
-        //ligament2d.setAngle(Units.radiansToDegrees(Units.rotationsToDegrees(motor.getPosition().getValueAsDouble())) / gearRatio);
-    }
+     }
 
     /**
      * Set the target position (angle) of the arm.
@@ -114,7 +117,6 @@ public class ArmComp extends ArmBase {
      */
     @Override
     public void setSetpoint(double setpoint) {
-        this.setpoint = setpoint;
         // Tell the PID object what thsete setpoint is
         // PID is using radians
         pid.setSetpoint(Units.degreesToRadians(setpoint));
@@ -130,7 +132,8 @@ public class ArmComp extends ArmBase {
 
     @Override
     public boolean atSetpoint() {
-        return (Math.abs(pid.getSetpoint() - getAngle()) < ArmConstants.TOLERANCE);
+        // return (Math.abs(Units.radiansToDegrees(pid.getSetpoint()) - getAngle()) < ArmConstants.TOLERANCE);
+        return pid.atSetpoint();
     }
 
     public double getAppliedVoltage() {
