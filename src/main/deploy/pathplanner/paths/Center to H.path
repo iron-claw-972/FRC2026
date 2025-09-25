@@ -31,7 +31,41 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "backdrive",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "backdrive"
+        }
+      }
+    },
+    {
+      "name": "lower intake",
+      "waypointRelativePos": 0.10418310970796944,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "lower intake"
+        }
+      }
+    },
+    {
+      "name": "MoveElevator",
+      "waypointRelativePos": 0.7371744277821581,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "L4"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 0.5,
     "maxAcceleration": 0.5,

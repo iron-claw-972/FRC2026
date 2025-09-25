@@ -552,7 +552,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public boolean getIsSlowMode() {
-        return slowMode;
+        //return slowMode;
+        return false;
     }
 
     @Override
