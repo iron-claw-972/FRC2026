@@ -90,8 +90,14 @@ public class ShutdownOrangePi extends Command {
 		if (this.process.isAlive())
 			this.process.destroy(); // end the process if we've been interrupted
 
-		int exitValue = this.process.exitValue();
-		if (exitValue != 0) // abnormal termination
-			System.out.println("OrangePi shutdown failed with exit code " + exitValue + ".");
+		if (interrupted) {
+			this.process.destroy(); // end the process if we've been interrupted
+		} else {
+			int exitValue = this.process.exitValue();
+			if (exitValue != 0) // abnormal termination
+				System.out.println("OrangePi shutdown failed with exit code " + exitValue + ".");
+			else
+				System.out.println("OrangePi shutdown succesful.");
+		}
 	}
 }
