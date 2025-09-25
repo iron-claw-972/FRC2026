@@ -10,6 +10,10 @@ import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.constants.IdConstants;
@@ -27,6 +31,12 @@ public class TurretBase extends SubsystemBase {
     private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
     private double calibrationOffset = 0;
 
+    private SingleJointedArmSim turretSim;
+    
+    Mechanism2d mechanism2d = new Mechanism2d(100, 100);
+    MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50,50);
+    MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret", 25, 0));
+
     public TurretBase(){ 
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
         position = 0;
@@ -34,6 +44,16 @@ public class TurretBase extends SubsystemBase {
         pid.setTolerance(Units.degreesToRadians(2));
         sensorTriggered = false;
         motorCalibrated = false;
+
+        turretSim = new SingleJointedArmSim(
+            motor,
+            gearRatio,
+            0.1,
+            0.3,
+            0,
+            Units.degreesToRadians(300),
+            false,
+            Units.degreesToRadians(0));
     }
 
     public double getPosition(){
