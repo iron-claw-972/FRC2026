@@ -42,11 +42,20 @@ public class ShutdownOrangePi extends Command {
 		}
 
 		try {
-			String[] commandString = new String[] { "ssh",
-					"-o", "UserKnownHostsFile /dev/null",
-					"-o", "StrictHostKeyChecking no",
-					VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
-					"sudo", "shutdown", "now" };
+			// String[] commandString = new String[] { "ssh",
+			// 		"-o", "UserKnownHostsFile /dev/null",
+			// 		"-o", "StrictHostKeyChecking no",
+			// 		VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
+			// 		"sudo", "shutdown", "now" };
+
+			String[] commandString = new String[] {
+						"/home/lvuser/deploy/sshpass",
+						"-p", "raspberry",
+						"ssh", "-o", "StrictHostKeyChecking=no",
+						VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
+						"sudo", "shutdown", "now" 
+					};
+		
 			this.process = Runtime.getRuntime().exec(commandString);
 		} catch (Exception e) {
 			String message = e.getMessage() == null ? "unknown" : e.getMessage();
