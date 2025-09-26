@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -52,6 +53,7 @@ import frc.robot.subsystems.outtake.OuttakeComp;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
+import frc.robot.commands.vision.ShutdownAllPis;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -169,6 +171,8 @@ public class RobotContainer {
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
     
+    SmartDashboard.putData("Shutdown back Orange Pi", new ShutdownAllPis());
+
   }
 
   /**
