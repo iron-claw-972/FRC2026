@@ -1,9 +1,10 @@
 package frc.robot.commands.vision;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.VisionConstants;
@@ -15,14 +16,11 @@ import frc.robot.constants.VisionConstants;
 public class ShutdownOrangePi extends Command {
 	private String hostname;
 	private Process process;
-	private boolean passwordTyped;
-	private Pattern promptMatcher;
 
 	/**
 	 * @param hostname The hostname or IP of the orangepi to shut down.
 	 */
 	public ShutdownOrangePi(String hostname) {
-		promptMatcher = Pattern.compile("password: ?$");
 		assert hostname != null;
 		this.hostname = hostname;
 	}
@@ -34,56 +32,29 @@ public class ShutdownOrangePi extends Command {
 
 	@Override
 	public void initialize() {
-		passwordTyped = false;
 		if (Robot.isSimulation()) {
-			// this will probably break on Windows systems so...
+			// needs to run on an actual roborio because of architecture-specific binaries
 			System.out.println("Would shut down OrangePi at " + hostname + " if this was real.");
 			return;
 		}
 
 		try {
-			// String[] commandString = new String[] { "ssh",
-			// 		"-o", "UserKnownHostsFile /dev/null",
-			// 		"-o", "StrictHostKeyChecking no",
-			// 		VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
-			// 		"sudo", "shutdown", "now" };
+			String binPath = Filesystem.getDeployDirectory() + "/sshpass";
+			Files.setPosixFilePermissions(Path.of(binPath), PosixFilePermissions.fromString("rwxr-xr-x"));
 
 			String[] commandString = new String[] {
-						"/home/lvuser/deploy/sshpass",
+						binPath,
 						"-p", "raspberry",
-						"ssh", "-o", "StrictHostKeyChecking=no",
+						"ssh",
+						"-o", "StrictHostKeyChecking=no",
 						VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
 						"sudo", "shutdown", "now" 
-					};
+			};
 		
 			this.process = Runtime.getRuntime().exec(commandString);
 		} catch (Exception e) {
 			String message = e.getMessage() == null ? "unknown" : e.getMessage();
 			System.out.println("Failed to shutdown OrangePi. Reason: " + message);
-		}
-	}
-
-	@Override
-	public void execute() {
-		if (this.process == null) return; // command creation failed for some reason
-		if (this.passwordTyped) return; // don't try typing the password if we've already done it
-
-		try {
-			// read as much as possible
-			int availibleBytes = this.process.getInputStream().available();
-			byte[] buffer = new byte[availibleBytes];
-			this.process.getInputStream().read(buffer, 0, availibleBytes);
-			String asStr = new String(buffer);
-
-			Matcher matches = promptMatcher.matcher(asStr);
-			if (matches.find()) { // if we're at the prompt...
-				this.process.getOutputStream().write((VisionConstants.ORANGEPI_PASSWORD + "\n")
-						.getBytes()); // ...type the password
-				this.process.getOutputStream().flush();
-				this.passwordTyped = true;
-			}
-		} catch (IOException e) {
-			this.cancel();
 		}
 	}
 
@@ -95,18 +66,16 @@ public class ShutdownOrangePi extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		if (this.process == null) return;
-		
-		if (this.process.isAlive())
-			this.process.destroy(); // end the process if we've been interrupted
 
-		if (interrupted) {
+		if (this.process.isAlive()) {
 			this.process.destroy(); // end the process if we've been interrupted
 		} else {
+			// only grab exit value if the process has had time to exit
 			int exitValue = this.process.exitValue();
 			if (exitValue != 0) // abnormal termination
-				System.out.println("OrangePi shutdown failed with exit code " + exitValue + ".");
+				System.out.println("OrangePi shutdown of " + hostname + " failed with exit code " + exitValue + ".");
 			else
-				System.out.println("OrangePi shutdown succesful.");
+				System.out.println("OrangePi shutdown of " + hostname + " succesful.");
 		}
 	}
 }
