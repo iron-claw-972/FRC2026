@@ -388,4 +388,9 @@ public class VisionConstants {
             return null;
         }
     }
+
+    	// used to cleanly shutdown the OrangePi
+	public static final String[] ORANGEPI_HOSTNAMES = {"photonfront.local", "photonback.local"};
+	public static final String ORANGEPI_USERNAME = "pi";
+	public static final String ORANGEPI_PASSWORD = "raspberry";
 }
