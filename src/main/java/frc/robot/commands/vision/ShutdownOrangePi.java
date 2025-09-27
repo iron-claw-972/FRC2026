@@ -44,7 +44,7 @@ public class ShutdownOrangePi extends Command {
 
 			String[] commandString = new String[] {
 						binPath,
-						"-p", "raspberry",
+						"-p", VisionConstants.ORANGEPI_PASSWORD,
 						"ssh",
 						"-o", "StrictHostKeyChecking=no",
 						VisionConstants.ORANGEPI_USERNAME + "@" + hostname,
