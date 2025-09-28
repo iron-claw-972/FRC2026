@@ -72,7 +72,7 @@ public class ReturnData extends Command{
 
   /**
    * Returns if the command is finished
-   * @retrun Always false (command never finishes)
+   * @return Always false (command never finishes)
    */
   @Override
   public boolean isFinished() {

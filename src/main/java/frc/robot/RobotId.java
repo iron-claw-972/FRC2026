@@ -39,7 +39,7 @@ public enum RobotId {
     
     /**
      * Determine the Robot Identity from the RoboRIO's onboard Preferences (flash memory).
-     * @returns the RobotId
+     * @return the RobotId
      */
     public static RobotId getRobotId() {
         // assume a default identity
