@@ -313,7 +313,7 @@ public class VisionConstants {
                 l4Pose = null;
                 l1Pose = null;
             }else{
-                l4Pose = pose.transformBy(new Transform2d(0, Units.inchesToMeters(2), new Rotation2d()));
+                l4Pose = pose.transformBy(new Transform2d(-0.04, Units.inchesToMeters(2), new Rotation2d()));
                 l1Pose = getL1Pose();
             }
         }
@@ -329,7 +329,7 @@ public class VisionConstants {
             double adjustedYOffset = DriveConstants.ROBOT_WIDTH_WITH_BUMPERS / 2.0 + (isAlgae ? 0 : Units.inchesToMeters(4.5));
 
             // Apply both X and Y offsets to calculate the reef branch pose
-            Transform3d transform = new Transform3d(adjustedYOffset, -xOffset, 0, new Rotation3d(0, 0, 0));
+            Transform3d transform = new Transform3d(adjustedYOffset, -xOffset -0.01, 0, new Rotation3d(0, 0, 0));
 
             Pose3d branchPose3d = basePose3d.plus(transform);
 

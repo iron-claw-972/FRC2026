@@ -476,7 +476,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     /**
      * Sets the drivetrain's alignmetn pose to the nearest reef branch or algae location
      * @param isAlgae True for algae, false for branches
-     * @param isLeft True for left branch, false for right, ignored for algae
+     * @param isTrue for left branch, false for right, ignored for algae
      * @param l4 If the robot should align to the L4 scoring pose
      */
     private void setAlignmentPose(boolean isAlgae, boolean isLeft, boolean l4, boolean l1){

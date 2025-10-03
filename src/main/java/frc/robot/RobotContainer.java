@@ -160,8 +160,8 @@ public class RobotContainer {
 
       String centerAuto = "Center"; 
 
-      PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
-      auto = new PathPlannerAuto(leftSideAuto);
+      PathPlannerAuto.getPathGroupFromAutoFile(rightSideAuto);
+      auto = new PathPlannerAuto(rightSideAuto);
     } 
     catch (IOException | ParseException e) {
         e.printStackTrace();

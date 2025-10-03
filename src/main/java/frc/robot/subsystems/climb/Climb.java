@@ -25,7 +25,7 @@ import frc.robot.util.ClimbArmSim;
 public class Climb extends SubsystemBase {
     
     private static final double startingPosition = 0;
-    private static final double extendPosition = 2;
+    private static final double extendPosition = 2 - Units.degreesToRotations(10);
     private static final double climbPosition = -0.83;
 
     //Motors
