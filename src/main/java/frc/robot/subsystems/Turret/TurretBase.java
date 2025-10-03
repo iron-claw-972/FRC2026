@@ -34,9 +34,7 @@ public class TurretBase extends SubsystemBase {
     private double versaPlanetaryGearRatio = 5.0;
     private double turretGearRatio = 140/10;
     private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
-    // TODO: Fix the way we are setting the offset
     private double calibrationOffset = 0;
-    private double offset = 0; 
 
     private SingleJointedArmSim turretSim;
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
@@ -46,34 +44,35 @@ public class TurretBase extends SubsystemBase {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50,50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret", 25, 0));
 
-    public TurretBase(){ 
+    public TurretBase() { 
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
         encoderSim = motor.getSimState();
         pid.setTolerance(Units.degreesToRadians(2));
         sensorTriggered = false;
         motorCalibrated = false;
+
         turretSim = new SingleJointedArmSim(
             simMotor,
-            gearRatio,
+            turretGearRatio,
             0.1,
             0.3,
             0,
             Units.degreesToRadians(300),
             false,
+            Units.degreesToRadians(0),
             Units.degreesToRadians(0));
-        
-        SmartDashboard.putData("Turret", mechanism2d);
+            
+        SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
-
-        SmartDashboard.putData("Go to 90 degrees", new InstantCommand(() -> spinTo(90)));
-        SmartDashboard.putData("Go to 270 degrees", new InstantCommand(() -> spinTo(270)));
-        SmartDashboard.putData("Go to 180 degrees", new InstantCommand(() -> spinTo(180)));
-        SmartDashboard.putData("Go to 67 degrees", new InstantCommand(() -> spinTo(67)));
-
+        
+        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> spinTo(90)));
+        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> spinTo(180)));
+        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> spinTo(0)));
+        SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> spinTo(270)));
     }
 
     public double getPosition(){
-        return (Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio) + offset;
+        return position/gearRatio;
     }
 
     public void spinTo(double setPoint){
@@ -86,7 +85,7 @@ public class TurretBase extends SubsystemBase {
     }
 
     public double getVelocity(){
-        return Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / gearRatio;
+        return velocity/gearRatio;
     }
 
     public boolean isSensorTriggered(){
@@ -99,11 +98,11 @@ public class TurretBase extends SubsystemBase {
 
     public void calibrate(){
         if(sensorTriggered){
-            if(getVelocity() > 0){
-                offset = 0 - calibrationOffset;
+            if(velocity > 0){
+                position = 0 - calibrationOffset;
             }
             else{
-                offset = 360 + calibrationOffset;
+                position = 360 + calibrationOffset;
             }
         }
     }
@@ -113,21 +112,28 @@ public class TurretBase extends SubsystemBase {
         if(!isMotorCalibrated()){
             calibrate();
         }
+        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         motor.set(pid.calculate(Units.degreesToRadians(getPosition())));
         sensorTriggered = sensor.get();
 
         ligament2d.setAngle(position);
     }
 
+    public double getAppliedVoltage() {
+        return motor.getMotorVoltage().getValueAsDouble();
+    }
+
+    @Override
     public void simulationPeriodic() {
-        // motor.get() * 12.0
-        turretSim.setInputVoltage(motor.getMotorVoltage().getValueAsDouble());
+        double voltsMotor = motor.get() * 12;
+        turretSim.setInputVoltage(voltsMotor);
 
         turretSim.update(Constants.LOOP_TIME);
 
         double simAngle = turretSim.getAngleRads();
-
-        double motorRotations = Units.radiansToRotations(simAngle) * gearRatio;
+        double simRotations = Units.radiansToRotations(simAngle);
+        double motorRotations = simRotations * gearRatio;
 
         encoderSim.setRawRotorPosition(motorRotations);
     }
