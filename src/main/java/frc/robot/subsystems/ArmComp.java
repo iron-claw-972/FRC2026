@@ -58,7 +58,7 @@ public class ArmComp extends ArmBase {
             0.3,
             Units.degreesToRadians(-110), 
             Units.degreesToRadians(360),
-            false,
+            true,
             Units.degreesToRadians(ArmConstants.START_ANGLE));
             
         // Puts the mechanism on the smartdashboard
@@ -78,10 +78,30 @@ public class ArmComp extends ArmBase {
         // Obtain the motor position
         double position = getAngle();
         // PID calculation
-        double power = pid.calculate(Units.degreesToRadians(position));
-
+        double powerPID = pid.calculate(Units.degreesToRadians(position));
+        // mass at the end of the arm = 1.0 kg
+        double mass = 2.0;
+        // g is acceleration of gravity m/s^2
+        double g = 9.8;
+        // force of gravity
+        double fg = mass * g;
+        // force component perpendicular to the arm
+        double fp = fg * Math.cos(Units.degreesToRadians(position));
+      
+        // length of arm = 0.6 m
+        double lengthArm = 0.3;
+        // calculate torque on the arm
+        double torqueArm = lengthArm * fp;
+        // relate the arm torque to the motor torque
+        double torqueMotor = torqueArm / gearRatio;
+        // convert motor torque to motor current
+        double currentGravity = torqueMotor / simMotor.KtNMPerAmp;
+        // convert motor current to voltage using Ohm's Law
+        double voltageGravity = currentGravity * simMotor.rOhms;
+        // convert the voltage to duty cycle
+        double powerF = voltageGravity / 12;
         // set motor power to the result of the PID calculation
-        motor.set(power);
+        motor.set(powerPID + powerF);
         // display the current position of the arm
         ligament2d.setAngle(position);
     }
