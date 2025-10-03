@@ -40,7 +40,7 @@ public class TurretBase extends SubsystemBase {
 
     private SingleJointedArmSim turretSim;
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
-    private TalonFXSimState encoderSim = motor.getSimState();
+    private TalonFXSimState encoderSim;
     
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50,50);
@@ -48,6 +48,7 @@ public class TurretBase extends SubsystemBase {
 
     public TurretBase(){ 
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
+        encoderSim = motor.getSimState();
         pid.setTolerance(Units.degreesToRadians(2));
         sensorTriggered = false;
         motorCalibrated = false;

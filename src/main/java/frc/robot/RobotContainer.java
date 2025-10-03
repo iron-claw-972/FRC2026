@@ -22,6 +22,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Turret.TurretBase;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -47,12 +48,16 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
+  // Turret 
+  private TurretBase turretBase;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    turretBase = new TurretBase();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
