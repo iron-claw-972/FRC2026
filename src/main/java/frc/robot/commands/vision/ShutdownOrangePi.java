@@ -1,8 +1,13 @@
 package frc.robot.commands.vision;
 
+import java.nio.file.CopyOption;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,8 +44,14 @@ public class ShutdownOrangePi extends Command {
 		}
 
 		try {
-			String binPath = Filesystem.getDeployDirectory() + "/sshpass";
-			Files.setPosixFilePermissions(Path.of(binPath), PosixFilePermissions.fromString("rwxr-xr-x"));
+			String initialPath = Filesystem.getDeployDirectory() + "/sshpass";
+			Path initalPathPath = Path.of(initialPath);
+			String binPath = "/home/lvuser/sshpass2";
+			Path binPathPath = Path.of(binPath);
+			//copies to be able to get executable permissions on the new binary
+			Files.copy(initalPathPath, binPathPath, StandardCopyOption.REPLACE_EXISTING);
+
+			Files.setPosixFilePermissions(binPathPath, PosixFilePermissions.fromString("rwxr-xr-x"));
 
 			String[] commandString = new String[] {
 						binPath,
@@ -54,7 +65,7 @@ public class ShutdownOrangePi extends Command {
 			this.process = Runtime.getRuntime().exec(commandString);
 		} catch (Exception e) {
 			String message = e.getMessage() == null ? "unknown" : e.getMessage();
-			System.out.println("Failed to shutdown OrangePi. Reason: " + message);
+			System.out.println("Failed to shutdown OrangePi. Reason: " + e.getClass() + " -- " + message);
 		}
 	}
 
