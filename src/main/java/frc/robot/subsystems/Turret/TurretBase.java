@@ -26,6 +26,7 @@ import frc.robot.constants.IdConstants;
 public class TurretBase extends SubsystemBase {
     private TalonFX motor; 
     private final DigitalInput sensor = new DigitalInput(0); 
+    double power;
     /** direction the turet is pointing in degrees */
     private double position;
     /** how fast the turret is moving in radians per second */
@@ -124,9 +125,8 @@ public class TurretBase extends SubsystemBase {
         // position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         /** feeding the PID radians */
-        double power = pid.calculate(Units.degreesToRadians(getPosition()));
+        power = pid.calculate(Units.degreesToRadians(getPosition()));
         motor.set(power);
-        fakePower = power;
         System.out.println(power);
         System.out.println("Check " + motor.get());
         sensorTriggered = sensor.get();
@@ -140,7 +140,7 @@ public class TurretBase extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        double voltsMotor = fakePower * 12;
+        double voltsMotor = power * 12;
         System.out.println("Motor " + voltsMotor);
         turretSim.setInputVoltage(voltsMotor);
 
@@ -152,8 +152,6 @@ public class TurretBase extends SubsystemBase {
         System.out.println("Rotations " + motorRotations);
         
         encoderSim.setRawRotorPosition(motorRotations);
-        // TODO: Fake position
-        position = Units.rotationsToDegrees(simRotations);
     }
 }
 
