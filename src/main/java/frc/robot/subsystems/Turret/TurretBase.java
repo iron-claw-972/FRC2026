@@ -127,8 +127,8 @@ public class TurretBase extends SubsystemBase {
         double power = pid.calculate(Units.degreesToRadians(getPosition()));
         motor.set(power);
         fakePower = power;
-        System.out.println(power);
-        System.out.println("Check " + motor.get());
+        System.out.println("Power: " + power);
+        System.out.println("Check " + motor.getPosition().getValueAsDouble());
         sensorTriggered = sensor.get();
 
         ligament2d.setAngle(position);
