@@ -49,7 +49,7 @@ public class RobotContainer {
   private Operator operator = null;
 
   // Turret 
-  private TurretBase turretBase;
+  private TurretBase turretBase = new TurretBase();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -57,7 +57,6 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    turretBase = new TurretBase();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
