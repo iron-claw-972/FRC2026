@@ -1,16 +1,11 @@
 package frc.robot.subsystems.Turret;
 
-import java.util.random.RandomGenerator.LeapableGenerator;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -19,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
@@ -31,7 +25,7 @@ public class TurretBase extends SubsystemBase {
     private double position;
     /** how fast the turret is moving in radians per second */
     private double velocity;
-    private PIDController pid = new PIDController(0.1, 0, 0);
+    private PIDController pid = new PIDController(0.005, 0, 0);
     private boolean sensorTriggered;
     private boolean motorCalibrated;
     private double versaPlanetaryGearRatio = 5.0;
@@ -39,8 +33,7 @@ public class TurretBase extends SubsystemBase {
     private double turretGearRatio = 140.0/10.0;
     private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
     private double calibrationOffset = 0;
-    private double fakePower = 0;
-
+    
     private SingleJointedArmSim turretSim;
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
@@ -54,8 +47,7 @@ public class TurretBase extends SubsystemBase {
         encoderSim = motor.getSimState();
         pid.setTolerance(Units.degreesToRadians(2));
         sensorTriggered = false;
-        // for testing
-        motorCalibrated = true;
+        motorCalibrated = false;
 
         turretSim = new SingleJointedArmSim(
             simMotor,
@@ -63,17 +55,22 @@ public class TurretBase extends SubsystemBase {
             0.1,
             0.3,
             0,
-            Units.degreesToRadians(300),
+            Units.degreesToRadians(360),
             false,
-            Units.degreesToRadians(0));
+            Units.degreesToRadians(-360)
+        );
             
         SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
+        SmartDashboard.putBoolean("Calibrated", motorCalibrated);
+
         
         SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> spinTo(90)));
         SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> spinTo(180)));
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> spinTo(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> spinTo(270)));
+
+
     }
 
     /** position in degrees of the turret not the turret motor */
@@ -86,7 +83,7 @@ public class TurretBase extends SubsystemBase {
      * @param setPoint angle in degrees
      */
     public void spinTo(double setPoint){
-        pid.reset();
+        //pid.reset();
         pid.setSetpoint(Units.degreesToRadians(setPoint));
     }
 
@@ -119,10 +116,10 @@ public class TurretBase extends SubsystemBase {
 
     @Override
     public void periodic(){
-        if(!isMotorCalibrated()){
-            calibrate();
-        }
-        // position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
+        // if(!isMotorCalibrated()){
+        //     calibrate();
+        // }
+        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         /** feeding the PID radians */
         power = pid.calculate(Units.degreesToRadians(getPosition()));

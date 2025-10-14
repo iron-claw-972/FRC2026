@@ -17,7 +17,7 @@ public class IdConstants {
     public static final int PIGEON = 13;
 
     // Ultimate Turret
-    public static final int BASE_MOTOR_ID = 67;
+    public static final int BASE_MOTOR_ID = 20;
 
     // LEDs
     public static final int CANDLE_ID = 1;
