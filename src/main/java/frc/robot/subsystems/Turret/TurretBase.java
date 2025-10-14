@@ -25,9 +25,12 @@ public class TurretBase extends SubsystemBase {
     private double position;
     /** how fast the turret is moving in radians per second */
     private double velocity;
-    private PIDController pid = new PIDController(0.005, 0, 0);
+    private PIDController pid = new PIDController(0.002, 0, 0);
     private boolean sensorTriggered;
+
     private boolean motorCalibrated;
+
+
     private double versaPlanetaryGearRatio = 5.0;
     /** 140 teeth divided by 10 teeth */
     private double turretGearRatio = 140.0/10.0;
@@ -70,6 +73,7 @@ public class TurretBase extends SubsystemBase {
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> spinTo(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> spinTo(270)));
 
+        pid.enableContinuousInput(-Math.PI, Math.PI);
 
     }
 
@@ -83,7 +87,7 @@ public class TurretBase extends SubsystemBase {
      * @param setPoint angle in degrees
      */
     public void spinTo(double setPoint){
-        //pid.reset();
+        pid.reset();
         pid.setSetpoint(Units.degreesToRadians(setPoint));
     }
 
@@ -103,32 +107,35 @@ public class TurretBase extends SubsystemBase {
         return motorCalibrated;
     }
 
-    public void calibrate(){
-        if(sensorTriggered){
-            if(velocity > 0){
+    public void calibrate() {
+        motor.set(0.02);
+        sensorTriggered = sensor.get();
+        if(isSensorTriggered()) {
+            if(velocity > 0) {
                 position = 0 - calibrationOffset;
+            } else {
+                position = 0 + calibrationOffset;
             }
-            else{
-                position = 360 + calibrationOffset;
-            }
+            motorCalibrated = true;
         }
     }
 
     @Override
-    public void periodic(){
-        // if(!isMotorCalibrated()){
-        //     calibrate();
-        // }
-        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
-        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
-        /** feeding the PID radians */
-        power = pid.calculate(Units.degreesToRadians(getPosition()));
-        motor.set(power);
-        System.out.println(power);
-        System.out.println("Check " + motor.get());
-        sensorTriggered = sensor.get();
-
-        ligament2d.setAngle(position);
+    public void periodic() {
+        if(!isMotorCalibrated()) {
+            calibrate();
+        } else {
+            position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
+            velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
+            /** feeding the PID radians */
+            power = pid.calculate(Units.degreesToRadians(getPosition()));
+            motor.set(power);
+            System.out.println(power);
+            System.out.println("Check " + motor.get());
+            sensorTriggered = sensor.get();
+    
+            ligament2d.setAngle(position);
+        }
     }
 
     public double getAppliedVoltage() {
