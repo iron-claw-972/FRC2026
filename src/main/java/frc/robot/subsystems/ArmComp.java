@@ -3,21 +3,16 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.vision.ReturnData;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -27,15 +22,14 @@ public class ArmComp extends ArmBase {
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
     private TalonFX motor = new TalonFX(IdConstants.ARM_MOTOR);
     private PIDController pid = new PIDController(0.1, 0, 0);
+    private ArmFeedforward ff = new ArmFeedforward(0,ArmConstants.MASS * ArmConstants.CENTER_OF_MASS_LENGTH/ArmConstants.GEAR_RATIO/ArmConstants.MOTOR.KtNMPerAmp*ArmConstants.MOTOR.rOhms, 0);
     private TalonFXSimState encoderSim = motor.getSimState(); 
 
     private SingleJointedArmSim armSim;
 
     // sim? motor idk which one to use
     // simulation Objects
-    Mechanism2d mechanism2d = new Mechanism2d(100, 100);
-    MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
-    MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("arm", 25, ArmConstants.START_ANGLE));
+    
 
     // TODO: fix gear ratio
     double gearRatio = 14;
@@ -54,15 +48,15 @@ public class ArmComp extends ArmBase {
         armSim = new SingleJointedArmSim(
             simMotor, 
             gearRatio,
-            0.1, 
-            0.3,
+            // moment of inertia
+            0.0261057394, 
+            0.276,
             Units.degreesToRadians(-110), 
             Units.degreesToRadians(360),
             true,
             Units.degreesToRadians(ArmConstants.START_ANGLE));
             
-        // Puts the mechanism on the smartdashboard
-        SmartDashboard.putData("arm", mechanism2d);
+        
         // Puts the PID tuner
         SmartDashboard.putData("PID", pid);
         
@@ -79,31 +73,10 @@ public class ArmComp extends ArmBase {
         double position = getAngle();
         // PID calculation
         double powerPID = pid.calculate(Units.degreesToRadians(position));
-        // mass at the end of the arm = 1.0 kg
-        double mass = 2.0;
-        // g is acceleration of gravity m/s^2
-        double g = 9.8;
-        // force of gravity
-        double fg = mass * g;
-        // force component perpendicular to the arm
-        double fp = fg * Math.cos(Units.degreesToRadians(position));
-      
-        // length of arm = 0.6 m
-        double lengthArm = 0.3;
-        // calculate torque on the arm
-        double torqueArm = lengthArm * fp;
-        // relate the arm torque to the motor torque
-        double torqueMotor = torqueArm / gearRatio;
-        // convert motor torque to motor current
-        double currentGravity = torqueMotor / simMotor.KtNMPerAmp;
-        // convert motor current to voltage using Ohm's Law
-        double voltageGravity = currentGravity * simMotor.rOhms;
-        // convert the voltage to duty cycle
-        double powerF = voltageGravity / 12;
         // set motor power to the result of the PID calculation
-        motor.set(powerPID + powerF);
+        motor.set(powerPID + ff.calculate(Units.degreesToRadians(position),0));
         // display the current position of the arm
-        ligament2d.setAngle(position);
+        displayPosition(position);
     }
 
     @Override
