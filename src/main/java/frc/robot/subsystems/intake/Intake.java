@@ -144,4 +144,8 @@ public class Intake extends SubsystemBase{
     public void startRollers(){
         setSpeed(1); //TODO change to proper motor power
     }
+
+    public boolean laserDetecting(){
+        return laserCan.getMeasurement().distance_mm < 100; //TODO add proper constant
+    }
 }
