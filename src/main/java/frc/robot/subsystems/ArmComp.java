@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -27,9 +31,13 @@ public class ArmComp extends ArmBase {
 
     private SingleJointedArmSim armSim;
 
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+
+    /**in degrees*/
+    private double setpoint = ArmConstants.START_ANGLE;
+
     // sim? motor idk which one to use
     // simulation Objects
-    
 
     // TODO: fix gear ratio
     double gearRatio = 14;
@@ -38,12 +46,33 @@ public class ArmComp extends ArmBase {
         // tell the PID object the tolerance
         pid.setTolerance(Units.degreesToRadians(ArmConstants.TOLERANCE));
 
+        var talonFXConfigs = new TalonFXConfiguration();
+
+        var slot0Configs = talonFXConfigs.Slot0;
+
+        slot0Configs.kS = 0;
+        // torque of gravity / gear ratio
+        slot0Configs.kG = (ArmConstants.MASS * 9.81 * ArmConstants.CENTER_OF_MASS_LENGTH ) / gearRatio;
+        slot0Configs.kV = 0.12;
+        slot0Configs.kA = 0.0;
+        slot0Configs.kP = 0.1 * 2 * Math.PI; // in rotations, not radians like the normal p
+        slot0Configs.kI = 0;
+        slot0Configs.kD = 0;
+
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(ArmConstants.MAX_VELOCITY * gearRatio);
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(ArmConstants.MAX_ACCELERATION * gearRatio);
+
+        motor.getConfigurator().apply(talonFXConfigs);
+        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));  
+    
+
         // Tell the PID object what the setpoint is
         // Note: at power on, the encoder will be zero
         // Ideally, the PID target value should also be zero
         // because if we were to call getAngle() right now, it would be zero rather than
         // START_ANGLE.
-        setSetpoint(ArmConstants.START_ANGLE);
+        setSetpoint(ArmConstants.START_ANGLE); 
         // simulation Arm
         armSim = new SingleJointedArmSim(
             simMotor, 
@@ -69,12 +98,16 @@ public class ArmComp extends ArmBase {
 
     @Override
     public void periodic() {
+        
         // Obtain the motor position
         double position = getAngle();
         // PID calculation
         double powerPID = pid.calculate(Units.degreesToRadians(position));
         // set motor power to the result of the PID calculation
-        motor.set(powerPID + ff.calculate(Units.degreesToRadians(position),0));
+        //motor.set(powerPID + ff.calculate(Units.degreesToRadians(position),0));
+
+        double setpointRotations = Units.degreesToRotations(setpoint) * gearRatio;
+        motor.setControl(voltageRequest.withPosition(setpointRotations).withFeedForward(ff.calculate(Units.degreesToRadians(position),0)));
         // display the current position of the arm
         displayPosition(position);
     }
@@ -112,7 +145,8 @@ public class ArmComp extends ArmBase {
     public void setSetpoint(double setpoint) {
         // Tell the PID object what thsete setpoint is
         // PID is using radians
-        pid.setSetpoint(Units.degreesToRadians(setpoint));
+        //pid.setSetpoint(Units.degreesToRadians(setpoint));
+        setpoint = this.setpoint;
     }
 
     /** Gets the arm angle in degrees */
@@ -126,7 +160,8 @@ public class ArmComp extends ArmBase {
     @Override
     public boolean atSetpoint() {
         // return (Math.abs(Units.radiansToDegrees(pid.getSetpoint()) - getAngle()) < ArmConstants.TOLERANCE);
-        return pid.atSetpoint();
+        //return pid.atSetpoint();
+        return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3;
     }
 
     public double getAppliedVoltage() {
