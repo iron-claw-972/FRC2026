@@ -45,7 +45,7 @@ public class HoodReal extends HoodBase {
             HoodConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
-            false,
+            true,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
 
@@ -93,7 +93,6 @@ public class HoodReal extends HoodBase {
     @Override
     public void simulationPeriodic() {
         double voltsMotor = power * 12;
-        System.out.println(" Motor " + voltsMotor);
         hoodSim.setInputVoltage(voltsMotor);
 
         hoodSim.update(Constants.LOOP_TIME);
@@ -101,7 +100,6 @@ public class HoodReal extends HoodBase {
         double simAngle = hoodSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * hoodGearRatio;
-        System.out.println("Rotations " + motorRotations);
 
         encoderSim.setRawRotorPosition(motorRotations);
     }
