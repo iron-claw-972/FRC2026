@@ -21,7 +21,10 @@ public class IdConstants {
     // LEDs
     public static final int CANDLE_ID = 1;
 
+    //Shooter
+    public static final int SHOOTER_ID = 16;
+    public static final int FEEDER_ID = 17;
     // Hood Motor
-    public static final int HOOD_MOTOR_ID = 17;
+    public static final int HOOD_MOTOR_ID = 26;
     
 }
