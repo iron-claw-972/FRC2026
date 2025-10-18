@@ -1,13 +1,12 @@
 package frc.robot.commands.vision;
 
-import java.nio.file.CopyOption;
-import java.nio.file.FileSystems;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.nio.file.attribute.UserPrincipal;
-import java.nio.file.attribute.UserPrincipalLookupService;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,9 +47,8 @@ public class ShutdownOrangePi extends Command {
 			Path initalPathPath = Path.of(initialPath);
 			String binPath = "/home/lvuser/sshpass2";
 			Path binPathPath = Path.of(binPath);
-			//copies to be able to get executable permissions on the new binary
+			// copies to be able to get executable permissions on the new binary
 			Files.copy(initalPathPath, binPathPath, StandardCopyOption.REPLACE_EXISTING);
-
 			Files.setPosixFilePermissions(binPathPath, PosixFilePermissions.fromString("rwxr-xr-x"));
 
 			String[] commandString = new String[] {
@@ -67,6 +65,29 @@ public class ShutdownOrangePi extends Command {
 			String message = e.getMessage() == null ? "unknown" : e.getMessage();
 			System.out.println("Failed to shutdown OrangePi. Reason: " + e.getClass() + " -- " + message);
 		}
+	}
+
+	@Override
+	public void execute() {
+		if (this.process == null) return;
+
+		try {
+			InputStream stdout = this.process.getInputStream();
+			InputStream stderr = this.process.getErrorStream();
+
+			int remainingStdoutBytes = stdout.available();
+			int remainingStderrBytes = stderr.available();
+
+			if (remainingStdoutBytes > 0) {
+				byte[] stdoutBytes = stdout.readNBytes(remainingStdoutBytes);
+				System.out.println("OPI: " + new String(stdoutBytes, StandardCharsets.UTF_8));
+			}
+
+			if (remainingStderrBytes > 0) {
+				byte[] stderrBytes = stderr.readNBytes(remainingStderrBytes);
+				System.err.println("OPI: " + new String(stderrBytes, StandardCharsets.UTF_8));
+			}
+		} catch (IOException e) {}
 	}
 
 	@Override
