@@ -1,4 +1,4 @@
-package frc.robot.commands.outtake;
+package frc.robot.commands.gpm.outtake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
