@@ -28,7 +28,7 @@ public class shooterReal extends shooterBase {
         config.Slot0.kP = 0.1; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
-        config.Slot0.kV = 0.12; //find this value
+        config.Slot0.kV = 0.12; //Maximum rps = 100 --> 12V/100rps
         shooterMotor.getConfigurator().apply(config);
         
         shooterMotor.getConfigurator().apply(
