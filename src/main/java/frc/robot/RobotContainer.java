@@ -24,7 +24,6 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.ArmComp;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -44,9 +43,7 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
-  private Command auto = new DoNothing();
-  private ArmComp arm = new ArmComp();
- 
+  private Command auto = new DoNothing(); 
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -58,10 +55,6 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
-    SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
-    // dispatch on the robot
-    
     switch (robotId) {
        
       case TestBed1:
@@ -81,7 +74,6 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
-        arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
