@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
+import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
 
 public class HoodReal extends HoodBase {
@@ -21,8 +22,8 @@ public class HoodReal extends HoodBase {
     private double position;
     private double velocity;
     double power;
-    private PIDController pid = new PIDController(0.02, 0.0, 0.0);
-    private double hoodGearRatio = 67/67;
+    private PIDController pid = new PIDController(0.2, 0.0, 0.05);
+    private double hoodGearRatio = 67.0/67.0;
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
@@ -40,12 +41,12 @@ public class HoodReal extends HoodBase {
         hoodSim = new SingleJointedArmSim(
             hoodMotorSim,
             hoodGearRatio,
-            0.1,
-            0.3,
+            HoodConstants.MOI,
+            HoodConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
             false,
-            Units.degreesToRadians(-360)
+            Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
 
         SmartDashboard.putData("hood", mechanism2d);
@@ -80,6 +81,7 @@ public class HoodReal extends HoodBase {
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         power = pid.calculate(Units.degreesToRadians(getPosition()));
         motor.set(power);
+        ligament2d.setAngle(position);
     }
 
     @Override
