@@ -81,7 +81,13 @@ public class HoodReal extends HoodBase {
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         power = pid.calculate(Units.degreesToRadians(getPosition()));
         motor.set(power);
+
         ligament2d.setAngle(position);
+    }
+
+    public double getAppliedVoltage() {
+        
+        return motor.getMotorVoltage().getValueAsDouble();
     }
 
     @Override
