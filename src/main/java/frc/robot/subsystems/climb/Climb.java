@@ -131,7 +131,7 @@ public class Climb extends SubsystemBase {
 		pid.setSetpoint(Units.degreesToRadians(angle));
 	}
 
-}
+
 
 	/**
 	 * Gets the current position of the motor in degrees
