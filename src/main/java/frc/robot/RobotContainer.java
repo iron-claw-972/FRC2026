@@ -108,7 +108,7 @@ public class RobotContainer {
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
 
-    SmartDashboard.putData("Shutdown back Orange Pi", new ShutdownAllPis());
+    SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
 
     
   }

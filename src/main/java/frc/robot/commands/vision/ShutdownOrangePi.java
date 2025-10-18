@@ -15,7 +15,7 @@ import frc.robot.constants.VisionConstants;
 
 /**
  * Run the ssh command to shutdown a single Orange Pi.
- * Uses the username and password set in {@link frc.robot.constantsVisionConstants}.
+ * Uses the username and password set in {@link frc.robot.constants.VisionConstants}.
  */
 public class ShutdownOrangePi extends Command {
 	private String hostname;
