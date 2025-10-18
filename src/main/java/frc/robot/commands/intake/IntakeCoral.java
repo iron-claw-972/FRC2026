@@ -1,40 +1,51 @@
-package frc.robot.commands.intake;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.constants.ArmConstants;
+import frc.robot.subsystems.Arm.ArmComp;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Outtake.Outtake;
 
-public class IntakeCoral extends Command{
+
+public class IntakeCoral extends Command {
     Intake intake;
-    //TODO add when other subsystems are made
-    // Indexer indexer; 
-    // Elevator elevator;
-
-    public IntakeCoral(Intake intake) {// Indexer indexer, Elevator elevator) {
+    Indexer indexer; 
+    Outtake outtake; 
+    ArmComp arm; 
+    Elevator elevator; 
+    public IntakeCoral(Intake intake, Indexer indexer, Elevator elevator, Outtake outtake, ArmComp arm) {
         this.intake = intake;
-        //TODO add when other subsystems are made
-        // this.elevator = elevator;
-        // this.indexer = indexer;
-        addRequirements(intake); //, indexer, elevator);
-        
+		this.indexer = indexer;
+		this.outtake = outtake;
+		this.arm = arm;
+		this.elevator = elevator;
+		addRequirements(intake, indexer, arm, elevator);  
     }
-
-    @Override
-    public final void initialize() {
+    public void intitialize() {
         intake.unstow();
         intake.startRollers();
-        
+        indexer.run();
+        outtake.setMotor(.7); 
     }
+    public void execute() {
+        // Change from last year, so might not work 
+        if (outtake != null && outtake.coralLoaded()) {
+            indexer.stop();
+            intake.stopRollers(); 
+            elevator.setSetpoint(1); // TODO: Replace with actual stow constant 
+			arm.setSetpoint(1); // TODO: Replace with actual stow constant   
+        }
+    } 
+    public boolean isFinished() {
+        return elevator.getPosition()> 1; // TODO: Replace with actual safe setpoint 
 
-    @Override
-    public final void execute() {
     }
-
-    @Override
-    public final void end(boolean interrupted) {
-    }
-
-    @Override
-    public final boolean isFinished() {
-        return true;
+    public void end(boolean interrupted) {
+        intake.stopRollers();
+		intake.stow();
+		indexer.stop();
+		if(outtake != null){
+			outtake.setMotor(0.02);
+		}
     }
 }
