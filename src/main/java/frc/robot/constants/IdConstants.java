@@ -18,4 +18,9 @@ public class IdConstants {
 
     // LEDs
     public static final int CANDLE_ID = 1;
+
+    // Elevator
+    public static final int ELEVATOR_RIGHT_MOTOR = 50;
+    public static final int ELEVATOR_BOTTOM_LIMIT_SWITCH = 29;
+    public static final int ELEVATOR_TOP_LIMIT_SWITCH = 30;
 }
