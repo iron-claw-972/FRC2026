@@ -22,7 +22,7 @@ public class HoodReal extends HoodBase {
     private double velocity;
     double power;
     private PIDController pid = new PIDController(0.02, 0.0, 0.0);
-    private double hoodGearRatio = 67/67;
+    private double hoodGearRatio = 67.0 / 67.0;
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
@@ -80,6 +80,13 @@ public class HoodReal extends HoodBase {
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         power = pid.calculate(Units.degreesToRadians(getPosition()));
         motor.set(power);
+
+        ligament2d.setAngle(position);
+    }
+
+    public double getAppliedVoltage() {
+        
+        return motor.getMotorVoltage().getValueAsDouble();
     }
 
     @Override
