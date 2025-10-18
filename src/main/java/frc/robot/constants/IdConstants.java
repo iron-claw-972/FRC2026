@@ -21,5 +21,7 @@ public class IdConstants {
     // LEDs
     public static final int CANDLE_ID = 1;
 
+    // Hood Motor
+    public static final int HOOD_MOTOR_ID = 17;
     
 }

@@ -26,6 +26,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -41,6 +42,7 @@ import frc.robot.util.Vision.Vision;
  */
 public class RobotContainer {
   // The robot's subsystems are defined here...
+  private HoodReal hood = new HoodReal();
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing(); 
