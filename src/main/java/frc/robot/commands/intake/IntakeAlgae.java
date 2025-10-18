@@ -45,9 +45,9 @@ public class IntakeAlgae extends Command {
     }
 
     public void end(boolean interrupted){
-        elevator.setSetpoint(0.0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        arm.setSetpoint(ARM_ALGAE_SETPOINT);
-        elevator.setArmStowed();
-        outtake.setMotor(0);
+        // elevator.setSetpoint(0.0);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        // elevator.setArmStowed(); Maybe? will this break?
+        outtake.setMotor(-0.01); //to keep algae in
+        //TODO maybe add lower elevator setpoints to lower center of mass height
     }
 }
