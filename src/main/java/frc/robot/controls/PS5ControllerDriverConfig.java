@@ -2,13 +2,17 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -20,6 +24,8 @@ import lib.controllers.PS5Controller.PS5Button;
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
+
+    private Pose2d alignmentPose = null;
 
     public PS5ControllerDriverConfig(Drivetrain drive) {
         super(drive);
@@ -44,6 +50,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+    }
+
+    public void setAlignmentPose(){
+        Translation2d drivepose = getDrivetrain().getPose().getTranslation();
+        //Uses tag #18
+        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(17).pose.toPose2d().getTranslation();
+        double YDifference = drivepose.getY()-tagpose.getX();
+        double XDifference = drivepose.getX()-tagpose.getY();
+        double angle = Math.atan(YDifference/XDifference);
+        alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
     }
     
     @Override
