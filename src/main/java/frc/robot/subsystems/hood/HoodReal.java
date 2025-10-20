@@ -1,3 +1,4 @@
+package frc.robot.subsystems.hood;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -6,11 +7,16 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.constants.Constants;
+import frc.robot.constants.HoodConstants;
 
 public class HoodReal extends HoodBase{
     double kP = 0.01;
@@ -21,14 +27,16 @@ public class HoodReal extends HoodBase{
     private TalonFX motor;
 
     private double position;
+    private double velocity;
 
     private final int motorId = -1;
 
-    SingleJointedArmSim hood_sim;
+    private double hoodGearRatio = 67.0/67.0;
 
-    Mechanism2d mechanism2d = new Mechanism2d(100, 100);
-    MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50,50);
-    MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hood", 25, 0));
+    SingleJointedArmSim hood_sim;
+    Mechanism2d mechanism2d;
+    MechanismLigament2d ligament2d;
+
 
     private TalonFXSimState encoderSim;
 
@@ -37,19 +45,33 @@ public class HoodReal extends HoodBase{
 
         encoderSim = motor.getSimState();
 
-        hood_sim = new SingleJointedArmSim(DCMotor.getFalcon500(1), 
-            kD, 
-            kD, 
-            motorId, 
-            kP, 
-            kI, 
-            true, 
-            kD, 
-            null
+        hood_sim = new SingleJointedArmSim(
+            DCMotor.getFalcon500(1), 
+            hoodGearRatio,
+            HoodConstants.MOI,
+            HoodConstants.LENGTH,
+            0,
+            Units.degreesToRadians(360),
+            true,
+            Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
+
+        mechanism2d = new Mechanism2d(100, 100);
+        ligament2d = new MechanismLigament2d("hood_ligament", 25, 0);
+
+        mechanism2d.getRoot("pivot", 50, 50).append(ligament2d);
+
+        SmartDashboard.putData("hood", mechanism2d);
+        SmartDashboard.putData("PID", hoodPid);
+        
+        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
     }
 
     public void setSetpoint(double setpoint){
+       hoodPid.reset();
        hoodPid.setSetpoint(setpoint);
     }
     
@@ -57,19 +79,28 @@ public class HoodReal extends HoodBase{
         return position;
     }
 
-    public double getVelocity(){}
+    public double getVelocity(){
+        return velocity/hoodGearRatio;
+    }
 
     public boolean atSetpoint(){
-        hoodPid.atSetpoint();
+        return hoodPid.atSetpoint();
     }
 
     public void periodic(){
        position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
+       velocity = motor.getVelocity().getValueAsDouble();
 
        motor.set(hoodPid.calculate(getPosition()));
     }
 
     public void simulationPeriodic(){
-        position = 
+        hood_sim.setInput(hoodPid.calculate(getPosition()) * RobotController.getBatteryVoltage());
+
+        hood_sim.update(0.020);
+
+        motor.setPosition(Units.radiansToRotations(hood_sim.getAngleRads()));
+
+        ligament2d.setAngle(Units.radiansToDegrees(getPosition()));
     }
 }

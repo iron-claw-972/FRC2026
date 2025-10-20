@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
-import frc.robot.util.BuildData;
+//import frc.robot.util.BuildData;
+import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.util.ShuffleBoard.ShuffleBoardManager;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,6 +36,7 @@ import frc.robot.util.BuildData;
 public class Robot extends LoggedRobot {
     private Command autoCommand;
     private RobotContainer robotContainer;
+    public static ShuffleBoardManager shuffleboard;
 
     public Robot(){
         CanBridge.runTCP();
@@ -70,6 +73,8 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
+        private final HoodReal hood = new HoodReal();
+        shuffleboard = new ShuffleBoardManager(drive, brianSubsystem);
         // To Set the Robot Identity
         //   SimGUI: Persistent Values, Preferences, RobotId, then restart Simulation
         //     changes networktables.json, networktables.json.bck (both Untracked)
@@ -81,6 +86,7 @@ public class Robot extends LoggedRobot {
         RobotId robotId = RobotId.getRobotId();
 
           // Record metadata
+          /* 
         Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
@@ -99,6 +105,7 @@ public class Robot extends LoggedRobot {
         }
 
         robotContainer = new RobotContainer(robotId);
+        */
         
     }
 
@@ -118,7 +125,9 @@ public class Robot extends LoggedRobot {
 
         CommandScheduler.getInstance().run();
 
-        robotContainer.logComponents();
+        if(this.robotContainer != null){ 
+            robotContainer.logComponents();
+        }    
     }
 
     /**
