@@ -25,7 +25,6 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 //import frc.robot.util.BuildData;
 import frc.robot.subsystems.hood.HoodReal;
-import frc.robot.util.ShuffleBoard.ShuffleBoardManager;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -36,7 +35,6 @@ import frc.robot.util.ShuffleBoard.ShuffleBoardManager;
 public class Robot extends LoggedRobot {
     private Command autoCommand;
     private RobotContainer robotContainer;
-    public static ShuffleBoardManager shuffleboard;
 
     public Robot(){
         CanBridge.runTCP();
@@ -73,8 +71,6 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
-        private final HoodReal hood = new HoodReal();
-        shuffleboard = new ShuffleBoardManager(drive, brianSubsystem);
         // To Set the Robot Identity
         //   SimGUI: Persistent Values, Preferences, RobotId, then restart Simulation
         //     changes networktables.json, networktables.json.bck (both Untracked)
@@ -103,9 +99,9 @@ public class Robot extends LoggedRobot {
             Logger.recordMetadata("GitDirty", "Unknown");
             break;
         }
-
-        robotContainer = new RobotContainer(robotId);
         */
+        robotContainer = new RobotContainer(robotId);
+        
         
     }
 
@@ -151,7 +147,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         // Disable vision if the constant is false.
-        robotContainer.setVisionEnabled(VisionConstants.ENABLED_AUTO);
+        //robotContainer.setVisionEnabled(VisionConstants.ENABLED_AUTO);
 
         // Get the autonomous command.
         // This access is fast (about 14 microseconds) because the value is already resident in the Network Tables.

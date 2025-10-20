@@ -2,12 +2,15 @@ package frc.robot.subsystems.hood;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -21,7 +24,7 @@ import frc.robot.constants.HoodConstants;
 public class HoodReal extends HoodBase{
     double kP = 0.01;
     double kI = 0;
-    double kD = 0;
+    double kD = 0.5;
     PIDController hoodPid = new PIDController(kP, kI, kD);
 
     private TalonFX motor;
@@ -29,7 +32,7 @@ public class HoodReal extends HoodBase{
     private double position;
     private double velocity;
 
-    private final int motorId = -1;
+    private final int motorId = 1;
 
     private double hoodGearRatio = 67.0/67.0;
 
@@ -41,9 +44,7 @@ public class HoodReal extends HoodBase{
     private TalonFXSimState encoderSim;
 
     public HoodReal(){
-        motor = new TalonFX(motorId);
-
-        encoderSim = motor.getSimState();
+        //motor = new TalonFX(motorId);
 
         hood_sim = new SingleJointedArmSim(
             DCMotor.getFalcon500(1), 
@@ -52,10 +53,10 @@ public class HoodReal extends HoodBase{
             HoodConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
-            true,
+            false,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
-
+        motor = new TalonFX(motorId);
         mechanism2d = new Mechanism2d(100, 100);
         ligament2d = new MechanismLigament2d("hood_ligament", 25, 0);
 
@@ -72,7 +73,7 @@ public class HoodReal extends HoodBase{
 
     public void setSetpoint(double setpoint){
        hoodPid.reset();
-       hoodPid.setSetpoint(setpoint);
+       hoodPid.setSetpoint(Units.degreesToRadians(setpoint));
     }
     
     public double getPosition(){
@@ -91,16 +92,21 @@ public class HoodReal extends HoodBase{
        position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
        velocity = motor.getVelocity().getValueAsDouble();
 
-       motor.set(hoodPid.calculate(getPosition()));
+       //motor.set(hoodPid.calculate(getPosition()));
+       ligament2d.setAngle(Units.radiansToDegrees(position));
     }
 
+    @Override
     public void simulationPeriodic(){
-        hood_sim.setInput(hoodPid.calculate(getPosition()) * RobotController.getBatteryVoltage());
+        System.out.println("Setpoint" + hoodPid.getSetpoint() + "@" + Timer.getFPGATimestamp());
+        hood_sim.setInput(hoodPid.calculate(getPosition(), hoodPid.getSetpoint()) * RobotController.getBatteryVoltage());
 
-        hood_sim.update(0.020);
+        hood_sim.update(Constants.LOOP_TIME);
 
         motor.setPosition(Units.radiansToRotations(hood_sim.getAngleRads()));
+        position = hood_sim.getAngleRads();
 
         ligament2d.setAngle(Units.radiansToDegrees(getPosition()));
+        System.out.println("sim");
     }
 }

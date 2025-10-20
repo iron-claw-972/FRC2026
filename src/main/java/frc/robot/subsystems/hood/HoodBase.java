@@ -24,7 +24,7 @@ abstract class HoodBase extends SubsystemBase{
 
     /**
      * Returns if hood is at the setpoint from the PID
-     * @return boolean representing if hood is a the setpoint
+     * @return boolean representing if hood is at the setpoint
      */
     public abstract boolean atSetpoint();
 }
