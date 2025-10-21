@@ -9,6 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
@@ -40,8 +41,8 @@ public class HoodReal extends HoodBase{
     Mechanism2d mechanism2d;
     MechanismLigament2d ligament2d;
 
-
     private TalonFXSimState encoderSim;
+    private double power;
 
     public HoodReal(){
         //motor = new TalonFX(motorId);
@@ -56,7 +57,11 @@ public class HoodReal extends HoodBase{
             false,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
+
         motor = new TalonFX(motorId);
+
+        encoderSim = motor.getSimState();
+
         mechanism2d = new Mechanism2d(100, 100);
         ligament2d = new MechanismLigament2d("hood_ligament", 25, 0);
 
@@ -89,24 +94,24 @@ public class HoodReal extends HoodBase{
     }
 
     public void periodic(){
-       position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
+        // Uncomment when not in simulation
+       //position = Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
        velocity = motor.getVelocity().getValueAsDouble();
 
-       //motor.set(hoodPid.calculate(getPosition()));
-       ligament2d.setAngle(Units.radiansToDegrees(position));
+       power = hoodPid.calculate(getPosition());
+       motor.set(power);
+       ligament2d.setAngle(Units.radiansToDegrees(getPosition()));
     }
 
     @Override
     public void simulationPeriodic(){
-        System.out.println("Setpoint" + hoodPid.getSetpoint() + "@" + Timer.getFPGATimestamp());
-        hood_sim.setInput(hoodPid.calculate(getPosition(), hoodPid.getSetpoint()) * RobotController.getBatteryVoltage());
+        //System.out.println("Setpoint" + hoodPid.getSetpoint() + "@" + Timer.getFPGATimestamp());
+
+        hood_sim.setInput(power * RobotController.getBatteryVoltage());
 
         hood_sim.update(Constants.LOOP_TIME);
 
-        motor.setPosition(Units.radiansToRotations(hood_sim.getAngleRads()));
+        encoderSim.setRawRotorPosition(Units.radiansToRotations(hood_sim.getAngleRads()));
         position = hood_sim.getAngleRads();
-
-        ligament2d.setAngle(Units.radiansToDegrees(getPosition()));
-        System.out.println("sim");
     }
 }
