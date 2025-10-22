@@ -9,11 +9,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.DoNothing;
+import frc.robot.commands.drive_comm.DriveToPose;
+import frc.robot.commands.gpm.MoveHood;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.HoodConstants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.subsystems.Shooter.ShooterConstants;
+import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.HoodBase;
+import frc.robot.subsystems.hood.HoodReal;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -22,13 +31,20 @@ import lib.controllers.PS5Controller.PS5Button;
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
+    private HoodReal hood;
+    private shooterReal shooter;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
 
+    //Turn on for alignment to the tag
+    private boolean alignTrue = false;
     private Pose2d alignmentPose = null;
+    private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, shooterReal shooter) {
         super(drive);
+        this.hood = hood;
+        this.shooter = shooter;
     }
 
     public void configureControls() {
@@ -50,6 +66,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+        
+        // Align and shoot
+        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
+            new SequentialCommandGroup(
+                alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(), // TODO: Does this work?
+                new MoveHood(hood, HOOD_SETPOINT),
+                new InstantCommand(()-> {
+                    shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+                    shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER);
+                })
+            )
+        ).onFalse(
+            new InstantCommand(()->{
+                shooter.stopFeeder();
+                shooter.stopShooter();
+            })
+        );
     }
 
     public void setAlignmentPose(){

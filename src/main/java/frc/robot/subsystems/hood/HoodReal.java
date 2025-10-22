@@ -35,7 +35,7 @@ public class HoodReal extends HoodBase {
 
     public HoodReal() {
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID);
-        pid.setTolerance(Units.degreesToRadians(2));
+        pid.setTolerance(Units.degreesToRadians(3));
         encoderSim = motor.getSimState();
 
         hoodSim = new SingleJointedArmSim(
@@ -45,7 +45,7 @@ public class HoodReal extends HoodBase {
             HoodConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
-            true,
+            false,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
 

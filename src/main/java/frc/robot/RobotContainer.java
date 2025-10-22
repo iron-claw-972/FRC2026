@@ -24,6 +24,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.HoodReal;
@@ -42,9 +43,10 @@ import frc.robot.util.Vision.Vision;
  */
 public class RobotContainer {
   // The robot's subsystems are defined here...
-  private HoodReal hood = new HoodReal();
   private Drivetrain drive = null;
   private Vision vision = null;
+  private HoodReal hood = null;
+  private shooterReal shooter = null;
   private Command auto = new DoNothing(); 
 
   // Controllers are defined here
@@ -72,12 +74,14 @@ public class RobotContainer {
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
+        hood = new HoodReal();
+        shooter = new shooterReal();
 
       case Vivace:
       case Phil:
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, hood, shooter);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
