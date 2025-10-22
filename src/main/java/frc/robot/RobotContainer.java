@@ -22,6 +22,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -41,6 +42,7 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
+  private Climb climb = null;
   private Command auto = new DoNothing();
 
   // Controllers are defined here
@@ -72,6 +74,7 @@ public class RobotContainer {
       case Phil:
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
+        climb = new Climb();
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
 

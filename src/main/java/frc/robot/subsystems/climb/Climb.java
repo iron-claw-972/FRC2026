@@ -81,7 +81,7 @@ public class Climb extends SubsystemBase {
 
         motor.setPosition(Units.degreesToRotations(START_DEG)*totalGearRatio);
         motor.setNeutralMode(NeutralModeValue.Brake);
-        //SmartDashboard.putData("Climb PID", pid);
+        SmartDashboard.putData("Climb PID", pid);
     }
 
 	// Runs repeatedly every 20ms
