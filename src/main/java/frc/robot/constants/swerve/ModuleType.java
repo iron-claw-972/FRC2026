@@ -2,7 +2,7 @@ package frc.robot.constants.swerve;
 
 /**
  * Represents the type for a module on the robot.
- * <p/>
+ * <br/>
  * IDs:
  * 0 - FRONT_LEFT
  * 1 - FRONT_RIGHT

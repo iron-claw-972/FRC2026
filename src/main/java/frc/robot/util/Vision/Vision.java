@@ -282,7 +282,6 @@ public class Vision {
   /**
    * Returns where it thinks the robot is
    * @param referencePose The pose to use as a reference, usually the previous robot pose
-   * @param yawFunction A unary operator that takes a timestamp and returns the yaw at that time
    * @return An array list of estimated poses, one for each camera that can see an april tag
    */
   public ArrayList<EstimatedRobotPose> getEstimatedPoses(Pose2d referencePose) {

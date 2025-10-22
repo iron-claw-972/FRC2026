@@ -55,20 +55,6 @@ public class AngledElevatorSim extends ElevatorSim {
     }
 
     // Copied from ElevatorSim with one difference
-    /**
-     * Creates a simulated elevator mechanism.
-     *
-     * @param gearbox The type of and number of motors in the elevator gearbox.
-     * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
-     * @param carriageMassKg The mass of the elevator carriage.
-     * @param drumRadiusMeters The radius of the drum that the elevator spool is wrapped around.
-     * @param minHeightMeters The min allowable height of the elevator.
-     * @param maxHeightMeters The max allowable height of the elevator.
-     * @param simulateGravity Whether gravity should be simulated or not.
-     * @param startingHeightMeters The starting height of the elevator.
-     * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
-     *     noise is desired. If present must have 1 element for position.
-     */
     @Override
     protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
         // Calculate updated x-hat from Runge-Kutta.

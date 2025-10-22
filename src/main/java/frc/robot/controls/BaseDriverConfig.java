@@ -21,8 +21,6 @@ public abstract class BaseDriverConfig {
 
     /**
      * @param drive               the drivetrain instance
-     * @param controllerTab       the shuffleboard controller tab
-     * @param shuffleboardUpdates whether to update the shuffleboard
      */
     public BaseDriverConfig(Drivetrain drive) {
         headingLimiter.setContinuousLimits(-Math.PI, Math.PI);

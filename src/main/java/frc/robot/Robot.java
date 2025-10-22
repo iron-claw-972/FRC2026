@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
@@ -208,7 +208,7 @@ public class Robot extends LoggedRobot {
 
 	/**
 	* Gets the set Alliance; defaults to red if not set.
-	* This method replaces {@link edu.first.wpilibj.DriverStation.getAlliance}.
+	* This method replaces {@link edu.wpi.first.wpilibj.DriverStation#getAlliance}.
 	* The .get() is not necessary, so DriverStation.getAlliance().get() becomes Robot.getAlliance()
 	*/
 	public static Alliance getAlliance() {

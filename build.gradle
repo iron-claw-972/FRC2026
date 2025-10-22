@@ -159,3 +159,7 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
+tasks.withType(Javadoc) {
+	options.encoding = "UTF-8"
+}
+

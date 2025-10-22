@@ -49,7 +49,7 @@ public class ClimbArmSim extends SingleJointedArmSim {
       double maxAngleRads,
       boolean simulateGravity,
       double startingAngleRads,
-      double robotMasKilograms,
+      double robotMassKilograms,
       double armMassKilograms,
       double... measurementStdDevs) {
     super(plant, gearbox, gearing, armLengthMeters, minAngleRads, maxAngleRads, simulateGravity, startingAngleRads, measurementStdDevs);
@@ -57,7 +57,7 @@ public class ClimbArmSim extends SingleJointedArmSim {
     minAngle = minAngleRads;
     maxAngle = maxAngleRads;
     this.simulateGravity = simulateGravity;
-    mass = robotMasKilograms;
+    mass = robotMassKilograms;
     momentOfInertia = 1.0/3.0 * armMassKilograms * armLengthMeters * armLengthMeters;
     isClimbing = false;
   }
