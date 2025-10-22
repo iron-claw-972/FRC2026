@@ -599,9 +599,12 @@ public class Vision {
       // The latest camera results
       for(PhotonPipelineResult result : inputs.results){
         // TODO: This could be improved by averaging all targets instead of only using 1
+
+        // Continue if the target doesn't exist or it should be ignored
+        if (!result.hasTargets()) continue;
         // Gets the best target to use for the calculations
         PhotonTrackedTarget target = result.getBestTarget();
-        // Continue if the target doesn't exist or it should be ignored
+        // I don't know why this would happen, but keep it in just in case
         if(target==null){
           continue;
         }
