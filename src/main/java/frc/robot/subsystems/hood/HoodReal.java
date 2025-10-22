@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hood;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -48,6 +49,9 @@ public class HoodReal extends HoodBase {
             false,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
+
+        motor.setPosition(Units.degreesToRadians(HoodConstants.START_ANGLE * hoodGearRatio));
+        motor.setNeutralMode(NeutralModeValue.Brake);
 
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);

@@ -27,4 +27,6 @@ public class IdConstants {
     // Hood Motor
     public static final int HOOD_MOTOR_ID = 26;
     
+    public static final int BASE_MOTOR_ID = 27;
+    public static final int FLYWHEEL_MOTOR_ID = 28;
 }
