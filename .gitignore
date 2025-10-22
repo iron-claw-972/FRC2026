@@ -183,3 +183,6 @@ logs/
 # I don't know what this is but it has local paths in it
 .factorypath
 
+# For vim
+*.sw?
+
