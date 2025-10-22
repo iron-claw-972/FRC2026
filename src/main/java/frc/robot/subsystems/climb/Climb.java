@@ -55,34 +55,33 @@ public class Climb extends SubsystemBase {
 
 	// Constructor to initialize subsystem
 	public Climb() {
-        if (RobotBase.isSimulation()) {
-            encoderSim = motor.getSimState();
-            encoderSim.setRawRotorPosition(Units.degreesToRotations(START_DEG)*totalGearRatio);
+		if (RobotBase.isSimulation()) {
+			encoderSim = motor.getSimState();
+			encoderSim.setRawRotorPosition(Units.degreesToRotations(START_DEG) * totalGearRatio);
 
-            climbSim = new ClimbArmSim(
-                climbGearBox, 
-                totalGearRatio, 
-                0.1, 
-                0.127, 
-                0, //min angle 
-                Units.degreesToRadians(90), //max angle
-                true, 
-                Units.degreesToRadians(START_DEG),
-                60
-                );
+			climbSim = new ClimbArmSim(
+					climbGearBox,
+					totalGearRatio,
+					0.1,
+					0.127,
+					0, // min angle
+					Units.degreesToRadians(90), // max angle
+					true,
+					Units.degreesToRadians(START_DEG),
+					60);
 
-            climbSim.setIsClimbing(true);
-            SmartDashboard.putData("Climb Display", simulationMechanism);
-        }
+			climbSim.setIsClimbing(true);
+			SmartDashboard.putData("Climb Display", simulationMechanism);
+		}
 
-        pid.setIZone(1);
+		pid.setIZone(1);
 
-        pid.setSetpoint(Units.degreesToRadians(START_DEG));
+		pid.setSetpoint(Units.degreesToRadians(START_DEG));
 
-        motor.setPosition(Units.degreesToRotations(START_DEG)*totalGearRatio);
-        motor.setNeutralMode(NeutralModeValue.Brake);
-        SmartDashboard.putData("Climb PID", pid);
-    }
+		motor.setPosition(Units.degreesToRotations(START_DEG) * totalGearRatio);
+		motor.setNeutralMode(NeutralModeValue.Brake);
+		SmartDashboard.putData("Climb PID", pid);
+	}
 
 	// Runs repeatedly every 20ms
 	@Override
@@ -111,15 +110,15 @@ public class Climb extends SubsystemBase {
 
 	// Runs repeatedly in simulation every 20ms
 	@Override
-    public void simulationPeriodic() {
-        climbSim.setInput(power * Constants.ROBOT_VOLTAGE);
-        climbSim.update(Constants.LOOP_TIME);
+	public void simulationPeriodic() {
+		climbSim.setInput(power * Constants.ROBOT_VOLTAGE);
+		climbSim.update(Constants.LOOP_TIME);
 
-        double climbRotations = Units.radiansToRotations(climbSim.getAngleRads());
-        encoderSim.setRawRotorPosition(climbRotations * totalGearRatio);
+		double climbRotations = Units.radiansToRotations(climbSim.getAngleRads());
+		encoderSim.setRawRotorPosition(climbRotations * totalGearRatio);
 
-        simLigament.setAngle(Units.radiansToDegrees(getAngle()));
-    }
+		simLigament.setAngle(Units.radiansToDegrees(getAngle()));
+	}
 
 	/**
 	 * Sets the motor to an angle from 0-90 degrees
@@ -130,8 +129,6 @@ public class Climb extends SubsystemBase {
 		pid.reset();
 		pid.setSetpoint(Units.degreesToRadians(angle));
 	}
-
-
 
 	/**
 	 * Gets the current position of the motor in degrees
