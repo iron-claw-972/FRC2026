@@ -12,7 +12,7 @@ public class SetOuttakeCoral extends ParallelCommandGroup {
 
     public SetOuttakeCoral(Elevator elevator, ArmComp arm, String reefLevel){
         addCommands(
-        
+            
         );
     }
     
