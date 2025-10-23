@@ -20,7 +20,7 @@ import lib.controllers.PS5Controller.PS5Button;
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->false;
+    private final BooleanSupplier slowModeSupplier = () -> false;
     private final Climb climb;
 
     public PS5ControllerDriverConfig(Drivetrain drive, Climb climb) {
@@ -31,33 +31,30 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
-            new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
-        )));
+                new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
-            getDrivetrain().setDesiredPose(()->null);
+            getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
         driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-            ()->getDrivetrain().setStateDeadband(false),
-            getDrivetrain()::alignWheels,
-            interrupted->getDrivetrain().setStateDeadband(true),
-            ()->false, getDrivetrain()).withTimeout(2));
+                () -> getDrivetrain().setStateDeadband(false),
+                getDrivetrain()::alignWheels,
+                interrupted -> getDrivetrain().setStateDeadband(true),
+                () -> false, getDrivetrain()).withTimeout(2));
 
-        //TODO: change controls as needed
+        // TODO: change controls as needed
         // Climb controls
-       driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> climb.extend()));
-       driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> climb.stow()));
-       driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> climb.climb()));
+        driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> climb.extend()));
+        driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> climb.stow()));
+        driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> climb.climb()));
 
-   }
+    }
 
-    
-    
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
@@ -93,11 +90,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return false;
     }
 
-    public void startRumble(){
+    public void startRumble() {
         driver.rumbleOn();
     }
 
-    public void endRumble(){
+    public void endRumble() {
         driver.rumbleOff();
     }
 }
