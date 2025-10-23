@@ -40,7 +40,6 @@ public class HoodReal extends HoodBase {
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
     private double setpoint = HoodConstants.START_ANGLE;
 
-
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
@@ -69,9 +68,9 @@ public class HoodReal extends HoodBase {
         config.Slot0.kG = 0; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = 0.012* 2*Math.PI; // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(0.2); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = 0; // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = 0.0 * 2*Math.PI; // Derivative term (used to dampen oscillations)
+        config.Slot0.kD = Units.radiansToRotations(0.0); // Derivative term (used to dampen oscillations)
 
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY * hoodGearRatio);
