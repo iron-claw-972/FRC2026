@@ -1,12 +1,18 @@
 package frc.robot.subsystems.hood;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -23,11 +29,16 @@ public class HoodReal extends HoodBase {
     private double velocity;
     double power;
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-    private double hoodGearRatio = 67.0/67.0;
+    //TODO: get actual gear ratio
+    private double hoodGearRatio = 76.0/67.0;
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
+
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+    private double setpoint = HoodConstants.START_ANGLE;
+
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
@@ -43,11 +54,30 @@ public class HoodReal extends HoodBase {
             hoodGearRatio,
             HoodConstants.MOI,
             HoodConstants.LENGTH,
-            0,
+            Units.degreesToRadians(-360),
             Units.degreesToRadians(360),
             false,
             Units.degreesToRadians(HoodConstants.START_ANGLE)
         );
+
+        motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE * hoodGearRatio));
+        motor.setNeutralMode(NeutralModeValue.Brake);
+
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
+        config.Slot0.kG = 0; // Gravity compensation
+        config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
+        config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
+        config.Slot0.kP = 0.012* 2*Math.PI; // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kI = 0; // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = 0.0 * 2*Math.PI; // Derivative term (used to dampen oscillations)
+
+        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY * hoodGearRatio);
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION * hoodGearRatio);
+        //TODO: find which direction is positive
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        motor.getConfigurator().apply(config);
 
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
@@ -58,9 +88,10 @@ public class HoodReal extends HoodBase {
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
     }
 
-    public void setSetpoint(double setPoint) {
-        pid.reset();
-        pid.setSetpoint(Units.degreesToRadians(setPoint));
+    public void setSetpoint(double setpoint) {
+        // pid.reset();
+        // pid.setSetpoint(Units.degreesToRadians(setPoint));
+        this.setpoint = setpoint;
     }
 
     public double getPosition() {
@@ -72,27 +103,29 @@ public class HoodReal extends HoodBase {
     }
 
     public boolean atSetpoint() {
-        return pid.atSetpoint();
+        return Math.abs(getPosition() - setpoint) < 3.0;
     }
 
     @Override
     public void periodic() {
-        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble());
-        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
+        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / hoodGearRatio;
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / hoodGearRatio;
         power = pid.calculate(Units.degreesToRadians(getPosition()));
-        motor.set(power);
+        //motor.set(power);
+        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * hoodGearRatio));
 
         ligament2d.setAngle(position);
     }
 
     public double getAppliedVoltage() {
-        
         return motor.getMotorVoltage().getValueAsDouble();
     }
 
+    boolean simInitialized = false;
     @Override
     public void simulationPeriodic() {
-        double voltsMotor = power * 12;
+        //double voltsMotor = power * 12;
+        double voltsMotor = motor.getMotorVoltage().getValueAsDouble();
         hoodSim.setInputVoltage(voltsMotor);
 
         hoodSim.update(Constants.LOOP_TIME);
