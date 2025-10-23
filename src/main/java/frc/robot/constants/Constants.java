@@ -3,7 +3,30 @@ package frc.robot.constants;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class Constants {
+    // Outtake speeds
+    // TODO: relocate these constants 
+    public static final double L1_SPEED = -0.2;
+    public static final double L2_L3_SPEED = -0.45;
+    public static final double L4_SPEED = -0.8;
 
+    // reef level setpoints
+    public enum ReefLevel {
+        L1(ElevatorConstants.L1_SETPOINT, ArmConstants.L1_SETPOINT, L1_SPEED), 
+        L2(ElevatorConstants.L2_SETPOINT, ArmConstants.L2_L3_SETPOINT, L2_L3_SPEED), 
+        L3(ElevatorConstants.L3_SETPOINT, ArmConstants.L2_L3_SETPOINT, L2_L3_SPEED), 
+        L4(ElevatorConstants.L4_SETPOINT, ArmConstants.L4_SETPOINT_RIGHT, L4_SPEED);
+
+        public final double elevatorSetpoint;
+        public final double armSetpoint;
+        public double speed;
+
+        ReefLevel(double elevatorSetpoint, double armSetpoint, double speed){
+            this.elevatorSetpoint = elevatorSetpoint;
+            this.armSetpoint = armSetpoint;
+            this.speed = speed;
+        }
+    }
+    
     // constants:   
 
     public static final double GRAVITY_ACCELERATION = 9.8;
