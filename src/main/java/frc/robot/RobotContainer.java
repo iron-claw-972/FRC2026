@@ -84,7 +84,7 @@ public class RobotContainer {
       case Phil:
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, hood, shooter);
+        driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

@@ -23,6 +23,7 @@ import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.HoodBase;
 import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.intake.IntakeReal;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -33,6 +34,7 @@ import lib.controllers.PS5Controller.PS5Button;
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private HoodReal hood;
     private shooterReal shooter;
+    private IntakeReal intake;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
 
@@ -41,10 +43,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Pose2d alignmentPose = null;
     private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, shooterReal shooter) {
+    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, shooterReal shooter, IntakeReal intake) {
         super(drive);
         this.hood = hood;
         this.shooter = shooter;
+        this.intake = intake;
     }
 
     public void configureControls() {

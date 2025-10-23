@@ -23,6 +23,7 @@ public class HoodReal extends HoodBase {
     private double position;
     private double velocity;
     double power;
+    
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
     private double hoodGearRatio = 67.0/67.0;
 

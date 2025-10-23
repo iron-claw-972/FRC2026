@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -27,9 +28,15 @@ public class IntakeReal extends IntakeBase {
 
     private double baseVelocity;
     private double flyWheelVelocity;
-    
+
     double basePower;
     double flyWheelPower;
+
+    // Increase kG until the arm just holds position against gravity (no PID).
+    // Add kS if you notice stiction (motor doesn’t start moving easily).
+    // Adjust kV to track moving targets more smoothly.
+
+    private final ArmFeedforward feedforward = new ArmFeedforward(0.2, 2.35, 0.2);
 
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
     private double intakeGearRatio = 67.0/67.0;
@@ -45,10 +52,9 @@ public class IntakeReal extends IntakeBase {
     public IntakeReal() {
         baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID);
         flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID);
-
         pid.setTolerance(Units.degreesToRadians(3));
         encoderSim = baseMotor.getSimState();
-
+        
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
             intakeGearRatio,
@@ -56,11 +62,11 @@ public class IntakeReal extends IntakeBase {
             HoodConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
-            false,
-            Units.degreesToRadians(HoodConstants.START_ANGLE)
+            true,
+            Units.degreesToRadians(0)
         );
 
-        baseMotor.setPosition(Units.degreesToRadians(HoodConstants.START_ANGLE * intakeGearRatio));
+        baseMotor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE * intakeGearRatio));
         baseMotor.setNeutralMode(NeutralModeValue.Brake);
 
         flyWheelMotor.getConfigurator().apply(
@@ -109,13 +115,30 @@ public class IntakeReal extends IntakeBase {
         baseVelocity = Units.rotationsPerMinuteToRadiansPerSecond(baseMotor.getVelocity().getValueAsDouble() * 60);
         flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
 
-        basePower = pid.calculate(Units.degreesToRadians(getPosition()));
-        baseMotor.set(basePower);
+        double positionRad = Units.degreesToRadians(getPosition());
+        double velocityRadPerSec = baseVelocity;
 
+        // PID output in volts
+        double pidOutputVolts = pid.calculate(positionRad) * 12.0;
+
+        // Feedforward voltage (using CURRENT position, not setpoint)
+        double ffVolts = feedforward.calculate(positionRad, velocityRadPerSec);
+
+        // Combine both
+        double outputVolts = pidOutputVolts + ffVolts;
+        basePower = outputVolts / 12.0;
+
+        baseMotor.set(basePower);
         flyWheelMotor.set(flyWheelPower);
 
         ligament2d.setAngle(position);
+
+        SmartDashboard.putNumber("PID Output (V)", pidOutputVolts);
+        SmartDashboard.putNumber("Feedforward (V)", ffVolts);
+        SmartDashboard.putNumber("Total Base Power", basePower);
     }
+
+
 
     public double getAppliedVoltage() {
         return baseMotor.getMotorVoltage().getValueAsDouble();
