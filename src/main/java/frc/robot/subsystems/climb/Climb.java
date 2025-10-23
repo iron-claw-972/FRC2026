@@ -29,7 +29,7 @@ public class Climb extends SubsystemBase {
 	private static final double CLIMB_DEG = -37.35;
 
 	// Motors
-	private final PIDController pid = new PIDController(2.5, 0.0, 0.0);
+	private final PIDController pid = new PIDController(1.0, 0, 0.05);
 
 	private TalonFX motor = new TalonFX(IdConstants.CLIMB_MOTOR, Constants.CANIVORE_CAN);
 	private final DCMotor climbGearBox = DCMotor.getKrakenX60(1);
@@ -74,7 +74,6 @@ public class Climb extends SubsystemBase {
 			SmartDashboard.putData("Climb Display", simulationMechanism);
 		}
 
-		pid.setIZone(1);
 
 		pid.setSetpoint(Units.degreesToRadians(START_DEG));
 
@@ -117,7 +116,7 @@ public class Climb extends SubsystemBase {
 		double climbRotations = Units.radiansToRotations(climbSim.getAngleRads());
 		encoderSim.setRawRotorPosition(climbRotations * totalGearRatio);
 
-		simLigament.setAngle(Units.radiansToDegrees(getAngle()));
+		simLigament.setAngle(Units.radiansToDegrees(climbSim.getAngleRads()));
 	}
 
 	/**
