@@ -28,6 +28,7 @@ import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -46,6 +47,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private HoodReal hood = null;
+  private IntakeReal intake = null;
   private shooterReal shooter = null;
   private Command auto = new DoNothing(); 
 
@@ -75,13 +77,14 @@ public class RobotContainer {
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
         hood = new HoodReal();
+        intake = new IntakeReal();
         shooter = new shooterReal();
 
       case Vivace:
       case Phil:
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, hood, shooter);
+        driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
