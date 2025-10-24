@@ -10,13 +10,13 @@ import frc.robot.commands.gpm.SetArm;
 import frc.robot.commands.gpm.SetElevator;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.Constants.ReefLevel;
+import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Outtake.Outtake;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.Intake.Intake;
 
-public class OuttakeCoral extends Command {
+public class OuttakeGamePiece extends Command {
     private Elevator elevator;
     private ArmComp arm;
     private Intake intake;
@@ -33,12 +33,12 @@ public class OuttakeCoral extends Command {
 
     private Phase phase; 
 
-    public OuttakeCoral(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake, ReefLevel reefLevel){
+    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake, OuttakeLocation outtakeLocation){
         this.elevator = elevator;
         this.arm = arm;
         this.intake = intake;
         this.outtake = outtake;
-        speed = reefLevel.speed;
+        speed = outtakeLocation.speed;
         timer = new Timer();
     }
 

@@ -2,10 +2,11 @@ package frc.robot.commands.gpm.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ArmConstants;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Outtake.Outtake;
 
 
@@ -30,17 +31,15 @@ public class IntakeCoral extends Command {
         outtake.setMotor(.7); 
     }
     public void execute() {
-        // Change from last year, so might not work 
         if (outtake != null && outtake.coralLoaded()) {
             indexer.stop();
             intake.stopRollers(); 
-            elevator.setSetpoint(1); // TODO: Replace with actual stow constant 
-			arm.setSetpoint(1); // TODO: Replace with actual stow constant   
+            elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT); 
+			arm.setSetpoint(ArmConstants.STOW_SETPOINT);  
         }
     } 
     public boolean isFinished() {
-        return elevator.getPosition()> 1; // TODO: Replace with actual safe setpoint 
-
+        return elevator.getPosition() > ElevatorConstants.SAFE_SETPOINT; 
     }
     public void end(boolean interrupted) {
         intake.stopRollers();
