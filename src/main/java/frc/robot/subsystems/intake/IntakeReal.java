@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.IntakeConstants;
 
 public class IntakeReal extends IntakeBase {
     private TalonFX flyWheelMotor;
@@ -36,10 +36,10 @@ public class IntakeReal extends IntakeBase {
     // Add kS if you notice stiction (motor doesn’t start moving easily).
     // Adjust kV to track moving targets more smoothly.
 
-    private final ArmFeedforward feedforward = new ArmFeedforward(0.2, 2.35, 0.2);
+    private final ArmFeedforward feedforward = new ArmFeedforward(0.0, IntakeConstants.MASS * 9.81 * IntakeConstants.LENGTH * Math.cos(IntakeConstants.START_ANGLE), 0.0);
 
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-    private double intakeGearRatio = 67.0/67.0;
+    private double intakeGearRatio = 76.0/67.0;
 
     private SingleJointedArmSim intakeSim;
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
@@ -58,15 +58,15 @@ public class IntakeReal extends IntakeBase {
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
             intakeGearRatio,
-            HoodConstants.MOI,
-            HoodConstants.LENGTH,
+            IntakeConstants.MOI,
+            IntakeConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
             true,
             Units.degreesToRadians(0)
         );
 
-        baseMotor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE * intakeGearRatio));
+        baseMotor.setPosition(Units.degreesToRotations(IntakeConstants.START_ANGLE * intakeGearRatio));
         baseMotor.setNeutralMode(NeutralModeValue.Brake);
 
         flyWheelMotor.getConfigurator().apply(
