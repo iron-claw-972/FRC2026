@@ -36,11 +36,14 @@ public class IntakeReal extends IntakeBase {
     // Add kS if you notice stiction (motor doesn’t start moving easily).
     // Adjust kV to track moving targets more smoothly.
 
-    private final ArmFeedforward feedforward = new ArmFeedforward(0.0, IntakeConstants.MASS * 9.81 * IntakeConstants.LENGTH * Math.cos(IntakeConstants.START_ANGLE), 0.0);
+    private ArmFeedforward feedforward = new ArmFeedforward(
+        0,
+        // Constants.GRAVITY_ACCELERATION * IntakeConstants.CENTER_OF_MASS_LENGTH * IntakeConstants.MASS / IntakeConstants.PIVOT_GEAR_RATIO * baseIntakeMotorSim.rOhms / baseIntakeMotorSim.KtNMPerAmp / Constants.ROBOT_VOLTAGE,
+        2.4,
+        0);
 
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-    private double intakeGearRatio = 76.0/67.0;
-
+    
     private SingleJointedArmSim intakeSim;
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
@@ -57,16 +60,16 @@ public class IntakeReal extends IntakeBase {
         
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
-            intakeGearRatio,
+            IntakeConstants.PIVOT_GEAR_RATIO,
             IntakeConstants.MOI,
             IntakeConstants.LENGTH,
             0,
             Units.degreesToRadians(360),
             true,
-            Units.degreesToRadians(0)
+            Units.degreesToRadians(IntakeConstants.START_ANGLE)
         );
 
-        baseMotor.setPosition(Units.degreesToRotations(IntakeConstants.START_ANGLE * intakeGearRatio));
+        baseMotor.setPosition(Units.degreesToRotations(IntakeConstants.START_ANGLE * IntakeConstants.PIVOT_GEAR_RATIO));
         baseMotor.setNeutralMode(NeutralModeValue.Brake);
 
         flyWheelMotor.getConfigurator().apply(
@@ -96,7 +99,7 @@ public class IntakeReal extends IntakeBase {
     
     @Override
     public double getBaseMotorVelocity() {
-        return baseVelocity/intakeGearRatio;
+        return baseVelocity/IntakeConstants.PIVOT_GEAR_RATIO;
     }
 
     @Override
@@ -153,7 +156,7 @@ public class IntakeReal extends IntakeBase {
 
         double simAngle = intakeSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
-        double motorRotations = simRotations * intakeGearRatio;
+        double motorRotations = simRotations * IntakeConstants.PIVOT_GEAR_RATIO;
 
         encoderSim.setRawRotorPosition(motorRotations);
     }
