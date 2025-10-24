@@ -73,6 +73,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Align and shoot
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new SequentialCommandGroup(
+                new InstantCommand(()-> setAlignmentPose()),
                 alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(), // TODO: Does this work?
                 new MoveHood(hood, HOOD_SETPOINT),
                 new InstantCommand(()-> {
@@ -85,6 +86,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 shooter.stopFeeder();
                 shooter.stopShooter();
             })
+        );
+
+        //Just align but don't shoot
+        driver.get(PS5Button.TRIANGLE).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> setAlignmentPose()),
+                new DriveToPose(getDrivetrain(), ()-> alignmentPose)
+            )
         );
     }
 
