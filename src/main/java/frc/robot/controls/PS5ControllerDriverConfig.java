@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
@@ -74,8 +75,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new SequentialCommandGroup(
                 new InstantCommand(()-> setAlignmentPose()),
-                alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(), // TODO: Does this work?
-                new MoveHood(hood, HOOD_SETPOINT),
+                new ParallelCommandGroup(
+                    alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(),
+                    new MoveHood(hood, HOOD_SETPOINT)
+                ),
                 new InstantCommand(()-> {
                     shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
                     shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER);
