@@ -77,10 +77,10 @@ public class IntakeReal extends IntakeBase {
         SmartDashboard.putData("intake", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
+        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        // SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
     }
 
     @Override

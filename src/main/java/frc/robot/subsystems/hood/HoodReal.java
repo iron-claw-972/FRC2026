@@ -24,20 +24,20 @@ import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
 
 public class HoodReal extends HoodBase {
-    private TalonFX motor;
+    final private TalonFX motor;
     private double position;
     private double velocity;
     double power;
     
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
     //TODO: get actual gear ratio
-    private double hoodGearRatio = 76.0/67.0;
+    private double hoodGearRatio = 50.0;
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(HoodConstants.START_ANGLE*hoodGearRatio);
     private double setpoint = HoodConstants.START_ANGLE;
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
@@ -45,38 +45,46 @@ public class HoodReal extends HoodBase {
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
     public HoodReal() {
+        // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID);
+
         pid.setTolerance(Units.degreesToRadians(3));
-        encoderSim = motor.getSimState();
 
-        hoodSim = new SingleJointedArmSim(
-            hoodMotorSim,
-            hoodGearRatio,
-            HoodConstants.MOI,
-            HoodConstants.LENGTH,
-            Units.degreesToRadians(-360),
-            Units.degreesToRadians(360),
-            false,
-            Units.degreesToRadians(HoodConstants.START_ANGLE)
-        );
+        if (RobotBase.isSimulation()) {
+            encoderSim = motor.getSimState();
 
+            hoodSim = new SingleJointedArmSim(
+                hoodMotorSim,
+                hoodGearRatio,
+                0.01 * 0.01 * 5,
+                0.10,
+                Units.degreesToRadians(-360),
+                Units.degreesToRadians(360),
+                false,
+                Units.degreesToRadians(HoodConstants.START_ANGLE)
+            );
+        }
+
+        // motor position at power up
         motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE * hoodGearRatio));
         motor.setNeutralMode(NeutralModeValue.Brake);
+
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(0.2); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
-        config.Slot0.kI = 0; // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = Units.radiansToRotations(0.0); // Derivative term (used to dampen oscillations)
+        config.Slot0.kP = Units.radiansToRotations(0.8 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY * hoodGearRatio);
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION * hoodGearRatio);
         //TODO: find which direction is positive
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        
         motor.getConfigurator().apply(config);
 
         SmartDashboard.putData("hood", mechanism2d);
@@ -90,8 +98,9 @@ public class HoodReal extends HoodBase {
 
     public void setSetpoint(double setpoint) {
         // pid.reset();
-        // pid.setSetpoint(Units.degreesToRadians(setPoint));
+        // pid.setSetpoint(Units.degreesToRadians(setpoint));
         this.setpoint = setpoint;
+        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * hoodGearRatio));
     }
 
     public double getPosition() {
@@ -108,12 +117,12 @@ public class HoodReal extends HoodBase {
 
     @Override
     public void periodic() {
+        //try find a way to do with motion magic
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / hoodGearRatio;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / hoodGearRatio;
-        power = pid.calculate(Units.degreesToRadians(getPosition()));
+        //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);
-        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * hoodGearRatio));
-
+        
         ligament2d.setAngle(position);
     }
 
@@ -127,6 +136,7 @@ public class HoodReal extends HoodBase {
         //double voltsMotor = power * 12;
         double voltsMotor = motor.getMotorVoltage().getValueAsDouble();
         hoodSim.setInputVoltage(voltsMotor);
+        System.out.println(voltsMotor);
 
         hoodSim.update(Constants.LOOP_TIME);
 
