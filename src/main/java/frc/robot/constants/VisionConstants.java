@@ -1,7 +1,10 @@
 package frc.robot.constants;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
@@ -170,8 +173,15 @@ public class VisionConstants {
     /**
      * The transformations from the robot to object detection cameras
      */
-    public static final ArrayList<Transform3d> OBJECT_DETECTION_CAMERAS = new ArrayList<>(List.of(
-            new Transform3d(
-                    new Translation3d(Units.inchesToMeters(10), 0, Units.inchesToMeters(24)),
-                    new Rotation3d(0, Units.degreesToRadians(20), 0))));
+    public static final Map<String, Transform3d> OBJECT_DETECTION_CAMERAS;
+	static {
+		var tmp = new Hashtable<String, Transform3d>();
+		tmp.put(
+			"ObjectCam",
+			new Transform3d(
+					new Translation3d(Units.inchesToMeters(10), 0, Units.inchesToMeters(24)),
+					new Rotation3d(0, Units.degreesToRadians(20), 0))
+		);
+		OBJECT_DETECTION_CAMERAS = Collections.unmodifiableMap(tmp);
+	}
 }

@@ -34,8 +34,8 @@ public class ReturnData extends Command{
   @Override
   public void execute() {
     if(timer.advanceIfElapsed(2)){
-        double[] xOffset = vision.getHorizontalOffset();
-        double[] yOffset = vision.getVerticalOffset();
+        double[] xOffset = vision.getObjectYaws();
+        double[] yOffset = vision.getObjectPitches();
         // long[] objectClass = vision.getDetectedObjectClass();
 
         // //put the offsets and area on SmartDashboard for testing 
