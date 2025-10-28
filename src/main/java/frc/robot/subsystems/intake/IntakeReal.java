@@ -62,7 +62,9 @@ public class IntakeReal extends IntakeBase {
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
             IntakeConstants.PIVOT_GEAR_RATIO,
+            //moment of inertia
             0.01 * 0.01 * 5,
+            //length
             0.10,
             Units.degreesToRadians(0),
             Units.degreesToRadians(360),
@@ -189,7 +191,12 @@ public class IntakeReal extends IntakeBase {
     }
 
     @Override
-    public void setFlyWheel(double speed) {
-        flyWheelMotor.set(speed);
+    public void setFlyWheel() {
+        flyWheelMotor.set(IntakeConstants.FLYWHEEL_SPEED);
     } 
+
+    @Override
+    public void stopFlyWheel(){
+        flyWheelMotor.set(0);
+    }
 }
