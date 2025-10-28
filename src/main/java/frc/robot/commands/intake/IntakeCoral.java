@@ -9,7 +9,7 @@ public class IntakeCoral extends Command{
     // Indexer indexer; 
     // Elevator elevator;
 
-    public IntakeCoral(Intake intake) // Indexer indexer, Elevator elevator) {
+    public IntakeCoral(Intake intake) { // Indexer indexer, Elevator elevator) {
         this.intake = intake;
         //TODO add when other subsystems are made
         // this.elevator = elevator;
