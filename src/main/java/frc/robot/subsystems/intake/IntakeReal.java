@@ -1,10 +1,12 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -48,6 +50,9 @@ public class IntakeReal extends IntakeBase {
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(IntakeConstants.START_ANGLE * IntakeConstants.PIVOT_GEAR_RATIO);
+    private double setpoint = IntakeConstants.START_ANGLE;
+
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("baseMotor", 25, 0));
@@ -63,7 +68,7 @@ public class IntakeReal extends IntakeBase {
             IntakeConstants.PIVOT_GEAR_RATIO,
             IntakeConstants.MOI,
             IntakeConstants.LENGTH,
-            0,
+            Units.degreesToRadians(-360),
             Units.degreesToRadians(360),
             true,
             Units.degreesToRadians(IntakeConstants.START_ANGLE)
@@ -71,6 +76,24 @@ public class IntakeReal extends IntakeBase {
 
         baseMotor.setPosition(Units.degreesToRotations(IntakeConstants.START_ANGLE * IntakeConstants.PIVOT_GEAR_RATIO));
         baseMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
+        config.Slot0.kG = 0; // Gravity compensation
+        config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
+        config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
+        config.Slot0.kP = Units.radiansToRotations(1 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
+
+        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.MAX_VELOCITY * IntakeConstants.PIVOT_GEAR_RATIO);
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(IntakeConstants.MAX_ACCELERATION * IntakeConstants.PIVOT_GEAR_RATIO);
+
+        //TODO: Check if this is right
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        
+        baseMotor.getConfigurator().apply(config);
 
         flyWheelMotor.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
@@ -80,16 +103,18 @@ public class IntakeReal extends IntakeBase {
         SmartDashboard.putData("intake", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        // SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
+        SmartDashboard.putData("Set intake 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        SmartDashboard.putData("Set intake 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        SmartDashboard.putData("Set intake 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        SmartDashboard.putData("Set intake 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
     }
 
     @Override
-    public void setSetpoint(double setPoint) {
-        pid.reset();
-        pid.setSetpoint(Units.degreesToRadians(setPoint));
+    public void setSetpoint(double setpoint) {
+        // pid.reset();
+        // pid.setSetpoint(Units.degreesToRadians(setPoint));
+        //this.setpoint = setpoint;
+        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
     }
 
     @Override
@@ -109,7 +134,7 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public boolean atSetpoint() {
-        return pid.atSetpoint();
+        return Math.abs(getPosition() - setpoint) < 3.0;
     }
 
     @Override
@@ -131,7 +156,7 @@ public class IntakeReal extends IntakeBase {
         double outputVolts = pidOutputVolts + ffVolts;
         basePower = outputVolts / 12.0;
 
-        baseMotor.set(basePower);
+        //baseMotor.set(basePower);
         flyWheelMotor.set(flyWheelPower);
 
         ligament2d.setAngle(position);
@@ -149,7 +174,8 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public void simulationPeriodic() {
-        double voltsMotor = basePower * 12;
+        //double voltsMotor = basePower * 12;
+        double voltsMotor = baseMotor.getMotorVoltage().getValueAsDouble();
         intakeSim.setInputVoltage(voltsMotor);
 
         intakeSim.update(Constants.LOOP_TIME);
