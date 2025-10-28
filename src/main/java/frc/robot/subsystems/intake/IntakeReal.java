@@ -135,7 +135,7 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public void periodic() {
-        position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble());
+        position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()) / IntakeConstants.PIVOT_GEAR_RATIO;
         baseVelocity = Units.rotationsPerMinuteToRadiansPerSecond(baseMotor.getVelocity().getValueAsDouble() * 60);
         flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
 
