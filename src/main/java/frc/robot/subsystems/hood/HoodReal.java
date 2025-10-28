@@ -136,7 +136,6 @@ public class HoodReal extends HoodBase {
         //double voltsMotor = power * 12;
         double voltsMotor = motor.getMotorVoltage().getValueAsDouble();
         hoodSim.setInputVoltage(voltsMotor);
-        System.out.println(voltsMotor);
 
         hoodSim.update(Constants.LOOP_TIME);
 

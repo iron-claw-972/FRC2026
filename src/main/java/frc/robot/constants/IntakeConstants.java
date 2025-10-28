@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 public class IntakeConstants {
     //TODO: Update these constants
-    public static final double PIVOT_GEAR_RATIO = 1.0;
+    public static final double PIVOT_GEAR_RATIO = 1/(18.0*18.0*10.0/54.0/60.0/38.0);
 
     public static final double MASS = 2.46; // kilograms
     public static final double MOI = 0.0261057394; // kg*m^2

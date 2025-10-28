@@ -36,11 +36,7 @@ public class IntakeReal extends IntakeBase {
     // Add kS if you notice stiction (motor doesn’t start moving easily).
     // Adjust kV to track moving targets more smoothly.
 
-    private ArmFeedforward feedforward = new ArmFeedforward(
-        0,
-        // Constants.GRAVITY_ACCELERATION * IntakeConstants.CENTER_OF_MASS_LENGTH * IntakeConstants.MASS / IntakeConstants.PIVOT_GEAR_RATIO * baseIntakeMotorSim.rOhms / baseIntakeMotorSim.KtNMPerAmp / Constants.ROBOT_VOLTAGE,
-        2.4,
-        0);
+    private final ArmFeedforward feedforward = new ArmFeedforward(0, IntakeConstants.MASS*IntakeConstants.CENTER_OF_MASS_LENGTH/IntakeConstants.PIVOT_GEAR_RATIO/baseIntakeMotorSim.KtNMPerAmp*baseIntakeMotorSim.rOhms, 0);
 
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
     
@@ -63,7 +59,7 @@ public class IntakeReal extends IntakeBase {
             IntakeConstants.PIVOT_GEAR_RATIO,
             IntakeConstants.MOI,
             IntakeConstants.LENGTH,
-            0,
+            Units.degreesToRadians(-360),
             Units.degreesToRadians(360),
             true,
             Units.degreesToRadians(IntakeConstants.START_ANGLE)
