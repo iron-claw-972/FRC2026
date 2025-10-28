@@ -20,13 +20,18 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Arm.ArmComp;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.Outtake.Outtake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -46,7 +51,10 @@ public class RobotContainer {
   private Vision vision = null;
   private Command auto = new DoNothing();
   private ArmComp arm = new ArmComp();
- 
+  private Elevator elevator = new Elevator();
+  private Outtake outtake = new Outtake();
+  private Intake intake = new Intake();
+  private Indexer indexer = new Indexer();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -83,7 +91,7 @@ public class RobotContainer {
       case Vertigo:
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

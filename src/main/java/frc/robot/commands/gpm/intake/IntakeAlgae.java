@@ -7,6 +7,9 @@ import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Outtake.Outtake;
 
+/**
+ * Sets position to intake algae from reef and intakes
+ */
 public class IntakeAlgae extends Command {
     
     private Outtake outtake;
@@ -15,7 +18,13 @@ public class IntakeAlgae extends Command {
 
     // If true, intaking from top, if false, intaking from bottom 
     private boolean isTop; 
-
+    /**
+     * Creates a command to intake algae from reef
+     * @param outtake Outtake subsystem
+     * @param arm Arm subsystem
+     * @param elevator Elevator subsystem
+     * @param isTop true if intaking from top reef level
+     */
     public IntakeAlgae(Outtake outtake, ArmComp arm, Elevator elevator, boolean isTop){
         this.outtake = outtake;
         this.arm = arm;

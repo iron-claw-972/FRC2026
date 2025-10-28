@@ -6,16 +6,28 @@ import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
-import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Outtake.Outtake;
 
-
+/**
+ * Intakes coral from ground
+ */
 public class IntakeCoral extends Command {
     Intake intake;
     Indexer indexer; 
     Outtake outtake; 
     ArmComp arm; 
     Elevator elevator; 
+
+    /**
+     * Creates a command to intake the coral from ground
+     * 
+     * @param intake Intake subsystem
+     * @param indexer Indexer subsystem
+     * @param elevator Elevator subsystem
+     * @param outtake Outtide subsystem
+     * @param arm Arm subsystem
+     */
     public IntakeCoral(Intake intake, Indexer indexer, Elevator elevator, Outtake outtake, ArmComp arm) {
         this.intake = intake;
 		this.indexer = indexer;

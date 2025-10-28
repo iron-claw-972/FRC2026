@@ -14,8 +14,11 @@ import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Outtake.Outtake;
-import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.intake.Intake;
 
+/**
+ * Scores coral/algae
+ */
 public class OuttakeGamePiece extends Command {
     private Elevator elevator;
     private ArmComp arm;
@@ -32,6 +35,15 @@ public class OuttakeGamePiece extends Command {
     }
 
     private Phase phase; 
+    /**
+     * Creates the command to score coral/algae
+     * 
+     * @param elevator Elevator subsystem
+     * @param arm Arm subsystem
+     * @param intake Intake subsystem
+     * @param outtake Outtake subsystem
+     * @param outtakeLocation Location the gamepiece will be outtaked to 
+     */
 
     public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake, OuttakeLocation outtakeLocation){
         this.elevator = elevator;

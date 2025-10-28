@@ -10,16 +10,32 @@ import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 
+/**
+ * Prepares the robot for outtake 
+ */
 public class SetOuttakeGamePiece extends ParallelCommandGroup {
     private Elevator elevator;
     private ArmComp arm;
     private double elevatorSetpoint;
     private double armSetpoint;
 
+    /**
+     * Creates the command to prepare the robot to outtake manually
+     * 
+     * @param elevator Elevator subsystem
+     * @param arm Arm subsystem
+     * @param outtakeLocation Location the gamepiece will be outtaked to 
+     */
     public SetOuttakeGamePiece(Elevator elevator, ArmComp arm, OuttakeLocation outtakeLocation) {
         this(elevator, arm, outtakeLocation, 0);
     }
-
+    /**
+     * Creates the command to prepare the robot to outtake for vision 
+     * @param elevator Elevator subsystem
+     * @param arm Arm subsystem
+     * @param outtakeLocation Location the gamepiece will be outtaked to 
+     * @param selectedDirection 1 if outtaking right branch, -1 if outtaking left branch
+     */
     public SetOuttakeGamePiece(Elevator elevator, ArmComp arm, OuttakeLocation outtakeLocation, int selectedDirection){
         this.elevator = elevator;
         this.arm = arm;
