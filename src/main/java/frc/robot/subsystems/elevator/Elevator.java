@@ -109,10 +109,12 @@ public class Elevator extends SubsystemBase {
         PhoenixUtil.tryUntilOk(100, () -> rightMotor.setNeutralMode(NeutralModeValue.Brake));
     }
 
+    /** Sets the arm stowed condition supplier (for safety interlock). */
     public void setArmStowed(BooleanSupplier armStowed) {
         this.armStowed = armStowed;
     }
 
+    /** Runs every 20ms. Handles motor commands and state logging. */
     @Override
     public void periodic() {
         double setpoint2 = setpoint;
@@ -127,6 +129,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/AtSetpoint", atSetpoint());
     }
 
+    /** Runs only in simulation. Updates virtual physics. */
     @Override
     public void simulationPeriodic() {
         sim.setInputVoltage(0);
@@ -136,6 +139,7 @@ public class Elevator extends SubsystemBase {
                 sim.getPositionMeters() / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS) * ElevatorConstants.GEARING);
     }
 
+    /** Resets the encoder position to a given height (meters). */
     public void resetEncoder(double height) {
         // Without the if statement, this causes loop overruns in simulation, and this
         // code does nothing anyway on sim (it sets the position to itself)
@@ -144,6 +148,7 @@ public class Elevator extends SubsystemBase {
         }
     }
 
+    /** Updates telemetry input struct from hardware sensors. */
     public void updateInputs() {
         inputs.measuredPosition = rightMotor.getPosition().getValueAsDouble() / ElevatorConstants.GEARING
                 * (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
@@ -166,6 +171,7 @@ public class Elevator extends SubsystemBase {
         return inputs.velocity;
     }
 
+    /** @return Current applied voltage to motor in V. */
     public double getVoltage() {
         return voltage;
     }
@@ -187,10 +193,15 @@ public class Elevator extends SubsystemBase {
         return setpoint;
     }
 
+    /** @return Mechanism2d object for simulation visualization. */
     public Mechanism2d getMechanism2d() {
         return mechanism;
     }
 
+    /**
+     * @return True if elevator is close enough to its setpoint.
+     * The tolerance is roughly ±0.0375 meters.
+     */
     public boolean atSetpoint() {
         return Math.abs(getPosition() - setpoint) < (0.025 + 0.0125);
     }

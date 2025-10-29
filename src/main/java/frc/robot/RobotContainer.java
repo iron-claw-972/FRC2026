@@ -27,6 +27,7 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -44,6 +45,7 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
+  private Elevator elevator = null;
   private Command auto = new DoNothing();
   private ArmComp arm = new ArmComp();
  
@@ -84,6 +86,7 @@ public class RobotContainer {
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
+        elevator = new Elevator();
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
