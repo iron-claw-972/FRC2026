@@ -24,6 +24,9 @@ import frc.robot.constants.swerve.DriveConstants;
  * Container class for vision constants.
  */
 public class VisionConstants {
+
+// TODO: change this
+public static final int MAX_EMPTY_TICKS = 0;
     /**
      * If April tag vision is enabled on the robot
      */
