@@ -33,6 +33,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.constants.swerve.ModuleConstants;
 import frc.robot.constants.swerve.ModuleType;
@@ -205,6 +206,9 @@ public class Module implements ModuleIO{
     }
     
     public void periodic() {
+        // For setting the offsets
+        SmartDashboard.putNumber("Encoder offset in degrees for " + getModuleType(), Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble())); 
+
         updateInputs();
         Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
 

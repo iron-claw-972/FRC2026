@@ -86,6 +86,7 @@ public class DriveConstants {
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_LOCATIONS);
 
+    // TODO: Need to update these (in degrees)
     public static double STEER_OFFSET_FRONT_LEFT = 302.646;
     public static double STEER_OFFSET_FRONT_RIGHT = 103.039+180;
     public static double STEER_OFFSET_BACK_LEFT = 165.49+90;
@@ -115,6 +116,14 @@ public class DriveConstants {
     public static String STEER_ENCODER_CAN = Constants.CANIVORE_CAN;
     public static String PIGEON_CAN = Constants.CANIVORE_CAN;
 
+    // Module constants for mK5n 
+    public static final double angleGearRatio = 0; // TODO: Need to update these 
+    public static final double angleKP = 0;
+    public static final double angleKI = 0;
+    public static final double angleKD = 0;
+    public static final double mk5nDriveGearRatio = 0; // Same as other gear ratio 
+    public static final boolean canCoderInvert = false; 
+
 
     public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
 
@@ -135,7 +144,7 @@ public class DriveConstants {
 
     /* Neutral Modes */
     public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
-    public static final NeutralModeValue STEER_NEUTRAL_MODE = NeutralModeValue.Brake;
+    public static final NeutralModeValue STEER_NEUTRAL_MODE = NeutralModeValue.Brake; 
 
     /* Drive Motor PID Values */
     public static final double[] P_VALUES = {
