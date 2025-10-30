@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -23,6 +24,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private final Climb climb;
+    private final Elevator elevator;
 
     public PS5ControllerDriverConfig(Drivetrain drive, Climb climb, Elevator elevator) {
         super(drive);
@@ -54,6 +56,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> climb.extend()));
         driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> climb.stow()));
         driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> climb.climb()));
+
+        // TODO: change controls as needed 
+        // Elevator controls
+        if (elevator != null) {
+            driver.get(PS5Button.LB).onTrue(new MoveElevator(elevator, 0.5)); // Move up
+            driver.get(PS5Button.RB).onTrue(new MoveElevator(elevator, 0.0)); // Move down
+        }
 
     }
 
