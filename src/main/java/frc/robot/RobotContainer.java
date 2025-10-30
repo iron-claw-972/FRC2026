@@ -45,7 +45,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing();
-  private ArmComp arm = new ArmComp();
+  private ArmComp arm;
  
 
   // Controllers are defined here
@@ -58,8 +58,7 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
-    SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
+    
     // dispatch on the robot
     
     switch (robotId) {
@@ -72,6 +71,10 @@ public class RobotContainer {
 
       default:
       case SwerveCompetition:
+        arm = new ArmComp();
+        SmartDashboard.putData("Sent -80 degrees", new InstantCommand(()-> arm.setSetpoint(-80)));
+        SmartDashboard.putData("Set -70 degrees", new InstantCommand(()-> arm.setSetpoint(-70)));
+        break;
         
 
       case BetaBot:
