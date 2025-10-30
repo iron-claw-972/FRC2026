@@ -8,10 +8,20 @@ public class IntakeConstants {
     public static final double CENTER_OF_MASS_LENGTH = 0.199608903192622; // meters
     public static final double LENGTH = CENTER_OF_MASS_LENGTH * 2; // meters
 
+<<<<<<< HEAD
     public static final double MOI = MASS * LENGTH; // kg*m^2
     public static final double MAX_VELOCITY = 2; // rad/s
     public static final double MAX_ACCELERATION = 10; // rad/s^2
 
     public static final double START_ANGLE = 101.7539148;
     public static final double END_ANGLE = 153.7635904;
+=======
+    public static final double STOW_ANGLE = 90;
+    public static final double START_ANGLE = STOW_ANGLE;
+    //TODO: find this
+    public static final double INTAKE_ANGLE = 40;
+
+    //TODO: find this
+    public static final double FLYWHEEL_SPEED = 0.8;
+>>>>>>> 955545cc2e16af4adbb96eb1e004319262bfc8f0
 }

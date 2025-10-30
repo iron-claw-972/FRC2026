@@ -62,9 +62,11 @@ public class IntakeReal extends IntakeBase {
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
             IntakeConstants.PIVOT_GEAR_RATIO,
-            IntakeConstants.MOI,
-            IntakeConstants.LENGTH,
-            Units.degreesToRadians(-360),
+            //moment of inertia
+            0.01 * 0.01 * 5,
+            //length
+            0.10,
+            Units.degreesToRadians(0),
             Units.degreesToRadians(360),
             true,
             Units.degreesToRadians(IntakeConstants.START_ANGLE)
@@ -110,7 +112,7 @@ public class IntakeReal extends IntakeBase {
         // pid.reset();
         // pid.setSetpoint(Units.degreesToRadians(setPoint));
         //this.setpoint = setpoint;
-        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
+        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(position), 0)));
     }
 
     @Override
@@ -135,30 +137,30 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public void periodic() {
-        position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble());
+        position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
         baseVelocity = Units.rotationsPerMinuteToRadiansPerSecond(baseMotor.getVelocity().getValueAsDouble() * 60);
         flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
 
-        double positionRad = Units.degreesToRadians(getPosition());
-        double velocityRadPerSec = baseVelocity;
+        // double positionRad = Units.degreesToRadians(getPosition());
+        // double velocityRadPerSec = baseVelocity;
 
-        // PID output in volts
-        double pidOutputVolts = pid.calculate(positionRad) * 12.0;
+        // // PID output in volts
+        // double pidOutputVolts = pid.calculate(positionRad) * 12.0;
 
-        // Feedforward voltage (using CURRENT position, not setpoint)
-        double ffVolts = feedforward.calculate(positionRad, velocityRadPerSec);
+        // // Feedforward voltage (using CURRENT position, not setpoint)
+        // double ffVolts = feedforward.calculate(positionRad, velocityRadPerSec);
 
-        // Combine both
-        double outputVolts = pidOutputVolts + ffVolts;
-        basePower = outputVolts / 12.0;
+        // // Combine both
+        // double outputVolts = pidOutputVolts + ffVolts;
+        // basePower = outputVolts / 12.0;
 
         //baseMotor.set(basePower);
         flyWheelMotor.set(flyWheelPower);
 
         ligament2d.setAngle(position);
 
-        SmartDashboard.putNumber("PID Output (V)", pidOutputVolts);
-        SmartDashboard.putNumber("Feedforward (V)", ffVolts);
+        // SmartDashboard.putNumber("PID Output (V)", pidOutputVolts);
+        // SmartDashboard.putNumber("Feedforward (V)", ffVolts);
         SmartDashboard.putNumber("Total Base Power", basePower);
     }
 
@@ -189,7 +191,12 @@ public class IntakeReal extends IntakeBase {
     }
 
     @Override
-    public void setFlyWheel(double speed) {
-        flyWheelMotor.set(speed);
+    public void setFlyWheel() {
+        flyWheelMotor.set(IntakeConstants.FLYWHEEL_SPEED);
     } 
+
+    @Override
+    public void stopFlyWheel(){
+        flyWheelMotor.set(0);
+    }
 }
