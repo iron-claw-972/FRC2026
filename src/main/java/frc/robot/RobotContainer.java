@@ -88,7 +88,7 @@ public class RobotContainer {
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         climb = new Climb();
-        driver = new PS5ControllerDriverConfig(drive, climb);
+        driver = new PS5ControllerDriverConfig(drive, climb, elevator);
         elevator = new Elevator();
         operator = new Operator(drive);
 

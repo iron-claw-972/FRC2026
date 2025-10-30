@@ -74,7 +74,6 @@ public class Climb extends SubsystemBase {
 			SmartDashboard.putData("Climb Display", simulationMechanism);
 		}
 
-
 		pid.setSetpoint(Units.degreesToRadians(START_DEG));
 
 		motor.setPosition(Units.degreesToRotations(START_DEG) * totalGearRatio);

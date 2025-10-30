@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -38,6 +39,8 @@ public class Elevator extends SubsystemBase {
 
     // Elevator motor contoller
     private TalonFX rightMotor = new TalonFX(IdConstants.ELEVATOR_RIGHT_MOTOR, Constants.CANIVORE_CAN);
+
+    private final PIDController pid = new PIDController(1.0, 0, 0.05); // TODO: Change for elevator
 
     // Target elevator position
     private double setpoint = ElevatorConstants.INTAKE_SETPOINT;
@@ -132,7 +135,9 @@ public class Elevator extends SubsystemBase {
     /** Runs only in simulation. Updates virtual physics. */
     @Override
     public void simulationPeriodic() {
-        sim.setInputVoltage(0);
+        // Get actual voltage being applied by the Motion Magic controller
+        double appliedVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
+        sim.setInputVoltage(appliedVoltage);
         sim.update(Constants.LOOP_TIME);
         ligament.setLength(sim.getPositionMeters());
         rightMotor.getSimState().setRawRotorPosition(
@@ -155,6 +160,7 @@ public class Elevator extends SubsystemBase {
         inputs.velocity = rightMotor.getVelocity().getValueAsDouble() / ElevatorConstants.GEARING
                 * (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         inputs.currentAmps = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.appliedVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
     }
 
     /**
@@ -169,6 +175,10 @@ public class Elevator extends SubsystemBase {
      */
     public double getVelocity() {
         return inputs.velocity;
+    }
+
+    public double getAppliedVoltage() {
+        return rightMotor.getMotorVoltage().getValueAsDouble();
     }
 
     /** @return Current applied voltage to motor in V. */
@@ -200,7 +210,7 @@ public class Elevator extends SubsystemBase {
 
     /**
      * @return True if elevator is close enough to its setpoint.
-     * The tolerance is roughly ±0.0375 meters.
+     *         The tolerance is roughly ±0.0375 meters.
      */
     public boolean atSetpoint() {
         return Math.abs(getPosition() - setpoint) < (0.025 + 0.0125);

@@ -11,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.elevator.Elevator;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -23,9 +24,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = () -> false;
     private final Climb climb;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, Climb climb) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Climb climb, Elevator elevator) {
         super(drive);
         this.climb = climb;
+        this.elevator = elevator;
     }
 
     public void configureControls() {
