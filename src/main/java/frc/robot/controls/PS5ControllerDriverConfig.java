@@ -10,13 +10,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.outtake.OuttakeGamePiece;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.Outtake.Outtake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -33,6 +36,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Elevator elevator;
     private Intake intake;
     private Indexer indexer;
+    private Outtake outtake;
     private Pose2d alignmentPose = null;
     private int selectedDirection = 0;
 
@@ -63,6 +67,25 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+
+        // outtake algae to barge (net)
+        driver.get(PS5Button.LEFT_TRIGGER).onTrue(
+            new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.NET));
+
+        // outtake algae to processor
+
+        // outtake coral L1
+        driver.get(PS5Button.CROSS).and(menu.negate()).onTrue(
+            new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L1)
+        );
+
+        // outtake coral L2
+
+        // outtake coral L3
+
+        // outtake coral L4
+
+
     }
 
      /**
