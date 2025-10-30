@@ -6,7 +6,7 @@ public class IntakeConstants {
 
     public static final double MASS = 1.5753263; // kilograms: mass of arm specifically
     public static final double CENTER_OF_MASS_LENGTH = 0.199608903192622; // meters
-    public static final double LENGTH = CENTER_OF_MASS_LENGTH * 2 * 1; // meters
+    public static final double LENGTH = CENTER_OF_MASS_LENGTH * 2; // meters
 
     public static final double MOI = MASS * Math.pow(2, LENGTH); // kg*m^2
     public static final double MAX_VELOCITY = 2; // rad/s
