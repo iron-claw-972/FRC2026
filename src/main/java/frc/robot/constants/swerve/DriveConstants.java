@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotId;
 import frc.robot.constants.Constants;
@@ -35,23 +36,28 @@ public class DriveConstants {
     /** Distance between the left and right wheels [meters]. */
     public static double TRACK_WIDTH = Units.inchesToMeters(20.75);//22.75 swerve bot, 20.75 comp bot
 
-    // Mk4i gear ratios
-    // https://www.swervedrivespecialties.com/products/mk4i-swerve-module
-    //   standard gear ratios
-    // https://www.swervedrivespecialties.com/products/kit-adapter-16t-drive-pinion-gear-mk4i
-    //   changes 14-tooth pinion to 16-tooth pinion -- (50.0 / 14.0) becomes (50.0 / 16.0).
-    /** Drive gear ratio for an Mk4i with L2-Plus gearing */
-    public static double DRIVE_GEAR_RATIO = (50.0 / 16.0) * (17.0 / 27.0) * (45.0 / 15.0);
-    // all MK4i modules have the same steering gear ratio
-    public static final double STEER_GEAR_RATIO = 150.0 / 7.0;
+    /**
+     * Drive gear ratio for MK5n swerve module 
+     */
+    public static double DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); 
+ 
+    /** 
+     * Steer gear ratio for MK5n swerve module 
+     */
+    public static final double STEER_GEAR_RATIO = 287.0 / 11.0; // TODO: make an enum for all these drivetrain/module constants 
 
-    /** Theoretical maximum speed of the robot based on maximum motor RPM, gear ratio, and wheel radius */
-    public static final double MAX_SPEED = 4.5;
+    /** Theoretical maximum speed of the robot based on maximum motor RPM, gear ratio, and wheel radius in m/s */
+    // Kraken x60 has 100.0 rotations per second max velocity 
+    // I don't know if this is right 
+    public static final double MAX_SPEED = 100.0 / (DRIVE_GEAR_RATIO) * (2 * Math.PI * WHEEL_RADIUS);
 
     // Need to convert tangential velocity (the m/s of the edge of the robot) to angular velocity (the radians/s of the robot)
     // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
     public static final double MAX_ANGULAR_SPEED = MAX_SPEED / ((TRACK_WIDTH / 2) * Math.sqrt(2));
 
+    /**
+     * Coefficient of static friction
+     */
     public static final double COSF = 0.9;
     
     // The maximum acceleration of the robot, limited by friction
