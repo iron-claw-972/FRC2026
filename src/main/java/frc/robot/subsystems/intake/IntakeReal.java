@@ -63,9 +63,9 @@ public class IntakeReal extends IntakeBase {
             baseIntakeMotorSim,
             IntakeConstants.PIVOT_GEAR_RATIO,
             //moment of inertia
-            0.01 * 0.01 * 5,
+            IntakeConstants.MOI,
             //length
-            0.10,
+            IntakeConstants.LENGTH,
             Units.degreesToRadians(0),
             Units.degreesToRadians(360),
             true,
@@ -77,10 +77,10 @@ public class IntakeReal extends IntakeBase {
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
-        config.Slot0.kG = 0; // Gravity compensation
+        config.Slot0.kG = IntakeConstants.MASS * IntakeConstants.CENTER_OF_MASS_LENGTH * 9.8 / IntakeConstants.PIVOT_GEAR_RATIO; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(1 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(1.5 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
@@ -101,8 +101,8 @@ public class IntakeReal extends IntakeBase {
         SmartDashboard.putData("intake", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        SmartDashboard.putData("Set intake 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        SmartDashboard.putData("Set intake 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        SmartDashboard.putData("Set intake stow angle", new InstantCommand(() -> setSetpoint(IntakeConstants.STOW_ANGLE)));
+        SmartDashboard.putData("Set intake down angle", new InstantCommand(() -> setSetpoint(IntakeConstants.INTAKE_ANGLE)));
         SmartDashboard.putData("Set intake 0 degrees", new InstantCommand(() -> setSetpoint(0)));
         SmartDashboard.putData("Set intake 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
     }
