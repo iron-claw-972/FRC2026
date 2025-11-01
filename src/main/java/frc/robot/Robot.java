@@ -75,7 +75,8 @@ public class Robot extends LoggedRobot {
         //     changes networktables.json, networktables.json.bck (both Untracked)
         //   Uncomment the next line, set the desired RobotId, deploy, and then comment the line out
         //  RobotId.setRobotId(RobotId.SwerveCompetition);
-        DriveConstants.update(RobotId.getRobotId());
+        // DriveConstants.update(RobotId.getRobotId());
+        // TODO: fix above
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();

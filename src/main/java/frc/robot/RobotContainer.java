@@ -24,7 +24,9 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.ArmBase;
 import frc.robot.subsystems.ArmComp;
+import frc.robot.subsystems.ArmCompSoftPID;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -45,7 +47,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing();
-  private ArmComp arm;
+  private ArmBase arm;
  
 
   // Controllers are defined here
@@ -71,9 +73,15 @@ public class RobotContainer {
 
       default:
       case SwerveCompetition:
-        arm = new ArmComp();
+        arm = new ArmCompSoftPID();
+        // // InsantCommands to set the different setpoints
+        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> arm.setSetpoint(90)));
+        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> arm.setSetpoint(180)));
+        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> arm.setSetpoint(0)));
+        SmartDashboard.putData("Set 67 degrees", new InstantCommand(() -> arm.setSetpoint(67)));
         SmartDashboard.putData("Sent -80 degrees", new InstantCommand(()-> arm.setSetpoint(-80)));
         SmartDashboard.putData("Set -70 degrees", new InstantCommand(()-> arm.setSetpoint(-70)));
+        
         break;
         
 
@@ -84,7 +92,7 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
-        arm = new ArmComp();
+        arm = new ArmCompSoftPID();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
