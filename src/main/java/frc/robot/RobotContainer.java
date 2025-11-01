@@ -95,6 +95,10 @@ public class RobotContainer {
         break;
 
       case TestBed2:
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        drive = new Drivetrain(vision, new GyroIOPigeon2());
+        driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
+        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
 
       default:

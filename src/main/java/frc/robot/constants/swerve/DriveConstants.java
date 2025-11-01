@@ -248,6 +248,14 @@ public class DriveConstants {
             STEER_OFFSET_BACK_RIGHT = 77.199;
 
             DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+        } else if (robotId == RobotId.TestBed2) {
+            ROBOT_MASS = 30;
+            WHEEL_MOI = 0.000326 * ROBOT_MASS;
+
+            STEER_OFFSET_FRONT_LEFT = 0.0;
+            STEER_OFFSET_FRONT_RIGHT = 0.0;
+            STEER_OFFSET_BACK_LEFT = 0.0;
+            STEER_OFFSET_BACK_RIGHT = 0.0;
         }
         
         MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
