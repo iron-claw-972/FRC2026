@@ -34,13 +34,13 @@ public class ArmComp extends ArmBase {
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
     /**in degrees*/
-    private double setpoint = ArmConstants.START_ANGLE;
+    //private double setpoint = ArmConstants.START_ANGLE;
 
     // sim? motor idk which one to use
     // simulation Objects
 
     // TODO: fix gear ratio
-    double gearRatio = 14;
+    double gearRatio = 29.36;
 
     public ArmComp() {
         // tell the PID object the tolerance
@@ -52,7 +52,7 @@ public class ArmComp extends ArmBase {
 
         slot0Configs.kS = 0;
         // torque of gravity / gear ratio
-        slot0Configs.kG = (ArmConstants.MASS * 9.81 * ArmConstants.CENTER_OF_MASS_LENGTH ) / gearRatio;
+        slot0Configs.kG = ((ArmConstants.MASS * 9.81 * ArmConstants.CENTER_OF_MASS_LENGTH ) / gearRatio);
         slot0Configs.kV = 0.12;
         slot0Configs.kA = 0.0;
         slot0Configs.kP = 0.1 * 2 * Math.PI; // in rotations, not radians like the normal p
@@ -64,7 +64,11 @@ public class ArmComp extends ArmBase {
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(ArmConstants.MAX_ACCELERATION * gearRatio);
 
         motor.getConfigurator().apply(talonFXConfigs);
-        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));  
+        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)); 
+        
+
+        // setting the motor encoder starting position to 0 degrees, but the arm is at the start angle
+        motor.setPosition(0);
     
 
         // Tell the PID object what the setpoint is
@@ -72,7 +76,8 @@ public class ArmComp extends ArmBase {
         // Ideally, the PID target value should also be zero
         // because if we were to call getAngle() right now, it would be zero rather than
         // START_ANGLE.
-        setSetpoint(ArmConstants.START_ANGLE); 
+        
+        //setSetpoint(ArmConstants.START_ANGLE); 
         // simulation Arm
         armSim = new SingleJointedArmSim(
             simMotor, 
@@ -102,12 +107,12 @@ public class ArmComp extends ArmBase {
         // Obtain the motor position
         double position = getAngle();
         // PID calculation
-        double powerPID = pid.calculate(Units.degreesToRadians(position));
+        //double powerPID = pid.calculate(Units.degreesToRadians(position));
         // set motor power to the result of the PID calculation
         //motor.set(powerPID + ff.calculate(Units.degreesToRadians(position),0));
 
-        double setpointRotations = Units.degreesToRotations(setpoint) * gearRatio;
-        motor.setControl(voltageRequest.withPosition(setpointRotations).withFeedForward(ff.calculate(Units.degreesToRadians(position),0)));
+        //double setpointRotations = Units.degreesToRotations(setpoint) * gearRatio;
+        
         // display the current position of the arm
         displayPosition(position);
     }
@@ -146,7 +151,8 @@ public class ArmComp extends ArmBase {
         // Tell the PID object what thsete setpoint is
         // PID is using radians
         //pid.setSetpoint(Units.degreesToRadians(setpoint));
-        setpoint = this.setpoint;
+        double setpointAdjusted = (setpoint - ArmConstants.START_ANGLE) * gearRatio;
+        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpointAdjusted)).withFeedForward(ff.calculate(Units.degreesToRadians(getAngle()),0)));
     }
 
     /** Gets the arm angle in degrees */
