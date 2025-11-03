@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.outtake.OuttakeGamePiece;
 import frc.robot.constants.Constants;
@@ -49,6 +50,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     }
 
     public void configureControls() {
+        Trigger menu = driver.get(DPad.UP);
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
             new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
@@ -80,6 +82,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         );
 
         // outtake coral L2
+        driver.get(PS5Butto)
 
         // outtake coral L3
 
