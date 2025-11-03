@@ -73,7 +73,7 @@ public class RobotContainer {
 
       default:
       case SwerveCompetition:
-        arm = new ArmCompSoftPID();
+        arm = new ArmComp();
         // // InsantCommands to set the different setpoints
         SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> arm.setSetpoint(90)));
         SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> arm.setSetpoint(180)));

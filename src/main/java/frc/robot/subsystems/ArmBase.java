@@ -17,9 +17,7 @@ public class ArmBase extends SubsystemBase {
 
     public ArmBase(){
         // Puts the mechanism on the smartdashboard
-        SmartDashboard.putData("arm display", mechanism2d);
-
-        
+        SmartDashboard.putData("arm display", mechanism2d);  
     }
     
     public void setSetpoint(double setpoint){

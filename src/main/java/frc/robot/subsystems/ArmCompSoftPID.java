@@ -61,7 +61,6 @@ public class ArmCompSoftPID extends ArmBase {
 
         displayPosition(angle);
 
-        System.out.println("periodic");
     }
 
     @Override

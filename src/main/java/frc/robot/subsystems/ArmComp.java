@@ -109,6 +109,8 @@ public class ArmComp extends ArmBase {
         
         // display the current position of the arm
         displayPosition(position);
+        System.out.println("FF: " + ff.calculate(Units.degreesToRadians(getAngle()), 0));
+        SmartDashboard.putNumber("arm angle", getAngle());
     }
 
     @Override
@@ -147,7 +149,7 @@ public class ArmComp extends ArmBase {
         //pid.setSetpoint(Units.degreesToRadians(setpoint));
         
         double setpointAdjusted = (setpoint - ArmConstants.START_ANGLE) * gearRatio;
-        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpointAdjusted)));//.withFeedForward(ff.calculate(Units.degreesToRadians(getAngle()),0)));
+        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpointAdjusted)).withFeedForward(ff.calculate(Units.degreesToRadians(getAngle()),0)));
     }
 
     /** Gets the arm angle in degrees */
@@ -162,7 +164,7 @@ public class ArmComp extends ArmBase {
     public boolean atSetpoint() {
         // return (Math.abs(Units.radiansToDegrees(pid.getSetpoint()) - getAngle()) < ArmConstants.TOLERANCE);
         //return pid.atSetpoint();
-        return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3;
+        return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3.0;
     }
 
     public double getAppliedVoltage() {
