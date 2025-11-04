@@ -6,7 +6,7 @@ public abstract class IntakeBase extends SubsystemBase {
     public abstract void setSetpoint(double setPoint);
     public abstract void setFlyWheel();
     public abstract void stopFlyWheel();
-    public abstract double getPosition();
+    public abstract double getAngle();
     public abstract double getBaseMotorVelocity();
     public abstract double getFlyWheelVelocity();
     public abstract boolean atSetpoint();

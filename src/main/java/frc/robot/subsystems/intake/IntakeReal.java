@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -26,7 +27,7 @@ import frc.robot.constants.IntakeConstants;
 public class IntakeReal extends IntakeBase {
     private TalonFX flyWheelMotor;
     private TalonFX baseMotor;
-    private double position;
+    private double position = IntakeConstants.START_ANGLE;
 
     private double baseVelocity;
     private double flyWheelVelocity;
@@ -52,6 +53,8 @@ public class IntakeReal extends IntakeBase {
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("baseMotor", 25, 0));
+
+    private final DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(0);
 
     public IntakeReal() {
         baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID);
@@ -113,11 +116,14 @@ public class IntakeReal extends IntakeBase {
         // pid.setSetpoint(Units.degreesToRadians(setPoint));
         //this.setpoint = setpoint;
         baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(position), 0)));
+        //baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
     }
 
     @Override
-    public double getPosition() {
-        return position;
+    public double getAngle() {
+        double encoderRotations = absoluteEncoder.get(); // 0–1 rotations
+        double armRotations = encoderRotations / (IntakeConstants.PIVOT_GEAR_RATIO / 18.0);
+        return Units.rotationsToDegrees(armRotations);
     }
     
     @Override
@@ -132,7 +138,7 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public boolean atSetpoint() {
-        return Math.abs(getPosition() - setpoint) < 3.0;
+        return Math.abs(getAngle() - setpoint) < 3.0;
     }
 
     @Override
@@ -193,7 +199,7 @@ public class IntakeReal extends IntakeBase {
     @Override
     public void setFlyWheel() {
         flyWheelMotor.set(IntakeConstants.FLYWHEEL_SPEED);
-    } 
+    }
 
     @Override
     public void stopFlyWheel(){
