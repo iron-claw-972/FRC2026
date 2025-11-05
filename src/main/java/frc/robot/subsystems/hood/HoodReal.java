@@ -70,6 +70,7 @@ public class HoodReal extends HoodBase {
         motor.setNeutralMode(NeutralModeValue.Brake);
 
 
+
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0; // Gravity compensation

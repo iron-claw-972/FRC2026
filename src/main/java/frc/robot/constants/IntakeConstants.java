@@ -18,5 +18,4 @@ public class IntakeConstants {
 
     //TODO: find this
     public static final double FLYWHEEL_SPEED = 0.8;
-
 }
