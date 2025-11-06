@@ -16,7 +16,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,8 +38,6 @@ public class Elevator extends SubsystemBase {
 
     // Elevator motor contoller
     private TalonFX rightMotor = new TalonFX(IdConstants.ELEVATOR_RIGHT_MOTOR, Constants.CANIVORE_CAN);
-
-    private final PIDController pid = new PIDController(1.0, 0, 0.05); // TODO: Change for elevator
 
     // Target elevator position
     private double setpoint = ElevatorConstants.INTAKE_SETPOINT;
