@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
+import frc.robot.commands.TestButton;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -25,6 +27,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Arm.ArmBase;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
@@ -35,6 +38,8 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
+import lib.controllers.PS5Controller;
+import lib.controllers.PS5Controller.PS5Button;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -50,11 +55,11 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing();
-  private ArmComp arm = new ArmComp();
-  private Elevator elevator = new Elevator();
-  private Outtake outtake = new Outtake();
-  private Intake intake = new Intake();
-  private Indexer indexer = new Indexer();
+  //private ArmBase arm = new ArmComp();
+  // private Elevator elevator = new Elevator();
+  // private Outtake outtake = new Outtake();
+  // private Intake intake = new Intake();
+  // private Indexer indexer = new Indexer();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -66,8 +71,9 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
-    SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
+    SmartDashboard.putString("robot id", robotId.toString());
+    // SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
+    // SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
     // dispatch on the robot
     
     switch (robotId) {
@@ -79,6 +85,17 @@ public class RobotContainer {
         break;
 
       default:
+        SmartDashboard.putData("commands", CommandScheduler.getInstance());
+        final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
+        driver.get(PS5Button.CIRCLE).onTrue(
+          new TestButton()
+        );
+
+        driver.get(PS5Button.TRIANGLE).whileTrue(
+          new TestButton()
+        );
+        //new TestButton().schedule();
+        break;
       case SwerveCompetition:
         
 
@@ -89,9 +106,9 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
-        arm = new ArmComp();
+        //arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer);
+        //driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
@@ -100,7 +117,7 @@ public class RobotContainer {
         // SignalLogger.start();
         
 
-        driver.configureControls();
+        //driver.configureControls();
         operator.configureControls();
         
         initializeAutoBuilder();
@@ -113,7 +130,7 @@ public class RobotContainer {
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
-        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        //drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
       }
 
