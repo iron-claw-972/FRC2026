@@ -80,6 +80,11 @@ public class Elevator extends SubsystemBase {
                             "elevator", ElevatorConstants.START_HEIGHT,
                             90 - Units.radiansToDegrees(Math.abs(ElevatorConstants.ANGLE))));
             SmartDashboard.putData("elevator", mechanism);
+
+            // Initialize simulation motor position to match starting height
+            double startingRotations = ElevatorConstants.GEARING * ElevatorConstants.START_HEIGHT
+                    / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
+            rightMotor.getSimState().setRawRotorPosition(startingRotations);
         }
         Timer.delay(1.0);
 
@@ -121,7 +126,8 @@ public class Elevator extends SubsystemBase {
         if (setpoint2 < ElevatorConstants.SAFE_SETPOINT && (armStowed == null || !armStowed.getAsBoolean())) {
             setpoint2 = ElevatorConstants.SAFE_SETPOINT;
         }
-        double setpointRotations = ElevatorConstants.GEARING * setpoint2 / ElevatorConstants.DRUM_RADIUS / Math.PI / 2;
+        double setpointRotations = ElevatorConstants.GEARING * setpoint2
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         rightMotor.setControl(voltageRequest.withPosition(setpointRotations).withFeedForward(0.4));
         updateInputs();
         Logger.processInputs("Elevator", inputs);
@@ -136,9 +142,18 @@ public class Elevator extends SubsystemBase {
         double appliedVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
         sim.setInputVoltage(appliedVoltage);
         sim.update(Constants.LOOP_TIME);
+
+        // Update visualization
         ligament.setLength(sim.getPositionMeters());
-        rightMotor.getSimState().setRawRotorPosition(
-                sim.getPositionMeters() / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS) * ElevatorConstants.GEARING);
+
+        // Clamp simulation position to physical limits to prevent unrealistic behavior
+        double clampedPosition = MathUtil.clamp(sim.getPositionMeters(),
+                ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT);
+
+        // Update motor simulation state with clamped position
+        double motorRotations = ElevatorConstants.GEARING * clampedPosition
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
+        rightMotor.getSimState().setRawRotorPosition(motorRotations);
     }
 
     /** Resets the encoder position to a given height (meters). */
@@ -186,7 +201,7 @@ public class Elevator extends SubsystemBase {
     /**
      * Method to set the setpoint of the elevator. Clamped between min and max
      * height.
-     * 
+     *
      * @param setpoint The setpoint in meters.
      */
     public void setSetpoint(double setpoint) {

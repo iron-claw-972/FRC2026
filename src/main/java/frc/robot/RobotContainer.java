@@ -88,8 +88,8 @@ public class RobotContainer {
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         climb = new Climb();
-        driver = new PS5ControllerDriverConfig(drive, climb, elevator);
         elevator = new Elevator();
+        driver = new PS5ControllerDriverConfig(drive, climb, elevator);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

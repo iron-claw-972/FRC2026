@@ -57,7 +57,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> climb.stow()));
         driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> climb.climb()));
 
-        // TODO: change controls as needed 
+        // TODO: change controls as needed
         // Elevator controls
         if (elevator != null) {
             driver.get(PS5Button.LB).onTrue(new MoveElevator(elevator, 0.5)); // Move up
