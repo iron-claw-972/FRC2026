@@ -70,6 +70,7 @@ public class HoodReal extends HoodBase {
         motor.setNeutralMode(NeutralModeValue.Brake);
 
 
+
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0; // Gravity compensation
@@ -144,5 +145,21 @@ public class HoodReal extends HoodBase {
         double motorRotations = simRotations * hoodGearRatio;
 
         encoderSim.setRawRotorPosition(motorRotations);
+    }
+
+    // This is radians
+    @Override
+    public double calculateAngle(double initialVelocity, double goalHeight, double goalDistance) {
+        var x = (Constants.GRAVITY_ACCELERATION * goalDistance * goalDistance) + (2 * goalHeight * initialVelocity * initialVelocity);
+        var y = initialVelocity * initialVelocity - Math.sqrt(initialVelocity * initialVelocity * initialVelocity * initialVelocity - Constants.GRAVITY_ACCELERATION * x);
+        var z = Math.atan(y/(Constants.GRAVITY_ACCELERATION * goalDistance));
+        return z;
+    }
+
+    @Override
+    public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
+        double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
+        double angleDeg = Units.radiansToDegrees(angleRad);
+        setSetpoint(angleDeg);
     }
 }
