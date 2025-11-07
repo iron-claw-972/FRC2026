@@ -13,7 +13,9 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -47,8 +49,8 @@ public class IntakeReal extends IntakeBase {
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(IntakeConstants.START_ANGLE * IntakeConstants.PIVOT_GEAR_RATIO);
-    private double setpoint = IntakeConstants.START_ANGLE;
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(getAngle() * IntakeConstants.PIVOT_GEAR_RATIO);
+    private double setpoint = getAngle();
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
@@ -75,7 +77,8 @@ public class IntakeReal extends IntakeBase {
             Units.degreesToRadians(IntakeConstants.START_ANGLE)
         );
 
-        baseMotor.setPosition(Units.degreesToRotations(IntakeConstants.START_ANGLE * IntakeConstants.PIVOT_GEAR_RATIO));
+        double absoluteAngleDegrees =  getAbsoluteEncoderAngle() - IntakeConstants.ABSOLUTE_OFFSET_ANGLE;
+        baseMotor.setPosition(Units.degreesToRotations(absoluteAngleDegrees * IntakeConstants.PIVOT_GEAR_RATIO));
         baseMotor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -91,7 +94,6 @@ public class IntakeReal extends IntakeBase {
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.MAX_VELOCITY * IntakeConstants.PIVOT_GEAR_RATIO);
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(IntakeConstants.MAX_ACCELERATION * IntakeConstants.PIVOT_GEAR_RATIO);
 
-        //TODO: Check if this is right
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
         baseMotor.getConfigurator().apply(config);
@@ -115,15 +117,23 @@ public class IntakeReal extends IntakeBase {
         // pid.reset();
         // pid.setSetpoint(Units.degreesToRadians(setPoint));
         //this.setpoint = setpoint;
-        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(position), 0)));
+        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
         //baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
     }
 
+    public double getAbsoluteEncoderAngle(){
+        double rotations = absoluteEncoder.get();
+        double armRotations = rotations / (IntakeConstants.PIVOT_GEAR_RATIO / 18.0);
+        return Units.rotationsToDegrees(armRotations);
+    }
+
+    /**
+     * Gets the angle of the intake
+     * @return The angle in degrees
+     */
     @Override
     public double getAngle() {
-        double encoderRotations = absoluteEncoder.get(); // 0–1 rotations
-        double armRotations = encoderRotations / (IntakeConstants.PIVOT_GEAR_RATIO / 18.0);
-        return Units.rotationsToDegrees(armRotations);
+        return position;
     }
     
     @Override
@@ -169,8 +179,6 @@ public class IntakeReal extends IntakeBase {
         // SmartDashboard.putNumber("Feedforward (V)", ffVolts);
         SmartDashboard.putNumber("Total Base Power", basePower);
     }
-
-
 
     public double getAppliedVoltage() {
         return baseMotor.getMotorVoltage().getValueAsDouble();
