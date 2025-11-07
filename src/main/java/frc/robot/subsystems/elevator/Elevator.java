@@ -82,7 +82,8 @@ public class Elevator extends SubsystemBase {
             SmartDashboard.putData("elevator", mechanism);
 
             // Initialize simulation motor position to match starting height
-            double startingRotations = ElevatorConstants.GEARING * ElevatorConstants.START_HEIGHT
+            // Account for motor inversion: positive sim position = negative motor rotations
+            double startingRotations = -ElevatorConstants.GEARING * ElevatorConstants.START_HEIGHT
                     / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
             rightMotor.getSimState().setRawRotorPosition(startingRotations);
         }
@@ -105,9 +106,9 @@ public class Elevator extends SubsystemBase {
         // set Motion Magic settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.GEARING * maxVelocity
-                / ElevatorConstants.DRUM_RADIUS / Math.PI / 2; // Target cruise velocity
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS); // Target cruise velocity
         motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.GEARING * maxAcceleration
-                / ElevatorConstants.DRUM_RADIUS / Math.PI / 2; // Target acceleration
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS); // Target acceleration
         rightMotor.getConfigurator().apply(talonFXConfigs);
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         updateInputs();
@@ -146,12 +147,9 @@ public class Elevator extends SubsystemBase {
         // Update visualization
         ligament.setLength(sim.getPositionMeters());
 
-        // Clamp simulation position to physical limits to prevent unrealistic behavior
-        double clampedPosition = MathUtil.clamp(sim.getPositionMeters(),
-                ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT);
-
-        // Update motor simulation state with clamped position
-        double motorRotations = ElevatorConstants.GEARING * clampedPosition
+        // Update motor simulation state: convert sim position to motor rotations
+        // Account for motor inversion: positive sim position = negative motor rotations
+        double motorRotations = -ElevatorConstants.GEARING * sim.getPositionMeters()
                 / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         rightMotor.getSimState().setRawRotorPosition(motorRotations);
     }
