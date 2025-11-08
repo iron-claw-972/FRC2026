@@ -8,8 +8,8 @@ public class IntakeConstants {
     public static final double LENGTH = 0.245750; // meters
 
     public static final double MOI = 0.0644; // kg*m^2
-    public static final double MAX_VELOCITY = 40; // rad/s
-    public static final double MAX_ACCELERATION = 50; // rad/s^2
+    public static final double MAX_VELOCITY = 21.0; // rad/s
+    public static final double MAX_ACCELERATION = 120.0; // rad/s^2
 
     public static final double START_ANGLE = 101.7539148;
     public static final double INTAKE_ANGLE = 153.7635904;

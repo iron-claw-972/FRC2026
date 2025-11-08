@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -86,7 +87,7 @@ public class IntakeReal extends IntakeBase {
         config.Slot0.kG = IntakeConstants.MASS * IntakeConstants.CENTER_OF_MASS_LENGTH * 9.8 / IntakeConstants.PIVOT_GEAR_RATIO; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(1.5 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(5.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
@@ -117,7 +118,8 @@ public class IntakeReal extends IntakeBase {
         // pid.reset();
         // pid.setSetpoint(Units.degreesToRadians(setPoint));
         //this.setpoint = setpoint;
-        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
+        double clampedSetpoint = MathUtil.clamp(setpoint, 90.0, 180.0);
+        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
         //baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
     }
 
