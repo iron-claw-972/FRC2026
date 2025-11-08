@@ -71,9 +71,35 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         )));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RB).and(menu.negate()).onTrue(new InstantCommand(()->{
+            if(elevator != null){
+                if(outtake != null && outtake.coralLoaded()){
+                    elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT);
+                }else{
+                    elevator.setSetpoint(ElevatorConstants.STOW_SETPOINT);
+                }
+            }
+            if(outtake != null){
+                outtake.setMotor(0);
+            }
+            if(intake != null){
+                intake.stow();
+                intake.stopRollers();
+            }
+            if(indexer != null){
+                indexer.stop();
+            }
+            if(arm != null){
+                if(outtake != null && outtake.coralLoaded()){
+                    arm.setSetpoint(ArmConstants.STOW_SETPOINT);
+                }else{
+                    arm.setSetpoint(ArmConstants.START_ANGLE);
+                }
+            }
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(()->null);
+            alignmentPose = null;
+            selectedDirection = 0;
             CommandScheduler.getInstance().cancelAll();
         }));
 
@@ -115,7 +141,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // TODO: top algae position intake (take off the reef)
 
         // I DONT KNOW IF THIS WORKS 
-        // intake coral
+        // intake coral 
+        // THIS WORKs when we use the instant command () -> intake.unstow() but it doesn't work when we call the command
         driver.get(PS5Button.RIGHT_TRIGGER).toggleOnTrue(
             new ConditionalCommand(
                 new IntakeCoral(intake, indexer, elevator, outtake, arm), 
@@ -124,7 +151,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 () -> !outtake.coralLoaded())
         );
 
-        // outtake coral
+       // outtake coral
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new ConditionalCommand(
                 new OuttakeGamePiece(elevator, arm, intake, outtake), 

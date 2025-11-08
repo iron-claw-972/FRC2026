@@ -64,11 +64,12 @@ public class Elevator extends SubsystemBase {
 
     /** Creates a new Elevator subsystem. */
     public Elevator() {
-        SmartDashboard.putData("move elevator 1 m", new InstantCommand(() -> setSetpoint(1.0)));
-        SmartDashboard.putData("move elevator 0 m", new InstantCommand(() -> setSetpoint(0.0)));
         // Initialize simulation tools if running in a simulated environment
         // This increases both the time and memory efficiency of the code when running
         // on a real robot; do not remove this if statement
+        SmartDashboard.putData("raise 1 meter", new InstantCommand(() -> setSetpoint(1.0)));
+        SmartDashboard.putData("0 meter", new InstantCommand(() -> setSetpoint(0)));
+        
         if (RobotBase.isSimulation()) {
             sim = new AngledElevatorSim(ElevatorConstants.MOTOR, ElevatorConstants.GEARING,
                     ElevatorConstants.CARRIAGE_MASS,
@@ -83,6 +84,12 @@ public class Elevator extends SubsystemBase {
                             "elevator", ElevatorConstants.START_HEIGHT,
                             90 - Units.radiansToDegrees(Math.abs(ElevatorConstants.ANGLE))));
             SmartDashboard.putData("elevator", mechanism);
+
+            // Initialize simulation motor position to match starting height
+            // Account for motor inversion: positive sim position = negative motor rotations
+            double startingRotations = -ElevatorConstants.GEARING * ElevatorConstants.START_HEIGHT
+                    / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
+            rightMotor.getSimState().setRawRotorPosition(startingRotations);
         }
         Timer.delay(1.0);
 
@@ -103,26 +110,29 @@ public class Elevator extends SubsystemBase {
         // set Motion Magic settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.GEARING * maxVelocity
-                / ElevatorConstants.DRUM_RADIUS / Math.PI / 2; // Target cruise velocity
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS); // Target cruise velocity
         motionMagicConfigs.MotionMagicAcceleration = ElevatorConstants.GEARING * maxAcceleration
-                / ElevatorConstants.DRUM_RADIUS / Math.PI / 2; // Target acceleration
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS); // Target acceleration
         rightMotor.getConfigurator().apply(talonFXConfigs);
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         updateInputs();
         PhoenixUtil.tryUntilOk(100, () -> rightMotor.setNeutralMode(NeutralModeValue.Brake));
     }
 
+    /** Sets the arm stowed condition supplier (for safety interlock). */
     public void setArmStowed(BooleanSupplier armStowed) {
         this.armStowed = armStowed;
     }
 
+    /** Runs every 20ms. Handles motor commands and state logging. */
     @Override
     public void periodic() {
         double setpoint2 = setpoint;
         if (setpoint2 < ElevatorConstants.SAFE_SETPOINT && (armStowed == null || !armStowed.getAsBoolean())) {
             setpoint2 = ElevatorConstants.SAFE_SETPOINT;
         }
-        double setpointRotations = ElevatorConstants.GEARING * setpoint2 / ElevatorConstants.DRUM_RADIUS / Math.PI / 2;
+        double setpointRotations = ElevatorConstants.GEARING * setpoint2
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         rightMotor.setControl(voltageRequest.withPosition(setpointRotations).withFeedForward(0.4));
         updateInputs();
         Logger.processInputs("Elevator", inputs);
@@ -130,15 +140,25 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/AtSetpoint", atSetpoint());
     }
 
+    /** Runs only in simulation. Updates virtual physics. */
     @Override
     public void simulationPeriodic() {
-        sim.setInputVoltage(0);
+        // Get actual voltage being applied by the Motion Magic controller
+        double appliedVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
+        sim.setInputVoltage(appliedVoltage);
         sim.update(Constants.LOOP_TIME);
+
+        // Update visualization
         ligament.setLength(sim.getPositionMeters());
-        rightMotor.getSimState().setRawRotorPosition(
-                sim.getPositionMeters() / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS) * ElevatorConstants.GEARING);
+
+        // Update motor simulation state: convert sim position to motor rotations
+        // Account for motor inversion: positive sim position = negative motor rotations
+        double motorRotations = -ElevatorConstants.GEARING * sim.getPositionMeters()
+                / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
+        rightMotor.getSimState().setRawRotorPosition(motorRotations);
     }
 
+    /** Resets the encoder position to a given height (meters). */
     public void resetEncoder(double height) {
         // Without the if statement, this causes loop overruns in simulation, and this
         // code does nothing anyway on sim (it sets the position to itself)
@@ -147,12 +167,14 @@ public class Elevator extends SubsystemBase {
         }
     }
 
+    /** Updates telemetry input struct from hardware sensors. */
     public void updateInputs() {
         inputs.measuredPosition = rightMotor.getPosition().getValueAsDouble() / ElevatorConstants.GEARING
                 * (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         inputs.velocity = rightMotor.getVelocity().getValueAsDouble() / ElevatorConstants.GEARING
                 * (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         inputs.currentAmps = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.appliedVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
     }
 
     /**
@@ -169,6 +191,11 @@ public class Elevator extends SubsystemBase {
         return inputs.velocity;
     }
 
+    public double getAppliedVoltage() {
+        return rightMotor.getMotorVoltage().getValueAsDouble();
+    }
+
+    /** @return Current applied voltage to motor in V. */
     public double getVoltage() {
         return voltage;
     }
@@ -176,7 +203,7 @@ public class Elevator extends SubsystemBase {
     /**
      * Method to set the setpoint of the elevator. Clamped between min and max
      * height.
-     * 
+     *
      * @param setpoint The setpoint in meters.
      */
     public void setSetpoint(double setpoint) {
@@ -190,10 +217,15 @@ public class Elevator extends SubsystemBase {
         return setpoint;
     }
 
+    /** @return Mechanism2d object for simulation visualization. */
     public Mechanism2d getMechanism2d() {
         return mechanism;
     }
 
+    /**
+     * @return True if elevator is close enough to its setpoint.
+     *         The tolerance is roughly ±0.0375 meters.
+     */
     public boolean atSetpoint() {
         return Math.abs(getPosition() - setpoint) < (0.025 + 0.0125);
     }
