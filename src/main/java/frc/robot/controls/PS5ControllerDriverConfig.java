@@ -8,14 +8,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
+import frc.robot.commands.DoNothing;
+import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.SetArm;
 import frc.robot.commands.gpm.SetElevator;
+import frc.robot.commands.gpm.intake.IntakeCoral;
 import frc.robot.commands.gpm.outtake.OuttakeGamePiece;
 import frc.robot.commands.gpm.outtake.SetOuttakeGamePiece;
 import frc.robot.constants.ArmConstants;
@@ -95,37 +99,121 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             )
         );
 
+        // Alignment
+        driver.get(DPad.LEFT).toggleOnTrue(new InstantCommand(() -> {
+            selectedDirection = -1;
+        }));
+
+        driver.get(DPad.RIGHT).toggleOnTrue(new InstantCommand(() -> {
+            selectedDirection = 1;
+        }));
+
         // TODO: bottom algae position intake (take off the reef)
     
 
         // TODO: top algae position intake (take off the reef)
+
+        // intake/outtake coral
+        // I DONT KNOW IF THIS WORKS 
+        driver.get(PS5Button.RIGHT_TRIGGER).toggleOnTrue(
+            new ConditionalCommand(
+                new IntakeCoral(intake, indexer, elevator, outtake, arm), 
+                new DoNothing(), 
+                () -> !outtake.coralLoaded())
+        );
+        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
+            new ConditionalCommand(
+                new OuttakeGamePiece(elevator, arm, intake, outtake, null), 
+                new DoNothing(), 
+                () -> outtake.coralLoaded())
+        );
        
 
-        // outtake coral L1
-        driver.get(PS5Button.CROSS).and(menu.negate()).whileTrue(
+        // set coral L1
+        driver.get(PS5Button.CROSS).and(menu.negate()).onTrue(
             new SequentialCommandGroup(
-                new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),
-                new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L1)
+                new InstantCommand(() -> setAlignmentPose(false, true)),
+                new ConditionalCommand(
+                    // with vision
+                    new ParallelCommandGroup(
+                        new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                    ),
+                    // Manual
+                    new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),  
+                    () -> selectedDirection != 0),
+                new ConditionalCommand(
+                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L1), 
+                    new DoNothing(), 
+                    () -> selectedDirection != 0
+                )
             )
         );
 
-        // outtake coral L2222
-        driver.get(PS5Button.SQUARE).and(menu.negate()).whileTrue(
+        // outtake coral L2 and outtake algae L2
+        driver.get(PS5Button.SQUARE).and(menu.negate()).onTrue(
             new SequentialCommandGroup(
-                new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),
-                new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L2)
+                new InstantCommand(() -> setAlignmentPose(false, false)),
+                new ConditionalCommand(
+                    // with vision
+                    new ParallelCommandGroup(
+                        new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                    ),
+                    // Manual
+                    new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),  
+                    () -> selectedDirection != 0),
+                new ConditionalCommand(
+                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L2), 
+                    new DoNothing(), 
+                    () -> selectedDirection != 0
+                )
             )
         );
 
-        // outtake coral L3
-        driver.get(PS5Button.CIRCLE).and(menu.negate()).whileTrue(
+        // outtake coral L3 and outtake algae L3
+        driver.get(PS5Button.CIRCLE).and(menu.negate()).onTrue(
             new SequentialCommandGroup(
-                new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),
-                new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L3)
+                new InstantCommand(() -> setAlignmentPose(false, false)),
+                new ConditionalCommand(
+                    // with vision
+                    new ParallelCommandGroup(
+                        new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                    ),
+                    // Manual
+                    new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),  
+                    () -> selectedDirection != 0),
+                new ConditionalCommand(
+                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L3), 
+                    new DoNothing(), 
+                    () -> selectedDirection != 0
+                )
             )
         );
 
         // outtake coral L4
+        driver.get(PS5Button.TRIANGLE).and(menu.negate()).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> setAlignmentPose(true, false)),
+                new ConditionalCommand(
+                    // with vision
+                    new ParallelCommandGroup(
+                        new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                    ),
+                    // Manual
+                    new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),  
+                    () -> selectedDirection != 0),
+                new ConditionalCommand(
+                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L4), 
+                    new DoNothing(), 
+                    () -> selectedDirection != 0
+                )
+            )
+        );
+
+        // climb
 
         
 
