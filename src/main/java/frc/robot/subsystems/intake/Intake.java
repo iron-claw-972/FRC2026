@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase{
     private final TalonFX rollerMotor = new TalonFX(0); // TODO
@@ -50,20 +52,22 @@ public class Intake extends SubsystemBase{
     private double startPosition = 90;
 
     public Intake() {
+        SmartDashboard.putData("set intake 90 deg", new InstantCommand(() -> setAngle(90)));
+        SmartDashboard.putData("set intake 0 deg", new InstantCommand(() -> setAngle(0.0)));
         if (RobotBase.isSimulation()) {
             stowMechanism2d = new Mechanism2d(10, 10);
             stowWheelLigament = stowMechanism2d.getRoot("Root", 5, 5)
                     .append(new MechanismLigament2d("Intake", 4, startPosition));
             SmartDashboard.putData("Intake pivot", stowMechanism2d);
             stowArmSim = new SingleJointedArmSim(
-                    dcMotor,
-                    3, // IntakeConstants.PIVOT_GEAR_RATIO,
-                    2, // IntakeConstants.MOMENT_OFiNERTIA,
-                    1, // IntakeConstants.ARM_LENGTH,
-                    Math.toRadians(0),
-                    Math.toRadians(90),
-                    true,
-                    Units.degreesToRadians(startPosition));
+                dcMotor,
+                IntakeConstants.PIVOT_GEAR_RATIO,
+                IntakeConstants.MOMENT_OFiNERTIA,
+                IntakeConstants.ARM_LENGTH,
+                Math.toRadians(0),
+                Math.toRadians(90),
+                true,
+                Units.degreesToRadians(startPosition));
             laserCanSimTimer = new Timer();
         } else {
             // laserCan = new LaserCan(IdConstants.INTAKE_LASER_CAN);

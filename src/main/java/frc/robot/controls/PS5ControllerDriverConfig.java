@@ -54,12 +54,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Pose2d alignmentPose = null;
     private int selectedDirection = 0;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, ArmComp arm, Elevator elevator, Intake intake, Indexer indexer) {
+    public PS5ControllerDriverConfig(Drivetrain drive, ArmComp arm, Elevator elevator, Intake intake, Indexer indexer, Outtake outtake) {
         super(drive);
         this.arm = arm;
         this.elevator = elevator;
         this.intake = intake;
         this.indexer = indexer;
+        this.outtake = outtake; 
     }
 
     public void configureControls() {
@@ -99,7 +100,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             )
         );
 
-        // Alignment
+        // Alignment for the reef 
         driver.get(DPad.LEFT).toggleOnTrue(new InstantCommand(() -> {
             selectedDirection = -1;
         }));
@@ -113,21 +114,24 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // TODO: top algae position intake (take off the reef)
 
-        // intake/outtake coral
         // I DONT KNOW IF THIS WORKS 
+        // intake coral
         driver.get(PS5Button.RIGHT_TRIGGER).toggleOnTrue(
             new ConditionalCommand(
                 new IntakeCoral(intake, indexer, elevator, outtake, arm), 
                 new DoNothing(), 
+                // if the coral is not loaded, intake (above)
                 () -> !outtake.coralLoaded())
         );
+
+        // outtake coral
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new ConditionalCommand(
-                new OuttakeGamePiece(elevator, arm, intake, outtake, null), 
+                new OuttakeGamePiece(elevator, arm, intake, outtake), 
                 new DoNothing(), 
+                // if the coral is loaded, outtake (above)
                 () -> outtake.coralLoaded())
         );
-       
 
         // set coral L1
         driver.get(PS5Button.CROSS).and(menu.negate()).onTrue(
@@ -143,7 +147,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L1), 
+                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -164,7 +168,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L2), 
+                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -185,7 +189,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L3), 
+                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -206,14 +210,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.L4), 
+                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
             )
         );
 
-        // climb
+        // climb?
+       
 
         
 

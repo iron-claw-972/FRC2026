@@ -12,7 +12,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow; 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -68,6 +68,8 @@ public class RobotContainer {
   public RobotContainer(RobotId robotId) {
     SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
     SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
+    driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake);
+    
     // dispatch on the robot
     
     switch (robotId) {
@@ -91,7 +93,7 @@ public class RobotContainer {
       case Vertigo:
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer);
+        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

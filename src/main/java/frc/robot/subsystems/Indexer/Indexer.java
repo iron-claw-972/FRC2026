@@ -39,14 +39,13 @@ public class Indexer extends SubsystemBase{
     public void periodic(){
         if (Robot.isReal()){
             velocity = motor.getVelocity().getValueAsDouble() / IndexerConstants.GEAR_RATIO;
+            // log stuff here 
+            var measurement = sensor.getMeasurement();
+            sensorDistance = (measurement == null || measurement.status > 0) ? 314159 : measurement.distance_mm;
         }
         else {
             // simulation stuff
         }
-        var measurement = sensor.getMeasurement();
-        sensorDistance = (measurement == null || measurement.status > 0) ? 314159 : measurement.distance_mm;
-        // log stuff here
-        
     }
 
     public void run(){

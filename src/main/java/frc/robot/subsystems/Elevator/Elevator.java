@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.ElevatorConstants;
@@ -63,6 +64,8 @@ public class Elevator extends SubsystemBase {
 
     /** Creates a new Elevator subsystem. */
     public Elevator() {
+        SmartDashboard.putData("move elevator 1 m", new InstantCommand(() -> setSetpoint(1.0)));
+        SmartDashboard.putData("move elevator 0 m", new InstantCommand(() -> setSetpoint(0.0)));
         // Initialize simulation tools if running in a simulated environment
         // This increases both the time and memory efficiency of the code when running
         // on a real robot; do not remove this if statement

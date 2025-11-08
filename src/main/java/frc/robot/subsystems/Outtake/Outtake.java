@@ -8,6 +8,9 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.hal.I2CJNI;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
 
@@ -30,6 +33,8 @@ public class Outtake extends SubsystemBase {
      */
     private ColorSensorV3 colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
 
+    private boolean simCoralLoaded = false;
+
     /**
      * Constructor that initializes the outtake subsystem.
      * Configures the motor to be inverted (counter-clockwise positive) and sets
@@ -38,6 +43,8 @@ public class Outtake extends SubsystemBase {
     public Outtake() {
         motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
                 .withNeutralMode(NeutralModeValue.Brake));
+
+        SmartDashboard.putData("toggle simulated coral loaded", new InstantCommand(() -> simCoralLoaded = !simCoralLoaded));
     }
 
     /**
@@ -112,7 +119,12 @@ public class Outtake extends SubsystemBase {
      * @return true if coral is detected (proximity > 2000), false otherwise
      */
     public boolean coralLoaded() {
-        return getProximity() > 2000;
+        // TODO: probably should find a better way to simulate the sensor 
+        if (RobotBase.isSimulation()) {
+            return simCoralLoaded; 
+        } else {
+            return getProximity() > 2000;
+        }
     }
 
     /**

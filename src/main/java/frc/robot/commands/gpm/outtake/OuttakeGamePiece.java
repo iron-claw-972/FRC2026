@@ -45,13 +45,33 @@ public class OuttakeGamePiece extends Command {
      * @param outtakeLocation Location the gamepiece will be outtaked to 
      */
 
+    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake){
+        double height = elevator.getPosition(); 
+        if (height > ElevatorConstants.L4_SETPOINT + 0.001) {
+            speed = OuttakeLocation.L4.speed; 
+        } else if (height > ElevatorConstants.L3_SETPOINT + 0.001) {
+            speed = OuttakeLocation.L3.speed; 
+        } else if (height > ElevatorConstants.L2_SETPOINT + 0.001) {
+            speed = OuttakeLocation.L2.speed;
+        } else if (height > ElevatorConstants.L1_SETPOINT + 0.001) {
+            speed = OuttakeLocation.L1.speed;
+        } else {
+            speed = OuttakeLocation.L4.speed; 
+        }
+        this.elevator = elevator;
+        this.arm = arm;
+        this.intake = intake;
+        this.outtake = outtake;
+        timer = new Timer();
+    }
+
     public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake, OuttakeLocation outtakeLocation){
         this.elevator = elevator;
         this.arm = arm;
         this.intake = intake;
         this.outtake = outtake;
-        speed = outtakeLocation.speed;
         timer = new Timer();
+        speed = outtakeLocation.speed; 
     }
 
     @Override
