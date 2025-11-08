@@ -34,5 +34,5 @@ public class IdConstants {
     //Intake
     public static final int BASE_MOTOR_ID = 27;
     public static final int FLYWHEEL_MOTOR_ID = 28;
-    public static final int INTAKE_SENSOR_ID = 29;
+    public static final int INTAKE_ENCODER_ID = 29;
 }

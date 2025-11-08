@@ -1,5 +1,9 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.Logger;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -14,7 +18,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -23,17 +26,14 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
-public class IntakeReal extends IntakeBase {
-    private TalonFX flyWheelMotor;
-    private TalonFX baseMotor;
-    private double position = IntakeConstants.START_ANGLE;
-
-    private double baseVelocity;
-    private double flyWheelVelocity;
+public class IntakeReal extends SubsystemBase implements IntakeIO{
+    private TalonFX flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID);
+    private TalonFX baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID);
 
     double basePower;
     double flyWheelPower;
@@ -50,19 +50,19 @@ public class IntakeReal extends IntakeBase {
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(getAngle() * IntakeConstants.PIVOT_GEAR_RATIO);
-    private double setpoint = getAngle();
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0.0 * IntakeConstants.PIVOT_GEAR_RATIO);
+    private double setpoint;
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("baseMotor", 25, 0));
 
-    private final DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(0);
+    private final DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(IdConstants.INTAKE_ENCODER_ID);
+
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public IntakeReal() {
-        baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID);
-        flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID);
-        pid.setTolerance(Units.degreesToRadians(3));
+        updateInputs();
         encoderSim = baseMotor.getSimState();
         
         intakeSim = new SingleJointedArmSim(
@@ -113,14 +113,9 @@ public class IntakeReal extends IntakeBase {
         SmartDashboard.putData("Set intake 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
     }
 
-    @Override
     public void setSetpoint(double setpoint) {
-        // pid.reset();
-        // pid.setSetpoint(Units.degreesToRadians(setPoint));
-        //this.setpoint = setpoint;
         double clampedSetpoint = MathUtil.clamp(setpoint, 90.0, 180.0);
         baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
-        //baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * IntakeConstants.PIVOT_GEAR_RATIO));
     }
 
     public double getAbsoluteEncoderAngle(){
@@ -133,52 +128,29 @@ public class IntakeReal extends IntakeBase {
      * Gets the angle of the intake
      * @return The angle in degrees
      */
-    @Override
     public double getAngle() {
-        return position;
-    }
-    
-    @Override
-    public double getBaseMotorVelocity() {
-        return baseVelocity/IntakeConstants.PIVOT_GEAR_RATIO;
+        // if(RobotBase.isSimulation()){
+        //     return position;
+        // }
+        return inputs.measuredAngle;
     }
 
-    @Override
     public double getFlyWheelVelocity() {
-        return flyWheelVelocity;
+        return inputs.flyWheelVelocity;
     }
 
-    @Override
     public boolean atSetpoint() {
         return Math.abs(getAngle() - setpoint) < 3.0;
     }
 
     @Override
     public void periodic() {
-        position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
-        baseVelocity = Units.rotationsPerMinuteToRadiansPerSecond(baseMotor.getVelocity().getValueAsDouble() * 60);
-        flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
+        updateInputs();
 
-        // double positionRad = Units.degreesToRadians(getPosition());
-        // double velocityRadPerSec = baseVelocity;
-
-        // // PID output in volts
-        // double pidOutputVolts = pid.calculate(positionRad) * 12.0;
-
-        // // Feedforward voltage (using CURRENT position, not setpoint)
-        // double ffVolts = feedforward.calculate(positionRad, velocityRadPerSec);
-
-        // // Combine both
-        // double outputVolts = pidOutputVolts + ffVolts;
-        // basePower = outputVolts / 12.0;
-
-        //baseMotor.set(basePower);
         flyWheelMotor.set(flyWheelPower);
 
-        ligament2d.setAngle(position);
+        ligament2d.setAngle(getAngle());
 
-        // SmartDashboard.putNumber("PID Output (V)", pidOutputVolts);
-        // SmartDashboard.putNumber("Feedforward (V)", ffVolts);
         SmartDashboard.putNumber("Total Base Power", basePower);
     }
 
@@ -188,7 +160,6 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public void simulationPeriodic() {
-        //double voltsMotor = basePower * 12;
         double voltsMotor = baseMotor.getMotorVoltage().getValueAsDouble();
         intakeSim.setInputVoltage(voltsMotor);
 
@@ -201,18 +172,29 @@ public class IntakeReal extends IntakeBase {
         encoderSim.setRawRotorPosition(motorRotations);
     }
 
-    @Override
     public boolean flyWheelSpinning() {
         return flyWheelMotor.getVelocity().getValueAsDouble() > 0;
     }
 
-    @Override
     public void setFlyWheel() {
         flyWheelMotor.set(IntakeConstants.FLYWHEEL_SPEED);
     }
 
-    @Override
     public void stopFlyWheel(){
         flyWheelMotor.set(0);
+    }
+
+    @AutoLogOutput
+    public double setpointAngle(){
+        return setpoint;
+    }
+
+    @Override
+    public void updateInputs() {
+        inputs.measuredAngle = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
+        inputs.currentAmps = baseMotor.getStatorCurrent().getValueAsDouble();
+        inputs.flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
+
+        Logger.processInputs("Intake", inputs);
     }
 }
