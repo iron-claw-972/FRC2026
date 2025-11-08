@@ -1,7 +1,7 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.elevator.Elevator;
 
 /**
  * Sets the elevator to the desired setpoint
