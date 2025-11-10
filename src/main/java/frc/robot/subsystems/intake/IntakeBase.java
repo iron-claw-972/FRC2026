@@ -11,4 +11,5 @@ public abstract class IntakeBase extends SubsystemBase {
     public abstract double getFlyWheelVelocity();
     public abstract boolean atSetpoint();
     public abstract boolean flyWheelSpinning();
+    public abstract double calculateMOI(double angle);
 }

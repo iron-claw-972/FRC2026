@@ -9,6 +9,7 @@ public class IntakeConstants {
     public static final double LENGTH = 0.245750; // meters
 
     public static final double MOI = 0.3333 * MASS * Math.pow(2, LENGTH); // kg*m^2
+    
     public static final double MAX_VELOCITY = 40; // rad/s
     public static final double MAX_ACCELERATION = 50; // rad/s^2
 

@@ -23,6 +23,8 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
+// TODO: Make the MOI update live in simulation
+
 public class IntakeReal extends IntakeBase {
     private TalonFX flyWheelMotor;
     private TalonFX baseMotor;
@@ -33,6 +35,9 @@ public class IntakeReal extends IntakeBase {
 
     double basePower;
     double flyWheelPower;
+
+    // kg * m^2 
+    double MOI = calculateMOI(IntakeConstants.START_ANGLE);
 
     // Increase kG until the arm just holds position against gravity (no PID).
     // Add kS if you notice stiction (motor doesn’t start moving easily).
@@ -135,6 +140,13 @@ public class IntakeReal extends IntakeBase {
         return Math.abs(getPosition() - setpoint) < 3.0;
     }
 
+    // takes degrees and returns lbs per inches^2
+    @Override
+    public double calculateMOI(double angle) {
+        var result = (-0.00000256991 * Math.pow(angle, 4)) + (0.0011465 * Math.pow(angle, 4)) + (-0.163514 * Math.pow(angle, 2)) + (9.19004 * angle) + 2.75;
+        return result * 703.07; // convert lbs*in^2 to kg*m^2
+    }
+
     @Override
     public void periodic() {
         position = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
@@ -172,18 +184,27 @@ public class IntakeReal extends IntakeBase {
 
     @Override
     public void simulationPeriodic() {
-        //double voltsMotor = basePower * 12;
         double voltsMotor = baseMotor.getMotorVoltage().getValueAsDouble();
-        intakeSim.setInputVoltage(voltsMotor);
 
+        // Get current angle and velocity before updating inertia
+        double currentAngle = intakeSim.getAngleRads();
+        double currentVelocity = intakeSim.getVelocityRadPerSec();
+
+        // Update the Moment of Inertia dynamically
+        MOI = calculateMOI(Units.radiansToDegrees(currentAngle));
+
+        // Apply input voltage and advance simulation
+        intakeSim.setInputVoltage(voltsMotor);
         intakeSim.update(Constants.LOOP_TIME);
 
+        // Reflect sim results into hardware sim
         double simAngle = intakeSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * IntakeConstants.PIVOT_GEAR_RATIO;
 
         encoderSim.setRawRotorPosition(motorRotations);
     }
+
 
     @Override
     public boolean flyWheelSpinning() {
