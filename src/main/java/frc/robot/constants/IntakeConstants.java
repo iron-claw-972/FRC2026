@@ -10,11 +10,13 @@ public class IntakeConstants {
     public static final double kP=0.02;
     public static final double kI=0.0;
     public static final double kD=0.0;
+    
+    public static final double position_tolerance = 0.03;
 
-    public static final double max_velocity = 1.0;
-    public static final double max_acceleration = 2.0;
+    public static final double max_velocity = 5.0;
+    public static final double max_acceleration = 3.0;
 
-    public static final double gear_ratio = 38;
+    public static final double gear_ratio = 38.0;
 
     public static final double robot_voltage = 12.0;
 
