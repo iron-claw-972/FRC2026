@@ -1,4 +1,7 @@
 package frc.robot.subsystems.intake;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -17,39 +20,26 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-import frc.robot.constants.HoodConstants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.swerve.DriveConstants;
 
 public class IntakeReal extends IntakeBase{
-    private final int flywheel_motor_id = 2;
-    private final int intake_motor_id = 3;
-
     TalonFX IntakeMotor;
     TalonFX FlywheelMotor;
 
     PIDController IntakePID;
 
-    private final double kP=0.02;
-    private final double kI=0.0;
-    private final double kD=0.0;
+    private final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
-    private final double max_velocity = 1.0;
-    private final double max_acceleration = 2.0;
-
-    private final double gear_ratio=1.0;
 
     private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
-          kP,
-          kI,
-          kD,
-          new TrapezoidProfile.Constraints(max_velocity, max_acceleration));         
+          IntakeConstants.kP,
+          IntakeConstants.kI,
+          IntakeConstants.kD,
+          new TrapezoidProfile.Constraints(IntakeConstants.max_velocity, IntakeConstants.max_acceleration));
 
     ArmFeedforward IntakeFeedforward;
-
-    private final double gravity = 9.81;
-    private final double arm_mass = 2.46;
-    private final double arm_length = HoodConstants.LENGTH;
 
     private double globalIntakePower = 0.0d;
 
@@ -64,9 +54,9 @@ public class IntakeReal extends IntakeBase{
     private SingleJointedArmSim IntakeSim = 
     new SingleJointedArmSim(
         DCMotor.getKrakenX60(1), 
-        gear_ratio, 
-        SingleJointedArmSim.estimateMOI(arm_length, arm_mass), 
-        arm_length, 
+        IntakeConstants.gear_ratio, 
+        IntakeConstants.momment_of_intertia, 
+        IntakeConstants.arm_length, 
         0, 
         Units.degreesToRadians(360), 
         true, 
@@ -74,12 +64,12 @@ public class IntakeReal extends IntakeBase{
 
 
     public IntakeReal(){
-        IntakeMotor = new TalonFX(intake_motor_id);
-        FlywheelMotor = new TalonFX(flywheel_motor_id);
+        IntakeMotor = new TalonFX(IntakeConstants.intake_motor_id);
+        FlywheelMotor = new TalonFX(IntakeConstants.flywheel_motor_id); 
 
         IntakeSimEncoder = IntakeMotor.getSimState();
 
-        IntakePID = new PIDController(kP, kI, kD);
+        IntakePID = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
 
         //m_controller.enableContinuousInput(0, Units.degreesToRadians(360));
 
@@ -87,9 +77,25 @@ public class IntakeReal extends IntakeBase{
 
         IntakeFeedforward = new ArmFeedforward
             (0.0,
-            gravity * arm_length/2.0 * arm_mass
-                    / gear_ratio * sim_motor.rOhms / sim_motor.KtNMPerAmp / 12,
+            IntakeConstants.gravity * IntakeConstants.center_of_mass * (IntakeConstants.arm_mass)
+                    / IntakeConstants.gear_ratio * sim_motor.rOhms / sim_motor.KtNMPerAmp / IntakeConstants.robot_voltage,
             0);
+
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
+        config.Slot0.kG = IntakeConstants.arm_mass * IntakeConstants.center_of_mass * 9.8 / IntakeConstants.gear_ratio; // Gravity compensation
+        config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
+        config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
+        config.Slot0.kP = Units.radiansToRotations(5.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
+
+        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.max_velocity * IntakeConstants.gear_ratio);
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(IntakeConstants.max_acceleration * IntakeConstants.gear_ratio);
+        
+
+        IntakeMotor.getConfigurator().apply(config);
 
         SmartDashboard.putData("IntakePID", IntakePID);
         SmartDashboard.putData("Motion Magic PID Controller", m_controller);
@@ -102,10 +108,7 @@ public class IntakeReal extends IntakeBase{
     }
 
     public void setIntakeSetpoint(double position){
-        IntakePID.reset();
-        IntakePID.setSetpoint(Units.degreesToRadians(position/gear_ratio));
-
-        m_controller.setGoal(Units.degreesToRadians(position/gear_ratio));
+        IntakeMotor.setControl(m_request.withPosition(position));
     }
     
     public double getIntakePosition(){
@@ -113,7 +116,7 @@ public class IntakeReal extends IntakeBase{
     }
 
     public double getIntakeVelocity(){
-        return Units.rotationsPerMinuteToRadiansPerSecond(IntakeMotor.getVelocity().getValueAsDouble() * 60);
+        return Units.rotationsPerMinuteToRadiansPerSecond(IntakeMotor.getVelocity().getValueAsDouble() * IntakeConstants.gear_ratio * 60);
     }
 
     public boolean IntakeAtSetpoint(){
@@ -134,9 +137,9 @@ public class IntakeReal extends IntakeBase{
     }
 
     @Override
-    public void periodic(){
-        globalIntakePower = /*IntakePID.calculate(getIntakePosition()) PID */ m_controller.calculate(getIntakePosition()) + 
-        IntakeFeedforward.calculate(getIntakePosition(), 0); // Feed Forward
+    public void periodic() {
+        globalIntakePower =  m_controller.calculate(getIntakePosition()) + 
+        IntakeFeedforward.calculate(getIntakePosition(), 0);
         //IntakeFeedforward.calculate(getIntakePosition(), 0);
         // IntakePower.set(globalIntakePower);
 
@@ -144,7 +147,7 @@ public class IntakeReal extends IntakeBase{
 
     @Override
     public void simulationPeriodic(){
-        IntakeSim.setInput(globalIntakePower * 12);
+        IntakeSim.setInput(globalIntakePower * IntakeConstants.robot_voltage);
         IntakeSim.update(0.02);
 
         IntakeSimEncoder.setRawRotorPosition(Units.radiansToRotations(IntakeSim.getAngleRads()));
