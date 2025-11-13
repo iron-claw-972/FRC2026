@@ -128,9 +128,9 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         double setpoint2 = setpoint;
-        if (setpoint2 < ElevatorConstants.SAFE_SETPOINT && (armStowed == null || !armStowed.getAsBoolean())) {
-            setpoint2 = ElevatorConstants.SAFE_SETPOINT;
-        }
+        // if (setpoint2 < ElevatorConstants.SAFE_SETPOINT && (armStowed == null || !armStowed.getAsBoolean())) {
+        //     setpoint2 = ElevatorConstants.SAFE_SETPOINT;
+        // }
         double setpointRotations = ElevatorConstants.GEARING * setpoint2
                 / (2 * Math.PI * ElevatorConstants.DRUM_RADIUS);
         rightMotor.setControl(voltageRequest.withPosition(setpointRotations).withFeedForward(0.4));

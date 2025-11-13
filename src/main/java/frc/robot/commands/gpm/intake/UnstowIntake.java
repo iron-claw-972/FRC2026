@@ -4,38 +4,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Arm.ArmComp;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Outtake.Outtake;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
 
-/**
- * Intakes coral from ground
- */
-public class IntakeCoral extends Command {
+public class UnstowIntake extends Command {
     private Intake intake;
-    private Indexer indexer; 
-    private Outtake outtake; 
-    private ArmComp arm; 
-    private Elevator elevator; 
+    Indexer indexer; 
+    Outtake outtake; 
+    ArmComp arm; 
+    Elevator elevator;
 
-    /**
-     * Creates a command to intake the coral from ground
-     * 
-     * @param intake Intake subsystem
-     * @param indexer Indexer subsystem
-     * @param elevator Elevator subsystem
-     * @param outtake Outtide subsystem
-     * @param arm Arm subsystem
-     */
-    public IntakeCoral(Intake intake, Indexer indexer, Elevator elevator, Outtake outtake, ArmComp arm) {
-        this.intake = intake;
-		this.indexer = indexer;
+    public UnstowIntake(Intake intake, Indexer indexer, Elevator elevator, ArmComp arm, Outtake outtake){
+        this.intake = intake; 
+        this.indexer = indexer;
 		this.outtake = outtake;
 		this.arm = arm;
 		this.elevator = elevator;
-		addRequirements(intake, indexer, arm, elevator);  
+        addRequirements(intake, indexer, arm, elevator);
     }
+
     public void initialize(){
         intake.unstow();
         intake.startRollers();
@@ -53,8 +42,7 @@ public class IntakeCoral extends Command {
     }
 
     public boolean isFinished(){
-        System.out.println("Elevator position:" + elevator.getPosition()); 
-        return elevator.getPosition() > ElevatorConstants.SAFE_SETPOINT;
+        return false; 
     }
 
     public void end(boolean interrupted) {
@@ -65,4 +53,5 @@ public class IntakeCoral extends Command {
 			outtake.setMotor(0.02);
 		}
     }
+
 }

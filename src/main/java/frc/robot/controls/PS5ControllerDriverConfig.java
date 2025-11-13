@@ -20,6 +20,7 @@ import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.SetArm;
 import frc.robot.commands.gpm.SetElevator;
 import frc.robot.commands.gpm.intake.IntakeCoral;
+import frc.robot.commands.gpm.intake.UnstowIntake;
 import frc.robot.commands.gpm.outtake.OuttakeGamePiece;
 import frc.robot.commands.gpm.outtake.SetOuttakeGamePiece;
 import frc.robot.constants.ArmConstants;
@@ -146,11 +147,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.RIGHT_TRIGGER).toggleOnTrue(
             new ConditionalCommand(
                 new IntakeCoral(intake, indexer, elevator, outtake, arm), 
+                // new InstantCommand(() -> intake.unstow()),
                 new DoNothing(), 
                 // if the coral is not loaded, intake (above)
                 () -> !outtake.coralLoaded())
         );
-
+     
        // outtake coral
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new ConditionalCommand(
