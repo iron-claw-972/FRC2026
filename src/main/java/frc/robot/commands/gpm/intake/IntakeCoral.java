@@ -47,17 +47,18 @@ public class IntakeCoral extends Command {
         if (outtake != null && outtake.coralLoaded()) {
             indexer.stop();
             intake.stopRollers(); 
-            elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT); 
-			arm.setSetpoint(ArmConstants.STOW_SETPOINT);  
+            elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT);   
         }
     }
 
     public boolean isFinished(){
-        System.out.println("Elevator position:" + elevator.getPosition()); 
         return elevator.getPosition() > ElevatorConstants.SAFE_SETPOINT;
     }
 
     public void end(boolean interrupted) {
+        if (!interrupted) {
+            arm.setSetpoint(ArmConstants.STOW_SETPOINT);
+        }
         intake.stopRollers();
 		intake.stow();
 		indexer.stop();

@@ -35,7 +35,8 @@ public class Intake extends SubsystemBase{
 
     private final double positionTolerance = 5;
 
-    private final PIDController stowPID = new PIDController(0.015, 0, 0);
+    // TODO: Original P was .015
+    private final PIDController stowPID = new PIDController(0.005, 0, 0);
     private double power;
 
     private LaserCan laserCan;

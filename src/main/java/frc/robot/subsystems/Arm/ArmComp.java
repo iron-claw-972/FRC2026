@@ -20,6 +20,7 @@ public class ArmComp extends ArmBase {
 
     private static final DCMotor simMotor = DCMotor.getKrakenX60(1);
     private TalonFX motor = new TalonFX(IdConstants.ARM_MOTOR);
+    // TODO: Change back to original PID which was .1 
     private PIDController pid = new PIDController(0.1, 0, 0);
     private TalonFXSimState encoderSim = motor.getSimState(); 
 

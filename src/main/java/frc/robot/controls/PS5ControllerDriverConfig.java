@@ -20,7 +20,6 @@ import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.SetArm;
 import frc.robot.commands.gpm.SetElevator;
 import frc.robot.commands.gpm.intake.IntakeCoral;
-import frc.robot.commands.gpm.intake.UnstowIntake;
 import frc.robot.commands.gpm.outtake.OuttakeGamePiece;
 import frc.robot.commands.gpm.outtake.SetOuttakeGamePiece;
 import frc.robot.constants.ArmConstants;
