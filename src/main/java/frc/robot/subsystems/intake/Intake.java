@@ -26,30 +26,29 @@ import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase{
-    private final TalonFX rollerMotor = new TalonFX(0); // TODO
-    private final TalonFX pivotMotor = new TalonFX(0, new CANBus()); // TODO
+    private final TalonFX rollerMotor = new TalonFX(IdConstants.INTAKE_ROLLER); 
+    private final TalonFX pivotMotor = new TalonFX(IdConstants.INTAKE_PIVOT, Constants.CANIVORE_CAN); 
 
     private SingleJointedArmSim stowArmSim;
     private Mechanism2d stowMechanism2d;
     private MechanismLigament2d stowWheelLigament;
 
     private final double positionTolerance = 5;
-
+    private double position = 0; 
+    
     // TODO: Original P was .015
-    private final PIDController stowPID = new PIDController(0.005, 0, 0);
+    private final PIDController stowPID = new PIDController(0.015, 0, 0);
     private double power;
 
-    private LaserCan laserCan;
+    private LaserCan laserCan;  
     private boolean hasCoral = false;
     private boolean isMoving = false;
     private Timer laserCanSimTimer;
     private DCMotor dcMotor = DCMotor.getKrakenX60(1);
-    private ArmFeedforward feedforward = new ArmFeedforward(0, 3,
-            // Constants.GRAVITY_ACCELERATION * IntakeConstants.CENTER_OF_MASS_DIST *
-            // IntakeConstants.MASS
-            // / IntakeConstants.PIVOT_GEAR_RATIO * dcMotor.rOhms / dcMotor.KtNMPerAmp /
-            // Constants.ROBOT_VOLTAGE,
-            0); // TODO
+    private ArmFeedforward feedforward = new ArmFeedforward(0,
+            Constants.GRAVITY_ACCELERATION * IntakeConstants.CENTER_OF_MASS_DIST * IntakeConstants.MASS
+                    / IntakeConstants.PIVOT_GEAR_RATIO * dcMotor.rOhms / dcMotor.KtNMPerAmp / Constants.ROBOT_VOLTAGE,
+            0);
     private double startPosition = 90;
 
     public Intake() {
@@ -84,7 +83,7 @@ public class Intake extends SubsystemBase{
                 .withInverted(InvertedValue.CounterClockwise_Positive));
         pivotMotor.getConfigurator()
                 .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-        pivotMotor.setPosition(Units.degreesToRotations(startPosition) * 1); // TODO replace with IntakeConstants.PIVOT_GEAR_RATIO
+        pivotMotor.setPosition(Units.degreesToRotations(startPosition) * IntakeConstants.PIVOT_GEAR_RATIO); 
         pivotMotor.setNeutralMode(NeutralModeValue.Coast);
         stowPID.setTolerance(positionTolerance);
 
@@ -96,15 +95,20 @@ public class Intake extends SubsystemBase{
 
     @Override
     public void periodic(){
-        power = stowPID.calculate(pivotMotor.getPosition().getValueAsDouble());
+        if(RobotBase.isSimulation()) {
+            position = Units.radiansToDegrees(stowArmSim.getAngleRads());
+        } else {
+            position = Units.rotationsToDegrees(pivotMotor.getPosition().getValueAsDouble()) / IntakeConstants.PIVOT_GEAR_RATIO;
+        }
+        power = stowPID.calculate(position) + feedforward.calculate(Units.degreesToRadians(position), 0);
         power = MathUtil.clamp(power, -1, 1);
         pivotMotor.set(power);
     }
 
     @Override
     public void simulationPeriodic(){
-        stowArmSim.setInputVoltage(power * 1); //TODO change to robo voltsage
-        stowArmSim.update(1);//TOOD change smth idk
+        stowArmSim.setInputVoltage(power * Constants.ROBOT_VOLTAGE); 
+        stowArmSim.update(Constants.LOOP_TIME);//TOOD change smth idk
         stowWheelLigament.setAngle(Units.radiansToDegrees(stowArmSim.getAngleRads()));
     }
 
@@ -135,11 +139,11 @@ public class Intake extends SubsystemBase{
     }
 
     public void stow(){
-        setAngle(90); //TODO set to STOW_SETPOINT constants
+        setAngle(IntakeConstants.STOW_SETPOINT); //TODO set to STOW_SETPOINT constants
     }
 
     public void unstow(){
-        setAngle(0); //TODO set to a constant
+        setAngle(IntakeConstants.INTAKE_SETPOINT); //TODO set to a constant
     }
 
     public void stopRollers(){
@@ -147,7 +151,7 @@ public class Intake extends SubsystemBase{
     }
 
     public void startRollers(){
-        setSpeed(1); //TODO change to proper motor power
+        setSpeed(1); 
     }
 
     public boolean laserDetecting(){

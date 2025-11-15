@@ -37,15 +37,17 @@ public class IntakeCoral extends Command {
 		addRequirements(intake, indexer, arm, elevator);  
     }
     public void initialize(){
+		elevator.setSetpoint(ElevatorConstants.INTAKE_SETPOINT); 
+		arm.setSetpoint(ArmConstants.INTAKE_SETPOINT);
         intake.unstow();
         intake.startRollers();
         indexer.run();
-        outtake.setMotor(.7); 
+        outtake.setMotor(0.7); 
     }
 
     public void execute(){
         if (outtake != null && outtake.coralLoaded()) {
-            indexer.stop();
+            indexer.stop(); 
             intake.stopRollers(); 
             elevator.setSetpoint(ElevatorConstants.INTAKE_STOW_SETPOINT);   
         }
@@ -58,12 +60,12 @@ public class IntakeCoral extends Command {
     public void end(boolean interrupted) {
         if (!interrupted) {
             arm.setSetpoint(ArmConstants.STOW_SETPOINT);
+            outtake.setMotor(0.02); 
+        } else {
+            outtake.setMotor(0.0); 
         }
         intake.stopRollers();
 		intake.stow();
 		indexer.stop();
-		if(outtake != null){
-			outtake.setMotor(0.02);
-		}
     }
 }

@@ -22,7 +22,7 @@ import frc.robot.constants.IdConstants;
 public class Outtake extends SubsystemBase {
 
     /** TalonFX motor controller that drives the outtake mechanism */
-    private TalonFX motor = new TalonFX(IdConstants.OUTTAKE_MOTOR);
+    private TalonFX motor = new TalonFX(IdConstants.OUTTAKE_MOTOR_COMP);
 
     /** Current power level being applied to the motor (-1.0 to 1.0) */
     private double power;
