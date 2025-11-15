@@ -12,7 +12,7 @@ import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Outtake.Outtake;
 import frc.robot.subsystems.intake.Intake;
 

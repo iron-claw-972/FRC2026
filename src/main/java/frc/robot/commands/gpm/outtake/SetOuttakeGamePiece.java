@@ -8,7 +8,7 @@ import frc.robot.commands.gpm.SetElevator;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.Elevator.Elevator;
 
 /**
  * Prepares the robot for outtake 
