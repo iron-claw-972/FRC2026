@@ -14,7 +14,6 @@ import frc.robot.constants.Constants.OuttakeLocation;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Outtake.Outtake;
-import frc.robot.subsystems.intake.Intake;
 
 /**
  * Scores coral/algae
@@ -22,7 +21,6 @@ import frc.robot.subsystems.intake.Intake;
 public class OuttakeGamePiece extends Command {
     private Elevator elevator;
     private ArmComp arm;
-    private Intake intake;
     private Outtake outtake;
     private double speed;
     private Timer timer;
@@ -45,7 +43,7 @@ public class OuttakeGamePiece extends Command {
      * @param outtakeLocation Location the gamepiece will be outtaked to 
      */
 
-    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake){
+    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Outtake outtake){
         double height = elevator.getPosition(); 
         if (height > ElevatorConstants.L4_SETPOINT + 0.001) {
             speed = OuttakeLocation.L4.speed; 
@@ -60,15 +58,13 @@ public class OuttakeGamePiece extends Command {
         }
         this.elevator = elevator;
         this.arm = arm;
-        this.intake = intake;
         this.outtake = outtake;
         timer = new Timer();
     }
 
-    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Intake intake, Outtake outtake, OuttakeLocation outtakeLocation){
+    public OuttakeGamePiece(Elevator elevator, ArmComp arm, Outtake outtake, OuttakeLocation outtakeLocation){
         this.elevator = elevator;
         this.arm = arm;
-        this.intake = intake;
         this.outtake = outtake;
         timer = new Timer();
         speed = outtakeLocation.speed; 
@@ -77,7 +73,7 @@ public class OuttakeGamePiece extends Command {
     @Override
     public void initialize(){
         timer.restart();
-        outtake.outtake(); 
+        outtake.setMotor(speed); 
         phase = Phase.Outtaking;
     }
 
@@ -97,17 +93,20 @@ public class OuttakeGamePiece extends Command {
                 if (elevator.getPosition() < ElevatorConstants.L2_SETPOINT) {
                     // if the arm is at fully stowed then continue lowering elevator 
                     if (arm.atSetpoint()) {
+                        System.out.println("ARM REACHED SETPOINT"); 
                         elevator.setSetpoint(ElevatorConstants.STOW_SETPOINT);
                         phase = Phase.FinalLowering;
                     // if arm is not fully stowed, stop elevator and wait until fully stowed then lower elevator
                     } else {
                         // Stop a little bit under L2 to make 
-                        elevator.setSetpoint(ElevatorConstants.L2_SETPOINT - .1); 
+                        System.out.println("WAITING FOR ARM");
+                        elevator.setSetpoint(ElevatorConstants.L2_SETPOINT - 0.1); 
                     }
                 } 
                 break;
             case FinalLowering:
                 if (elevator.atSetpoint()) {
+                    System.out.println("DONNEEE"); 
                     phase = Phase.Done; 
                 }
                 break;

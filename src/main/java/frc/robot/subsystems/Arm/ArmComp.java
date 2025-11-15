@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.util.PhoenixUtil;
 
 public class ArmComp extends ArmBase {
 
@@ -76,7 +78,7 @@ public class ArmComp extends ArmBase {
         // because if we were to call getAngle() right now, it would be zero rather than
         // START_ANGLE.
         
-        //setSetpoint(ArmConstants.START_ANGLE); 
+        setSetpoint(ArmConstants.START_ANGLE); 
         // simulation Arm
         armSim = new SingleJointedArmSim(
             simMotor, 
@@ -89,7 +91,7 @@ public class ArmComp extends ArmBase {
             true,
             Units.degreesToRadians(ArmConstants.START_ANGLE));
             
-        
+        PhoenixUtil.tryUntilOk(100, ()->motor.setNeutralMode(NeutralModeValue.Brake));
         // Puts the PID tuner
         //SmartDashboard.putData("PID", pid);
         

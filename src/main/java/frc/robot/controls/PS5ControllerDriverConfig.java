@@ -114,7 +114,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.TOUCHPAD).onTrue(
             new SequentialCommandGroup(
                 new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.NET),
-                new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.NET)
+                new OuttakeGamePiece(elevator, arm, outtake, OuttakeLocation.NET)
             )
         );
 
@@ -122,7 +122,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(DPad.DOWN).and(menu.negate()).onTrue(
             new SequentialCommandGroup(
                 new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.PROCESSOR),
-                new OuttakeGamePiece(elevator, arm, intake, outtake, OuttakeLocation.PROCESSOR)
+                new OuttakeGamePiece(elevator, arm, outtake, OuttakeLocation.PROCESSOR)
             )
         );
 
@@ -155,7 +155,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
        // outtake coral
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new ConditionalCommand(
-                new OuttakeGamePiece(elevator, arm, intake, outtake), 
+                new OuttakeGamePiece(elevator, arm, outtake), 
                 new DoNothing(), 
                 // if the coral is loaded, outtake (above)
                 () -> outtake.coralLoaded())
@@ -175,7 +175,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -196,7 +196,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -217,7 +217,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -238,7 +238,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, intake, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
