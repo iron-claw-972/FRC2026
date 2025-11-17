@@ -35,6 +35,11 @@ public class ArmComp extends ArmBase {
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
+    /**
+     * Setpoint of the arm in degrees 
+     */
+    private double setpoint; 
+
     /**in degrees*/
     //private double setpoint = ArmConstants.START_ANGLE;
 
@@ -99,7 +104,11 @@ public class ArmComp extends ArmBase {
 
     @Override
     public void periodic() {
-        
+        System.out.println("Arm at setpoint: " + atSetpoint());
+        System.out.println("Arm setpoint: " + setpoint);
+        System.out.println("Arm angle: " + getAngle()); 
+        System.out.println("Difference: " + Math.abs(setpoint - getAngle())); 
+
         // Obtain the motor position
         double position = getAngle();
         // PID calculation
@@ -133,7 +142,7 @@ public class ArmComp extends ArmBase {
         double simRotations = Units.degreesToRotations(armAngleWithOffset);
 
         double motorRotations = simRotations * gearRatio;
-
+        
         // Turning the encoder by the set rotations
         encoderSim.setRawRotorPosition(motorRotations);
      }
@@ -148,7 +157,7 @@ public class ArmComp extends ArmBase {
         // Tell the PID object what thsete setpoint is
         // PID is using radians
         //pid.setSetpoint(Units.degreesToRadians(setpoint));
-        
+        this.setpoint = setpoint; 
         double setpointAdjusted = (setpoint - ArmConstants.START_ANGLE) * gearRatio;
         motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpointAdjusted)).withFeedForward(ff.calculate(Units.degreesToRadians(getAngle()),0)));
     }
@@ -163,9 +172,10 @@ public class ArmComp extends ArmBase {
 
     @Override
     public boolean atSetpoint() {
-        // return (Math.abs(Units.radiansToDegrees(pid.getSetpoint()) - getAngle()) < ArmConstants.TOLERANCE);
+        // TODO: There is problem where setpoint will oscillate between the start angle and the actual setpoint it is being set to. This results in atSetpoint oscillating betweeen true or false. 
+        return Math.abs(setpoint - getAngle()) < ArmConstants.TOLERANCE;
         //return pid.atSetpoint();
-        return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3.0;
+        // return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3.0;
     }
 
     public double getAppliedVoltage() {
