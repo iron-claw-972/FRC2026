@@ -172,7 +172,6 @@ public class ArmComp extends ArmBase {
 
     @Override
     public boolean atSetpoint() {
-        // TODO: There is problem where setpoint will oscillate between the start angle and the actual setpoint it is being set to. This results in atSetpoint oscillating betweeen true or false. 
         return Math.abs(setpoint - getAngle()) < ArmConstants.TOLERANCE;
         //return pid.atSetpoint();
         // return Math.abs(Units.radiansToDegrees(motor.getPosition().getValueAsDouble())) < 3.0;
