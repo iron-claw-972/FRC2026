@@ -57,7 +57,7 @@ public class RobotContainer {
   private Outtake outtake = new Outtake();
   private Intake intake = new Intake();
   private Indexer indexer = new Indexer();
-  private LED led = new LED();
+  private LED led = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -71,7 +71,7 @@ public class RobotContainer {
   public RobotContainer(RobotId robotId) {
     SmartDashboard.putData("Sent 90 degrees", new InstantCommand(()-> arm.setSetpoint(90)));
     SmartDashboard.putData("Set 180 degrees", new InstantCommand(()-> arm.setSetpoint(180)));
-    driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake);
+    driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake, led);
     
     // dispatch on the robot
     
@@ -96,7 +96,8 @@ public class RobotContainer {
       case Vertigo:
         arm = new ArmComp();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake);
+        led = new LED();
+        driver = new PS5ControllerDriverConfig(drive, arm, elevator, intake, indexer, outtake, led);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

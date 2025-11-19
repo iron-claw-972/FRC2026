@@ -56,13 +56,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Pose2d alignmentPose = null;
     private int selectedDirection = 0;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, ArmComp arm, Elevator elevator, Intake intake, Indexer indexer, Outtake outtake) {
+    public PS5ControllerDriverConfig(Drivetrain drive, ArmComp arm, Elevator elevator, Intake intake, Indexer indexer, Outtake outtake, LED led) {
         super(drive);
         this.arm = arm;
         this.elevator = elevator;
         this.intake = intake;
         this.indexer = indexer;
         this.outtake = outtake; 
+        this.led = led;
     }
 
     public void configureControls() {
