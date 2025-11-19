@@ -93,22 +93,31 @@ public class RobotContainer {
   public RobotContainer(RobotId robotId) {
     vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
     drive = new Drivetrain(vision, new GyroIOPigeon2());
-    
+
+    Rotation2d ninety = new Rotation2d(drive.getPose().getRotation().getDegrees() + 90.0); 
+    Rotation2d oneEighty = new Rotation2d(drive.getPose().getRotation().getDegrees() + 180.0); 
+
     // Are these units in meters?
     // Poses for GoToPose commands 
     Pose2d forwardOneMeter = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), drive.getYaw()); 
     Pose2d backwardOneMeter = new Pose2d(drive.getPose().getX() - 1.0, drive.getPose().getY(), drive.getYaw()); 
     Pose2d upOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() + 1.0, drive.getYaw()); 
     Pose2d downOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() - 1.0, drive.getYaw());
+    Pose2d forwardOneMeterAndRotateOneEighty = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), oneEighty); 
+    Pose2d rotateOneEighty = new Pose2d(drive.getPose().getX(), drive.getPose().getY(), oneEighty); 
 
     // Drive 1 meter forward 
     SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(forwardOneMeter, drive))); 
     // Drive 1 meter backward 
-    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(backwardOneMeter, drive))); 
+    SmartDashboard.putData("Drive 1 meter backward: ", new InstantCommand(() -> new GoToPose(backwardOneMeter, drive))); 
     // Drive 1 meter up 
-    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(upOneMeter, drive))); 
+    SmartDashboard.putData("Drive 1 meter up: ", new InstantCommand(() -> new GoToPose(upOneMeter, drive))); 
     // Drive 1 meter down 
-    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(downOneMeter, drive))); 
+    SmartDashboard.putData("Drive 1 meter down: ", new InstantCommand(() -> new GoToPose(downOneMeter, drive))); 
+    // Drive 1 meter forward and rotate 180 deg
+    SmartDashboard.putData("Drive 1 meter forward and rotate 180 deg: ", new InstantCommand(() -> new GoToPose(forwardOneMeterAndRotateOneEighty, drive)));
+    // Rotate 180 deg 
+    SmartDashboard.putData("Drive 1 meter forward and rotate 180 deg: ", new InstantCommand(() -> new GoToPose(rotateOneEighty, drive)));
 
     // dispatch on the robot
     switch (robotId) {
