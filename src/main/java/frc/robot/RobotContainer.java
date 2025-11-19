@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.drive_comm.DriveToPose;
+import frc.robot.commands.drive_comm.GoToPose;
 import frc.robot.commands.gpm.IntakeCoral;
 import frc.robot.commands.gpm.MoveArm;
 import frc.robot.commands.gpm.MoveElevator;
@@ -89,6 +91,25 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+    drive = new Drivetrain(vision, new GyroIOPigeon2());
+    
+    // Are these units in meters?
+    // Poses for GoToPose commands 
+    Pose2d forwardOneMeter = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), drive.getYaw()); 
+    Pose2d backwardOneMeter = new Pose2d(drive.getPose().getX() - 1.0, drive.getPose().getY(), drive.getYaw()); 
+    Pose2d upOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() + 1.0, drive.getYaw()); 
+    Pose2d downOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() - 1.0, drive.getYaw());
+
+    // Drive 1 meter forward 
+    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(forwardOneMeter, drive))); 
+    // Drive 1 meter backward 
+    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(backwardOneMeter, drive))); 
+    // Drive 1 meter up 
+    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(upOneMeter, drive))); 
+    // Drive 1 meter down 
+    SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(downOneMeter, drive))); 
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
