@@ -119,7 +119,8 @@ public class RobotContainer {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
-        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));        led.setDefaultCommand(
+        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));        
+        led.setDefaultCommand(
             new LEDDefaultCommand(led, outtake, drive, vision)
         );
         break;
