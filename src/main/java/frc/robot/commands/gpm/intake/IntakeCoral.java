@@ -42,7 +42,7 @@ public class IntakeCoral extends Command {
         intake.unstow();
         intake.startRollers();
         indexer.run();
-        outtake.setMotor(0.7); 
+        outtake.setMotor(-0.7); 
     }
 
     public void execute(){
@@ -60,7 +60,7 @@ public class IntakeCoral extends Command {
     public void end(boolean interrupted) {
         if (!interrupted) {
             arm.setSetpoint(ArmConstants.STOW_SETPOINT);
-            outtake.setMotor(0.02); 
+            outtake.setMotor(-0.02); 
         } else {
             outtake.setMotor(0.0); 
         }

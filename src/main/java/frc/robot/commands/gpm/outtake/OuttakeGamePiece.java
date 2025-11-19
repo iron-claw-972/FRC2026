@@ -73,7 +73,7 @@ public class OuttakeGamePiece extends Command {
     @Override
     public void initialize(){
         timer.restart();
-        outtake.setMotor(speed); 
+        outtake.setMotor(-speed); 
         phase = Phase.Outtaking;
     }
 
@@ -84,7 +84,7 @@ public class OuttakeGamePiece extends Command {
                 if (timer.hasElapsed(0.5)){
                     outtake.setMotor(0);
                     arm.setSetpoint(ArmConstants.INTAKE_SETPOINT);
-                    elevator.setSetpoint(ElevatorConstants.STOW_SETPOINT);
+                    elevator.setSetpoint(ElevatorConstants.INTAKE_SETPOINT);
                     phase = Phase.InitialLowering;
                 }
                 break;
@@ -94,7 +94,7 @@ public class OuttakeGamePiece extends Command {
                     // if the arm is at fully stowed then continue lowering elevator 
                     if (arm.atSetpoint()) {
                         System.out.println("ARM REACHED SETPOINT"); 
-                        elevator.setSetpoint(ElevatorConstants.STOW_SETPOINT);
+                        elevator.setSetpoint(ElevatorConstants.INTAKE_SETPOINT);
                         phase = Phase.FinalLowering;
                     // if arm is not fully stowed, stop elevator and wait until fully stowed then lower elevator
                     } else {

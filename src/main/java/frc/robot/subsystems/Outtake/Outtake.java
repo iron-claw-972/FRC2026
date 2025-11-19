@@ -23,6 +23,7 @@ public class Outtake extends SubsystemBase {
 
     /** TalonFX motor controller that drives the outtake mechanism */
     private TalonFX motor = new TalonFX(IdConstants.OUTTAKE_MOTOR_COMP);
+    
 
     /** Current power level being applied to the motor (-1.0 to 1.0) */
     private double power;
@@ -99,7 +100,7 @@ public class Outtake extends SubsystemBase {
             // Attempt to fix I2C communication issues by closing and reopening the
             // connection
             I2CJNI.i2CClose(1);
-            colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+            colorSensor = new ColorSensorV3(IdConstants.i2cPort);
             return colorSensor.getProximity();
         }
     }

@@ -104,11 +104,6 @@ public class ArmComp extends ArmBase {
 
     @Override
     public void periodic() {
-        System.out.println("Arm at setpoint: " + atSetpoint());
-        System.out.println("Arm setpoint: " + setpoint);
-        System.out.println("Arm angle: " + getAngle()); 
-        System.out.println("Difference: " + Math.abs(setpoint - getAngle())); 
-
         // Obtain the motor position
         double position = getAngle();
         // PID calculation
