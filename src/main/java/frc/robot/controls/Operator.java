@@ -27,7 +27,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.outtake.Outtake;

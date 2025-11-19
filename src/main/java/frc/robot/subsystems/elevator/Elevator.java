@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.Elevator;
 
 import java.util.function.BooleanSupplier;
 
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
+import frc.robot.subsystems.Elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.util.AngledElevatorSim;
 import frc.robot.util.PhoenixUtil;
 
