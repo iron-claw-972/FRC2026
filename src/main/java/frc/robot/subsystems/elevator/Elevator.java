@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.elevator.ElevatorIOInputsAutoLogged;
 import frc.robot.util.AngledElevatorSim;
 import frc.robot.util.PhoenixUtil;
 
