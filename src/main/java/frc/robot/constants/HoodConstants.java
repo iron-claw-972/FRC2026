@@ -1,5 +1,7 @@
 package frc.robot.constants;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class HoodConstants {
@@ -13,4 +15,17 @@ public class HoodConstants {
     public static final double MAX_ACCELERATION = 120; // rad/s^2
 
     public static final double START_ANGLE = 0;
+
+    // Arena dimensions
+    public static final double TARGET_HEIGHT = 1.6; // meters
+
+    public static final Translation2d TRANSLATION_TARGET = new Translation2d(0, 0);
+    public static final Rotation2d ROTATION_TARGET_ANGLE = new Rotation2d();
+    public static final Pose2d TARGET_POSITION = new Pose2d(TRANSLATION_TARGET, ROTATION_TARGET_ANGLE); // meters
+    // Other
+    public static final double INITIAL_VELOCTIY = 5; // meters per second
+
+
+    // Testing purposes
+    public static final double START_DISTANCE = 8; // meters
 }

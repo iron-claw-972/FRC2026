@@ -10,6 +10,7 @@ import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -22,6 +23,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.drivetrain.Drivetrain;
+
+// TODO:
+// check if NaN is because of drivetrain or velocity being too low
+// get sim to work of course
+// fix config for motion magic
+// tune for gravity and stuff
+// implement live odometry distance reading instead of setting manually
 
 public class HoodReal extends HoodBase {
     final private TalonFX motor;
@@ -37,14 +46,18 @@ public class HoodReal extends HoodBase {
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(HoodConstants.START_ANGLE*hoodGearRatio);
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.START_ANGLE) * hoodGearRatio);
     private double setpoint = HoodConstants.START_ANGLE;
+    private double distance = HoodConstants.START_DISTANCE;
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
-    public HoodReal() {
+    // for calculating angle
+    private Drivetrain drivetrain;
+
+    public HoodReal(Drivetrain drivetrain) {
         // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID);
 
@@ -66,27 +79,41 @@ public class HoodReal extends HoodBase {
         }
 
         // motor position at power up
-        motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE * hoodGearRatio));
+        motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * hoodGearRatio);
         motor.setNeutralMode(NeutralModeValue.Brake);
 
 
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
-        config.Slot0.kG = 0; // Gravity compensation
+        config.Slot0.kG = 0.25; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
+        
+        // CHATGPT SAYS THIS IS WRONG
         config.Slot0.kP = Units.radiansToRotations(1 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
+        // Recommened from chatGPT:
+        // config.Slot0.kP = 8.0;
+        // config.Slot0.kI = 0.0;
+        // config.Slot0.kD = 0.2;
+        // config.Slot0.kS = 0.1;
+        // config.Slot0.kG = 0.25;   // flip sign if hood drops
+        // config.Slot0.kV = 0.12;
+
+
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY * hoodGearRatio);
-        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION * hoodGearRatio);
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * hoodGearRatio;
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * hoodGearRatio;
         //TODO: find which direction is positive
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
         motor.getConfigurator().apply(config);
+
+        this.drivetrain = drivetrain;
 
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
@@ -95,6 +122,13 @@ public class HoodReal extends HoodBase {
         SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
+
+        SmartDashboard.putData("Set target distance to 5 meters", new InstantCommand(() -> setDistance(5)));
+        SmartDashboard.putData("Set target distance to 6 meters", new InstantCommand(() -> setDistance(6)));
+        SmartDashboard.putData("Set target distance to 7 meters", new InstantCommand(() -> setDistance(7)));
+        SmartDashboard.putData("Set target distance to 8 meters", new InstantCommand(() -> setDistance(8)));
+
+        SmartDashboard.putData("AIM", new InstantCommand(() -> aimToTarget()));
     }
 
     public void setSetpoint(double setpoint) {
@@ -104,10 +138,32 @@ public class HoodReal extends HoodBase {
         motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * hoodGearRatio));
     }
 
+
     public double getPosition() {
         return position;
     }
     
+    private Pose2d getPose() {
+        return drivetrain.getPose();
+    }
+    
+    // assuming we are aligned of course, but I need to switch if we don't have a turret
+    // technically, we should have the drivetrain now the distance at all times, and we can grab that instead
+    private double calculateDistanceToTarget() {
+        Pose2d robotPose = getPose();
+        double dx = HoodConstants.TARGET_POSITION.getX() - robotPose.getX();
+        double dy = HoodConstants.TARGET_POSITION.getY() - robotPose.getY();
+        return Math.hypot(dx, dy);
+    }
+
+    public void aimToTarget() {
+        setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, distance);
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
     public double getVelocity() {
         return velocity/hoodGearRatio;
     }
@@ -121,6 +177,7 @@ public class HoodReal extends HoodBase {
         //try find a way to do with motion magic
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / hoodGearRatio;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / hoodGearRatio;
+        
         //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);
         
@@ -144,7 +201,8 @@ public class HoodReal extends HoodBase {
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * hoodGearRatio;
 
-        encoderSim.setRawRotorPosition(motorRotations);
+        encoderSim.setRawRotorPosition(motorRotations); // MUST set position
+        encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * hoodGearRatio);
     }
 
     // This is radians
@@ -160,6 +218,14 @@ public class HoodReal extends HoodBase {
     public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
         double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
         double angleDeg = Units.radiansToDegrees(angleRad);
-        setSetpoint(angleDeg);
+
+        System.out.println("AIM angle = " + angleDeg);
+
+        // in case we can't reach the target with our velocity:
+        if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
+            setSetpoint(angleDeg);
+        } else {
+            System.out.println("Angle is not able to reach the target with given velocity.");
+        }
     }
 }
