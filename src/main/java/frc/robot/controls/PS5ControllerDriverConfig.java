@@ -32,6 +32,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.Outtake.Outtake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
@@ -51,6 +52,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Intake intake;
     private Indexer indexer;
     private Outtake outtake;
+    private LED led;
     private Pose2d alignmentPose = null;
     private int selectedDirection = 0;
 
@@ -169,13 +171,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     // with vision
                     new ParallelCommandGroup(
                         new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),
-                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose, led)
                     ),
                     // Manual
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L1),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake).andThen(new InstantCommand(()->{}, led)), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -190,13 +192,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     // with vision
                     new ParallelCommandGroup(
                         new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),
-                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose, led)
                     ),
                     // Manual
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L2),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake).andThen(new InstantCommand(()->{}, led)), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -211,13 +213,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     // with vision
                     new ParallelCommandGroup(
                         new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),
-                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose, led)
                     ),
                     // Manual
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L3),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake).andThen(new InstantCommand(()->{}, led)), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )
@@ -232,13 +234,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     // with vision
                     new ParallelCommandGroup(
                         new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),
-                        new DriveToPose(getDrivetrain(), ()->alignmentPose)
+                        new DriveToPose(getDrivetrain(), ()->alignmentPose, led)
                     ),
                     // Manual
                     new SetOuttakeGamePiece(elevator, arm, OuttakeLocation.L4),  
                     () -> selectedDirection != 0),
                 new ConditionalCommand(
-                    new OuttakeGamePiece(elevator, arm, outtake), 
+                    new OuttakeGamePiece(elevator, arm, outtake).andThen(new InstantCommand(()->{}, led)), 
                     new DoNothing(), 
                     () -> selectedDirection != 0
                 )

@@ -39,7 +39,7 @@ import frc.robot.util.MathUtils;
 
 // Vision and it's commands are adapted from Iron Claw's FRC2023
 public class Vision {
-  private NetworkTable objectDetectionTable;
+  private NetworkTable m_objectDetectionTable;
 
   private NetworkTableEntry xOffset;
   private NetworkTableEntry yOffset;
@@ -59,19 +59,28 @@ public class Vision {
   // Array of tags to use, null or empty array to use all tags
   private int[] onlyUse = null;
 
+  public boolean oneCameraDisconnected(){
+    for(int i = 0; i < cameras.size(); i++){
+      if (cameras.get(i).getCameraConnected()){
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Creates a new instance of Vision and sets up the cameras and field layout
    */
   public Vision(ArrayList<Pair<String, Transform3d>> camList) {
     // Initialize object_detection NetworkTable
-    objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
+    m_objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
 
     // From the object detection NetworkTable, get the entries
-    objectDistance = objectDetectionTable.getEntry("distance");
-    xOffset = objectDetectionTable.getEntry("x_offset");
-    yOffset = objectDetectionTable.getEntry("y_offset");
-    objectClass = objectDetectionTable.getEntry("class");
-    cameraIndex = objectDetectionTable.getEntry("index");
+    objectDistance = m_objectDetectionTable.getEntry("distance");
+    xOffset = m_objectDetectionTable.getEntry("x_offset");
+    yOffset = m_objectDetectionTable.getEntry("y_offset");
+    objectClass = m_objectDetectionTable.getEntry("class");
+    cameraIndex = m_objectDetectionTable.getEntry("index");
 
     // Start NetworkTables server
     NetworkTableInstance.getDefault().startServer();
@@ -426,6 +435,10 @@ public class Vision {
     private double lastTimestamp = 0;
     private boolean enabled = true;
     private final VisionIOInputs inputs = new VisionIOInputs();
+
+    public boolean getCameraConnected(){
+      return inputs.connected;
+    }
   
     /**
      * Stores information about a camera

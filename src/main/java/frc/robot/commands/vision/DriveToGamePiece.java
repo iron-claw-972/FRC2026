@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.DetectedObject;
 
@@ -25,9 +26,9 @@ public class DriveToGamePiece extends DriveToPose {
    * @param detectedObject The supplier for the detected object to use
    * @param drive The drivetrain
    */
-  public DriveToGamePiece(Supplier<DetectedObject> detectedObject, Drivetrain drive) {
+  public DriveToGamePiece(Supplier<DetectedObject> detectedObject, Drivetrain drive, LED led) {
     super(drive,
-      () -> getPose(detectedObject, drive)
+      () -> getPose(detectedObject, drive), led
     );
     updateTarget = constantUpdate;
   }

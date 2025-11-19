@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.gpm.LEDDefaultCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.ElevatorConstants;
@@ -28,6 +29,7 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Arm.ArmComp;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Indexer.Indexer;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.Outtake.Outtake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -55,6 +57,7 @@ public class RobotContainer {
   private Outtake outtake = new Outtake();
   private Intake intake = new Intake();
   private Indexer indexer = new Indexer();
+  private LED led = new LED();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -116,6 +119,9 @@ public class RobotContainer {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));        led.setDefaultCommand(
+            new LEDDefaultCommand(led, outtake, drive, vision)
+        );
         break;
       }
 
