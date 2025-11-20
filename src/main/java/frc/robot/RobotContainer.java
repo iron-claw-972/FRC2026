@@ -117,7 +117,7 @@ public class RobotContainer {
     // Drive 1 meter forward and rotate 180 deg
     SmartDashboard.putData("Drive 1 meter forward and rotate 180 deg: ", new InstantCommand(() -> new GoToPose(forwardOneMeterAndRotateOneEighty, drive)));
     // Rotate 180 deg 
-    SmartDashboard.putData("Drive 1 meter forward and rotate 180 deg: ", new InstantCommand(() -> new GoToPose(rotateOneEighty, drive)));
+    SmartDashboard.putData("Rotate 180 deg: ", new InstantCommand(() -> new GoToPose(rotateOneEighty, drive)));
 
     // dispatch on the robot
     switch (robotId) {
