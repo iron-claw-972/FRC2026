@@ -25,7 +25,6 @@ public class HoodConstants {
     // Other
     public static final double INITIAL_VELOCTIY = 8; // meters per second
 
-
     // Testing purposes
     public static final double START_DISTANCE = 2; // meters
 }

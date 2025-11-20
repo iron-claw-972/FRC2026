@@ -56,9 +56,8 @@ public class HoodReal extends HoodBase {
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
     // for calculating angle
-    private Drivetrain drivetrain;
 
-    public HoodReal(Drivetrain drivetrain) {
+    public HoodReal() {
         // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID);
 
@@ -114,8 +113,6 @@ public class HoodReal extends HoodBase {
         
         motor.getConfigurator().apply(config);
 
-        this.drivetrain = drivetrain;
-
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
@@ -128,9 +125,6 @@ public class HoodReal extends HoodBase {
         SmartDashboard.putData("Set target distance to 3 meters", new InstantCommand(() -> setDistance(3)));
         SmartDashboard.putData("Set target distance to 4 meters", new InstantCommand(() -> setDistance(4)));
         SmartDashboard.putData("Set target distance to 4.5 meters", new InstantCommand(() -> setDistance(4.5)));
-
-        SmartDashboard.putData("AIM", new InstantCommand(() -> aimToTarget()));
-        SmartDashboard.putNumber("Hood Angle", distance);
     }
 
     public void setSetpoint(double setpoint) {
@@ -145,21 +139,16 @@ public class HoodReal extends HoodBase {
         return position;
     }
     
-    private Pose2d getPose() {
-        return drivetrain.getPose();
-    }
-    
     // assuming we are aligned of course, but I need to switch if we don't have a turret
     // technically, we should have the drivetrain now the distance at all times, and we can grab that instead
-    private double calculateDistanceToTarget() {
-        Pose2d robotPose = getPose();
+    private double calculateDistanceToTarget(Pose2d robotPose) {
         double dx = HoodConstants.TARGET_POSITION.getX() - robotPose.getX();
         double dy = HoodConstants.TARGET_POSITION.getY() - robotPose.getY();
         return Math.hypot(dx, dy);
     }
 
-    public void aimToTarget() {
-        setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, distance);
+    public void aimToTarget(Pose2d robotPose) {
+        setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, calculateDistanceToTarget(robotPose));
     }
 
     public void setDistance(double distance) {

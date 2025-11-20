@@ -2,6 +2,8 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -112,6 +114,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new IntakeStart(intake, IntakeConstants.STOW_ANGLE),
                 new InstantCommand(()->{intake.stopFlyWheel();})
             )
+        );
+
+        // aim hood for shooter
+        driver.get(PS5Button.SQUARE).onTrue(
+            new InstantCommand(()->{
+                hood.aimToTarget(getDrivetrain().getPose());
+            })
         );
     }
 
