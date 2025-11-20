@@ -9,7 +9,7 @@ import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.Elevator.Elevator;
 
 public class NetSetpoint extends SequentialCommandGroup {
     public NetSetpoint(Elevator elevator, Arm arm, Drivetrain drive){
