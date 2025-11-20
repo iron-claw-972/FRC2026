@@ -123,12 +123,13 @@ public class HoodReal extends HoodBase {
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
 
-        SmartDashboard.putData("Set target distance to 5 meters", new InstantCommand(() -> setDistance(5)));
-        SmartDashboard.putData("Set target distance to 6 meters", new InstantCommand(() -> setDistance(6)));
-        SmartDashboard.putData("Set target distance to 7 meters", new InstantCommand(() -> setDistance(7)));
-        SmartDashboard.putData("Set target distance to 8 meters", new InstantCommand(() -> setDistance(8)));
+        SmartDashboard.putData("Set target distance to 2 meters", new InstantCommand(() -> setDistance(2)));
+        SmartDashboard.putData("Set target distance to 3 meters", new InstantCommand(() -> setDistance(3)));
+        SmartDashboard.putData("Set target distance to 4 meters", new InstantCommand(() -> setDistance(4)));
+        SmartDashboard.putData("Set target distance to 4.5 meters", new InstantCommand(() -> setDistance(4.5)));
 
         SmartDashboard.putData("AIM", new InstantCommand(() -> aimToTarget()));
+        SmartDashboard.putNumber("Hood Angle", distance);
     }
 
     public void setSetpoint(double setpoint) {
@@ -204,15 +205,26 @@ public class HoodReal extends HoodBase {
         encoderSim.setRawRotorPosition(motorRotations); // MUST set position
         encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * hoodGearRatio);
     }
-
-    // This is radians
+    
     @Override
-    public double calculateAngle(double initialVelocity, double goalHeight, double goalDistance) {
-        var x = (Constants.GRAVITY_ACCELERATION * goalDistance * goalDistance) + (2 * goalHeight * initialVelocity * initialVelocity);
-        var y = initialVelocity * initialVelocity - Math.sqrt(initialVelocity * initialVelocity * initialVelocity * initialVelocity - Constants.GRAVITY_ACCELERATION * x);
-        var z = Math.atan(y/(Constants.GRAVITY_ACCELERATION * goalDistance));
+    public double calculateAngle(double v0, double U, double R) {
+        double g = Constants.GRAVITY_ACCELERATION;
+    
+        double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * U * v0 * v0);
+        double sqrtTerm = Math.sqrt(inside);
+    
+        // match Desmos: v0² + sqrt(...)
+        double numerator = (v0 * v0) + sqrtTerm;
+    
+        double denominator = g * R;
+    
+        double z = Math.atan(numerator / denominator);
+    
+        System.out.println("CalculatedAngle = " + z);
         return z;
     }
+
+    
 
     @Override
     public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {

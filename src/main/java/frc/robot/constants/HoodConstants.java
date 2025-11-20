@@ -23,9 +23,9 @@ public class HoodConstants {
     public static final Rotation2d ROTATION_TARGET_ANGLE = new Rotation2d();
     public static final Pose2d TARGET_POSITION = new Pose2d(TRANSLATION_TARGET, ROTATION_TARGET_ANGLE); // meters
     // Other
-    public static final double INITIAL_VELOCTIY = 5; // meters per second
+    public static final double INITIAL_VELOCTIY = 8; // meters per second
 
 
     // Testing purposes
-    public static final double START_DISTANCE = 8; // meters
+    public static final double START_DISTANCE = 2; // meters
 }
