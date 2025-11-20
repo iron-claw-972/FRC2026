@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.IntakeCoral;
+import frc.robot.commands.gpm.LEDDefaultCommand;
 import frc.robot.commands.gpm.MoveArm;
 import frc.robot.commands.gpm.MoveElevator;
 import frc.robot.commands.gpm.OuttakeCoral;
@@ -40,6 +41,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -74,6 +76,7 @@ public class RobotContainer {
   private Elevator elevator = null;
   private Climb climb = null;
   private Arm arm = null;
+  private LED led = null;
   private Command auto;
 
   public double armWaitTime = 0.5;
@@ -130,6 +133,8 @@ public class RobotContainer {
           // SmartDashboard.putData("l4 outake", new ScoreL4(elevator, outtake));
         }
       case Vertigo:
+        led = new LED();
+        led.setDefaultCommand(new LEDDefaultCommand(led, outtake, drive, vision));
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
         //operator = new Operator(drive, elevator, intake, indexer, outtake, climb);
