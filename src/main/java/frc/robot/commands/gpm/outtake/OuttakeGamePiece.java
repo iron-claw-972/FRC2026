@@ -24,6 +24,7 @@ public class OuttakeGamePiece extends Command {
     private Outtake outtake;
     private double speed;
     private Timer timer;
+    private boolean isCoralLoadedInitially; 
 
     private enum Phase {
         Outtaking,
@@ -44,6 +45,8 @@ public class OuttakeGamePiece extends Command {
      */
 
     public OuttakeGamePiece(Elevator elevator, ArmComp arm, Outtake outtake){
+        isCoralLoadedInitially = outtake.coralLoaded();
+         
         double height = elevator.getPosition(); 
         if (height > ElevatorConstants.L4_SETPOINT + 0.001) {
             speed = OuttakeLocation.L4.speed; 
@@ -81,7 +84,9 @@ public class OuttakeGamePiece extends Command {
     public void execute(){
         switch (phase){
             case Outtaking:
-                if (timer.hasElapsed(0.5)){
+                // Don't start initial lowering until the coral has been ejected and time has elapsed 
+                // If there was no coral loaded before outtaking, just start initial lowering 
+                if ((timer.hasElapsed(0.5) && !outtake.coralLoaded()) || !isCoralLoadedInitially) {
                     outtake.setMotor(0);
                     arm.setSetpoint(ArmConstants.INTAKE_SETPOINT);
                     elevator.setSetpoint(ElevatorConstants.INTAKE_SETPOINT);
