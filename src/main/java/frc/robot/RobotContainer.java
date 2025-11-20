@@ -76,7 +76,7 @@ public class RobotContainer {
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
-        hood = new HoodReal(drive);
+        hood = new HoodReal();
         intake = new IntakeReal();
         shooter = new shooterReal();
 
