@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 // TODO:
@@ -39,8 +40,8 @@ public class HoodReal extends HoodBase {
     double power;
     
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-    //TODO: get actual gear ratio
-    private double hoodGearRatio = 50.0;
+    // Hood gear ratio from ShooterConstants
+    private double hoodGearRatio = ShooterConstants.HOOD_GEAR_RATIO;
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);

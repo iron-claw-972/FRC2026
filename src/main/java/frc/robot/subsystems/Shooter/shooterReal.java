@@ -19,11 +19,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.IdConstants;
 
 public class shooterReal extends shooterBase {
-    
+
     private TalonFX shooterMotor = new TalonFX(IdConstants.SHOOTER_ID);
     private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID);
     //TODO: find sensor ID
     private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);
+
+    private final double shooterGearRatio = ShooterConstants.SHOOTER_GEAR_RATIO;
 
     //rotations/sec
     private double shooterTargetSpeed = 0;
