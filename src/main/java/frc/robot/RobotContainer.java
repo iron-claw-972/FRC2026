@@ -94,17 +94,14 @@ public class RobotContainer {
     vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
     drive = new Drivetrain(vision, new GyroIOPigeon2());
 
-    Rotation2d ninety = new Rotation2d(drive.getPose().getRotation().getDegrees() + 90.0); 
-    Rotation2d oneEighty = new Rotation2d(drive.getPose().getRotation().getDegrees() + 180.0); 
-
     // Are these units in meters?
     // Poses for GoToPose commands 
     Pose2d forwardOneMeter = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), drive.getYaw()); 
     Pose2d backwardOneMeter = new Pose2d(drive.getPose().getX() - 1.0, drive.getPose().getY(), drive.getYaw()); 
     Pose2d upOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() + 1.0, drive.getYaw()); 
     Pose2d downOneMeter = new Pose2d(drive.getPose().getX(), drive.getPose().getY() - 1.0, drive.getYaw());
-    Pose2d forwardOneMeterAndRotateOneEighty = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), oneEighty); 
-    Pose2d rotateOneEighty = new Pose2d(drive.getPose().getX(), drive.getPose().getY(), oneEighty); 
+    Pose2d forwardOneMeterAndRotateOneEighty = new Pose2d(drive.getPose().getX() + 1.0, drive.getPose().getY(), new Rotation2d(drive.getPose().getRotation().getDegrees() + 180.0)); 
+    Pose2d rotateOneEighty = new Pose2d(drive.getPose().getX(), drive.getPose().getY(), new Rotation2d(drive.getPose().getRotation().getDegrees() + 180.0)); 
 
     // Drive 1 meter forward 
     SmartDashboard.putData("Drive 1 meter forward: ", new InstantCommand(() -> new GoToPose(forwardOneMeter, drive))); 
