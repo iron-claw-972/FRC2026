@@ -9,6 +9,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -37,7 +38,7 @@ public class IntakeReal extends IntakeBase{
 
     private SingleJointedArmSim IntakeSim = 
     new SingleJointedArmSim(
-        DCMotor.getKrakenX60(1), 
+        sim_motor, 
         IntakeConstants.gear_ratio, 
         IntakeConstants.momment_of_intertia, 
         IntakeConstants.arm_length, 
@@ -49,6 +50,7 @@ public class IntakeReal extends IntakeBase{
 
     public IntakeReal(){
         IntakeMotor = new TalonFX(IntakeConstants.intake_motor_id);
+
         FlywheelMotor = new TalonFX(IntakeConstants.flywheel_motor_id); 
 
         IntakeSimEncoder = IntakeMotor.getSimState();
@@ -79,23 +81,23 @@ public class IntakeReal extends IntakeBase{
         config.Slot0.kG = IntakeConstants.arm_mass * IntakeConstants.center_of_mass * 9.8 / IntakeConstants.gear_ratio; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(5.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(0.5 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
+        config.Slot0.kD = Units.radiansToRotations(0.1 * 12); // Derivative term (used to dampen oscillations)
 
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.max_velocity);
-        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(IntakeConstants.max_acceleration);
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.max_velocity) * IntakeConstants.gear_ratio;
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(IntakeConstants.max_acceleration) * IntakeConstants.gear_ratio;
 
         return config;
     }
 
     public void setIntakeSetpoint(double position){
-        IntakeMotor.setControl(m_request.withPosition(Units.degreesToRotations(position)));
+        IntakeMotor.setControl(m_request.withPosition(Units.degreesToRotations(position*IntakeConstants.gear_ratio)));
     }
     
     public double getIntakePosition(){
-        return Units.rotationsToRadians(IntakeMotor.getPosition().getValueAsDouble());
+        return Units.rotationsToRadians(IntakeMotor.getPosition().getValueAsDouble()/IntakeConstants.gear_ratio);
     }
 
     public double getIntakeVelocity(){
@@ -118,6 +120,11 @@ public class IntakeReal extends IntakeBase{
         FlywheelMotor.stopMotor();
     }
 
+    public void setMomentOfInertia(double momentOfIntertia){
+        var system = LinearSystemId.createSingleJointedArmSystem(sim_motor, momentOfIntertia, IntakeConstants.gear_ratio);
+        // IntakeSim.setState(new Matrix<sim_motor, N1>(new SimpleMatrix(system.getA().getNumRows(), 1)));
+    }
+
     @Override
     public void periodic() {
         ligament2d.setAngle(Units.radiansToDegrees(getIntakePosition()));
@@ -128,6 +135,6 @@ public class IntakeReal extends IntakeBase{
         IntakeSim.setInput(IntakeMotor.getMotorVoltage().getValueAsDouble());
         IntakeSim.update(0.02);
 
-        IntakeSimEncoder.setRawRotorPosition(Units.radiansToRotations(IntakeSim.getAngleRads()));
+        IntakeSimEncoder.setRawRotorPosition(Units.radiansToRotations(IntakeSim.getAngleRads()*IntakeConstants.gear_ratio));
     }
 }

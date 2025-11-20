@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
@@ -45,7 +46,7 @@ public class RobotContainer {
 
   //private HoodReal hood = new HoodReal();
 
-  private IntakeReal intake = new IntakeReal();
+  private IntakeReal intake;
   
   private Drivetrain drive = null;
   private Vision vision = null;
@@ -62,6 +63,7 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     // dispatch on the robot
+
     switch (robotId) {
       case TestBed1:
         break;
@@ -74,6 +76,9 @@ public class RobotContainer {
 
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+
+        intake = new IntakeReal();
+        SmartDashboard.putData(intake);
         // fall-through
 
       case Vivace:
