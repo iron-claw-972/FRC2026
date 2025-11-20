@@ -134,7 +134,6 @@ public class RobotContainer {
         }
       case Vertigo:
         led = new LED();
-        led.setDefaultCommand(new LEDDefaultCommand(led, outtake, drive, vision));
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
         //operator = new Operator(drive, elevator, intake, indexer, outtake, climb);
@@ -151,8 +150,10 @@ public class RobotContainer {
         initializeAutoBuilder();
         registerCommands();
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        led.setDefaultCommand(
+            new LEDDefaultCommand(led, outtake, drive, vision)
+        );
         PathGroupLoader.loadPathGroups();
-        
              
         break;
       }
