@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.IdConstants;
 
 public class shooterReal extends shooterBase {
+    
+    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_ONE_ID);
+    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_TWO_ID);
 
-    private TalonFX shooterMotor = new TalonFX(IdConstants.SHOOTER_ID);
     private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID);
     //TODO: find sensor ID
     private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);
-
-    private final double shooterGearRatio = ShooterConstants.SHOOTER_GEAR_RATIO;
 
     //rotations/sec
     private double shooterTargetSpeed = 0;
@@ -50,11 +50,16 @@ public class shooterReal extends shooterBase {
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
         config.Slot0.kV = 0.12; //Maximum rps = 100 --> 12V/100rps
-        shooterMotor.getConfigurator().apply(config);
+        shooterMotorLeft.getConfigurator().apply(config);
+        shooterMotorRight.getConfigurator().apply(config);
         
-        shooterMotor.getConfigurator().apply(
+        shooterMotorLeft.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
+        );
+
+        shooterMotorRight.getConfigurator().apply(
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
         feederMotor.getConfigurator().apply(
@@ -65,7 +70,8 @@ public class shooterReal extends shooterBase {
 
     @Override
     public void periodic(){
-        shooterMotor.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         feederMotor.set(feederPower);
     }
 
@@ -82,7 +88,8 @@ public class shooterReal extends shooterBase {
 
     @Override
     public double getShooterVelcoity(){
-        return Units.radiansToDegrees(shooterMotor.getVelocity().getValueAsDouble());
+        // left motor should be the same as the right
+        return Units.radiansToDegrees(shooterMotorLeft.getVelocity().getValueAsDouble());
     }
 
     @Override
