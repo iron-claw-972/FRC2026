@@ -75,6 +75,18 @@ public class shooterReal extends shooterBase {
         feederMotor.set(feederPower);
     }
 
+    public void loadBallIntoShooter() {
+
+        if sensor.getMeasurement().distance_mm <= 300 {
+            setFeeder(0);
+            System.out.println("Loaded ball into shooter");
+        } else {
+            setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+            System.out.println("Loading ball into shooter");
+        }
+        
+    }
+
     @Override
     public void setFeeder(double power){
         feederPower = power;

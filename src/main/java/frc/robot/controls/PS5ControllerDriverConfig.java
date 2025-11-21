@@ -122,6 +122,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 hood.aimToTarget(getDrivetrain().getPose());
             })
         );
+
+        driver.get(PS5Button.CIRCLE).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> shooter.loadBallIntoShooter()),
+                new InstantCommand(()-> shooter.shootGamePiece())
+            )
+        ).onFalse(
+            new InstantCommand(()->{
+                shooter.deactivateShooter();
+            })
+        );
     }
 
     public void setAlignmentPose(){
