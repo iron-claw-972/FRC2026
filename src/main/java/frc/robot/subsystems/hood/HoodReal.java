@@ -41,13 +41,11 @@ public class HoodReal extends HoodBase {
     
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
     // Hood gear ratio from ShooterConstants
-    private double hoodGearRatio = ShooterConstants.HOOD_GEAR_RATIO;
-
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.START_ANGLE) * hoodGearRatio);
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
     private double setpoint = HoodConstants.START_ANGLE;
     private double distance = HoodConstants.START_DISTANCE;
 
@@ -68,7 +66,7 @@ public class HoodReal extends HoodBase {
 
             hoodSim = new SingleJointedArmSim(
                 hoodMotorSim,
-                hoodGearRatio,
+                HoodConstants.HOOD_GEAR_RATIO,
                 0.01 * 0.01 * 5,
                 0.10,
                 Units.degreesToRadians(-360),
@@ -79,7 +77,7 @@ public class HoodReal extends HoodBase {
         }
 
         // motor position at power up
-        motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * hoodGearRatio);
+        motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setNeutralMode(NeutralModeValue.Brake);
 
 
@@ -106,8 +104,8 @@ public class HoodReal extends HoodBase {
 
 
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * hoodGearRatio;
-        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * hoodGearRatio;
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * HoodConstants.HOOD_GEAR_RATIO;
+        motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * HoodConstants.HOOD_GEAR_RATIO;
         //TODO: find which direction is positive
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
@@ -131,7 +129,7 @@ public class HoodReal extends HoodBase {
         // pid.reset();
         // pid.setSetpoint(Units.degreesToRadians(setpoint));
         this.setpoint = setpoint;
-        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * hoodGearRatio));
+        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * HoodConstants.HOOD_GEAR_RATIO));
     }
 
 
@@ -156,7 +154,7 @@ public class HoodReal extends HoodBase {
     }
 
     public double getVelocity() {
-        return velocity/hoodGearRatio;
+        return velocity/HoodConstants.HOOD_GEAR_RATIO;
     }
 
     public boolean atSetpoint() {
@@ -166,8 +164,8 @@ public class HoodReal extends HoodBase {
     @Override
     public void periodic() {
         //try find a way to do with motion magic
-        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / hoodGearRatio;
-        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / hoodGearRatio;
+        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / HoodConstants.HOOD_GEAR_RATIO;
         
         //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);
@@ -190,10 +188,10 @@ public class HoodReal extends HoodBase {
 
         double simAngle = hoodSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
-        double motorRotations = simRotations * hoodGearRatio;
+        double motorRotations = simRotations * HoodConstants.HOOD_GEAR_RATIO;
 
         encoderSim.setRawRotorPosition(motorRotations); // MUST set position
-        encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * hoodGearRatio);
+        encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * HoodConstants.HOOD_GEAR_RATIO);
     }
     
     @Override

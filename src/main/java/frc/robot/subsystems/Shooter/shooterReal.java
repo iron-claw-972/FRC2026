@@ -16,6 +16,7 @@ import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.IdConstants;
 
 public class shooterReal extends shooterBase {
@@ -30,6 +31,8 @@ public class shooterReal extends shooterBase {
     //rotations/sec
     private double shooterTargetSpeed = 0;
     private double feederPower = 0;
+
+    private boolean shooterAtMaxSpeed = false;
 
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
@@ -73,18 +76,44 @@ public class shooterReal extends shooterBase {
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         feederMotor.set(feederPower);
+
+        if (shooterMotorLeft.getVelocity().getValueAsDouble() >= shooterTargetSpeed * 0.95) {
+            shooterAtMaxSpeed = true;
+        } else {
+            shooterAtMaxSpeed = false;
+        }
     }
 
     public void loadBallIntoShooter() {
-
-        if sensor.getMeasurement().distance_mm <= 300 {
+        if (ballDetected()) {
             setFeeder(0);
-            System.out.println("Loaded ball into shooter");
+            System.out.println("Ball loaded into shooter");
         } else {
-            setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-            System.out.println("Loading ball into shooter");
+            while (sensor.getMeasurement().distance_mm > 300) {
+                setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+            }
         }
-        
+    }
+
+    public void shootGamePiece() {
+        if (ballDetected()) {
+            setShooter(ShooterConstants.SHOOTER_RUN_POWER);
+            while (!shooterAtMaxSpeed) {
+                // wait until shooter is at max speed
+                System.out.println("Powering up shooter");
+            }
+            setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+            System.out.println("Shooting game piece");
+        } else {
+            loadBallIntoShooter();
+            shootGamePiece();
+        }
+    }
+
+    public void deactivateShooter() {
+        setFeeder(0);
+        setShooter(0);
+        System.out.println("Shooter deactivated");
     }
 
     @Override
