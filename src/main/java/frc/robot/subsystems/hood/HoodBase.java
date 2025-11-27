@@ -14,7 +14,7 @@ abstract class HoodBase extends SubsystemBase{
      * Gets the position of the hood for robot
      * @return Returns position of hood in radians
      */
-    public abstract double getPosition();
+    public abstract double getHoodPosition();
 
     /**
      * Gets the velocity of the hood

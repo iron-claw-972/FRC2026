@@ -60,7 +60,7 @@ public class IntakeReal extends IntakeBase{
         IntakeFeedforward = new ArmFeedforward
             (0.0,
             IntakeConstants.gravity * IntakeConstants.center_of_mass * (IntakeConstants.arm_mass)
-                    / IntakeConstants.gear_ratio * sim_motor.rOhms / sim_motor.KtNMPerAmp / IntakeConstants.robot_voltage,
+                    / IntakeConstants.gear_ratio * sim_motor.rOhms / sim_motor.KtNMPerAmp,
             0);
         
         IntakeMotor.getConfigurator().apply(getMotionMagicConfig());
@@ -68,22 +68,22 @@ public class IntakeReal extends IntakeBase{
         SmartDashboard.putData("IntakePID", IntakePID);
         SmartDashboard.putData("Intake", mechanism2d);
 
-        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setIntakeSetpoint(0)));
-        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setIntakeSetpoint(90)));
-        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setIntakeSetpoint(180)));
-        SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setIntakeSetpoint(270)));
+        SmartDashboard.putData("Set 0 degrees2", new InstantCommand(() -> setIntakeSetpoint(0)));
+        SmartDashboard.putData("Set 90 degrees2", new InstantCommand(() -> setIntakeSetpoint(90)));
+        SmartDashboard.putData("Set 180 degrees2", new InstantCommand(() -> setIntakeSetpoint(180)));
+        SmartDashboard.putData("Set 270 degrees2", new InstantCommand(() -> setIntakeSetpoint(270)));
     }
 
     public TalonFXConfiguration getMotionMagicConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
-        config.Slot0.kG = IntakeConstants.arm_mass * IntakeConstants.center_of_mass * 9.8 / IntakeConstants.gear_ratio; // Gravity compensation
+        config.Slot0.kG = 0.0;//IntakeConstants.arm_mass * IntakeConstants.center_of_mass * 9.8 / IntakeConstants.gear_ratio; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(0.5 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(2.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = Units.radiansToRotations(0.1 * 12); // Derivative term (used to dampen oscillations)
+        config.Slot0.kD = Units.radiansToRotations(0.0 * 12); // Derivative term (used to dampen oscillations)
 
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(IntakeConstants.max_velocity) * IntakeConstants.gear_ratio;
@@ -93,7 +93,7 @@ public class IntakeReal extends IntakeBase{
     }
 
     public void setIntakeSetpoint(double position){
-        IntakeMotor.setControl(m_request.withPosition(Units.degreesToRotations(position*IntakeConstants.gear_ratio)));
+        IntakeMotor.setControl(m_request.withPosition(Units.degreesToRotations(position*IntakeConstants.gear_ratio)).withFeedForward(IntakeFeedforward.calculate(getIntakePosition(), 0)));
     }
     
     public double getIntakePosition(){
@@ -128,6 +128,9 @@ public class IntakeReal extends IntakeBase{
     @Override
     public void periodic() {
         ligament2d.setAngle(Units.radiansToDegrees(getIntakePosition()));
+
+        // Feedforward update
+        IntakeMotor.setControl(m_request.withPosition(m_request.Position).withFeedForward(IntakeFeedforward.calculate(getIntakePosition(), 0)));
     }
 
     @Override

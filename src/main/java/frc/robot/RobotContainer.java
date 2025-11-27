@@ -30,7 +30,6 @@ import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
-import pabeles.concurrency.IntRangeTask;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -44,7 +43,7 @@ import pabeles.concurrency.IntRangeTask;
 public class RobotContainer {
   // The robot's subsystems are defined here...
 
-  //private HoodReal hood = new HoodReal();
+  private HoodReal hood;
 
   private IntakeReal intake;
   
@@ -78,7 +77,10 @@ public class RobotContainer {
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
 
         intake = new IntakeReal();
+        //hood = new HoodReal();
+
         SmartDashboard.putData(intake);
+        //SmartDashboard.putData(hood);
         // fall-through
 
       case Vivace:
