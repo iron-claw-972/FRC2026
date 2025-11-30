@@ -197,8 +197,11 @@ public class HoodReal extends HoodBase {
     @Override
     public double calculateAngle(double v0, double U, double R) {
         double g = Constants.GRAVITY_ACCELERATION;
+        //TODO: change this
+        double shooterHeight = 1.0;
+        double h = U - shooterHeight;
     
-        double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * U * v0 * v0);
+        double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
         double sqrtTerm = Math.sqrt(inside);
     
         // match Desmos: v0² + sqrt(...)

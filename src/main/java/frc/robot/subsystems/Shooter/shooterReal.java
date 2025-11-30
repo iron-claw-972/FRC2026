@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Shooter;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -18,8 +20,9 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
 
-public class shooterReal extends shooterBase {
+public class shooterReal extends shooterBase implements ShooterIO {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_ONE_ID);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_TWO_ID);
@@ -37,8 +40,11 @@ public class shooterReal extends shooterBase {
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
     public shooterReal(){
 
+        updateInputs();
         //Sensor configs
         try {
             sensor.setRangingMode(RangingMode.SHORT);
@@ -73,6 +79,7 @@ public class shooterReal extends shooterBase {
 
     @Override
     public void periodic(){
+        updateInputs();
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         feederMotor.set(feederPower);
@@ -85,6 +92,7 @@ public class shooterReal extends shooterBase {
     }
 
     public void loadBallIntoShooter() {
+        //TODO: if ball is detected then it's loaded?
         if (ballDetected()) {
             setFeeder(0);
             System.out.println("Ball loaded into shooter");
@@ -110,7 +118,7 @@ public class shooterReal extends shooterBase {
         }
     }
 
-    public void deactivateShooter() {
+    public void deactivateShooterAndFeeder() {
         setFeeder(0);
         setShooter(0);
         System.out.println("Shooter deactivated");
@@ -129,18 +137,25 @@ public class shooterReal extends shooterBase {
 
     @Override
     public double getShooterVelcoity(){
-        // left motor should be the same as the right
-        return Units.radiansToDegrees(shooterMotorLeft.getVelocity().getValueAsDouble());
+        return inputs.shooterSpeedLeft;
     }
 
     @Override
     public double getFeederVelocity(){
-        return Units.radiansToDegrees(feederMotor.getVelocity().getValueAsDouble());
+        return inputs.feederSpeed;
     }
 
+    @AutoLogOutput
     public boolean ballDetected(){
         Measurement measurement = sensor.getMeasurement();
         return measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT
         && measurement.distance_mm <= 1000 * 0.3;
+    }
+
+    @Override
+    public void updateInputs(){
+        inputs.shooterSpeedLeft = shooterMotorLeft.getVelocity().getValueAsDouble();
+        inputs.shooterSpeedRight = shooterMotorRight.getVelocity().getValueAsDouble();
+        inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
     }
 }

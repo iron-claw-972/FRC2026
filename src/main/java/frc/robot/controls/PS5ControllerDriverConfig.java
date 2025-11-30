@@ -44,7 +44,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = ()->false;
 
     //Turn on for alignment to the tag
-    private boolean alignTrue = false;
+    private boolean alignTrue = true;
     private Pose2d alignmentPose = null;
     private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
 
@@ -75,25 +75,46 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
         
-        // Align and shoot
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(()-> setAlignmentPose()),
-                new ParallelCommandGroup(
-                    alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(),
-                    new MoveHood(hood, HOOD_SETPOINT)
-                ),
-                new InstantCommand(()-> {
-                    shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-                    shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER);
+
+        if (intake != null && shooter != null){
+            // Align and shoot
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
+                new SequentialCommandGroup(
+                    new InstantCommand(()-> setAlignmentPose()),
+                    new ParallelCommandGroup(
+                        alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(),
+                        new MoveHood(hood, HOOD_SETPOINT)
+                    ),
+                    new InstantCommand(()-> {
+                        shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+                        shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER);
+                    })
+                )
+            ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
                 })
+            );
+
+            // aim hood for shooter
+            driver.get(PS5Button.SQUARE).onTrue(
+                new InstantCommand(()->{
+                    hood.aimToTarget(getDrivetrain().getPose());
+                })
+            );
+
+            // just run shooter & feeder motors
+            driver.get(PS5Button.CIRCLE).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> shooter.loadBallIntoShooter()),
+                new InstantCommand(()-> shooter.shootGamePiece())
             )
-        ).onFalse(
-            new InstantCommand(()->{
-                shooter.stopFeeder();
-                shooter.stopShooter();
-            })
-        );
+            ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
+                })
+            );
+        }
 
         //Just align but don't shoot
         driver.get(PS5Button.TRIANGLE).onTrue(
@@ -104,35 +125,20 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         );
 
         //Intake
-        driver.get(PS5Button.LEFT_TRIGGER).onTrue(
+        if (intake != null){
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(
             new ParallelCommandGroup(
                 new IntakeStart(intake, IntakeConstants.INTAKE_ANGLE),
                 new InstantCommand(()->{intake.setFlyWheel();})
             )
-        ).onFalse(
-            new ParallelCommandGroup(
-                new IntakeStart(intake, IntakeConstants.STOW_ANGLE),
-                new InstantCommand(()->{intake.stopFlyWheel();})
-            )
-        );
+            ).onFalse(
+                new ParallelCommandGroup(
+                    new IntakeStart(intake, IntakeConstants.STOW_ANGLE),
+                    new InstantCommand(()->{intake.stopFlyWheel();})
+                )
+            );
+        }
 
-        // aim hood for shooter
-        driver.get(PS5Button.SQUARE).onTrue(
-            new InstantCommand(()->{
-                hood.aimToTarget(getDrivetrain().getPose());
-            })
-        );
-
-        driver.get(PS5Button.CIRCLE).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.loadBallIntoShooter()),
-                new InstantCommand(()-> shooter.shootGamePiece())
-            )
-        ).onFalse(
-            new InstantCommand(()->{
-                shooter.deactivateShooter();
-            })
-        );
     }
 
     public void setAlignmentPose(){
