@@ -33,7 +33,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 // tune for gravity and stuff
 // implement live odometry distance reading instead of setting manually
 
-public class HoodReal extends HoodBase {
+public class HoodReal extends HoodBase implements HoodIO{
     final private TalonFX motor;
     private double position;
     private double velocity;
@@ -55,7 +55,10 @@ public class HoodReal extends HoodBase {
 
     // for calculating angle
 
+    private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
+
     public HoodReal() {
+        updateInputs();
         // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID);
 
@@ -163,6 +166,7 @@ public class HoodReal extends HoodBase {
 
     @Override
     public void periodic() {
+        updateInputs();
         //try find a way to do with motion magic
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / HoodConstants.HOOD_GEAR_RATIO;
@@ -230,5 +234,9 @@ public class HoodReal extends HoodBase {
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
         }
+    }
+
+    public void updateInputs(){
+        inputs.measuredAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
     }
 }
