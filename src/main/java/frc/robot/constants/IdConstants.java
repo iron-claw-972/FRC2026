@@ -27,7 +27,7 @@ public class IdConstants {
     public static final int SHOOTER_ONE_ID = 16;
     public static final int SHOOTER_TWO_ID = 19;
     public static final int FEEDER_ID = 18;
-    public static final int SHOOTER_SENSOR_ID = 19;
+    public static final int SHOOTER_SENSOR_ID = 20;
 
     //Hood
     public static final int HOOD_MOTOR_ID = 26;
