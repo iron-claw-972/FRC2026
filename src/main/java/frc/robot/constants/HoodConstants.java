@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
 public class HoodConstants {
-    //TODO: update all of these constants
     public static final double HOOD_GEAR_RATIO = (3.75)*(24/18)*(163/10); // 81.5
 
     public static final double MASS = 2.46; // kilograms
