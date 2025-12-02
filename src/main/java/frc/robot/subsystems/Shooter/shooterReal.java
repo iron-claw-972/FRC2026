@@ -91,33 +91,6 @@ public class shooterReal extends shooterBase implements ShooterIO {
         }
     }
 
-    public void loadBallIntoShooter() {
-        //TODO: if ball is detected then it's loaded?
-        if (ballDetected()) {
-            setFeeder(0);
-            System.out.println("Ball loaded into shooter");
-        } else {
-            while (sensor.getMeasurement().distance_mm > 300) {
-                setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-            }
-        }
-    }
-
-    public void shootGamePiece() {
-        if (ballDetected()) {
-            setShooter(ShooterConstants.SHOOTER_RUN_POWER);
-            while (!shooterAtMaxSpeed) {
-                // wait until shooter is at max speed
-                System.out.println("Powering up shooter");
-            }
-            setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-            System.out.println("Shooting game piece");
-        } else {
-            loadBallIntoShooter();
-            shootGamePiece();
-        }
-    }
-
     public void deactivateShooterAndFeeder() {
         setFeeder(0);
         setShooter(0);

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
@@ -98,16 +99,21 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // aim hood for shooter
             driver.get(PS5Button.SQUARE).onTrue(
-                new InstantCommand(()->{
-                    hood.aimToTarget(getDrivetrain().getPose());
-                })
+                new SequentialCommandGroup(
+                    new InstantCommand(()-> setAlignmentPose()),
+                    new ParallelCommandGroup(
+                        new DriveToPose(getDrivetrain(), ()-> alignmentPose),
+                        new InstantCommand(() -> hood.aimToTarget(getDrivetrain().getPose()))
+                    )
+                )
             );
 
-            // just run shooter & feeder motors
+            // shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.loadBallIntoShooter()),
-                new InstantCommand(()-> shooter.shootGamePiece())
+                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER)),
+                new WaitCommand(0.5),
+                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(
                 new InstantCommand(()->{
