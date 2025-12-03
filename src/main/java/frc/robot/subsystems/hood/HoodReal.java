@@ -33,7 +33,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 // tune for gravity and stuff
 // implement live odometry distance reading instead of setting manually
 
-public class HoodReal extends HoodBase implements HoodIO{
+public class HoodReal extends HoodBase implements HoodIO {
     final private TalonFX motor;
     private double position;
     private double velocity;

@@ -3,6 +3,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 
 public class HoodConstants {
     public static final double HOOD_GEAR_RATIO = (3.75)*(24/18)*(163/10); // 81.5
@@ -26,7 +27,7 @@ public class HoodConstants {
     public static final int tagNumber = 18;
     public static final Pose2d TARGET_POSITION = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d(); // meters
     // Other
-    public static final double INITIAL_VELOCTIY = 8; // meters per second
+    public static final double INITIAL_VELOCTIY = ShooterConstants.SHOOTER_RUN_POWER; // meters per second
 
     // Testing purposes
     public static final double START_DISTANCE = 2; // meters

@@ -18,6 +18,10 @@ import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
@@ -75,6 +79,15 @@ public class shooterReal extends shooterBase implements ShooterIO {
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
+
+        SmartDashboard.putData("Shoot Game Piece", new SequentialCommandGroup(
+            new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_RUN_POWER)),
+            new WaitCommand(0.5),
+            new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER))
+        ));
+        SmartDashboard.putData("Stop Shooting", new InstantCommand(()-> deactivateShooterAndFeeder()));
+        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_RUN_POWER)));
+        SmartDashboard.putData("Turn own feeder motor", new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER)));
     }
 
     @Override
