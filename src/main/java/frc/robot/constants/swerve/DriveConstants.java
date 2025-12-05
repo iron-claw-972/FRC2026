@@ -93,10 +93,14 @@ public class DriveConstants {
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_LOCATIONS);
 
     // TODO: Need to update these (in degrees)
-    public static double STEER_OFFSET_FRONT_LEFT = 302.646;
-    public static double STEER_OFFSET_FRONT_RIGHT = 103.039+180;
-    public static double STEER_OFFSET_BACK_LEFT = 165.49+90;
-    public static double STEER_OFFSET_BACK_RIGHT = 73.563;
+    // public static double STEER_OFFSET_FRONT_LEFT = 302.646;
+    // public static double STEER_OFFSET_FRONT_RIGHT = 103.039+180;
+    // public static double STEER_OFFSET_BACK_LEFT = 165.49+90;
+    // public static double STEER_OFFSET_BACK_RIGHT = 73.563;
+    public static double STEER_OFFSET_FRONT_LEFT;
+    public static double STEER_OFFSET_FRONT_RIGHT;
+    public static double STEER_OFFSET_BACK_LEFT;
+    public static double STEER_OFFSET_BACK_RIGHT;
 
     // Heading PID.
     public static final double HEADING_P = 5.5;
@@ -210,6 +214,12 @@ public class DriveConstants {
      * Updates the constants if the RobotId is not the competition robot.
      */
     public static void update(RobotId robotId) {
+        if(robotId == RobotId.WaffleHouse){
+            STEER_OFFSET_FRONT_LEFT = 300.058594;
+            STEER_OFFSET_FRONT_RIGHT = 65.654297;
+            STEER_OFFSET_BACK_LEFT = 38.232422;
+            STEER_OFFSET_BACK_RIGHT = 116.279297;
+        }
         if(robotId == RobotId.BetaBot) {
             STEER_OFFSET_FRONT_LEFT = 193.884-180;
             STEER_OFFSET_FRONT_RIGHT = 110.914;

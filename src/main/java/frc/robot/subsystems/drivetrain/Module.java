@@ -207,7 +207,7 @@ public class Module implements ModuleIO{
     
     public void periodic() {
         // For setting the offsets
-        SmartDashboard.putNumber("Encoder offset in degrees for " + getModuleType(), Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble())); 
+        SmartDashboard.putNumber("Encoder offset in degrees for " + getModuleType(), Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble()));
 
         updateInputs();
         Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
