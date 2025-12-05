@@ -59,7 +59,8 @@ public class PhoenixOdometryThread extends Thread {
   }
 
   private boolean started = false;
-
+  
+  //Changed because this was giving error messages
   @Override
   public synchronized void start() {
       if (!started && timestampQueues.size() > 0) {
