@@ -126,16 +126,7 @@ public class DriveConstants {
     public static String STEER_ENCODER_CAN = Constants.CANIVORE_CAN;
     public static String PIGEON_CAN = Constants.CANIVORE_CAN;
 
-    // Module constants for mK5n 
-    public static final double angleGearRatio = 0; // TODO: Need to update these 
-    public static final double angleKP = 0;
-    public static final double angleKI = 0;
-    public static final double angleKD = 0;
-    public static final double mk5nDriveGearRatio = 0; // Same as other gear ratio 
-    public static final boolean canCoderInvert = false; 
-
-
-    public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
+    public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
     /* Swerve Current Limiting */
     public static final int STEER_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -268,6 +259,6 @@ public class DriveConstants {
             STEER_OFFSET_BACK_RIGHT = 0.0;
         }
         
-        MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
+        MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
     }
 }
