@@ -87,9 +87,9 @@ public class RobotContainer {
       case Phil:
 
       case WaffleHouse:
-      //hood = new HoodReal();
+      hood = new HoodReal();
       intake = new IntakeReal();
-      //shooter = new shooterReal();
+      shooter = new shooterReal();
       driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
 
       case Vertigo:
