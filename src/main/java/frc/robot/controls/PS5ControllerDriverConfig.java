@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
-import frc.robot.commands.gpm.IntakeStart;
 import frc.robot.commands.gpm.MoveHood;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -129,21 +128,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new DriveToPose(getDrivetrain(), ()-> alignmentPose)
             )
         );
-
-        //Intake
-        if (intake != null){
-            driver.get(PS5Button.LEFT_TRIGGER).onTrue(
-            new ParallelCommandGroup(
-                new IntakeStart(intake, IntakeConstants.INTAKE_ANGLE),
-                new InstantCommand(()->{intake.setFlyWheel();})
-            )
-            ).onFalse(
-                new ParallelCommandGroup(
-                    new IntakeStart(intake, IntakeConstants.STOW_ANGLE),
-                    new InstantCommand(()->{intake.stopFlyWheel();})
-                )
-            );
-        }
 
     }
 
