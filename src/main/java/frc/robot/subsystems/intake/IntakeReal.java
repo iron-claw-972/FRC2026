@@ -104,6 +104,15 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
             .withNeutralMode(NeutralModeValue.Coast)
         );
         
+        SmartDashboard.putData("Set intake stow angle", new InstantCommand(() -> setSetpoint(IntakeConstants.STOW_ANGLE)));
+        SmartDashboard.putData("Set intake down angle", new InstantCommand(() -> setSetpoint(IntakeConstants.INTAKE_ANGLE)));
+        SmartDashboard.putData("Set intake 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        SmartDashboard.putData("Set intake 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
+    
+        SmartDashboard.putData("Spin flywheel motor", new InstantCommand(() -> setFlyWheel()));
+        SmartDashboard.putData("Stop flywheel motor", new InstantCommand(() -> stopFlyWheel()));
+    
+        SmartDashboard.putData("Get absolute encoder angle", new InstantCommand(() -> System.out.println(getAbsoluteEncoderAngle())));
         SmartDashboard.putNumber("Absolute Encoder Value", getAbsoluteEncoderAngle());
     }
 
@@ -112,7 +121,8 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
         baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
     }
 
-    public double getAbsoluteEncoderAngle(){
+    @AutoLogOutput
+    public double getAbsoluteEncoderAngle() {
         double rotations = absoluteEncoder.get();
         double armRotations = rotations / (IntakeConstants.PIVOT_GEAR_RATIO / 18.0);
         return Units.rotationsToDegrees(armRotations);

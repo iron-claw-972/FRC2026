@@ -87,7 +87,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
                 )
             ).onFalse(
-                new InstantCommand(()->{
+                new InstantCommand(()-> {
                     shooter.deactivateShooterAndFeeder();
                 })
             );
@@ -102,12 +102,21 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     )
                 )
             );
-
+  
             // shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(
                 new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER)),
-                new WaitCommand(0.5),
+                // I am not sure if this works below - Wesley, If it doesn't use the "new WaitCommand(0.5)," instead
+                new InstantCommand(() -> {
+                    while(!shooter.shooterAtMaxSpeed) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(
