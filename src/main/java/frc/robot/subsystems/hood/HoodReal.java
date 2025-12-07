@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -202,7 +203,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     public double calculateAngle(double v0, double U, double R) {
         double g = Constants.GRAVITY_ACCELERATION;
         //TODO: change this
-        double shooterHeight = 1.0;
+        double shooterHeight = 0.3;
         double h = U - shooterHeight;
     
         double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
@@ -230,7 +231,7 @@ public class HoodReal extends HoodBase implements HoodIO {
 
         // in case we can't reach the target with our velocity:
         if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
-            setSetpoint(angleDeg);
+            setSetpoint(MathUtil.clamp(angleDeg, 0.0, 90.0));
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
         }

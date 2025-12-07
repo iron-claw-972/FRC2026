@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.gpm.DefaultHoodCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
@@ -90,7 +91,6 @@ public class RobotContainer {
       hood = new HoodReal();
       intake = new IntakeReal();
       shooter = new shooterReal();
-      driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
 
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
@@ -117,6 +117,7 @@ public class RobotContainer {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        //hood.setDefaultCommand(new DefaultHoodCommand(hood, drive));
         break;
       }
 

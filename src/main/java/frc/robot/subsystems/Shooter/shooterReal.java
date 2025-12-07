@@ -143,5 +143,6 @@ public class shooterReal extends shooterBase implements ShooterIO {
         inputs.shooterSpeedLeft = shooterMotorLeft.getVelocity().getValueAsDouble();
         inputs.shooterSpeedRight = shooterMotorRight.getVelocity().getValueAsDouble();
         inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
+        inputs.sensorDistance = sensor.getMeasurement().distance_mm;
     }
 }

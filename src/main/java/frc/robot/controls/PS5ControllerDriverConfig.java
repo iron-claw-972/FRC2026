@@ -2,8 +2,6 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,16 +15,15 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
+import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.commands.gpm.MoveHood;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.hood.HoodBase;
 import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.subsystems.intake.IntakeReal;
 import lib.controllers.PS5Controller;
@@ -83,12 +80,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new InstantCommand(()-> setAlignmentPose()),
                     new ParallelCommandGroup(
                         alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(),
-                        new MoveHood(hood, HOOD_SETPOINT)
+                        //new MoveHood(hood, HOOD_SETPOINT)
+                        new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER))
                     ),
-                    new InstantCommand(()-> {
-                        shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-                        shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER);
-                    })
+                    new WaitCommand(0.5),
+                    new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
                 )
             ).onFalse(
                 new InstantCommand(()->{
@@ -129,12 +125,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             )
         );
 
+        //Intake
         if(intake != null){
             driver.get(PS5Button.CROSS).onTrue(
-                new InstantCommand(()->{
-                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
-                    intake.setFlyWheel();
-                })
+                new IntakeBall(intake, shooter)
             ).onFalse(
                 new InstantCommand(()->{
                     intake.setSetpoint(IntakeConstants.STOW_ANGLE);
@@ -143,6 +137,24 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             );
         }
 
+        //Cancel commands
+        driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
+            if(intake != null){
+                intake.stopFlyWheel();
+                intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+            }
+            if(shooter != null){
+                shooter.stopFeeder();
+                shooter.stopShooter();
+            }
+            if(hood != null){
+                hood.setSetpoint(HoodConstants.START_ANGLE);
+            }
+            getDrivetrain().setIsAlign(false);
+            getDrivetrain().setDesiredPose(()->null);
+            alignmentPose = null;
+            CommandScheduler.getInstance().cancelAll();
+        }));
     }
 
     public void setAlignmentPose(){
