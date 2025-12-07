@@ -1,5 +1,6 @@
 package frc.robot.subsystems.hood;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -58,9 +59,10 @@ public class HoodReal extends HoodBase implements HoodIO {
     private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
 
     public HoodReal() {
-        updateInputs();
         // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+        
+        updateInputs();
 
         pid.setTolerance(Units.degreesToRadians(3));
 
@@ -83,9 +85,15 @@ public class HoodReal extends HoodBase implements HoodIO {
         motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setNeutralMode(NeutralModeValue.Brake);
 
-
-
         TalonFXConfiguration config = new TalonFXConfiguration();
+
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+
+        limitConfig.StatorCurrentLimit = 2; // 120
+        limitConfig.StatorCurrentLimitEnable = true;
+
+        motor.getConfigurator().apply(limitConfig);
+
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0.25; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
@@ -169,7 +177,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         updateInputs();
         //try find a way to do with motion magic
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
-        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60) / HoodConstants.HOOD_GEAR_RATIO;
+        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         
         //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);

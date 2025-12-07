@@ -36,7 +36,9 @@ public class shooterReal extends shooterBase implements ShooterIO {
     private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);
 
     //rotations/sec
-    private double shooterTargetSpeed = 0;
+
+    // Goal Velocity / Double the Circumfrence
+    private double shooterTargetSpeed = ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
     private double feederPower = 0;
 
 
