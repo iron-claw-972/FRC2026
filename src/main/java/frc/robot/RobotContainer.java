@@ -67,21 +67,31 @@ public class RobotContainer {
         break;
 
       case TestBed2:
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        drive = new Drivetrain(vision, new GyroIOPigeon2());
+        driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
+        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
 
       default:
+
+
       case SwerveCompetition:
         
 
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        // fall-through
-        hood = new HoodReal();
-        intake = new IntakeReal();
-        shooter = new shooterReal();
 
       case Vivace:
+
       case Phil:
+
+      case WaffleHouse:
+      hood = new HoodReal();
+      intake = new IntakeReal();
+      shooter = new shooterReal();
+      driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
+
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
