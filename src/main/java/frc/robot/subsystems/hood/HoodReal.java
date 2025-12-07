@@ -47,7 +47,7 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
     private double setpoint = HoodConstants.START_ANGLE;
-    private double distance = HoodConstants.START_DISTANCE;
+    public double distance = HoodConstants.START_DISTANCE;
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
@@ -122,10 +122,10 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
 
-        SmartDashboard.putData("Set target distance to 2 meters", new InstantCommand(() -> setDistance(2)));
-        SmartDashboard.putData("Set target distance to 3 meters", new InstantCommand(() -> setDistance(3)));
-        SmartDashboard.putData("Set target distance to 4 meters", new InstantCommand(() -> setDistance(4)));
-        SmartDashboard.putData("Set target distance to 4.5 meters", new InstantCommand(() -> setDistance(4.5)));
+        SmartDashboard.putData("Move hood for a distance of 3 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 3)));
+        SmartDashboard.putData("Move hood for a distance of 4 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4)));
+        SmartDashboard.putData("Move hood for a distance of 5 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 5)));
+        SmartDashboard.putData("Move hood for a distance of 6 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6)));
     }
 
     public void setSetpoint(double setpoint) {
@@ -142,7 +142,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     
     // assuming we are aligned of course, but I need to switch if we don't have a turret
     // technically, we should have the drivetrain now the distance at all times, and we can grab that instead
-    private double calculateDistanceToTarget(Pose2d robotPose) {
+    public double calculateDistanceToTarget(Pose2d robotPose) {
         double dx = HoodConstants.TARGET_POSITION.getX() - robotPose.getX();
         double dy = HoodConstants.TARGET_POSITION.getY() - robotPose.getY();
         return Math.hypot(dx, dy);
@@ -175,6 +175,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         //motor.set(power);
         
         ligament2d.setAngle(position);
+        
     }
 
     public double getAppliedVoltage() {
@@ -226,7 +227,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
         double angleDeg = Units.radiansToDegrees(angleRad);
 
-        System.out.println("AIM angle = " + angleDeg);
+        System.out.println("AIM angle = " + angleDeg + "degrees");
 
         // in case we can't reach the target with our velocity:
         if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
@@ -234,6 +235,10 @@ public class HoodReal extends HoodBase implements HoodIO {
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
         }
+    }
+    // Intended to be used for the slipping of the bands that are on the gears
+    public void resetDueToSlippingError() {
+        setSetpoint(HoodConstants.slipResetAngle - HoodConstants.slipResetPush); // BIG ISSUE I DONT THINK THIS WORKS BECAUSE IT WILL GO THE OTHER WAY AND DOESN'T TAKE SHORTEST PATH
     }
 
     public void updateInputs(){

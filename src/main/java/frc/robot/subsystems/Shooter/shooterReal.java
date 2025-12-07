@@ -39,7 +39,8 @@ public class shooterReal extends shooterBase implements ShooterIO {
     private double shooterTargetSpeed = 0;
     private double feederPower = 0;
 
-    private boolean shooterAtMaxSpeed = false;
+
+    public boolean shooterAtMaxSpeed = false;
 
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
