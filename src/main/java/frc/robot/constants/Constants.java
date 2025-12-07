@@ -14,6 +14,7 @@ public class Constants {
     //public static final String CANIVORE_CAN = "CANivore";
     public static final String CANIVORE_CAN = "Default Name";
     public static final String RIO_CAN = "rio";
+    public static final String SUBSYSTEM_CANIVORE_CAN = "CANivoreSub";
 
     // Logging 
     public static final boolean USE_TELEMETRY = true;

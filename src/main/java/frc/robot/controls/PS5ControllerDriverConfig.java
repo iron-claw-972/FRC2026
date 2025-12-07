@@ -129,6 +129,20 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             )
         );
 
+        if(intake != null){
+            driver.get(PS5Button.CROSS).onTrue(
+                new InstantCommand(()->{
+                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+                    intake.setFlyWheel();
+                })
+            ).onFalse(
+                new InstantCommand(()->{
+                    intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+                    intake.stopFlyWheel();
+                })
+            );
+        }
+
     }
 
     public void setAlignmentPose(){

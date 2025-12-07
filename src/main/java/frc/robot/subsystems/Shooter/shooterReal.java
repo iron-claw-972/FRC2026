@@ -23,16 +23,16 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
 
 public class shooterReal extends shooterBase implements ShooterIO {
     
-    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_ONE_ID);
-    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_TWO_ID);
+    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_ONE_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_TWO_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
-    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID);
-    //TODO: find sensor ID
+    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);
 
     //rotations/sec

@@ -32,8 +32,8 @@ import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
 public class IntakeReal extends SubsystemBase implements IntakeIO{
-    private TalonFX flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID);
-    private TalonFX baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID);
+    private TalonFX flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     double basePower;
     double flyWheelPower;
@@ -80,7 +80,7 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
 
         double absoluteAngleDegrees =  getAbsoluteEncoderAngle() - IntakeConstants.ABSOLUTE_OFFSET_ANGLE;
         baseMotor.setPosition(Units.degreesToRotations(absoluteAngleDegrees * IntakeConstants.PIVOT_GEAR_RATIO));
-        baseMotor.setNeutralMode(NeutralModeValue.Brake);
+        baseMotor.setNeutralMode(NeutralModeValue.Coast);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
@@ -103,14 +103,8 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
-
-        SmartDashboard.putData("intake", mechanism2d);
-        SmartDashboard.putData("PID", pid);
         
-        SmartDashboard.putData("Set intake stow angle", new InstantCommand(() -> setSetpoint(IntakeConstants.STOW_ANGLE)));
-        SmartDashboard.putData("Set intake down angle", new InstantCommand(() -> setSetpoint(IntakeConstants.INTAKE_ANGLE)));
-        SmartDashboard.putData("Set intake 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        SmartDashboard.putData("Set intake 270 degrees", new InstantCommand(() -> setSetpoint(270)));    
+        SmartDashboard.putNumber("Absolute Encoder Value", getAbsoluteEncoderAngle());
     }
 
     public void setSetpoint(double setpoint) {
