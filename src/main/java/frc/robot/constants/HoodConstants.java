@@ -17,7 +17,10 @@ public class HoodConstants {
     public static final double MAX_VELOCITY = 21; // rad/s
     public static final double MAX_ACCELERATION = 120; // rad/s^2
 
-    public static final double START_ANGLE = 0;
+    public static final double MAX_ANGLE = 51.48; // degrees
+    public static final double MIN_ANGLE = 33.48; // degrees
+    
+    public static final double START_ANGLE = MAX_ANGLE;
 
     // Arena dimensions
     public static final double TARGET_HEIGHT = 1.6; // meters
@@ -33,8 +36,5 @@ public class HoodConstants {
     public static final double START_DISTANCE = 2; // meters
 
     // Calibration Purposes
-    public static final double MAX_ANGLE = 51.48; // degrees
-    public static final double MIN_ANGLE = 33.48; // degrees
-
-    public static final double slipResetPush = 5.0; // this is degrees that the motor is pushed past the maximum
+    public static final double CURRENT_SPIKE_THRESHHOLD = 10.0; // amps
 }

@@ -139,7 +139,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("Move hood for a distance of 6 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6)));
    
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
-        
+
         SmartDashboard.putNumber("Hood Position", getPosition());
         SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
     }
@@ -258,8 +258,10 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
-        setSetpoint(HoodConstants.MIN_ANGLE - HoodConstants.slipResetPush); // BIG ISSUE I DONT THINK THIS WORKS BECAUSE IT WILL GO THE OTHER WAY AND DOESN'T TAKE SHORTEST PATH
-        position = 0;
+        while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
+            motor.setVoltage(3);
+        }
+        position = HoodConstants.START_ANGLE;
     }
 
     public void updateInputs(){
