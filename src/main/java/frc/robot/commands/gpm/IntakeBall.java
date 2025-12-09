@@ -31,14 +31,14 @@ public class IntakeBall extends Command {
 
     @Override
     public void execute(){
-        if(shooter.ballDetected()){
+        if(shooter.ballDetected){
             phase = Phase.Acquired;
         }
         switch (phase){
             case Intaking:
             break;
             case Acquired:
-                if(shooter.ballDetected()){
+                if(shooter.ballDetected){
                     intake.stopFlyWheel();
                     intake.setSetpoint(IntakeConstants.STOW_ANGLE);
                     phase = Phase.Done;

@@ -31,6 +31,16 @@ import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
 
 /**
+ * Key for shooter + hood + intake controls
+ *  SQUARE: Aim hood at target
+ *  CIRCLE: Shoot at target
+ *  TRIANGLE: Align to target
+ *  CROSS: Intake ball
+ */
+
+// TODO: Add some sensor logic
+
+/**
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
@@ -106,12 +116,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             // shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER)),
+                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER)),
                 // I am not sure if this works below - Wesley, If it doesn't use the "new WaitCommand(0.5)," instead
                 new InstantCommand(() -> {
                     while(!shooter.shooterAtMaxSpeed) {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(20); // each periodic
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

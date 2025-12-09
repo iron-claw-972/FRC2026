@@ -37,13 +37,13 @@ public class shooterReal extends shooterBase implements ShooterIO {
 
     //rotations/sec
 
-    // Goal Velocity / Double the Circumfrence
-    private double shooterTargetSpeed = ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+    // Goal Velocity / Double theCircumfrence
+    private double shooterTargetSpeed = 0;
     private double feederPower = 0;
 
 
     public boolean shooterAtMaxSpeed = false;
-
+    public boolean ballDetected = false;
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
@@ -89,7 +89,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
             new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER))
         ));
         SmartDashboard.putData("Stop Shooting", new InstantCommand(()-> deactivateShooterAndFeeder()));
-        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_RUN_POWER)));
+        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER)));
         SmartDashboard.putData("Turn own feeder motor", new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER)));
     }
 
@@ -100,6 +100,8 @@ public class shooterReal extends shooterBase implements ShooterIO {
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         feederMotor.set(feederPower);
 
+        ballDetected();
+        
         if (shooterMotorLeft.getVelocity().getValueAsDouble() >= shooterTargetSpeed * 0.95) {
             shooterAtMaxSpeed = true;
         } else {
@@ -121,6 +123,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
     @Override
     public void setShooter(double power){
         //Maximum velocity = 100
+        // not sure why we multiply by 100?? - Wesley
         shooterTargetSpeed = power * 100.0;
     }
 
@@ -135,9 +138,9 @@ public class shooterReal extends shooterBase implements ShooterIO {
     }
 
     @AutoLogOutput
-    public boolean ballDetected(){
+    public void ballDetected() {
         Measurement measurement = sensor.getMeasurement();
-        return measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT
+        ballDetected =  measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT
         && measurement.distance_mm <= 1000 * 0.3;
     }
 
@@ -146,6 +149,5 @@ public class shooterReal extends shooterBase implements ShooterIO {
         inputs.shooterSpeedLeft = shooterMotorLeft.getVelocity().getValueAsDouble();
         inputs.shooterSpeedRight = shooterMotorRight.getVelocity().getValueAsDouble();
         inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
-        inputs.sensorDistance = sensor.getMeasurement().distance_mm;
     }
 }
