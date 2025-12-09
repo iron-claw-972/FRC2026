@@ -113,6 +113,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 )
             );
   
+            driver.get(PS5Button.LEFT_TRIGGER).onFalse(
+                new InstantCommand(()-> {
+                    hood.resetDueToSlippingError();
+                })
+            );
+            
             // shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(

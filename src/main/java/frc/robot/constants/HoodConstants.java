@@ -33,6 +33,8 @@ public class HoodConstants {
     public static final double START_DISTANCE = 2; // meters
 
     // Calibration Purposes
-    public static final double slipResetAngle = 0.0; // angle degrees
+    public static final double MAX_ANGLE = 51.48; // degrees
+    public static final double MIN_ANGLE = 33.48; // degrees
+
     public static final double slipResetPush = 5.0; // this is degrees that the motor is pushed past the maximum
 }

@@ -42,7 +42,9 @@ public class HoodReal extends HoodBase implements HoodIO {
     double power;
     
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
+
     // Hood gear ratio from ShooterConstants
+
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
@@ -247,10 +249,13 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
-        setSetpoint(HoodConstants.slipResetAngle - HoodConstants.slipResetPush); // BIG ISSUE I DONT THINK THIS WORKS BECAUSE IT WILL GO THE OTHER WAY AND DOESN'T TAKE SHORTEST PATH
+        setSetpoint(HoodConstants.MIN_ANGLE - HoodConstants.slipResetPush); // BIG ISSUE I DONT THINK THIS WORKS BECAUSE IT WILL GO THE OTHER WAY AND DOESN'T TAKE SHORTEST PATH
+        position = 0;
     }
 
     public void updateInputs(){
         inputs.measuredAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
     }
 }
+
+
