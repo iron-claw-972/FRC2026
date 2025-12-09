@@ -137,6 +137,11 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("Move hood for a distance of 4 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4)));
         SmartDashboard.putData("Move hood for a distance of 5 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 5)));
         SmartDashboard.putData("Move hood for a distance of 6 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6)));
+   
+        SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
+        
+        SmartDashboard.putNumber("Hood Position", getPosition());
+        SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
     }
 
     public void setSetpoint(double setpoint) {
@@ -151,6 +156,10 @@ public class HoodReal extends HoodBase implements HoodIO {
         return position;
     }
     
+    public double getSetpoint() {
+        return setpoint;
+    }
+
     // assuming we are aligned of course, but I need to switch if we don't have a turret
     // technically, we should have the drivetrain now the distance at all times, and we can grab that instead
     public double calculateDistanceToTarget(Pose2d robotPose) {
