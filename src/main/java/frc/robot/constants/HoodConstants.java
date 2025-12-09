@@ -3,6 +3,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 
 public class HoodConstants {
@@ -20,7 +21,7 @@ public class HoodConstants {
     public static final double MAX_ANGLE = 51.48; // degrees
     public static final double MIN_ANGLE = 33.48; // degrees
     
-    public static final double START_ANGLE = MAX_ANGLE;
+    public static final double START_ANGLE = MAX_ANGLE; // degrees
 
     // Arena dimensions
     public static final double TARGET_HEIGHT = 1.6; // meters

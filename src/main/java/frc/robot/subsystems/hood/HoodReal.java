@@ -80,7 +80,7 @@ public class HoodReal extends HoodBase implements HoodIO {
                 Units.degreesToRadians(-360),
                 Units.degreesToRadians(360),
                 false,
-                Units.degreesToRadians(HoodConstants.START_ANGLE)
+                HoodConstants.START_ANGLE
             );
         }
 
@@ -128,10 +128,10 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
-        SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
+        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        // SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
 
         SmartDashboard.putData("Move hood for a distance of 3 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 3)));
         SmartDashboard.putData("Move hood for a distance of 4 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4)));
@@ -139,6 +139,9 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("Move hood for a distance of 6 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6)));
    
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
+
+        SmartDashboard.putData("Move to max angle", new InstantCommand(() -> setSetpoint(HoodConstants.MAX_ANGLE)));
+        SmartDashboard.putData("Move to min angle", new InstantCommand(() -> setSetpoint(HoodConstants.MIN_ANGLE)));
 
         SmartDashboard.putNumber("Hood Position", getPosition());
         SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
@@ -150,7 +153,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         this.setpoint = setpoint;
         motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * HoodConstants.HOOD_GEAR_RATIO));
     }
-
 
     public double getPosition() {
         return position;
@@ -251,7 +253,7 @@ public class HoodReal extends HoodBase implements HoodIO {
 
         // in case we can't reach the target with our velocity:
         if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
-            setSetpoint(MathUtil.clamp(angleDeg, 0.0, 90.0));
+            setSetpoint(MathUtil.clamp(angleDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE));
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
         }
@@ -259,7 +261,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
         while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
-            motor.setVoltage(3);
+            motor.set(0.1);
         }
         position = HoodConstants.START_ANGLE;
     }
