@@ -21,5 +21,4 @@ public class IntakeConstants {
     //TODO: find this
     public static final double ABSOLUTE_OFFSET_ANGLE = 30.0;
 
-
 }

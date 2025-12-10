@@ -32,10 +32,10 @@ import lib.controllers.PS5Controller.PS5Button;
 
 /**
  * Key for shooter + hood + intake controls
- *  SQUARE: Aim hood at target
- *  CIRCLE: Shoot at target
- *  TRIANGLE: Align to target
- *  CROSS: Intake ball
+ *  SQUARE: Aim hood at target (left button)
+ *  CIRCLE: Shoot at target (right button)
+ *  TRIANGLE: Align to target (top button)
+ *  CROSS: Intake ball (bottom button)
  */
 
 // TODO: Add some sensor logic
@@ -150,10 +150,24 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             )
         );
 
-        //Intake
+        //Intake -> Sensor was disconnected :(
+        // if(intake != null){
+        //     driver.get(PS5Button.CROSS).onTrue(
+        //         new IntakeBall(intake, shooter)
+        //     ).onFalse(
+        //         new InstantCommand(()->{
+        //             intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+        //             intake.stopFlyWheel();
+        //         })
+        //     );
+        // }
+
         if(intake != null){
             driver.get(PS5Button.CROSS).onTrue(
-                new IntakeBall(intake, shooter)
+                new InstantCommand(()->{
+                    intake.setFlyWheel();
+                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+                })
             ).onFalse(
                 new InstantCommand(()->{
                     intake.setSetpoint(IntakeConstants.STOW_ANGLE);
