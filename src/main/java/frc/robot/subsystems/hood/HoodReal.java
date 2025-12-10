@@ -125,6 +125,12 @@ public class HoodReal extends HoodBase implements HoodIO {
         
         motor.getConfigurator().apply(config);
 
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO;
+
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(HoodConstants.MIN_ANGLE) * HoodConstants.HOOD_GEAR_RATIO;
+
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
@@ -148,11 +154,16 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
 
     public void setSetpoint(double setpoint) {
-        // pid.reset();
-        // pid.setSetpoint(Units.degreesToRadians(setpoint));
-        this.setpoint = setpoint;
-        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * HoodConstants.HOOD_GEAR_RATIO));
+        double error = MathUtil.inputModulus(setpoint - getPosition(), -180.0, 180.0);
+        double shortestDeg = getPosition() + error;
+        this.setpoint = shortestDeg;
+        
+        // command the controller with the *wrapped* target
+        double motorTargetRotations = Units.degreesToRotations(shortestDeg) * HoodConstants.HOOD_GEAR_RATIO;
+        motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+        
     }
+    
 
     public double getPosition() {
         return position;
@@ -183,7 +194,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(getPosition() - setpoint) < 3.0;
+        return Math.abs(getPosition() - setpoint) < 1.0;
     }
 
     @Override
@@ -195,7 +206,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         
         //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);
-        
+        System.out.println(position + " degrees");
         ligament2d.setAngle(position);
         
     }
@@ -229,10 +240,11 @@ public class HoodReal extends HoodBase implements HoodIO {
         double h = U - shooterHeight;
     
         double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
+        if (inside < 0) return Double.NaN;
         double sqrtTerm = Math.sqrt(inside);
     
         // match Desmos: v0² + sqrt(...)
-        double numerator = (v0 * v0) + sqrtTerm;
+        double numerator = (v0 * v0) - sqrtTerm;
     
         double denominator = g * R;
     
@@ -252,7 +264,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         System.out.println("AIM angle = " + angleDeg + "degrees");
 
         // in case we can't reach the target with our velocity:
-        if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
+        if (!Double.isNaN(angleDeg) && !Double.isInfinite(angleDeg)) {
             setSetpoint(MathUtil.clamp(angleDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE));
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
@@ -261,7 +273,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
         while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
-            motor.set(0.1);
+            motor.setVoltage(4);;
         }
         position = HoodConstants.START_ANGLE;
     }
