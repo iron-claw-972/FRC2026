@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
@@ -95,7 +96,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     new ParallelCommandGroup(
                         alignTrue ? new DriveToPose(getDrivetrain(), ()-> alignmentPose) : new DoNothing(),
                         //new MoveHood(hood, HOOD_SETPOINT)
-                        new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_RUN_POWER))
+                        new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))
                     ),
                     new WaitCommand(0.5),
                     new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
@@ -126,17 +127,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             // shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER)),
-                // I am not sure if this works below - Wesley, If it doesn't use the "new WaitCommand(0.5)," instead
-                new InstantCommand(() -> {
-                    while(!shooter.shooterAtMaxSpeed) {
-                        try {
-                            Thread.sleep(20); // each periodic
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }),
+                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY)),
+                new WaitUntilCommand(() -> shooter.shooterAtMaxSpeed),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(
@@ -147,7 +139,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             driver.get(PS5Button.LB).onTrue(
                 new InstantCommand(()->{
-                    shooter.setShooter(-0.5);
+                    // shooter.setShooter(-0.5);
+                    shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY);
                 })
             ).onFalse(
                 new InstantCommand(()->{

@@ -84,12 +84,12 @@ public class shooterReal extends shooterBase implements ShooterIO {
         );
 
         SmartDashboard.putData("Shoot Game Piece", new SequentialCommandGroup(
-            new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_RUN_POWER)),
+            new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY)),
             new WaitCommand(0.5),
             new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER))
         ));
         SmartDashboard.putData("Stop Shooting", new InstantCommand(()-> deactivateShooterAndFeeder()));
-        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY / 2 * Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER)));
+        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
         SmartDashboard.putData("Turn own feeder motor", new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER)));
     }
 
@@ -120,11 +120,9 @@ public class shooterReal extends shooterBase implements ShooterIO {
         feederPower = power;
     }
 
-    @Override
-    public void setShooter(double power){
-        //Maximum velocity = 100
-        // not sure why we multiply by 100?? - Wesley
-        shooterTargetSpeed = power * 100.0;
+    public void setShooter(double linearVelocityMps) {
+        double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+        shooterTargetSpeed = linearVelocityMps / wheelCircumference; // rps
     }
 
     @Override
