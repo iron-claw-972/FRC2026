@@ -132,16 +132,10 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        // SmartDashboard.putData("Set 90 degrees", new InstantCommand(() -> setSetpoint(90)));
+        SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45)));
         // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
         // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
         // SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
-
-        SmartDashboard.putData("Move hood for a distance of 3 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 3)));
-        SmartDashboard.putData("Move hood for a distance of 4 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4)));
-        SmartDashboard.putData("Move hood for a distance of 5 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 5)));
-        SmartDashboard.putData("Move hood for a distance of 6 meters", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6)));
-   
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
 
         SmartDashboard.putData("Move to max angle", new InstantCommand(() -> setSetpoint(HoodConstants.MAX_ANGLE)));
