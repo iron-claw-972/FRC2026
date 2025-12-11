@@ -91,6 +91,8 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    SmartDashboard.putString("Robot ID: ", robotId.toString()); 
+
     vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
     drive = new Drivetrain(vision, new GyroIOPigeon2());
 
@@ -141,7 +143,8 @@ public class RobotContainer {
       case Phil:
         
       case Vertigo:
-        drive = new Drivetrain(vision, new GyroIOPigeon2());
+        drive = new Drivetrain(vision, new GyroIOPigeon2()); // can take in enum for correct swerve as a parameter for swerve
+
         driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
         //operator = new Operator(drive, elevator, intake, indexer, outtake, climb);
 

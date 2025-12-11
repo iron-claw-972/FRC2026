@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotId;
 import frc.robot.constants.Constants;
 import frc.robot.util.SwerveStuff.ModuleLimits;
@@ -204,12 +205,13 @@ public class DriveConstants {
     /**
      * Updates the constants if the RobotId is not the competition robot.
      */
-    public static void update(RobotId robotId) {
+    public static void update(RobotId robotId) { 
         if(robotId == RobotId.WaffleHouse){
-            STEER_OFFSET_FRONT_LEFT = 300.058594;
-            STEER_OFFSET_FRONT_RIGHT = 65.654297;
-            STEER_OFFSET_BACK_LEFT = 38.232422;
-            STEER_OFFSET_BACK_RIGHT = 116.279297;
+            System.out.println("RIGHT OFFSEST"); 
+            STEER_OFFSET_FRONT_LEFT = 300.058594 + 90.0;
+            STEER_OFFSET_FRONT_RIGHT = 65.654297 + 90.0;
+            STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 90.0;
+            STEER_OFFSET_BACK_RIGHT = 116.279297 + 90.0;
         }
         if(robotId == RobotId.BetaBot) {
             STEER_OFFSET_FRONT_LEFT = 193.884-180;

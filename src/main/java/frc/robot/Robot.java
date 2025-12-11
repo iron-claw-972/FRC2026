@@ -17,6 +17,7 @@ import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -74,8 +75,9 @@ public class Robot extends LoggedRobot {
         //   SimGUI: Persistent Values, Preferences, RobotId, then restart Simulation
         //     changes networktables.json, networktables.json.bck (both Untracked)
         //   Uncomment the next line, set the desired RobotId, deploydate, and then comment the line out
-        RobotId.setRobotId(RobotId.WaffleHouse);
+        // RobotId.setRobotId(RobotId.WaffleHouse);
         DriveConstants.update(RobotId.getRobotId());
+        
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
