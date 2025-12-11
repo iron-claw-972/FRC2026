@@ -74,7 +74,8 @@ public class Robot extends LoggedRobot {
         //   SimGUI: Persistent Values, Preferences, RobotId, then restart Simulation
         //     changes networktables.json, networktables.json.bck (both Untracked)
         //   Uncomment the next line, set the desired RobotId, deploydate, and then comment the line out
-        RobotId.setRobotId(RobotId.WaffleHouse);
+        //RobotId.setRobotId(RobotId.WaffleHouse);
+        System.out.println("ROBOT ID: " + RobotId.getRobotId()); 
         DriveConstants.update(RobotId.getRobotId());
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity

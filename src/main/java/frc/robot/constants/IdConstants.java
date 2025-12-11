@@ -24,16 +24,16 @@ public class IdConstants {
     //TODO: get actual ID constants
 
     //Shooter
-    public static final int SHOOTER_ONE_ID = 16;
-    public static final int SHOOTER_TWO_ID = 19;
-    public static final int FEEDER_ID = 18;
-    public static final int SHOOTER_SENSOR_ID = 20;
+    public static final int SHOOTER_LEFT_ID = 6;
+    public static final int SHOOTER_RIGHT_ID = 4;
+    public static final int FEEDER_ID = 3;
+    public static final int SHOOTER_SENSOR_ID = 1;
 
     //Hood
-    public static final int HOOD_MOTOR_ID = 26;
+    public static final int HOOD_MOTOR_ID = 5;
     
     //Intake
-    public static final int BASE_MOTOR_ID = 27;
-    public static final int FLYWHEEL_MOTOR_ID = 28;
-    public static final int INTAKE_ENCODER_ID = 29;
+    public static final int BASE_MOTOR_ID = 7;
+    public static final int FLYWHEEL_MOTOR_ID = 8;
+    public static final int INTAKE_ENCODER_ID = 2;
 }

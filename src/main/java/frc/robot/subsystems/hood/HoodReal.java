@@ -106,8 +106,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
         // CHATGPT SAYS THIS IS WRONG
-        config.Slot0.kP = Units.radiansToRotations(1 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
-        
+        config.Slot0.kP = Units.radiansToRotations(0.1 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
@@ -126,6 +125,12 @@ public class HoodReal extends HoodBase implements HoodIO {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
         motor.getConfigurator().apply(config);
+
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO;
+
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(HoodConstants.MIN_ANGLE) * HoodConstants.HOOD_GEAR_RATIO;
 
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
@@ -152,11 +157,16 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
 
     public void setSetpoint(double setpoint) {
-        // pid.reset();
-        // pid.setSetpoint(Units.degreesToRadians(setpoint));
-        this.setpoint = setpoint;
-        motor.setControl(voltageRequest.withPosition(Units.degreesToRotations(setpoint) * HoodConstants.HOOD_GEAR_RATIO));
+        double error = MathUtil.inputModulus(setpoint - getPosition(), -180.0, 180.0);
+        double shortestDeg = getPosition() + error;
+        this.setpoint = shortestDeg;
+        
+        // command the controller with the *wrapped* target
+        double motorTargetRotations = Units.degreesToRotations(shortestDeg) * HoodConstants.HOOD_GEAR_RATIO;
+        motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+        
     }
+    
 
     public double getPosition() {
         return position;
@@ -187,7 +197,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(getPosition() - setpoint) < 3.0;
+        return Math.abs(getPosition() - setpoint) < 1.0;
     }
 
     @Override
@@ -234,6 +244,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         double h = U - shooterHeight;
     
         double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
+        if (inside < 0) return Double.NaN;
         double sqrtTerm = Math.sqrt(inside);
     
         // match Desmos: v0² + sqrt(...)
