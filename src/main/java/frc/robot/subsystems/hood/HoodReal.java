@@ -50,7 +50,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     private TalonFXSimState encoderSim;
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
-    private double setpoint = HoodConstants.START_ANGLE;
+    private double setpoint = HoodConstants.MAX_ANGLE;
     public double distance = HoodConstants.START_DISTANCE;
 
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
@@ -136,15 +136,12 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("PID", pid);
         
         SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45)));
-        // SmartDashboard.putData("Set 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        // SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        // SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> setSetpoint(270)));
+        SmartDashboard.putData("Set to 6.5 distance", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6.5)));
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
 
         SmartDashboard.putData("Move to max angle", new InstantCommand(() -> setSetpoint(HoodConstants.MAX_ANGLE)));
         SmartDashboard.putData("Move to min angle", new InstantCommand(() -> setSetpoint(HoodConstants.MIN_ANGLE)));
 
-        SmartDashboard.putNumber("Hood Position", getPosition());
         SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
 
         System.out.println("After Constructor motor position: " + position);
@@ -163,7 +160,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     
 
     public double getPosition() {
-        return position;
+        return inputs.measuredAngle;
     }
     
     public double getSetpoint() {
@@ -196,17 +193,19 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     @Override
     public void periodic() {
-        updateInputs();
         //try find a way to do with motion magic
 
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
+
+        SmartDashboard.putNumber("Hood Position", position);
         
         //power = pid.calculate(Units.degreesToRadians(getPosition()));
         //motor.set(power);
         // System.out.println(position + " degrees");
         ligament2d.setAngle(position);
-        
+
+        updateInputs();
     }
 
     public double getAppliedVoltage() {
