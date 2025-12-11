@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
+import frc.robot.commands.gpm.IntakeAndLoad;
 import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.commands.gpm.IntakeBallNoSensor;
 import frc.robot.commands.gpm.MoveHood;
@@ -152,6 +153,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new InstantCommand(()->{
                     shooter.setShooter(0);
                 })
+            );
+
+            driver.get(PS5Button.OPTIONS).onTrue(
+                new IntakeAndLoad(intake, shooter)
             );
         }
 
