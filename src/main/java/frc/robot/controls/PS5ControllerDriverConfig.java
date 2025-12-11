@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -55,6 +56,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private boolean alignTrue = true;
     private Pose2d alignmentPose = null;
     private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
+    int intakeInt = 1;
 
     public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, shooterReal shooter, IntakeReal intake) {
         super(drive);
@@ -175,28 +177,42 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         if(intake != null){
             driver.get(PS5Button.CROSS).onTrue(
-                new IntakeBallNoSensor(intake, shooter)
+                new ConditionalCommand(
+                    new InstantCommand(()->{
+                        intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+                        intake.setFlyWheel();
+                        shooter.setFeeder(0.3);
+                        intakeInt = intakeInt * -1;
+                    })
+                    , 
+                    new InstantCommand(()->{
+                        intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+                        intake.stopFlyWheel();
+                        shooter.setFeeder(0);
+                        intakeInt = intakeInt * -1;
+                    })
+                    , ()-> (intakeInt == 1))
             );
         }
 
         //Cancel commands
-        driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
-            if(intake != null){
-                intake.stopFlyWheel();
-                intake.setSetpoint(IntakeConstants.STOW_ANGLE);
-            }
-            if(shooter != null){
-                shooter.stopFeeder();
-                shooter.stopShooter();
-            }
-            if(hood != null){
-                hood.setSetpoint(HoodConstants.START_ANGLE);
-            }
-            getDrivetrain().setIsAlign(false);
-            getDrivetrain().setDesiredPose(()->null);
-            alignmentPose = null;
-            CommandScheduler.getInstance().cancelAll();
-        }));
+        // driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
+        //     if(intake != null){
+        //         intake.stopFlyWheel();
+        //         intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+        //     }
+        //     if(shooter != null){
+        //         shooter.stopFeeder();
+        //         shooter.stopShooter();
+        //     }
+        //     if(hood != null){
+        //         hood.setSetpoint(HoodConstants.START_ANGLE);
+        //     }
+        //     getDrivetrain().setIsAlign(false);
+        //     getDrivetrain().setDesiredPose(()->null);
+        //     alignmentPose = null;
+        //     CommandScheduler.getInstance().cancelAll();
+        // }));
     }
 
     public void setAlignmentPose(){
