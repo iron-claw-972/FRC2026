@@ -68,10 +68,12 @@ public class HoodReal extends HoodBase implements HoodIO {
         updateInputs();
 
         pid.setTolerance(Units.degreesToRadians(3));
-
+        System.out.println("Before constructor class position:" + position);
+        System.out.println("Before constructor class position:" + motor.getPosition());
         if (RobotBase.isSimulation()) {
             encoderSim = motor.getSimState();
-
+            System.out.println("Simulation in constructor:" + position);
+            System.out.println(HoodConstants.START_ANGLE + "Start angle in hoodreal");
             hoodSim = new SingleJointedArmSim(
                 hoodMotorSim,
                 HoodConstants.HOOD_GEAR_RATIO,
@@ -85,6 +87,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         }
 
         // motor position at power up
+        System.out.println("About to set the position in the constructor to: " + Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -143,6 +146,8 @@ public class HoodReal extends HoodBase implements HoodIO {
 
         SmartDashboard.putNumber("Hood Position", getPosition());
         SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
+
+        System.out.println("After Constructor motor position: " + position);
     }
 
     public void setSetpoint(double setpoint) {
@@ -193,10 +198,13 @@ public class HoodReal extends HoodBase implements HoodIO {
     public void periodic() {
         updateInputs();
         //try find a way to do with motion magic
+
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         
-        System.out.println(position + " degrees");
+        //power = pid.calculate(Units.degreesToRadians(getPosition()));
+        //motor.set(power);
+        // System.out.println(position + " degrees");
         ligament2d.setAngle(position);
         
     }
@@ -250,12 +258,14 @@ public class HoodReal extends HoodBase implements HoodIO {
     public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
         double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
         double angleDeg = Units.radiansToDegrees(angleRad);
-
+        System.out.println(initialVelocity + " degrees");
+        System.out.println("Goal Height = " + goalHeight + " meters");
+        System.out.println("Goal Distance = " + goalDistance + " meters");
         System.out.println("AIM angle = " + angleDeg + "degrees");
 
         // in case we can't reach the target with our velocity:
-        if (!Double.isNaN(angleDeg) && !Double.isInfinite(angleDeg)) {
-            setSetpoint(MathUtil.clamp(angleDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE));
+        if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
+            setSetpoint(MathUtil.clamp(angleDeg + 360, HoodConstants.MIN_ANGLE + 360, HoodConstants.MAX_ANGLE + 360));
         } else {
             System.out.println("Angle is not able to reach the target with given velocity.");
         }
@@ -263,7 +273,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
         while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
-            motor.setVoltage(4);;
+            motor.setVoltage(4);
         }
         position = HoodConstants.START_ANGLE;
     }
