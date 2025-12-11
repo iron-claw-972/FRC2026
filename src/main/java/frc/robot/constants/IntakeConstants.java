@@ -16,9 +16,9 @@ public class IntakeConstants {
     public static final double STOW_ANGLE = START_ANGLE;
 
     //TODO: find this
-    public static final double FLYWHEEL_SPEED = 0.8;
+    public static final double FLYWHEEL_SPEED = 1.0;
 
     //TODO: find this
-    public static final double ABSOLUTE_OFFSET_ANGLE = 30.0;
+    public static final double ABSOLUTE_OFFSET_ANGLE = (139.1748046875 - START_ANGLE + 30);
 
 }

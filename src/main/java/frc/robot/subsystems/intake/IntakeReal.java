@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -99,6 +100,13 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
         
         baseMotor.getConfigurator().apply(config);
 
+         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+
+        limitConfig.StatorCurrentLimit = 3; // 120
+        limitConfig.StatorCurrentLimitEnable = true;
+
+        baseMotor.getConfigurator().apply(limitConfig);
+
         flyWheelMotor.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
@@ -181,11 +189,11 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
     }
 
     public void setFlyWheel() {
-        flyWheelMotor.set(IntakeConstants.FLYWHEEL_SPEED);
+        flyWheelPower = IntakeConstants.FLYWHEEL_SPEED;
     }
 
     public void stopFlyWheel(){
-        flyWheelMotor.set(0);
+        flyWheelPower = 0;
     }
 
     @AutoLogOutput

@@ -16,6 +16,7 @@ import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.IntakeBall;
+import frc.robot.commands.gpm.IntakeBallNoSensor;
 import frc.robot.commands.gpm.MoveHood;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -140,6 +141,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     shooter.deactivateShooterAndFeeder();
                 })
             );
+
+            driver.get(PS5Button.LB).onTrue(
+                new InstantCommand(()->{
+                    shooter.setShooter(-0.5);
+                })
+            ).onFalse(
+                new InstantCommand(()->{
+                    shooter.setShooter(0);
+                })
+            );
         }
 
         //Just align but don't shoot
@@ -164,15 +175,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         if(intake != null){
             driver.get(PS5Button.CROSS).onTrue(
-                new InstantCommand(()->{
-                    intake.setFlyWheel();
-                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
-                })
-            ).onFalse(
-                new InstantCommand(()->{
-                    intake.setSetpoint(IntakeConstants.STOW_ANGLE);
-                    intake.stopFlyWheel();
-                })
+                new IntakeBallNoSensor(intake, shooter)
             );
         }
 

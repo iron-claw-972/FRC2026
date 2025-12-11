@@ -29,8 +29,8 @@ import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
 
 public class shooterReal extends shooterBase implements ShooterIO {
     
-    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_ONE_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_TWO_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);

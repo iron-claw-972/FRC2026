@@ -204,8 +204,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         
-        //power = pid.calculate(Units.degreesToRadians(getPosition()));
-        //motor.set(power);
         System.out.println(position + " degrees");
         ligament2d.setAngle(position);
         
