@@ -116,7 +116,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         // config.Slot0.kG = 0.25;   // flip sign if hood drops
         // config.Slot0.kV = 0.12;
 
-
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * HoodConstants.HOOD_GEAR_RATIO;
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * HoodConstants.HOOD_GEAR_RATIO;
