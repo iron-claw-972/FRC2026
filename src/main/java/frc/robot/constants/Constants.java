@@ -6,7 +6,7 @@ public class Constants {
 
     // constants:   
 
-    public static final double GRAVITY_ACCELERATION = 9.8;
+    public static final double GRAVITY_ACCELERATION = 9.81;
     public static final double ROBOT_VOLTAGE = 12.0;
     public static final double LOOP_TIME = 0.02;
 

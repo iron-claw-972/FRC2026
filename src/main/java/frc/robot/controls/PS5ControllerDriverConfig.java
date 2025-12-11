@@ -149,6 +149,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new DriveToPose(getDrivetrain(), ()-> alignmentPose)
             )
         );
+        
+        // aim hood
+        driver.get(PS5Button.PS).onTrue(
+            new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6))
+        );
+        driver.get(PS5Button.LB).onTrue(
+            new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 3))
+        );
 
         //Intake -> Sensor was disconnected :(
         // if(intake != null){
@@ -175,7 +183,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 })
             );
         }
-
+        
         //Cancel commands
         driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
             if(intake != null){
