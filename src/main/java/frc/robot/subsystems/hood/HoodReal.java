@@ -1,5 +1,7 @@
 package frc.robot.subsystems.hood;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -105,7 +107,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
-        // CHATGPT SAYS THIS IS WRONG
         config.Slot0.kP = Units.radiansToRotations(3.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
@@ -136,7 +137,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("PID", pid);
         
         SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45)));
-        SmartDashboard.putData("Set to 6.5 distance", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6.5)));
+        SmartDashboard.putData("Set to 4.0132 distance", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4.0132)));
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
 
         SmartDashboard.putData("Move to max angle", new InstantCommand(() -> setSetpoint(HoodConstants.MAX_ANGLE)));
@@ -233,7 +234,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     public double calculateAngle(double v0, double U, double R) {
         double g = Constants.GRAVITY_ACCELERATION;
         //TODO: change this
-        double shooterHeight = 0.3;
+        double shooterHeight = HoodConstants.SHOOTER_HEIGHT;
         double h = U - shooterHeight;
     
         double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
@@ -279,6 +280,8 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     public void updateInputs(){
         inputs.measuredAngle = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
+
+        Logger.processInputs("Hood", inputs);
     }
 }
 

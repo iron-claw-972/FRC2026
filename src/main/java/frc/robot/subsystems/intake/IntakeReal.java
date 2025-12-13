@@ -88,7 +88,7 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
         config.Slot0.kG = IntakeConstants.MASS * IntakeConstants.CENTER_OF_MASS_LENGTH * 9.8 / IntakeConstants.PIVOT_GEAR_RATIO; // Gravity compensation
         config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
-        config.Slot0.kP = Units.radiansToRotations(1.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
+        config.Slot0.kP = Units.radiansToRotations(0.8 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 

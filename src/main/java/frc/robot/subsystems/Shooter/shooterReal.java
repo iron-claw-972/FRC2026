@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -101,6 +102,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
         feederMotor.set(feederPower);
 
         ballDetected();
+        //SmartDashboard.putNumber("Sensor Distance", sensor.getMeasurement().distance_mm);
         
         if (shooterMotorLeft.getVelocity().getValueAsDouble() >= shooterTargetSpeed * 0.95) {
             shooterAtMaxSpeed = true;
@@ -136,9 +138,10 @@ public class shooterReal extends shooterBase implements ShooterIO {
     }
 
     @AutoLogOutput
-    public void ballDetected() {
+    public boolean ballDetected() {
         Measurement measurement = sensor.getMeasurement();
         ballDetected =  measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurement.distance_mm <= 45;
+        return ballDetected;
     }
 
     @Override
@@ -146,5 +149,8 @@ public class shooterReal extends shooterBase implements ShooterIO {
         inputs.shooterSpeedLeft = shooterMotorLeft.getVelocity().getValueAsDouble();
         inputs.shooterSpeedRight = shooterMotorRight.getVelocity().getValueAsDouble();
         inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
+        inputs.sensorDistance = sensor.getMeasurement().distance_mm;
+
+        Logger.processInputs("Shooter", inputs);
     }
 }

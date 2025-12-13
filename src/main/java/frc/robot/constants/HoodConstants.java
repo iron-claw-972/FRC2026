@@ -15,23 +15,25 @@ public class HoodConstants {
 
     public static final double CENTER_OF_MASS_LENGTH = 0.138; // meters
 
-    public static final double MAX_VELOCITY = 5; // rad/s
+    // public static final double MAX_VELOCITY = 5; // rad/s
+    public static final double MAX_VELOCITY = 0.15; // rad/s
     public static final double MAX_ACCELERATION = 30; // rad/s^2
 
     public static final double MAX_ANGLE = 48.48; // degrees
-    public static final double MIN_ANGLE = 41.8; // degrees
+    public static final double MIN_ANGLE = 29.77; // degrees
     
     public static final double START_ANGLE = 51.48; // degrees
 
     // Arena dimensions
-    public static final double TARGET_HEIGHT = 1.6; // meters
+    public static final double TARGET_HEIGHT = 2.44; // meters
+    public static final double SHOOTER_HEIGHT = 0.51; //meters
 
     public static final Translation2d TRANSLATION_TARGET = new Translation2d(0, 0);
     public static final Rotation2d ROTATION_TARGET_ANGLE = new Rotation2d();
     public static final int tagNumber = 18;
     public static final Pose2d TARGET_POSITION = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d(); // meters
     // Other
-    public static final double INITIAL_VELOCTIY = ShooterConstants.SHOOTER_VELOCITY; // meters per second
+    public static final double INITIAL_VELOCTIY = 14.9; // meters per second
 
     // Testing purposes
     public static final double START_DISTANCE = 2; // meters
