@@ -139,14 +139,10 @@ public class shooterReal extends shooterBase implements ShooterIO {
     public void ballDetected() {
         Measurement measurement = sensor.getMeasurement();
 
-        if (measurement.distance_mm < ShooterConstants.SENSOR_DISTANNCE_THRESHOLD) {
-            if (measurement.ambient < ShooterConstants.SENSOR_AMBIENCE_THRESHOLD) {
-                ballDetected = true;
-            } else {
-                ballDetected = false;
-            }
-        } else {
+        if (measurement.distance_mm > ShooterConstants.SENSOR_DISTANNCE_THRESHOLD || measurement.ambient > ShooterConstants.SENSOR_AMBIENCE_THRESHOLD) {
             ballDetected = false;
+        } else {
+            ballDetected = true;
         }
     }
 
