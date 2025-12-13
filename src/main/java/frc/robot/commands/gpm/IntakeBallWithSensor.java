@@ -5,7 +5,7 @@ import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Shooter.shooterReal;
 import frc.robot.subsystems.intake.IntakeReal;
 
-public class IntakeAndLoad extends Command {
+public class IntakeBallWithSensor extends Command {
     private IntakeReal intake;
     private shooterReal shooter;
 
@@ -15,7 +15,7 @@ public class IntakeAndLoad extends Command {
 
     private Phase phase;
 
-    public IntakeAndLoad(IntakeReal intake, shooterReal shooter){
+    public IntakeBallWithSensor(IntakeReal intake, shooterReal shooter){
         this.intake = intake;
         this.shooter = shooter;
 
