@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DriveToPose;
-import frc.robot.commands.gpm.IntakeAndLoad;
 import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -116,18 +115,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             //     })
             // );
             
-            // shoots it
-            // driver.get(PS5Button.CIRCLE).onTrue(
-            // new SequentialCommandGroup(
-            //     new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY)),
-            //     new WaitUntilCommand(() -> shooter.shooterAtMaxSpeed),
-            //     new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
-            // )
-            // ).onFalse(
-            //     new InstantCommand(()->{
-            //         shooter.deactivateShooterAndFeeder();
-            //     })
-            // );
+            //shoots it
+            driver.get(PS5Button.CIRCLE).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY)),
+                new WaitUntilCommand(() -> shooter.shooterAtMaxSpeed),
+                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
+            )
+            ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
+                })
+            );
 
             // Shoot the ball
             driver.get(PS5Button.LB).onTrue(

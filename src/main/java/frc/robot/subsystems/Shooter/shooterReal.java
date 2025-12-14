@@ -140,13 +140,8 @@ public class shooterReal extends shooterBase implements ShooterIO {
     @AutoLogOutput
     public boolean ballDetected() {
         Measurement measurement = sensor.getMeasurement();
-
-        if (measurement.distance_mm > ShooterConstants.SENSOR_DISTANNCE_THRESHOLD || measurement.ambient > ShooterConstants.SENSOR_AMBIENCE_THRESHOLD) {
-            ballDetected = false;
-        } else {
-            ballDetected = true;
-        }
-        return false;
+        ballDetected =  measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurement.distance_mm <= 45;
+        return ballDetected;
     }
 
     @Override
