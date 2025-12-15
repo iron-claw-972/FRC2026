@@ -46,7 +46,8 @@ public class DriveConstants {
     public static final double STEER_GEAR_RATIO = 150.0 / 7.0;
 
     /** Theoretical maximum speed of the robot based on maximum motor RPM, gear ratio, and wheel radius */
-    public static final double MAX_SPEED = 4.5;
+    // Kraken x60 has 100.0 rotations per second max velocity
+    public static final double MAX_SPEED = 100.0 / (DRIVE_GEAR_RATIO) * (2 * Math.PI * WHEEL_RADIUS); // = 5.16 m/s
 
     // Need to convert tangential velocity (the m/s of the edge of the robot) to angular velocity (the radians/s of the robot)
     // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
@@ -86,10 +87,17 @@ public class DriveConstants {
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_LOCATIONS);
 
+    // Old offsets 
     public static double STEER_OFFSET_FRONT_LEFT = 302.646;
     public static double STEER_OFFSET_FRONT_RIGHT = 103.039+180;
     public static double STEER_OFFSET_BACK_LEFT = 165.49+90;
     public static double STEER_OFFSET_BACK_RIGHT = 73.563;
+
+    // New offsets 
+    // STEER_OFFSET_FRONT_LEFT = 300.058594 + 90.0;
+    // STEER_OFFSET_FRONT_RIGHT = 65.654297 + 90.0;
+    // STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 90.0;
+    // STEER_OFFSET_BACK_RIGHT = 116.279297 + 90.0;
 
     // Heading PID.
     public static final double HEADING_P = 5.5;
@@ -116,7 +124,7 @@ public class DriveConstants {
     public static String PIGEON_CAN = Constants.CANIVORE_CAN;
 
 
-    public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
+    public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
     /* Swerve Current Limiting */
     public static final int STEER_CONTINUOUS_CURRENT_LIMIT = 15;
@@ -186,8 +194,8 @@ public class DriveConstants {
 
     public static final boolean INVERT_GYRO = false; // Make sure gyro is CCW+ CW-
 
-    public static final double SLOW_DRIVE_FACTOR = 0.1;
-    //Changed from 0.2 to 0.1 (only used for barge outtake)
+    public static final double SLOW_DRIVE_FACTOR = 0.2;
+
     public static final double SLOW_ROT_FACTOR = 0.1;
 
     public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
@@ -237,6 +245,6 @@ public class DriveConstants {
             DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
         }
         
-        MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
+        MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
     }
 }

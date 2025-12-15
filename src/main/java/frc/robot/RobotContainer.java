@@ -150,9 +150,9 @@ public class RobotContainer {
         initializeAutoBuilder();
         registerCommands();
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
-        led.setDefaultCommand(
-            new LEDDefaultCommand(led, outtake, drive, vision)
-        );
+        // led.setDefaultCommand(
+        //     new LEDDefaultCommand(led, outtake, drive, vision)
+        // );
         PathGroupLoader.loadPathGroups();
              
         break;
