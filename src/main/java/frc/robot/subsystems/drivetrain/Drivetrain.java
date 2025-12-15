@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -118,6 +119,8 @@ public class Drivetrain extends SubsystemBase {
      * Creates a new Swerve Style Drivetrain.
      */
     public Drivetrain(Vision vision, GyroIO gyroIO) {
+        SmartDashboard.putData("Reset encoders", new InstantCommand(() -> resetModulesToAbsolute()));
+
         this.vision = vision;
 
         modules = new Module[4];
@@ -139,7 +142,7 @@ public class Drivetrain extends SubsystemBase {
          * with inverting motors.
          * See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
          */
-        Timer.delay(1.0);
+        Timer.delay(5.0);
         resetModulesToAbsolute();
         gyroIO.updateInputs(gyroInputs);
         poseEstimator = new SwerveDrivePoseEstimator(

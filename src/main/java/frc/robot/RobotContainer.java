@@ -125,7 +125,6 @@ public class RobotContainer {
 
       case TestBed2:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
@@ -143,7 +142,7 @@ public class RobotContainer {
       case Phil:
         
       case Vertigo:
-        drive = new Drivetrain(vision, new GyroIOPigeon2()); // can take in enum for correct swerve as a parameter for swerve
+        // drive = new Drivetrain(vision, new GyroIOPigeon2()); // can take in enum for correct swerve as a parameter for swerve
 
         driver = new PS5ControllerDriverConfig(drive, elevator, intake, indexer, outtake, climb, arm);
         //operator = new Operator(drive, elevator, intake, indexer, outtake, climb);
@@ -153,7 +152,6 @@ public class RobotContainer {
         
         //SignalLogger.start();
         
-
         driver.configureControls();
         //operator.configureControls();
         

@@ -207,7 +207,9 @@ public class Module implements ModuleIO{
     
     public void periodic() {
         // For setting the offsets
-        SmartDashboard.putNumber("Encoder offset in degrees for " + getModuleType(), Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble()));
+        SmartDashboard.putNumber("Encoder readings in degrees for " + getModuleType(), Units.rotationsToDegrees(getCANcoder().getRotations()));
+        SmartDashboard.putNumber("Encoder offset for " + getModuleType(), angleOffset); 
+        SmartDashboard.putNumber("Module angle " + getModuleType(), getAngle().getDegrees()); 
 
         updateInputs();
         Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
@@ -298,9 +300,17 @@ public class Module implements ModuleIO{
     }
 
     public void resetToAbsolute() {
-        // Sensor ticks
+        for (int i = 0; i < 10; i++) {
+            System.out.println("RESETTING " + moduleConstants.getType() + " GOING FROM " + Units.rotationsToDegrees(angleMotor.getPosition().getValueAsDouble() / DriveConstants.MODULE_CONSTANTS.angleGearRatio) + " MODULE DEG: " + getAngle().getDegrees());
+        }
+        for (int i = 0; i < 10; i++) {
+            System.out.println("CANCODER READING BEFORE OFFSET: " + Units.rotationsToDegrees(getCANcoder().getRotations()) + " AFTER: " + Units.rotationsToDegrees(getCANcoder().getRotations() - Units.degreesToRotations(angleOffset)));
+        }
         double absolutePosition = getCANcoder().getRotations() - Units.degreesToRotations(angleOffset);
         angleMotor.setPosition(absolutePosition*DriveConstants.MODULE_CONSTANTS.angleGearRatio);
+        for (int i = 0; i < 10; i++) {
+            System.out.println("TO " + Units.rotationsToDegrees(angleMotor.getPosition().getValueAsDouble() / DriveConstants.MODULE_CONSTANTS.angleGearRatio) + " MODULE DEG: " + getAngle().getDegrees());
+        }
     }
 
     private void configCANcoder() {
@@ -323,7 +333,7 @@ public class Module implements ModuleIO{
             .withKD(DriveConstants.MODULE_CONSTANTS.angleKD));
         angleMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(DriveConstants.INVERT_STEER_MOTOR));
         angleMotor.setNeutralMode(DriveConstants.STEER_NEUTRAL_MODE);
-        angleMotor.setPosition(0);
+        //angleMotor.setPosition(0);
         
         resetToAbsolute();
     }

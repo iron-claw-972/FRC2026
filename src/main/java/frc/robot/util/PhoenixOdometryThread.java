@@ -17,6 +17,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 import java.util.ArrayList;
@@ -58,13 +59,13 @@ public class PhoenixOdometryThread extends Thread {
     setDaemon(true);
   }
 
-  private boolean started = false;
+  // private boolean started = false;
   
   //Changed because this was giving error messages
   @Override
   public synchronized void start() {
-      if (!started && timestampQueues.size() > 0) {
-          started = true;
+      if (timestampQueues.size() > 0) {
+          // started = true;
           super.start();
       }
   }

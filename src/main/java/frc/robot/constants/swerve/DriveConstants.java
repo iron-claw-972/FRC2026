@@ -208,7 +208,7 @@ public class DriveConstants {
     public static void update(RobotId robotId) { 
         if(robotId == RobotId.WaffleHouse){
             System.out.println("RIGHT OFFSEST"); 
-            STEER_OFFSET_FRONT_LEFT = 300.058594 + 90.0;
+            STEER_OFFSET_FRONT_LEFT = 300.058594 + 90.0 - 360;
             STEER_OFFSET_FRONT_RIGHT = 65.654297 + 90.0;
             STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 90.0;
             STEER_OFFSET_BACK_RIGHT = 116.279297 + 90.0;
