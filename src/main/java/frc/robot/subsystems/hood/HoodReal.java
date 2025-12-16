@@ -136,7 +136,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         SmartDashboard.putData("hood", mechanism2d);
         SmartDashboard.putData("PID", pid);
         
-        SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45)));
+        SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45.98)));
         SmartDashboard.putData("Set to 4.0132 distance", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4.0132)));
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
 

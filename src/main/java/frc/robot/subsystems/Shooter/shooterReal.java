@@ -119,6 +119,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
 
     @Override
     public void setFeeder(double power){
+        System.out.println("VELOCITY: " + getShooterVelcoity()); 
         feederPower = power;
     }
 
