@@ -118,32 +118,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             //shoots it
             driver.get(PS5Button.CIRCLE).onTrue(
             new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY)),
+                new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
                 new WaitUntilCommand(() -> shooter.shooterAtMaxSpeed),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(
                 new InstantCommand(()->{
                     shooter.deactivateShooterAndFeeder();
-                })
-            );
-
-            // Shoot the ball
-            driver.get(PS5Button.LB).onTrue(
-                new SequentialCommandGroup(
-                    new InstantCommand(()->{
-                        // shooter.setShooter(-0.5);
-                        shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY);
-                    }),
-                    new WaitCommand(0.8),
-                    new InstantCommand(()->{
-                        shooter.setFeeder(1.0);
-                    })
-                )
-            ).onFalse(
-                new InstantCommand(()->{
-                    shooter.setShooter(0);
-                    shooter.setFeeder(0);
                 })
             );
 

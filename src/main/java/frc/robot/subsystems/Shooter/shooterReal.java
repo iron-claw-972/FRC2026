@@ -63,6 +63,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
         }
         
         TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Feedback.SensorToMechanismRatio = ShooterConstants.SHOOTER_GEAR_RATIO;
         config.Slot0.kP = 0.1; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
@@ -104,17 +105,20 @@ public class shooterReal extends shooterBase implements ShooterIO {
         ballDetected();
         //SmartDashboard.putNumber("Sensor Distance", sensor.getMeasurement().distance_mm);
         
-        if (shooterMotorLeft.getVelocity().getValueAsDouble() >= shooterTargetSpeed * 0.95) {
-            shooterAtMaxSpeed = true;
-        } else {
-            shooterAtMaxSpeed = false;
-        }
+        shooterAtMaxSpeed = shooterAtMaxSpeed();
     }
 
     public void deactivateShooterAndFeeder() {
         setFeeder(0);
         setShooter(0);
         System.out.println("Shooter deactivated");
+    }
+
+    public boolean shooterAtMaxSpeed() {
+        double leftRps = shooterMotorLeft.getVelocity().getValueAsDouble();
+        double rightRps = shooterMotorRight.getVelocity().getValueAsDouble();
+        double average = (leftRps + rightRps) / 2.0;
+        return average >= shooterTargetSpeed * 0.95;
     }
 
     @Override
