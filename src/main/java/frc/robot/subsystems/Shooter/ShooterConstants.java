@@ -11,3 +11,5 @@ public class ShooterConstants {
     public static final double SENSOR_DISTANNCE_THRESHOLD = 0.150; // meters
     public static final double SENSOR_AMBIENCE_THRESHOLD = 0.100; // meters
 }
+// 8 velcocity is too little
+// 16 is too much

@@ -50,7 +50,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private shooterReal shooter;
     private IntakeReal intake;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->false;
+    private final BooleanSupplier slowModeSupplier = ()->true;
 
     //Turn on for alignment to the tag
     private boolean alignTrue = true;
@@ -99,15 +99,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             );
 
             // aim hood for shooter
-            driver.get(PS5Button.SQUARE).onTrue(
-                new SequentialCommandGroup(
-                    new InstantCommand(()-> setAlignmentPose()),
-                    new ParallelCommandGroup(
-                        new DriveToPose(getDrivetrain(), ()-> alignmentPose),
-                        new InstantCommand(() -> hood.aimToTarget(getDrivetrain().getPose()))
-                    )
-                )
-            );
+            // driver.get(PS5Button.SQUARE).onTrue(
+            //     new SequentialCommandGroup(
+            //         new InstantCommand(()-> setAlignmentPose()),
+            //         new ParallelCommandGroup(
+            //             new DriveToPose(getDrivetrain(), ()-> alignmentPose),
+            //             new InstantCommand(() -> hood.aimToTarget(getDrivetrain().getPose()))
+            //         )
+            //     )
+            // );
   
             // driver.get(PS5Button.LEFT_TRIGGER).onFalse(
             //     new InstantCommand(()-> {
@@ -143,8 +143,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         
         // aim hood
         driver.get(PS5Button.PS).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> setAlignmentPose()),
+                new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose)))
+            )
+        );
+
+        driver.get(PS5Button.SQUARE).onTrue(
             new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 6))
         );
+
         // driver.get(PS5Button.LB).onTrue(
         //     new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 3))
         // );
@@ -213,7 +221,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         double angle = Math.atan(YDifference/XDifference);
         alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
     }
-    
+
+  
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);

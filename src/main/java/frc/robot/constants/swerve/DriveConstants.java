@@ -141,7 +141,7 @@ public class DriveConstants {
 
     /* Motor inversions */
     public static final InvertedValue INVERT_DRIVE_MOTOR = InvertedValue.CounterClockwise_Positive;
-    public static final InvertedValue INVERT_STEER_MOTOR = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
     /* Neutral Modes */
     public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
@@ -196,7 +196,7 @@ public class DriveConstants {
 
     public static final boolean INVERT_GYRO = false; // Make sure gyro is CCW+ CW-
 
-    public static final double SLOW_DRIVE_FACTOR = 0.2;
+    public static final double SLOW_DRIVE_FACTOR = 0.1;
     public static final double SLOW_ROT_FACTOR = 0.1;
 
     public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
@@ -206,9 +206,9 @@ public class DriveConstants {
      */
     public static void update(RobotId robotId) {
         if(robotId == RobotId.WaffleHouse){
-            STEER_OFFSET_FRONT_LEFT = 300.058594 + 90.0;
+            STEER_OFFSET_FRONT_LEFT = 300.058594 - 360;
             STEER_OFFSET_FRONT_RIGHT = 65.654297;
-            STEER_OFFSET_BACK_LEFT = 38.232422;
+            STEER_OFFSET_BACK_LEFT = 38.232422 + 180;
             STEER_OFFSET_BACK_RIGHT = 116.279297;
         }
         if(robotId == RobotId.BetaBot) {
