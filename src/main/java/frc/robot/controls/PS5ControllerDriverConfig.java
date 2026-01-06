@@ -51,7 +51,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private shooterReal shooter;
     private IntakeReal intake;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->true;
+    private final BooleanSupplier slowModeSupplier = ()->false;
 
     //Turn on for alignment to the tag
     private Pose2d alignmentPose = null;
@@ -98,7 +98,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             driver.get(PS5Button.LB).onTrue(
             new SequentialCommandGroup(
                 new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-                new WaitUntilCommand(() -> shooter.shooterAtMaxSpeed),
+                new WaitCommand(0.4),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(

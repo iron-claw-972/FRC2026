@@ -63,7 +63,6 @@ public class shooterReal extends shooterBase implements ShooterIO {
         }
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Feedback.SensorToMechanismRatio = ShooterConstants.SHOOTER_GEAR_RATIO;
         config.Slot0.kP = 0.1; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
@@ -129,7 +128,7 @@ public class shooterReal extends shooterBase implements ShooterIO {
 
     public void setShooter(double linearVelocityMps) {
         double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
-        shooterTargetSpeed = linearVelocityMps / wheelCircumference; // rps
+        shooterTargetSpeed = linearVelocityMps * ShooterConstants.SHOOTER_GEAR_RATIO / wheelCircumference; // rps
     }
 
     @Override
