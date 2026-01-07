@@ -50,6 +50,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private HoodReal hood;
     private shooterReal shooter;
     private IntakeReal intake;
+    private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
 
@@ -122,13 +123,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         );
 
         if(intake != null){
-            Command intakeBall = new IntakeBall(intake, shooter);
             driver.get(PS5Button.CROSS).onTrue(
                 new InstantCommand(()->{
-                    if(intakeBall.isScheduled()){
+                    if(intakeBall != null && intakeBall.isScheduled()){
                         intakeBall.cancel();
                     }
                     else{
+                        intakeBall = new IntakeBall(intake, shooter);
                         intakeBall.schedule();
                     }
                 })

@@ -22,7 +22,7 @@ public class VisionConstants {
     /**
      * If April tag vision is enabled on the robot
      */
-    public static final boolean ENABLED = false;
+    public static final boolean ENABLED = true;
 
     /**
      * If object detection should be enabled
