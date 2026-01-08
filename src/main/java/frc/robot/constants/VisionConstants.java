@@ -165,7 +165,7 @@ public class VisionConstants {
                                 new Translation3d(Units.inchesToMeters(0.0), Units.inchesToMeters(6.5),
                                         Units.inchesToMeters(13.5)),
                                 new Rotation3d(0, 0,
-                                        Math.PI/2)))));
+                                        0)))));
 
     /**
      * The transformations from the robot to object detection cameras

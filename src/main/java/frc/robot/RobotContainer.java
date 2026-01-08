@@ -88,6 +88,7 @@ public class RobotContainer {
       case Phil:
 
       case WaffleHouse:
+      if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
       hood = new HoodReal();
       intake = new IntakeReal();
       shooter = new shooterReal();
