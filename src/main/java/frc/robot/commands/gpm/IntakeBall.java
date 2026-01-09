@@ -18,7 +18,7 @@ public class IntakeBall extends Command {
 
     private Phase phase;
 
-    public IntakeBall(IntakeReal intake, shooterReal shooter){
+    public IntakeBall(IntakeReal intake, shooterReal shooter) {
         this.intake = intake;
         this.shooter = shooter;
 

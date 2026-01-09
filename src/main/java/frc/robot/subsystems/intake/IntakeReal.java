@@ -192,6 +192,10 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
         flyWheelPower = IntakeConstants.FLYWHEEL_SPEED;
     }
 
+    public void outtakeFlyWheel() {
+        flyWheelPower = -IntakeConstants.FLYWHEEL_SPEED;
+    }
+
     public void stopFlyWheel(){
         flyWheelPower = 0;
     }
