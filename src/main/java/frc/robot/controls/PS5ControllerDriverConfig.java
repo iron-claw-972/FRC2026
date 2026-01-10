@@ -115,11 +115,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             new SequentialCommandGroup(
                 new InstantCommand(() -> setAlignmentPose()),
                 new ParallelCommandGroup(
-                    new DriveToPose(getDrivetrain(), ()-> alignmentPose),
-                    new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))
+                    new DriveToPose(getDrivetrain(), ()-> alignmentPose)
+                    //new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose)
                     )
                 )
-            )
         );
 
         if(intake != null){

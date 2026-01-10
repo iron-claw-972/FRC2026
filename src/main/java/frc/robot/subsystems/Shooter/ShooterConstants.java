@@ -3,7 +3,7 @@ package frc.robot.subsystems.Shooter;
 public class ShooterConstants {
     //TODO: find these values
     public static final double FEEDER_RUN_POWER = 0.3; // meters per second??
-    public static final double SHOOTER_VELOCITY = 10.0; // meters per second
+    public static final double SHOOTER_VELOCITY = 12.0; // meters per second
     public static final double SHOOTER_GEAR_RATIO = 36.0 / 24.0; // gear ratio from motors to shooter wheel
     // public static final double SHOOTER_LAUNCH_DIAMETER = 0.0762; // meters (3 inches)
     public static final double SHOOTER_LAUNCH_DIAMETER = 0.1016; // meters (4 inches) I think this is right.
