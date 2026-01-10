@@ -1,3 +1,5 @@
+package frc.robot;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
