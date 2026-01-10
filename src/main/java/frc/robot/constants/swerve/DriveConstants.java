@@ -206,10 +206,10 @@ public class DriveConstants {
      */
     public static void update(RobotId robotId) {
         if(robotId == RobotId.WaffleHouse){
-            STEER_OFFSET_FRONT_LEFT = 300.058594 - 360;
-            STEER_OFFSET_FRONT_RIGHT = 65.654297;
-            STEER_OFFSET_BACK_LEFT = 38.232422 + 180;
-            STEER_OFFSET_BACK_RIGHT = 116.279297;
+            STEER_OFFSET_FRONT_LEFT = 300.058594 - 360 + 180;
+            STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
+            STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
+            STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
         }
         if(robotId == RobotId.BetaBot) {
             STEER_OFFSET_FRONT_LEFT = 193.884-180;

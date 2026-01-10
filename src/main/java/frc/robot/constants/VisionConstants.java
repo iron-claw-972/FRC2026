@@ -128,7 +128,7 @@ public class VisionConstants {
      * <p>
      * Only affects calculations using PhotonVision, not manual calculations.
      */
-    public static final double HIGHEST_AMBIGUITY = 0.01;
+    public static final double HIGHEST_AMBIGUITY = 0.1;
 
     public static final int MAX_EMPTY_TICKS = 10;
 
@@ -155,17 +155,16 @@ public class VisionConstants {
                 new Pair<String, Transform3d>(
                         "CameraLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(10.485), Units.inchesToMeters(10.217),
-                                        Units.inchesToMeters(11.012)),
-                                new Rotation3d(0, Units.degreesToRadians(-11),
-                                        Math.PI/2 + Units.degreesToRadians(20)))),
+                                new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-6.5),
+                                        Units.inchesToMeters(14.5)),
+                                new Rotation3d(0, 0,0))),
                 new Pair<String, Transform3d>(
                         "CameraRight",
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(0.0), Units.inchesToMeters(6.5),
                                         Units.inchesToMeters(13.5)),
                                 new Rotation3d(0, 0,
-                                        0)))));
+                                       0)))));
 
     /**
      * The transformations from the robot to object detection cameras
