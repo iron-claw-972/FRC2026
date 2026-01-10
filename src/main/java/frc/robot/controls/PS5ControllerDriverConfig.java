@@ -134,6 +134,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     }
                 })
             );
+
+            driver.get(PS5Button.CIRCLE).onTrue(
+                new InstantCommand(()->{
+                    intake.outtakeFlyWheel();
+                })
+            );
         }
         
         //Cancel commands
