@@ -37,7 +37,7 @@ import lib.controllers.PS5Controller.PS5Button;
  * Key for shooter + hood + intake controls
  *  SQUARE: Aim hood at target (left button)
  *  CIRCLE: Shoot at target (right button)
- *  TRIANGLE: Align to target (top button)
+ *  TRIANGLE: Aim to target (top button)
  *  CROSS: Intake ball (bottom button)
  */
 
@@ -107,9 +107,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     shooter.deactivateShooterAndFeeder();
                 })
             );
-
+            
         }
         
+        driver.get(PS5Button.RB).onTrue(
+                new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose)))
+                ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
+                })
+            );
+
         // aim hood and drive
         driver.get(PS5Button.SQUARE).onTrue(
             new SequentialCommandGroup(
@@ -138,6 +146,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             driver.get(PS5Button.CIRCLE).onTrue(
                 new InstantCommand(()->{
                     intake.outtakeFlyWheel();
+                })
+            );
+
+            driver.get(PS5Button.TRIANGLE).onTrue(
+                new InstantCommand(() -> {
+                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
                 })
             );
         }

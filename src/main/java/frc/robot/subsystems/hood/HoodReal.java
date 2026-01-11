@@ -252,8 +252,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         return z;
     }
 
-    
-
     @Override
     public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
         double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
