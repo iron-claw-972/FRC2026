@@ -1,0 +1,79 @@
+
+package frc.robot.util;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+
+class ShooterPhysicsTest {
+	private static final double epsilon = .001;
+
+	@BeforeEach
+	public void prepare() {
+	}
+
+	@AfterEach
+	public void cleanup() {
+	}
+
+	@Test
+	public void basicImpulseTest() {
+		Translation3d transform = ShooterPhysics.getRequiredImpulse(Translation2d.kZero, Translation3d.kZero, 1);
+		assertEquals(0, transform.getX(), epsilon);
+		assertEquals(0, transform.getY(), epsilon);
+		assertEquals(4.427, transform.getZ(), epsilon);
+
+		Translation3d transform2 = ShooterPhysics.getRequiredImpulse(Translation2d.kZero, new Translation3d(10, 0, 0),
+				1);
+		assertTrue(transform2.getX() > 0, transform2.toString());
+		assertEquals(0, transform2.getY(), epsilon);
+		assertEquals(4.427, transform2.getZ(), epsilon);
+
+		Translation3d transform3 = ShooterPhysics.getRequiredImpulse(Translation2d.kZero,
+				new Translation3d(0, -6, 0), 1);
+		assertEquals(0, transform3.getX(), epsilon);
+		assertTrue(transform3.getY() < 0, transform3.toString());
+		assertEquals(4.427, transform3.getZ(), epsilon);
+
+		Translation3d transform4 = ShooterPhysics.getRequiredImpulse(Translation2d.kZero,
+				new Translation3d(6, 3, 0), 2);
+		assertEquals(6. / 3, transform4.getX() / transform4.getY(), epsilon);
+
+		Translation3d transform5 = ShooterPhysics.getRequiredImpulse(Translation2d.kZero,
+				new Translation3d(12.14, 3.21, 0), 2);
+		assertEquals(12.14 / 3.21, transform5.getX() / transform5.getY(), epsilon);
+
+		Translation3d transform6 = ShooterPhysics.getRequiredImpulse(Translation2d.kZero,
+				new Translation3d(-16.32, 3.3, 0), 2);
+		assertEquals(-16.32 / 3.3, transform6.getX() / transform6.getY(), epsilon);
+	}
+
+	@Test
+	public void angleTest() {
+		ShooterPhysics.TurretState state1 = ShooterPhysics.getShotParams(Translation2d.kZero, Translation2d.kZero,
+				new Translation3d(1, 0, 0), 1);
+		// different for this one because it's close to 0, so the angle wraps and
+		// assertEquals can't handle that
+		assertTrue(Math.abs((state1.yaw()).getRadians()) <= epsilon, state1.toString());
+
+		ShooterPhysics.TurretState state2 = ShooterPhysics.getShotParams(Translation2d.kZero, Translation2d.kZero,
+				new Translation3d(0, 1, 0), 1);
+		assertEquals(new Rotation2d(Math.PI / 2).getRadians(), state2.yaw().getRadians(), epsilon);
+
+		ShooterPhysics.TurretState state3 = ShooterPhysics.getShotParams(Translation2d.kZero, Translation2d.kZero,
+				new Translation3d(-1, 0, 0), 1);
+		assertEquals(new Rotation2d(Math.PI).getRadians(), state3.yaw().getRadians(), epsilon);
+
+		ShooterPhysics.TurretState state4 = ShooterPhysics.getShotParams(Translation2d.kZero, Translation2d.kZero,
+				new Translation3d(0, -1, 0), 1);
+		assertEquals(new Rotation2d(-Math.PI / 2).getRadians(), state4.yaw().getRadians(), epsilon);
+	}
+
+}
