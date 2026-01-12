@@ -104,7 +104,7 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
         ballDetected();
         //SmartDashboard.putNumber("Sensor Distance", sensor.getMeasurement().distance_mm);
         
-        shooterAtMaxSpeed = shooterAtMaxSpeed();
+        shooterAtMaxSpeed = atMaxSpeed();
     }
 
     public void deactivateShooterAndFeeder() {
@@ -113,11 +113,15 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
         System.out.println("Shooter deactivated");
     }
 
-    public boolean shooterAtMaxSpeed() {
+    public boolean atMaxSpeed() {
         double leftRps = shooterMotorLeft.getVelocity().getValueAsDouble();
         double rightRps = shooterMotorRight.getVelocity().getValueAsDouble();
         double average = (leftRps + rightRps) / 2.0;
         return average >= shooterTargetSpeed * 0.95;
+    }
+
+    public boolean atTargetSpeed() {
+        return ((shooterTargetSpeed - shooterMotorLeft.getVelocity().getValueAsDouble())) < 0.5;
     }
 
     @Override

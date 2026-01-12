@@ -34,9 +34,9 @@ public class AutoShoot extends Command {
                 new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72)),
                 4);
 
-        drive.setIsAlign(true);
         hood.setSetpoint(target_state.pitch());
         shooter.setShooter(target_state.speed());
+        drive.setIsAlign(true);
         drive.setAlignAngle(target_state.yaw().getRadians());
     }
 
@@ -54,8 +54,10 @@ public class AutoShoot extends Command {
         drive.setAlignAngle(target_state.yaw().getRadians());
 
 
-        if (hood.atSetpoint()) {
+        if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
             shooter.setFeeder(1);
+        } else {
+            shooter.setFeeder(0);
         }
     }
 
