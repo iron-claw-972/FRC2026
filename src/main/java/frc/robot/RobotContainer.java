@@ -25,7 +25,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.Shooter.shooterReal;
+import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.HoodReal;
@@ -49,7 +49,7 @@ public class RobotContainer {
   private Vision vision = null;
   private HoodReal hood = null;
   private IntakeReal intake = null;
-  private shooterReal shooter = null;
+  private ShooterReal shooter = null;
   private Command auto = new DoNothing(); 
 
   // Controllers are defined here
@@ -91,7 +91,7 @@ public class RobotContainer {
       if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
       hood = new HoodReal();
       intake = new IntakeReal();
-      shooter = new shooterReal();
+      shooter = new ShooterReal();
 
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());

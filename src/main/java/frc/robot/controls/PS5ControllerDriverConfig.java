@@ -25,7 +25,7 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
-import frc.robot.subsystems.Shooter.shooterReal;
+import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.subsystems.intake.IntakeReal;
@@ -48,7 +48,7 @@ import lib.controllers.PS5Controller.PS5Button;
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private HoodReal hood;
-    private shooterReal shooter;
+    private ShooterReal shooter;
     private IntakeReal intake;
     private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
@@ -59,7 +59,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
     int intakeInt = 1;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, shooterReal shooter, IntakeReal intake) {
+    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeReal intake) {
         super(drive);
         this.hood = hood;
         this.shooter = shooter;

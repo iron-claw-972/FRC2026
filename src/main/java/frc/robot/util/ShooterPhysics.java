@@ -8,12 +8,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 import frc.robot.constants.Constants;
 
-class ShooterPhysics {
+public class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// speed in m/s
 	public record TurretState(Rotation2d yaw, double pitch, double speed){};
 
-	public TurretState getShotParams(Translation2d initialVelocity, Translation2d robot, Translation3d target, double height) {
+	public static TurretState getShotParams(Translation2d initialVelocity, Translation2d robot, Translation3d target, double height) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
 		Translation3d impulse = getRequiredImpulse(initialVelocity, robotToTarget, height);
 
