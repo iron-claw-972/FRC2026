@@ -10,10 +10,12 @@ import frc.robot.constants.Constants;
 class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// speed in m/s
-	public record TurretState(Rotation2d yaw, double pitch, double speed){};
+	public record TurretState(Rotation2d yaw, double pitch, double speed) {
+	};
 
 	@CheckReturnValue
-	public static TurretState getShotParams(Translation2d initialVelocity, Translation2d robot, Translation3d target, double height) {
+	public static TurretState getShotParams(Translation2d initialVelocity, Translation2d robot, Translation3d target,
+			double height) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
 		Translation3d impulse = getRequiredImpulse(initialVelocity, robotToTarget, height);
 
@@ -21,7 +23,7 @@ class ShooterPhysics {
 		Rotation2d yaw = as2d.getAngle();
 		double magnitude2d = as2d.getDistance(Translation2d.kZero);
 
-		double pitch = Math.atan2(impulse.getZ(), magnitude2d) + Math.PI * 3 / 2;
+		double pitch = new Translation2d(magnitude2d, impulse.getZ()).getAngle().getRadians();
 		pitch %= Math.PI * 2;
 		double speed = impulse.getDistance(Translation3d.kZero);
 
@@ -49,12 +51,13 @@ class ShooterPhysics {
 		// quadratic formula
 		// t = (-v_z_impulse ± √(4 * (-.5 * g) * (-z_target))) / (2 * -.5 * g)
 		// t = (-v_z_impulse ± √(2 * g * z_target)) / -g
-		// onlz use + because we only want the part where it's coming down
-		double t = (-zImpulse + Math.sqrt(2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
-			/ -Constants.GRAVITY_ACCELERATION;
+		// onlz use - because we only want the part where it's coming down, and that
+		// gives the longer time
+		double t = (-zImpulse - Math.sqrt(2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
+				/ -Constants.GRAVITY_ACCELERATION;
 
 		if (t < 0)
-			throw new RuntimeException("Time should never be negative (got: " + t + ").");
+			throw new RuntimeException("Time should never be negative (got t=" + t + ").");
 
 		// calculate x and z impulse
 		// x = (v_x_robot + v_x_impulse) * t
@@ -67,4 +70,3 @@ class ShooterPhysics {
 		return new Translation3d(xImpulse, yImpulse, zImpulse);
 	}
 }
-
