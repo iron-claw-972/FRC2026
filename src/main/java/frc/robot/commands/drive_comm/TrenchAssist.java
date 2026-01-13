@@ -113,10 +113,10 @@ public class TrenchAssist extends Command {
                 drive.getChassisSpeeds().vyMetersPerSecond);
 
         Translation2d[] corners = new Translation2d[] {
-                pose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
-                pose.plus(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
-                pose.plus(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
-                pose.plus(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
         }; // TODO add actual corner locations
 
         for (Translation2d corner : corners) {
@@ -126,7 +126,7 @@ public class TrenchAssist extends Command {
                     if (drive.getPose().getY() > rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
                         // above rectangle
                         return new Translation2d(0, 1).times(0.5);
-                    } else if (drive.getPose().getY() <= rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
+                    } else if (drive.getPose().getY() <= rectangle.getCenter().getY() - (rectangle.getYWidth() / 2)) {
                         // below rectangle
                         return new Translation2d(0, -1).times(0.5);
 
@@ -140,6 +140,7 @@ public class TrenchAssist extends Command {
                     // //left of rectangle
                     // return new Translation2d(-1, 0).times(0.5);
                     }
+                    
                     if (rayCast(rectangle, corner, velocity, 0.2)) {
                         return velocity.unaryMinus(); // fallback if uh oh
                         // alex won't like robot stopping suddenly, so only if about to crash
