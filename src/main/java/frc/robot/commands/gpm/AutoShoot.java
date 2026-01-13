@@ -3,6 +3,7 @@ package frc.robot.commands.gpm;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -23,6 +24,8 @@ public class AutoShoot extends Command {
         this.drive = drive;
         this.hood = hood;
         this.shooter = shooter;
+
+        addRequirements(hood, shooter);
     }
 
     @Override
