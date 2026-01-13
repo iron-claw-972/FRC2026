@@ -34,7 +34,12 @@ public class AutoShoot extends Command {
                 new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72)),
                 4);
 
-        hood.setSetpoint(target_state.pitch());
+        if (Units.degreesToRadians(0) < target_state.pitch()) {
+
+        } else if (Units.degreesToRadians(0) > target_state.pitch()) {
+
+        }
+        hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
         shooter.setShooter(target_state.speed());
         drive.setIsAlign(true);
         drive.setAlignAngle(target_state.yaw().getRadians());
