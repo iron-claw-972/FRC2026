@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
+import frc.robot.constants.swerve.TrenchAssistConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.DriverAssist;
@@ -56,7 +57,12 @@ public class TrenchAssist extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(drive, driverInput, drive.getDesiredPose(), true);
 
-        drive(corrected);
+        Translation2d calculated = calculateCorrection(TrenchAssistConstants.OBSTACLES);
+        ChassisSpeeds assisted = new ChassisSpeeds(corrected.vxMetersPerSecond + calculated.getX(), 
+            corrected.vyMetersPerSecond + calculated.getY(), corrected.omegaRadiansPerSecond);
+
+        drive(assisted);
+
     }
 
     /**
@@ -112,14 +118,14 @@ public class TrenchAssist extends Command {
         Translation2d velocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                 drive.getChassisSpeeds().vyMetersPerSecond);
 
-        Translation2d[] corners = new Translation2d[] {
+        Translation2d[] robotCorners = new Translation2d[] {
                 pose.transformBy(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
                 pose.transformBy(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
                 pose.transformBy(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
                 pose.transformBy(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
         }; // TODO add actual corner locations
 
-        for (Translation2d corner : corners) {
+        for (Translation2d corner : robotCorners) {
             for (Rectangle2d rectangle : rectangles) {
                 if (rayCast(rectangle, corner, velocity, 1.0)) {
                     // correction to push perpendicular to rectangle
@@ -130,7 +136,8 @@ public class TrenchAssist extends Command {
                         // below rectangle
                         return new Translation2d(0, -1).times(0.5);
 
-                    // Are these last two necessary?
+                        // Are these last two necessary?
+                        
                     // } else if (drive.getPose().getX() > rectangle.getCenter().getX() +
                     // (rectangle.getXWidth() / 2)){
                     // //right of rectangle

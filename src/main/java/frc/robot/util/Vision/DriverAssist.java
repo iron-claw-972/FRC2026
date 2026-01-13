@@ -38,9 +38,9 @@ public class DriverAssist {
 
     /**
      * Combines the driver input with a speed calculated using a trapezoidal profile <p>
-     * Called when VisionConstants.DRIVER_ASSIST_MODE is 2
+     * Called when VisionConstants.DRIVER_ASSIST_MODE is 2speed
      * @param drive The drivetrain
-     * @param driverInput The driver input speed
+     * @param driverInput The driver input 
      * @param desiredPose The pose to drive to
      * @param keepAngle True to use the angle in the pose, false to point hte robot toward the pose
      * @return The new speed
