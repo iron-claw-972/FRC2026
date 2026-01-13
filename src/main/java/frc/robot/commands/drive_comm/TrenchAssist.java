@@ -140,7 +140,7 @@ public class TrenchAssist extends Command {
                     // //left of rectangle
                     // return new Translation2d(-1, 0).times(0.5);
                     }
-                    
+
                     if (rayCast(rectangle, corner, velocity, 0.2)) {
                         return velocity.unaryMinus(); // fallback if uh oh
                         // alex won't like robot stopping suddenly, so only if about to crash
