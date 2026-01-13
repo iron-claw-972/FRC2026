@@ -61,41 +61,45 @@ public class TrenchAssist extends Command {
 
     /**
      * Drives the robot
+     * 
      * @param speeds The ChassisSpeeds to drive at
      */
-    protected void drive(ChassisSpeeds speeds){
+    protected void drive(ChassisSpeeds speeds) {
         // If the driver is pressing the align button or a command set the drivetrain to
         // align, then align to speaker
         if (driver.getIsAlign() || drive.getIsAlign()) {
             drive.driveHeading(
-                speeds.vxMetersPerSecond,
-                speeds.vyMetersPerSecond,
-                drive.getAlignAngle(),
-                true);
+                    speeds.vxMetersPerSecond,
+                    speeds.vyMetersPerSecond,
+                    drive.getAlignAngle(),
+                    true);
         } else {
             drive.drive(
-                speeds.vxMetersPerSecond,
-                speeds.vyMetersPerSecond,
-                speeds.omegaRadiansPerSecond,
-                true,
-                false);
+                    speeds.vxMetersPerSecond,
+                    speeds.vyMetersPerSecond,
+                    speeds.omegaRadiansPerSecond,
+                    true,
+                    false);
         }
     }
 
     /**
      * 
      * @param rectangle the rectangle that the ray should check against
-     * @param point the origin point of the ray
-     * @param velocity vector of the ray, magnitude is speed
-     * @return true if ray intersects rectangle within 1 second into future, .01 second resolution for raymarching
+     * @param point     the origin point of the ray
+     * @param velocity  vector of the ray, magnitude is speed
+     * @param time      how far into the future to check
+     * @return true if ray intersects rectangle within time param into future, time/100
+     *         second resolution for raymarching
      */
-    public static boolean rayCast(Rectangle2d rectangle, Translation2d point, Translation2d velocity){
-        //double distance = velocity.getNorm();
-        //Translation2d normalized = new Translation2d(velocity.getX() / distance, velocity.getY() / distance);
+    public static boolean rayCast(Rectangle2d rectangle, Translation2d point, Translation2d velocity, double time) {
+        // double distance = velocity.getNorm();
+        // Translation2d normalized = new Translation2d(velocity.getX() / distance,
+        // velocity.getY() / distance);
 
-        for (int i = 0; i <= 100 ; i++){
-            Translation2d ray = velocity.times(i / 100.0).plus(point);
-            if (rectangle.contains(ray)){
+        for (int i = 0; i <= 100; i++) {
+            Translation2d ray = velocity.times((i * time) / 100.0).plus(point);
+            if (rectangle.contains(ray)) {
                 return true;
             }
         }
@@ -103,44 +107,49 @@ public class TrenchAssist extends Command {
         return false;
     }
 
-
-    Translation2d calculateCorrection(Rectangle2d[] rectangles){
+    Translation2d calculateCorrection(Rectangle2d[] rectangles) {
         Pose2d pose = drive.getPose();
-        Translation2d velocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond);
+        Translation2d velocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
+                drive.getChassisSpeeds().vyMetersPerSecond);
 
-        Translation2d[] corners = new Translation2d[]{
-            pose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
-            pose.plus(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
-            pose.plus(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
-            pose.plus(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
-        }; //TODO add actual corner locations
+        Translation2d[] corners = new Translation2d[] {
+                pose.plus(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.plus(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
+                pose.plus(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.plus(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
+        }; // TODO add actual corner locations
 
-        for (Translation2d corner: corners){
-            for (Rectangle2d rectangle: rectangles){
-                if (rayCast(rectangle, corner, velocity)){
-                    //correction to push perpendicular to rectangle
-                    if (drive.getPose().getY() > rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)){
-                        //above rectangle
+        for (Translation2d corner : corners) {
+            for (Rectangle2d rectangle : rectangles) {
+                if (rayCast(rectangle, corner, velocity, 1.0)) {
+                    // correction to push perpendicular to rectangle
+                    if (drive.getPose().getY() > rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
+                        // above rectangle
                         return new Translation2d(0, 1).times(0.5);
-                    } else if (drive.getPose().getY() <= rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)){
-                        //below rectangle
+                    } else if (drive.getPose().getY() <= rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
+                        // below rectangle
                         return new Translation2d(0, -1).times(0.5);
 
-                        // Are these last two necessary? 
-                    // } else if (drive.getPose().getX() > rectangle.getCenter().getX() + (rectangle.getXWidth() / 2)){
-                    //     //right of rectangle
-                    //     return new Translation2d(1, 0).times(0.5);
-                    // } else if (drive.getPose().getX() < rectangle.getCenter().getX() + (rectangle.getXWidth() / 2)){
-                    //     //left of rectangle
-                    //     return new Translation2d(-1, 0).times(0.5);
+                    // Are these last two necessary?
+                    // } else if (drive.getPose().getX() > rectangle.getCenter().getX() +
+                    // (rectangle.getXWidth() / 2)){
+                    // //right of rectangle
+                    // return new Translation2d(1, 0).times(0.5);
+                    // } else if (drive.getPose().getX() < rectangle.getCenter().getX() +
+                    // (rectangle.getXWidth() / 2)){
+                    // //left of rectangle
+                    // return new Translation2d(-1, 0).times(0.5);
                     }
-                    return velocity.unaryMinus(); //fallback if uh oh
+                    if (rayCast(rectangle, corner, velocity, 0.2)) {
+                        return velocity.unaryMinus(); // fallback if uh oh
+                        // alex won't like robot stopping suddenly, so only if about to crash
+                    }
                 }
             }
         }
 
         return new Translation2d(0, 0);
-        
+
     }
 
 }
