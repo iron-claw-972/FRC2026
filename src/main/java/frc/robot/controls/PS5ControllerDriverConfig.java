@@ -53,6 +53,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
+    private boolean alignWithTrench = false; 
 
     //Turn on for alignment to the tag
     private Pose2d alignmentPose = null;
@@ -149,9 +150,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 })
             );
 
+            // driver.get(PS5Button.TRIANGLE).onTrue(
+            //     new InstantCommand(() -> {
+            //         intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+            //     })
+            // );
             driver.get(PS5Button.TRIANGLE).onTrue(
                 new InstantCommand(() -> {
-                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+                    toggleAlignWithTrench();
                 })
             );
         }
@@ -222,6 +228,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     @Override
     public boolean getIsAlign() {
         return false;
+    }
+
+    @Override
+    public boolean getAlignWithTrench() {
+        return alignWithTrench; 
+    }
+
+    public void toggleAlignWithTrench() {
+        alignWithTrench = !alignWithTrench; 
     }
 
     public void startRumble(){

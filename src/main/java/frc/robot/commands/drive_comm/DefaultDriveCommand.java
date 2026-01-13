@@ -60,6 +60,11 @@ public class DefaultDriveCommand extends Command {
     protected void drive(ChassisSpeeds speeds){
         // If the driver is pressing the align button or a command set the drivetrain to
         // align, then align to speaker
+        if (driver.getAlignWithTrench()) {
+            swerve.setAlignAngle(0.0);
+            swerve.setIsAlign(true); 
+        }
+
         if (driver.getIsAlign() || swerve.getIsAlign()) {
             swerve.driveHeading(
                 speeds.vxMetersPerSecond,
