@@ -118,12 +118,15 @@ public class TrenchAssist extends Command {
         Translation2d velocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                 drive.getChassisSpeeds().vyMetersPerSecond);
 
+        double robotCornerRadius = 0.5 * Math.sqrt(2 * Math.pow(DriveConstants.ROBOT_WIDTH_WITH_BUMPERS, 2));
+        double halfRobotWidth = 0.5 * DriveConstants.ROBOT_WIDTH_WITH_BUMPERS;
+
         Translation2d[] robotCorners = new Translation2d[] {
-                pose.transformBy(new Transform2d(new Translation2d(1, 0), new Rotation2d(0.0))).getTranslation(),
-                pose.transformBy(new Transform2d(new Translation2d(0, 1), new Rotation2d(0.0))).getTranslation(),
-                pose.transformBy(new Transform2d(new Translation2d(-1, 0), new Rotation2d(0.0))).getTranslation(),
-                pose.transformBy(new Transform2d(new Translation2d(0, -1), new Rotation2d(0.0))).getTranslation(),
-        }; // TODO add actual corner locations
+                pose.transformBy(new Transform2d(new Translation2d(halfRobotWidth, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(0, halfRobotWidth), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(-halfRobotWidth, 0), new Rotation2d(0.0))).getTranslation(),
+                pose.transformBy(new Transform2d(new Translation2d(0, -halfRobotWidth), new Rotation2d(0.0))).getTranslation(),
+        };
 
         for (Translation2d corner : robotCorners) {
             for (Rectangle2d rectangle : rectangles) {
