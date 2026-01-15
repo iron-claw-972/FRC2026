@@ -2,8 +2,6 @@ package frc.robot.util;
 
 import java.util.Optional;
 
-import com.google.errorprone.annotations.CheckReturnValue;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -15,7 +13,6 @@ class ShooterPhysics {
 	public record TurretState(Rotation2d yaw, double pitch, double exit_vel) {
 	};
 
-	@CheckReturnValue
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target,
 			double height) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
@@ -34,7 +31,6 @@ class ShooterPhysics {
 
 	// assumes shot from (0, 0, 0)
 	// only public for unit testing, don't actually use this directly
-	@CheckReturnValue
 	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target, double peakZ) {
 		// z = v_z_exit_vel * t - .5 * g * t²
 		// want vertex of this equation to equal peakZ
