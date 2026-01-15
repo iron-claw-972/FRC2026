@@ -124,13 +124,13 @@ class ShooterPhysicsTest {
 	@Test
 	public void velocityTest() {
 		// just make sure it converges properly
-		Optional<Translation3d> translation = ShooterPhysics.getImpulseForSpeed(new Translation2d(4.2, -3),
+		Optional<Translation3d> translation = ShooterPhysics.getExitVelocityForSpeed(new Translation2d(4.2, -3),
 				new Translation3d(1, 2, 3), 20);
 		assertTrue(translation.isPresent());
 		assertEquals(translation.get().getNorm(), 20, 0.1);
 
 		// check something impossible is impossible
-		Optional<Translation3d> translation2 = ShooterPhysics.getImpulseForSpeed(Translation2d.kZero,
+		Optional<Translation3d> translation2 = ShooterPhysics.getExitVelocityForSpeed(Translation2d.kZero,
 				new Translation3d(100, 0, 5), 10);
 		assertTrue(translation2.isEmpty());
 	}
