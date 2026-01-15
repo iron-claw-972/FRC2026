@@ -1,6 +1,6 @@
 package frc.robot.util;
 
-import com.google.errorprone.annotations.CheckReturnValue;
+import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,7 +13,6 @@ class ShooterPhysics {
 	public record TurretState(Rotation2d yaw, double pitch, double speed) {
 	};
 
-	@CheckReturnValue
 	public static TurretState getShotParams(Translation2d initialVelocity, Translation2d robot, Translation3d target,
 			double height) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
@@ -32,7 +31,6 @@ class ShooterPhysics {
 
 	// assumes shot from (0, 0, 0)
 	// only public for unit testing, don't actually use this directly
-	@CheckReturnValue
 	public static Translation3d getRequiredImpulse(Translation2d initialVelocity, Translation3d target, double peakZ) {
 		// z = v_z_impulse * t - .5 * g * t²
 		// want vertex of this equation to equal peakZ
@@ -68,5 +66,38 @@ class ShooterPhysics {
 		// same for y
 		double yImpulse = target.getY() / t - initialVelocity.getY();
 		return new Translation3d(xImpulse, yImpulse, zImpulse);
+	}
+
+	// call with default tolerance
+	public static Optional<Translation3d> getImpulseForSpeed(Translation2d initialVelocity, Translation3d target,
+			double speed) {
+		return getImpulseForSpeed(initialVelocity, target, speed, 0.1);
+	}
+
+	public static Optional<Translation3d> getImpulseForSpeed(Translation2d initialVelocity, Translation3d target,
+			double speed, double tolerance) {
+
+		// TODO: detect when the given velocity is insufficient and exit before maxIters
+
+		// guess a peak height
+		double guess = 10;
+		int maxIters = 20;
+		while (maxIters >= 0) {
+			maxIters--;
+			Translation3d guessVelocity = getRequiredImpulse(initialVelocity, target, guess);
+			double guessSpeed = guessVelocity.getNorm();
+			double difference = speed - guessSpeed;
+
+			// we've already hit zero height and are trying to go lower
+			if (guess <= 0 && difference < 0)
+				return Optional.empty();
+
+			if (Math.abs(difference) <= tolerance)
+				return Optional.of(guessVelocity);
+
+			guess += difference * 1.7; // experimentally determined value
+		}
+
+		return Optional.empty();
 	}
 }
