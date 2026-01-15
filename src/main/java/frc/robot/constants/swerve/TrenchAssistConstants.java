@@ -7,9 +7,13 @@ public class TrenchAssistConstants {
     public static final Rectangle2d[] OBSTACLES = new Rectangle2d[]{
         new Rectangle2d(new Translation2d(4.03, 1.28), new Translation2d(5.22, 1.58)),
         new Rectangle2d(new Translation2d(4.03, 8.07 - 1.28), new Translation2d(5.22, 8.07 - 1.58)),
-        new Rectangle2d(new Translation2d(11.32, 1.28), new Translation2d()),
-        new Rectangle2d(new Translation2d(12.51, 8.07 - 1.28), new Translation2d()),
+        new Rectangle2d(new Translation2d(11.32, 1.28), new Translation2d(12.51, 1.58)),
+        new Rectangle2d(new Translation2d(11.32, 8.07 - 1.28), new Translation2d(12.51, 8.07 - 1.58)),
     }; //8.07m
+
+    public static final Rectangle2d[] ALIGN_ZONES = new Rectangle2d[]{
+        new Rectangle2d(new Translation2d(4.03, 1.28), new Translation2d(5.22, 1.58))
+    };
 
 
 }
