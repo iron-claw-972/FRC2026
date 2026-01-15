@@ -10,21 +10,21 @@ import frc.robot.constants.Constants;
 class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// exit velocity speed in m/s
-	public record TurretState(Rotation2d yaw, double pitch, double exit_vel) {
+	public record TurretState(Rotation2d yaw, double pitch, double exitVel) {
 	};
 
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target,
 			double height) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
-		Translation3d exit_vel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
 
-		Translation2d as2d = exit_vel.toTranslation2d();
+		Translation2d as2d = exitVel.toTranslation2d();
 		Rotation2d yaw = as2d.getAngle();
 		double magnitude2d = as2d.getDistance(Translation2d.kZero);
 
-		double pitch = new Translation2d(magnitude2d, exit_vel.getZ()).getAngle().getRadians();
+		double pitch = new Translation2d(magnitude2d, exitVel.getZ()).getAngle().getRadians();
 		pitch %= Math.PI * 2;
-		double speed = exit_vel.getDistance(Translation3d.kZero);
+		double speed = exitVel.getDistance(Translation3d.kZero);
 
 		return new TurretState(yaw, pitch, speed);
 	}
@@ -41,7 +41,7 @@ class ShooterPhysics {
 		// peakZ = .5 * v_z_exit_vel² / g
 		// v_z_exit_vel² = 2 * peakZ * g
 		// v_z_exit_vel = √(2 * peakZ * g)
-		double zExit_vel = Math.sqrt(2 * peakZ * Constants.GRAVITY_ACCELERATION);
+		double zExitVel = Math.sqrt(2 * peakZ * Constants.GRAVITY_ACCELERATION);
 
 		// now we need time to hit target
 		// z_target = v_z_exit_vel * t - .5 * g * t²
@@ -51,7 +51,7 @@ class ShooterPhysics {
 		// t = (-v_z_exit_vel ± √(2 * g * z_target)) / -g
 		// onlz use - because we only want the part where it's coming down, and that
 		// gives the longer time
-		double t = (-zExit_vel - Math.sqrt(2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
+		double t = (-zExitVel - Math.sqrt(2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
 				/ -Constants.GRAVITY_ACCELERATION;
 
 		if (t < 0)
@@ -62,10 +62,10 @@ class ShooterPhysics {
 		// x_target = (v_x_robot + v_x_exit_vel) * t_target
 		// v_x_robot + v_x_exit_vel = x_target / t_target
 		// v_x_exit_vel = x_target / t_target - v_x_robot
-		double xExit_vel = target.getX() / t - robotVelocity.getX();
+		double xExitVel = target.getX() / t - robotVelocity.getX();
 		// same for y
-		double yExit_vel = target.getY() / t - robotVelocity.getY();
-		return new Translation3d(xExit_vel, yExit_vel, zExit_vel);
+		double yExitVel = target.getY() / t - robotVelocity.getY();
+		return new Translation3d(xExitVel, yExitVel, zExitVel);
 	}
 
 	// call with default tolerance
