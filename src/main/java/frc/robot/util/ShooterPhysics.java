@@ -31,7 +31,8 @@ class ShooterPhysics {
 
 	// assumes shot from (0, 0, 0)
 	// only public for unit testing, don't actually use this directly
-	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target, double peakZ) {
+	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
+			double peakZ) {
 		// z = v_z_exit_vel * t - .5 * g * t²
 		// want vertex of this equation to equal peakZ
 		// t_vertex = -v_z_exit_vel / -g
@@ -47,11 +48,12 @@ class ShooterPhysics {
 		// z_target = v_z_exit_vel * t - .5 * g * t²
 		// 0 = -.5 * g * t² + v_z_exit_vel * t - z_target
 		// quadratic formula
-		// t = (-v_z_exit_vel ± √(4 * (-.5 * g) * (-z_target))) / (2 * -.5 * g)
-		// t = (-v_z_exit_vel ± √(2 * g * z_target)) / -g
+		// t = (-v_z_exit_vel ± √(v_z_exit_vel² - 4 * (-.5 * g) * (-z_target))) / (2 *
+		// -.5 * g)
+		// t = (-v_z_exit_vel ± √(v_z_exit_vel² - 2 * g * z_target)) / -g
 		// onlz use - because we only want the part where it's coming down, and that
 		// gives the longer time
-		double t = (-zExitVel - Math.sqrt(2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
+		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
 				/ -Constants.GRAVITY_ACCELERATION;
 
 		if (t < 0)
