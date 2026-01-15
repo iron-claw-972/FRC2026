@@ -4,6 +4,8 @@ package frc.robot.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -117,5 +119,19 @@ class ShooterPhysicsTest {
 		ShooterPhysics.TurretState state6 = ShooterPhysics.getShotParams(Translation2d.kZero, Translation2d.kZero,
 				new Translation3d(100, 50, 1), 2);
 		assertTrue(state6.pitch() >= 0 && state6.pitch() <= Math.PI / 16, state6.toString());
+	}
+
+	@Test
+	public void velocityTest() {
+		// just make sure it converges properly
+		Optional<Translation3d> translation = ShooterPhysics.getImpulseForSpeed(new Translation2d(4.2, -3),
+				new Translation3d(1, 2, 3), 20);
+		assertTrue(translation.isPresent());
+		assertEquals(translation.get().getNorm(), 20, 0.1);
+
+		// check something impossible is impossible
+		Optional<Translation3d> translation2 = ShooterPhysics.getImpulseForSpeed(Translation2d.kZero,
+				new Translation3d(100, 0, 5), 10);
+		assertTrue(translation2.isEmpty());
 	}
 }

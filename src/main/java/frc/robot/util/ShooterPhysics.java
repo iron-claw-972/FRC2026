@@ -1,6 +1,6 @@
 package frc.robot.util;
 
-import com.google.errorprone.annotations.CheckReturnValue;
+import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -68,5 +68,38 @@ class ShooterPhysics {
 		// same for y
 		double yExit_vel = target.getY() / t - robotVelocity.getY();
 		return new Translation3d(xExit_vel, yExit_vel, zExit_vel);
+	}
+
+	// call with default tolerance
+	public static Optional<Translation3d> getExitVelocityForSpeed(Translation2d initialVelocity, Translation3d target,
+			double speed) {
+		return getExitVelocityForSpeed(initialVelocity, target, speed, 0.1);
+	}
+
+	public static Optional<Translation3d> getExitVelocityForSpeed(Translation2d initialVelocity, Translation3d target,
+			double speed, double tolerance) {
+
+		// TODO: detect when the given velocity is insufficient and exit before maxIters
+
+		// guess a peak height
+		double guess = 10;
+		int maxIters = 20;
+		while (maxIters >= 0) {
+			maxIters--;
+			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
+			double guessSpeed = guessVelocity.getNorm();
+			double difference = speed - guessSpeed;
+
+			// we've already hit zero height and are trying to go lower
+			if (guess <= 0 && difference < 0)
+				return Optional.empty();
+
+			if (Math.abs(difference) <= tolerance)
+				return Optional.of(guessVelocity);
+
+			guess += difference * 1.7; // experimentally determined value
+		}
+
+		return Optional.empty();
 	}
 }
