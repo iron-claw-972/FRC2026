@@ -1,5 +1,9 @@
 package frc.robot.commands.drive_comm;
 
+import static edu.wpi.first.units.Units.Rotation;
+
+import java.util.Optional;
+
 import org.opencv.core.Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -8,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -95,10 +100,10 @@ public class TrenchAssist extends Command {
      * @param point     the origin point of the ray
      * @param velocity  vector of the ray, magnitude is speed
      * @param time      how far into the future to check
-     * @return true if ray intersects rectangle within time param into future, time/100
-     *         second resolution for raymarching
+     * @return returns Optional full if intersects rectangle within time param into future, time/100
+     *         second resolution for raymarching, returns distance that it hits it at
      */
-    public static boolean rayCast(Rectangle2d rectangle, Translation2d point, Translation2d velocity, double time) {
+    public static Optional<Double> rayCast(Rectangle2d rectangle, Translation2d point, Translation2d velocity, double time) {
         // double distance = velocity.getNorm();
         // Translation2d normalized = new Translation2d(velocity.getX() / distance,
         // velocity.getY() / distance);
@@ -106,11 +111,11 @@ public class TrenchAssist extends Command {
         for (int i = 0; i <= 100; i++) {
             Translation2d ray = velocity.times((i * time) / 100.0).plus(point);
             if (rectangle.contains(ray)) {
-                return true;
+                return Optional.of((i / 100.0) * velocity.getNorm());
             }
         }
 
-        return false;
+        return Optional.empty();
     }
 
     Translation2d calculateCorrection(Rectangle2d[] rectangles) {
@@ -130,14 +135,15 @@ public class TrenchAssist extends Command {
 
         for (Translation2d corner : robotCorners) {
             for (Rectangle2d rectangle : rectangles) {
-                if (rayCast(rectangle, corner, velocity, 1.0)) {
+                Optional<Double> distanceOptional = rayCast(rectangle, corner, velocity, 1.0);
+                if (distanceOptional.isPresent()) {
                     // correction to push perpendicular to rectangle
                     if (drive.getPose().getY() > rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
                         // above rectangle
-                        return new Translation2d(0, 1).times(0.5);
+                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(90))).times(distanceOptional.get() / velocity.getNorm());
                     } else if (drive.getPose().getY() <= rectangle.getCenter().getY() - (rectangle.getYWidth() / 2)) {
                         // below rectangle
-                        return new Translation2d(0, -1).times(0.5);
+                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(-90))).times(distanceOptional.get() / velocity.getNorm()); // meters / (meters / second) -> (meters * seconds) / meters -> seconds, between 0 and 1 because time value to raycast is 1
 
                         // Are these last two necessary?
                         
@@ -151,7 +157,7 @@ public class TrenchAssist extends Command {
                     // return new Translation2d(-1, 0).times(0.5);
                     }
 
-                    if (rayCast(rectangle, corner, velocity, 0.2)) {
+                    if (rayCast(rectangle, corner, velocity, 0.2).isPresent()) {
                         return velocity.unaryMinus(); // fallback if uh oh
                         // alex won't like robot stopping suddenly, so only if about to crash
                     }
