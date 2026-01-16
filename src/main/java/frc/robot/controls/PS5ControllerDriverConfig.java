@@ -54,8 +54,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean rumbleEnabled = false;
-    private final BooleanSupplier slowModeSupplier = ()->false;
-    private boolean alignWithTrench = false; 
+    private boolean alignWithTrench = false;
 
     //Turn on for alignment to the tag
     private Pose2d alignmentPose = null;
@@ -97,13 +96,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 endRumble();
             }
         }));
-    }
-
-            ()->getDrivetrain().setStateDeadband(false),
-            getDrivetrain()::alignWheels,
-            interrupted->getDrivetrain().setStateDeadband(true),
-            ()->false, getDrivetrain()).withTimeout(2));
-        
 
         if (intake != null && shooter != null){
 
@@ -247,14 +239,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return false;
     }
 
-    public void startRumble() {
     @Override
     public boolean getAlignWithTrench() {
-        return alignWithTrench; 
+        return alignWithTrench;
     }
 
     public void toggleAlignWithTrench() {
-        alignWithTrench = !alignWithTrench; 
+        alignWithTrench = !alignWithTrench;
     }
 
     public void startRumble(){
