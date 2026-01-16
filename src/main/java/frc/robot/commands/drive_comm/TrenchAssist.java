@@ -62,6 +62,20 @@ public class TrenchAssist extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(drive, driverInput, drive.getDesiredPose(), true);
 
+        for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
+            if (rectangle.contains(drive.getPose().getTranslation())){
+                drive.setIsAlign(true);
+
+                if (drive.getPose().getRotation().getDegrees() > 90 && drive.getPose().getRotation().getDegrees() < 270){
+                    drive.setAlignAngle(0.0);
+                } else if (drive.getPose().getRotation().getDegrees() > 270 && drive.getPose().getRotation().getDegrees() < 90){
+                    drive.setAlignAngle(Units.degreesToRadians(180));
+                }
+            } else {
+                drive.setIsAlign(false);
+            }
+        }
+
         Translation2d calculated = calculateCorrection(TrenchAssistConstants.OBSTACLES);
         ChassisSpeeds assisted = new ChassisSpeeds(corrected.vxMetersPerSecond + calculated.getX(), 
             corrected.vyMetersPerSecond + calculated.getY(), corrected.omegaRadiansPerSecond);
