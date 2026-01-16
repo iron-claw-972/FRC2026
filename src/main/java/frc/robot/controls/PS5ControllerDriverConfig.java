@@ -2,28 +2,71 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
+import frc.robot.commands.DoNothing;
+import frc.robot.commands.drive_comm.DriveToPose;
+import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.HoodConstants;
+import frc.robot.constants.IntakeConstants;
+import frc.robot.subsystems.Shooter.ShooterConstants;
+import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.intake.IntakeReal;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
 
 /**
+ * Key for shooter + hood + intake controls
+ *  SQUARE: Aim hood at target (left button)
+ *  CIRCLE: Shoot at target (right button)
+ *  TRIANGLE: Aim to target (top button)
+ *  CROSS: Intake ball (bottom button)
+ */
+
+// TODO: Add some sensor logic
+
+/**
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
+    private HoodReal hood;
+    private ShooterReal shooter;
+    private IntakeReal intake;
+    private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean rumbleEnabled = false;
+    private final BooleanSupplier slowModeSupplier = ()->false;
+    private boolean alignWithTrench = false; 
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    //Turn on for alignment to the tag
+    private Pose2d alignmentPose = null;
+    private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
+    int intakeInt = 1;
+
+    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeReal intake) {
         super(drive);
+        this.hood = hood;
+        this.shooter = shooter;
+        this.intake = intake;
     }
 
     public void configureControls() {
@@ -56,6 +99,119 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }));
     }
 
+            ()->getDrivetrain().setStateDeadband(false),
+            getDrivetrain()::alignWheels,
+            interrupted->getDrivetrain().setStateDeadband(true),
+            ()->false, getDrivetrain()).withTimeout(2));
+        
+
+        if (intake != null && shooter != null){
+
+            // driver.get(PS5Button.LEFT_TRIGGER).onFalse(
+            //     new InstantCommand(()-> {
+            //         hood.resetDueToSlippingError();
+            //     })
+            // );
+            
+            //shoots it
+            driver.get(PS5Button.LB).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+                new WaitCommand(0.4),
+                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
+            )
+            ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
+                })
+            );
+            
+        }
+        
+        driver.get(PS5Button.RB).onTrue(
+                new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose)))
+                ).onFalse(
+                new InstantCommand(()->{
+                    shooter.deactivateShooterAndFeeder();
+                })
+            );
+
+        // aim hood and drive
+        driver.get(PS5Button.SQUARE).onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> setAlignmentPose()),
+                new ParallelCommandGroup(
+                    new DriveToPose(getDrivetrain(), ()-> alignmentPose),
+                    new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))
+                    )
+                )
+            )
+        );
+
+        if(intake != null){
+            driver.get(PS5Button.CROSS).onTrue(
+                new InstantCommand(()->{
+                    if(intakeBall != null && intakeBall.isScheduled()){
+                        intakeBall.cancel();
+                    }
+                    else{
+                        intakeBall = new IntakeBall(intake, shooter);
+                        intakeBall.schedule();
+                    }
+                })
+            );
+
+            driver.get(PS5Button.CIRCLE).onTrue(
+                new InstantCommand(()->{
+                    intake.outtakeFlyWheel();
+                })
+            );
+
+            // driver.get(PS5Button.TRIANGLE).onTrue(
+            //     new InstantCommand(() -> {
+            //         intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+            //     })
+            // );
+            driver.get(PS5Button.TRIANGLE).onTrue(
+                new InstantCommand(() -> {
+                    toggleAlignWithTrench();
+                })
+            );
+        }
+        
+        //Cancel commands
+        // driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
+        //     if(intake != null){
+        //         intake.stopFlyWheel();
+        //         intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+        //     }
+        //     if(shooter != null){
+        //         shooter.stopFeeder();
+        //         shooter.stopShooter();
+        //     }
+        //     if(hood != null){
+        //         hood.setSetpoint(HoodConstants.START_ANGLE);
+        //     }
+        //     getDrivetrain().setIsAlign(false);
+        //     getDrivetrain().setDesiredPose(()->null);
+        //     alignmentPose = null;
+        //     CommandScheduler.getInstance().cancelAll();
+        // }));
+    }
+
+    public void setAlignmentPose(){
+        Translation2d drivepose = getDrivetrain().getPose().getTranslation();
+        //Uses tag #17
+        int tagNumber = 17;
+        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
+        double YDifference = tagpose.getY()-drivepose.getY();
+        double XDifference = tagpose.getX()-drivepose.getX();
+        double angle = Math.atan(YDifference/XDifference);
+        alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
+        System.out.println("Alignment Angle: " + Units.radiansToDegrees(angle));
+    }
+
+  
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
@@ -92,6 +248,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     }
 
     public void startRumble() {
+    @Override
+    public boolean getAlignWithTrench() {
+        return alignWithTrench; 
+    }
+
+    public void toggleAlignWithTrench() {
+        alignWithTrench = !alignWithTrench; 
+    }
+
+    public void startRumble(){
         driver.rumbleOn();
     }
 

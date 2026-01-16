@@ -76,4 +76,6 @@ public abstract class BaseDriverConfig {
 
     public abstract boolean getIsAlign();
 
+    public abstract boolean getAlignWithTrench(); 
+
 }

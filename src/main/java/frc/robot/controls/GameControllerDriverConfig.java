@@ -74,6 +74,11 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
     // return kDriver.LEFT_TRIGGER_BUTTON.getAsBoolean();
   }
 
+  @Override
+  public boolean getAlignWithTrench() {
+    return false;
+  }
+
   public GameController getGameController() {
     return driver;
   }

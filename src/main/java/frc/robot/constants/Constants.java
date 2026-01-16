@@ -6,13 +6,15 @@ public class Constants {
 
     // constants:   
 
-    public static final double GRAVITY_ACCELERATION = 9.8;
+    public static final double GRAVITY_ACCELERATION = 9.81;
     public static final double ROBOT_VOLTAGE = 12.0;
     public static final double LOOP_TIME = 0.02;
 
     // CAN bus names
-    public static final String CANIVORE_CAN = "CANivore";
+    //public static final String CANIVORE_CAN = "CANivore";
+    public static final String CANIVORE_CAN = "Default Name";
     public static final String RIO_CAN = "rio";
+    public static final String SUBSYSTEM_CANIVORE_CAN = "CANivoreSub";
 
     // Logging 
     public static final boolean USE_TELEMETRY = true;

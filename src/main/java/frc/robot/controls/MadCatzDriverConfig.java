@@ -64,4 +64,9 @@ public class MadCatzDriverConfig extends BaseDriverConfig {
         return false;
     }
 
+    @Override
+    public boolean getAlignWithTrench() {
+        return false;
+    }
+
 }

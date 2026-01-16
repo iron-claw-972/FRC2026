@@ -63,4 +63,9 @@ public class Ex3DProDriverConfig extends BaseDriverConfig {
     public boolean getIsAlign() {
         return false;
     }
+
+    @Override
+    public boolean getAlignWithTrench() {
+        return false;
+    }
 }
