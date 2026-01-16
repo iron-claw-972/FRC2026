@@ -56,7 +56,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private boolean rumbleEnabled = false;
     private boolean alignWithTrench = false;
 
-    //Turn on for alignment to the tag
+    // Turn on for alignment to the tag
     private Pose2d alignmentPose = null;
     private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
     int intakeInt = 1;
@@ -97,113 +97,103 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }
         }));
 
-        if (intake != null && shooter != null){
+        if (intake != null && shooter != null) {
 
             // driver.get(PS5Button.LEFT_TRIGGER).onFalse(
-            //     new InstantCommand(()-> {
-            //         hood.resetDueToSlippingError();
-            //     })
+            // new InstantCommand(()-> {
+            // hood.resetDueToSlippingError();
+            // })
             // );
-            
-            //shoots it
+
+            // shoots it
             driver.get(PS5Button.LB).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-                new WaitCommand(0.4),
-                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
-            )
-            ).onFalse(
-                new InstantCommand(()->{
-                    shooter.deactivateShooterAndFeeder();
-                })
-            );
-            
+                    new SequentialCommandGroup(
+                            new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+                            new WaitCommand(0.4),
+                            new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))))
+                    .onFalse(
+                            new InstantCommand(() -> {
+                                shooter.deactivateShooterAndFeeder();
+                            }));
+
         }
-        
+
         driver.get(PS5Button.RB).onTrue(
-                new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose)))
-                ).onFalse(
-                new InstantCommand(()->{
-                    shooter.deactivateShooterAndFeeder();
-                })
-            );
+                new InstantCommand(() -> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY,
+                        HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))))
+                .onFalse(
+                        new InstantCommand(() -> {
+                            shooter.deactivateShooterAndFeeder();
+                        }));
 
         // aim hood and drive
         driver.get(PS5Button.SQUARE).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> setAlignmentPose()),
-                new ParallelCommandGroup(
-                    new DriveToPose(getDrivetrain(), ()-> alignmentPose),
-                    new InstantCommand(()-> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))
-                    )
-                )
-            )
-        );
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> setAlignmentPose()),
+                        new ParallelCommandGroup(
+                                new DriveToPose(getDrivetrain(), () -> alignmentPose),
+                                new InstantCommand(() -> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY,
+                                        HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))))));
 
-        if(intake != null){
+        if (intake != null) {
             driver.get(PS5Button.CROSS).onTrue(
-                new InstantCommand(()->{
-                    if(intakeBall != null && intakeBall.isScheduled()){
-                        intakeBall.cancel();
-                    }
-                    else{
-                        intakeBall = new IntakeBall(intake, shooter);
-                        intakeBall.schedule();
-                    }
-                })
-            );
+                    new InstantCommand(() -> {
+                        if (intakeBall != null && intakeBall.isScheduled()) {
+                            intakeBall.cancel();
+                        } else {
+                            intakeBall = new IntakeBall(intake, shooter);
+                            intakeBall.schedule();
+                        }
+                    }));
 
             driver.get(PS5Button.CIRCLE).onTrue(
-                new InstantCommand(()->{
-                    intake.outtakeFlyWheel();
-                })
-            );
+                    new InstantCommand(() -> {
+                        intake.outtakeFlyWheel();
+                    }));
 
             // driver.get(PS5Button.TRIANGLE).onTrue(
-            //     new InstantCommand(() -> {
-            //         intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
-            //     })
+            // new InstantCommand(() -> {
+            // intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+            // })
             // );
             driver.get(PS5Button.TRIANGLE).onTrue(
-                new InstantCommand(() -> {
-                    toggleAlignWithTrench();
-                })
-            );
+                    new InstantCommand(() -> {
+                        toggleAlignWithTrench();
+                    }));
         }
-        
-        //Cancel commands
+
+        // Cancel commands
         // driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
-        //     if(intake != null){
-        //         intake.stopFlyWheel();
-        //         intake.setSetpoint(IntakeConstants.STOW_ANGLE);
-        //     }
-        //     if(shooter != null){
-        //         shooter.stopFeeder();
-        //         shooter.stopShooter();
-        //     }
-        //     if(hood != null){
-        //         hood.setSetpoint(HoodConstants.START_ANGLE);
-        //     }
-        //     getDrivetrain().setIsAlign(false);
-        //     getDrivetrain().setDesiredPose(()->null);
-        //     alignmentPose = null;
-        //     CommandScheduler.getInstance().cancelAll();
+        // if(intake != null){
+        // intake.stopFlyWheel();
+        // intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+        // }
+        // if(shooter != null){
+        // shooter.stopFeeder();
+        // shooter.stopShooter();
+        // }
+        // if(hood != null){
+        // hood.setSetpoint(HoodConstants.START_ANGLE);
+        // }
+        // getDrivetrain().setIsAlign(false);
+        // getDrivetrain().setDesiredPose(()->null);
+        // alignmentPose = null;
+        // CommandScheduler.getInstance().cancelAll();
         // }));
     }
 
-    public void setAlignmentPose(){
+    public void setAlignmentPose() {
         Translation2d drivepose = getDrivetrain().getPose().getTranslation();
-        //Uses tag #17
+        // Uses tag #17
         int tagNumber = 17;
         Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
-        double YDifference = tagpose.getY()-drivepose.getY();
-        double XDifference = tagpose.getX()-drivepose.getX();
-        double angle = Math.atan(YDifference/XDifference);
+        double YDifference = tagpose.getY() - drivepose.getY();
+        double XDifference = tagpose.getX() - drivepose.getX();
+        double angle = Math.atan(YDifference / XDifference);
         alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
         System.out.println("Alignment Angle: " + Units.radiansToDegrees(angle));
     }
 
-  
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
@@ -248,7 +238,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         alignWithTrench = !alignWithTrench;
     }
 
-    public void startRumble(){
+    public void startRumble() {
         driver.rumbleOn();
     }
 
