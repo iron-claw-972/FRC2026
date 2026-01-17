@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.constants.swerve.ModuleConstants;
@@ -310,7 +309,7 @@ public class Drivetrain extends SubsystemBase {
         if(!Vision.nearField(prevPose)){
             // If the pose at the beginning of the method is off the field, reset to a position in the middle of the field
             // Use the rotation of the pose after updating odometry so the yaw is right
-            prevPose = new Pose2d(FieldConstants.FIELD_LENGTH/2, FieldConstants.FIELD_WIDTH/2, pose2.getRotation());
+            prevPose = new Pose2d(VisionConstants.field.getFieldLength()/2, VisionConstants.field.getFieldWidth()/2, pose2.getRotation());
             resetOdometry(prevPose);
         }else if(!Vision.nearField(pose2)){
             // if the drivetrain pose is off the field, reset our odometry to the pose before(this is the right pose)
