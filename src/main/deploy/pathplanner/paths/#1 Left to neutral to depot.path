@@ -132,7 +132,7 @@
         "y": 5.773
       },
       "prevControl": {
-        "x": 0.3379761076237264,
+        "x": 0.33797610762372643,
         "y": 5.2179935180131
       },
       "nextControl": null,
@@ -178,7 +178,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Left Autos",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0

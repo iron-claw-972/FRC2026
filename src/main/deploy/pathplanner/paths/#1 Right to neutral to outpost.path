@@ -126,7 +126,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right Autos",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0
