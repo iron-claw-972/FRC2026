@@ -210,6 +210,9 @@ public class DriveConstants {
             STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
             STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
             STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
+
+            ROBOT_MASS = 44;
+            WHEEL_MOI = 0.000326 * ROBOT_MASS;
         }
         if(robotId == RobotId.BetaBot) {
             STEER_OFFSET_FRONT_LEFT = 193.884-180;
