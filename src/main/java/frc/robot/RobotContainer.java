@@ -62,6 +62,9 @@ public class RobotContainer {
         break;
 
       default:
+
+      case Wafflehouse:
+      
       case SwerveCompetition:
 
       case BetaBot:
