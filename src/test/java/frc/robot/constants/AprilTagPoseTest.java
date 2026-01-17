@@ -30,7 +30,7 @@ public class AprilTagPoseTest {
     Vision vision = new Vision(new ArrayList<Pair<String, Transform3d>>());
 
     // we should have 22 tags
-    assertEquals(22, FieldConstants.APRIL_TAGS.size());
+    assertEquals(22, VisionConstants.field.getTags().size());
     assertEquals(22, vision.getAprilTagFieldLayout().getTags().size());
 
     // Check each tag in the field layout
@@ -40,7 +40,7 @@ public class AprilTagPoseTest {
 
       // Get the poses from the two sources
       // From the ArrayList<AprilTag> source
-      AprilTag apriltag1 = FieldConstants.APRIL_TAGS.get(i);
+      AprilTag apriltag1 = VisionConstants.field.getTags().get(i);
       Pose3d p1 = apriltag1.pose;
       // From the vision source
       Pose3d p2 = vision.getTagPose(tagId);
@@ -60,17 +60,17 @@ public class AprilTagPoseTest {
 
       // 1-11 should be on the right, and 12-22 should be on the left
       if(tagId > 11){
-        assertTrue(p1.getX() < FieldConstants.FIELD_LENGTH/2);
+        assertTrue(p1.getX() < VisionConstants.field.getFieldLength()/2);
       }else{
-        assertTrue(p1.getX() > FieldConstants.FIELD_LENGTH/2);
+        assertTrue(p1.getX() > VisionConstants.field.getFieldLength()/2);
       }
     }
   }
 
   @Test
   public void testReefTags(){
-    List<Pose3d> redPoses = FieldConstants.APRIL_TAGS.subList(5, 11).stream().map(tag->tag.pose).toList();
-    List<Pose3d> bluePoses = FieldConstants.APRIL_TAGS.subList(16, 22).stream().map(tag->tag.pose).toList();
+    List<Pose3d> redPoses = VisionConstants.field.getTags().subList(5, 11).stream().map(tag->tag.pose).toList();
+    List<Pose3d> bluePoses = VisionConstants.field.getTags().subList(16, 22).stream().map(tag->tag.pose).toList();
     Pose3d redCenter = findCenter(redPoses);
     Pose3d blueCenter = findCenter(bluePoses);
     
@@ -87,16 +87,16 @@ public class AprilTagPoseTest {
     assertEquals(redCenter.getZ(), blueCenter.getZ(), 0.0001);
 
     // X should be mirrored
-    assertEquals(redCenter.getX(), FieldConstants.FIELD_LENGTH-blueCenter.getX(), 0.01);
+    assertEquals(redCenter.getX(), VisionConstants.field.getFieldLength()-blueCenter.getX(), 0.01);
 
     // Compare each matching pair of tags
     for(int i = 5; i < 11; i++){
-      Pose3d red = FieldConstants.APRIL_TAGS.get(i).pose;
-      Pose3d blue = FieldConstants.APRIL_TAGS.get(i+11).pose;
+      Pose3d red = VisionConstants.field.getTagPose(i+1).get();
+      Pose3d blue = VisionConstants.field.getTagPose(i+12).get();
       assertEquals(red.getY(), blue.getY(), 0.0001);
       assertEquals(red.getZ(), blue.getZ(), 0.0001);
       assertEquals(red.getZ(), redCenter.getZ(), 0.0001);
-      assertEquals(red.getX(), FieldConstants.FIELD_LENGTH-blue.getX(), 0.01);
+      assertEquals(red.getX(), VisionConstants.field.getFieldLength()-blue.getX(), 0.01);
       assertEquals(MathUtil.angleModulus(red.getRotation().getZ()), MathUtil.angleModulus(Math.PI-blue.getRotation().getZ()), 0.0001);
     }
   }
