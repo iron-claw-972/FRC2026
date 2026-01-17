@@ -16,6 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
@@ -28,6 +29,9 @@ public class TrenchAssist extends Command {
 
     protected final Drivetrain drive;
     protected final BaseDriverConfig driver;
+
+    private boolean trenchAlign;
+    private boolean trenchAssist;
 
     public TrenchAssist(
             Drivetrain swerve,
@@ -45,6 +49,13 @@ public class TrenchAssist extends Command {
 
     @Override
     public void execute() {
+        trenchAlign = SmartDashboard.getBoolean("trench aligning", trenchAlign);
+        trenchAssist = SmartDashboard.getBoolean("trench aligning", trenchAssist);
+
+        SmartDashboard.putBoolean("trench aligning", trenchAlign);
+        SmartDashboard.putBoolean("trench assisting", trenchAssist);
+
+
         double forwardTranslation = driver.getForwardTranslation();
         double sideTranslation = driver.getSideTranslation();
         double rotation = -driver.getRotation();
@@ -62,25 +73,31 @@ public class TrenchAssist extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(drive, driverInput, drive.getDesiredPose(), true);
 
-        for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
-            if (rectangle.contains(drive.getPose().getTranslation())){
-                drive.setIsAlign(true);
+        if (trenchAlign) {
+            for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
+                if (rectangle.contains(drive.getPose().getTranslation())){
+                    drive.setIsAlign(true);
 
-                if (drive.getPose().getRotation().getDegrees() > 90 && drive.getPose().getRotation().getDegrees() < 270){
-                    drive.setAlignAngle(0.0);
-                } else if (drive.getPose().getRotation().getDegrees() > 270 && drive.getPose().getRotation().getDegrees() < 90){
-                    drive.setAlignAngle(Units.degreesToRadians(180));
+                    if (drive.getPose().getRotation().getDegrees() > 90 && drive.getPose().getRotation().getDegrees() < 270){
+                        drive.setAlignAngle(0.0);
+                    } else if (drive.getPose().getRotation().getDegrees() > 270 && drive.getPose().getRotation().getDegrees() < 90){
+                        drive.setAlignAngle(Units.degreesToRadians(180));
+                    }
+                } else {
+                    drive.setIsAlign(false);
                 }
-            } else {
-                drive.setIsAlign(false);
             }
         }
 
-        Translation2d calculated = calculateCorrection(TrenchAssistConstants.OBSTACLES);
-        ChassisSpeeds assisted = new ChassisSpeeds(corrected.vxMetersPerSecond + calculated.getX(), 
-            corrected.vyMetersPerSecond + calculated.getY(), corrected.omegaRadiansPerSecond);
+        if (trenchAssist){
+            Translation2d calculated = calculateCorrection(TrenchAssistConstants.OBSTACLES);
+            ChassisSpeeds assisted = new ChassisSpeeds(corrected.vxMetersPerSecond + calculated.getX(), 
+                corrected.vyMetersPerSecond + calculated.getY(), corrected.omegaRadiansPerSecond);
 
-        drive(assisted);
+            drive(assisted);
+        } else {
+            drive(corrected);
+        }
 
     }
 
