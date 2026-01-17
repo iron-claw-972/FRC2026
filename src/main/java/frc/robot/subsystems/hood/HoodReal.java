@@ -59,8 +59,6 @@ public class HoodReal extends HoodBase implements HoodIO {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
-    // for calculating angle
-
     private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
 
     public HoodReal() {
