@@ -42,7 +42,7 @@ public class Turret extends SubsystemBase {
     private SingleJointedArmSim turretSim;
     private static final DCMotor turretMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(0) * 1); // 1 is placeholder for gear ratio
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(0) * gearRatio); // gear ratio
     private double setpoint = 0;
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
@@ -70,7 +70,7 @@ public class Turret extends SubsystemBase {
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = 40;
+        limitConfig.StatorCurrentLimit = 200;
         limitConfig.StatorCurrentLimitEnable = true;
 
         motor.getConfigurator().apply(limitConfig);
@@ -86,20 +86,29 @@ public class Turret extends SubsystemBase {
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
         
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.degreesToRotations(0.1) * gearRatio; // max velocity * gear ratio
-        motionMagicConfigs.MotionMagicAcceleration = Units.degreesToRotations(0.1) * gearRatio; // max Acceleration * gear ratio
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.degreesToRotations(90) * gearRatio; // max velocity * gear ratio
+        motionMagicConfigs.MotionMagicAcceleration = Units.degreesToRotations(90) * gearRatio; // max Acceleration * gear ratio
 
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         motor.getConfigurator().apply(config);
 
-        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        // config.ClosedLoopGeneral.ContinuousWrap = true;
+
+        motor.getConfigurator().apply(config);
+
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(360) * gearRatio; // max angle * gear ratio
         
-        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(0) * gearRatio; // min angle * gear ratio
         
         SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
+
+        SmartDashboard.putData("Set to 0 degrees", new InstantCommand(() -> setSetpoint(0)));
+        SmartDashboard.putData("Set to 90 degrees", new InstantCommand(( )-> setSetpoint(90)));
+        SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180)));
+        SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270)));
 
         SmartDashboard.putData("Set to 1,1", new InstantCommand(() -> setTarget(1,1)));
         SmartDashboard.putData("Set to -1,1", new InstantCommand(( )-> setTarget(-1,1)));
@@ -124,13 +133,17 @@ public class Turret extends SubsystemBase {
          return motor.getPosition().getValueAsDouble() / gearRatio; // Gear ratio
     }
 
-    public void setSetpoint(double setpointDegrees) {
-        // If you want to handle the wrap-around ( -180 to 180)
-        double clampedSetpoint = MathUtil.inputModulus(setpointDegrees, -180, 180);
-        this.setpoint = clampedSetpoint;
+    // public void setSetpoint(double setpointDegrees) {
+    //     double clampedSetpoint = MathUtil.inputModulus(setpointDegrees, 0, 360);
+    //     this.setpoint = clampedSetpoint;
     
-        // Convert mechanism degrees to motor rotations: (Degrees / 360) * GearRatio
-        double motorTargetRotations = (clampedSetpoint / 360.0) * gearRatio;
+    //     // Convert mechanism degrees to motor rotations: (Degrees / 360) * GearRatio
+    //     double motorTargetRotations = (clampedSetpoint / 360.0) * gearRatio;
+    //     motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+    // }
+
+    public void setSetpoint(double setpointDegrees) {
+        double motorTargetRotations = (setpointDegrees / 360.0) * gearRatio;
         motor.setControl(voltageRequest.withPosition(motorTargetRotations));
     }
 
@@ -147,7 +160,6 @@ public class Turret extends SubsystemBase {
         // SmartDashboard.putNumber("Turret Position", position);
         // align();
         ligament2d.setAngle(position);
-
     }
 
     public double getAppliedVoltage() {
