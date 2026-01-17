@@ -6,6 +6,7 @@ import java.util.List;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class FieldConstants {
@@ -43,4 +44,7 @@ public class FieldConstants {
     new AprilTag(21, new Pose3d(Units.inchesToMeters(209.49), Units.inchesToMeters(158.50), Units.inchesToMeters(12.13), new Rotation3d(0, 0, 0))),
     new AprilTag(22, new Pose3d(Units.inchesToMeters(193.10), Units.inchesToMeters(130.17), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(300))))
   ));
+
+  public static final Translation3d HUB_TRANSLATION3D = new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72));
+
 }

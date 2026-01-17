@@ -14,9 +14,9 @@ public class ShooterPhysics {
 	};
 
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target,
-			double height) {
+			double peakHeight) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
-		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
 
 		Translation2d as2d = exitVel.toTranslation2d();
 		Rotation2d yaw = as2d.getAngle();

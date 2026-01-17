@@ -121,7 +121,7 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
     }
 
     public boolean atTargetSpeed() {
-        return ((shooterTargetSpeed - shooterMotorLeft.getVelocity().getValueAsDouble())) < 0.5;
+        return ((shooterTargetSpeed - shooterMotorLeft.getVelocity().getValueAsDouble())) < ShooterConstants.EXIT_VELOCITY_TOLERANCE;
     }
 
     @Override

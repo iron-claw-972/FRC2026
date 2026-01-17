@@ -4,9 +4,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.FieldConstants;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.hood.HoodBase;
 import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
@@ -18,6 +19,8 @@ public class AutoShoot extends Command {
     TurretState target_state;
 
     boolean atTarget;
+    // apex of parabola in meters
+    double peakHeight = 10.0;
 
     public AutoShoot(Drivetrain drive, HoodReal hood, ShooterReal shooter) {
         this.drive = drive;
@@ -31,14 +34,9 @@ public class AutoShoot extends Command {
                 new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                         drive.getChassisSpeeds().vyMetersPerSecond),
                 drive.getPose().getTranslation(),
-                new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72)),
-                4);
-
-        if (Units.degreesToRadians(0) < target_state.pitch()) {
-
-        } else if (Units.degreesToRadians(0) > target_state.pitch()) {
-
-        }
+                FieldConstants.HUB_TRANSLATION3D,
+                peakHeight);
+                
         hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
         shooter.setShooter(target_state.exitVel());
         drive.setIsAlign(true);
@@ -51,16 +49,15 @@ public class AutoShoot extends Command {
                 new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                         drive.getChassisSpeeds().vyMetersPerSecond),
                 drive.getPose().getTranslation(),
-                new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72)),
-                4);
+                FieldConstants.HUB_TRANSLATION3D,
+                peakHeight);
 
         hood.setSetpoint(target_state.pitch());
         shooter.setShooter(target_state.exitVel());
         drive.setAlignAngle(target_state.yaw().getRadians());
 
-
         if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
-            shooter.setFeeder(1);
+            shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
         } else {
             shooter.setFeeder(0);
         }

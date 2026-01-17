@@ -10,6 +10,9 @@ public class ShooterConstants {
     public static final double SHOOTER_RUN_POWER = 0.3;
     public static final double SENSOR_DISTANNCE_THRESHOLD = 0.150; // meters
     public static final double SENSOR_AMBIENCE_THRESHOLD = 0.100; // meters
+
+    // in m/s
+    public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
 }
 // 8 velcocity is too little
 // 16 is too much
