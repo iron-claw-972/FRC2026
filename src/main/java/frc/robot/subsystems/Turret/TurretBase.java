@@ -18,6 +18,8 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class TurretBase extends SubsystemBase {
+    private double target_x = 1;
+    private double target_y = 0;
     private TalonFX motor; 
     private final DigitalInput sensor = new DigitalInput(0); 
     double power;
@@ -45,7 +47,7 @@ public class TurretBase extends SubsystemBase {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50,50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret", 25, 0));
 
-    public TurretBase() { 
+    public TurretBase() {
         motor = new TalonFX(IdConstants.BASE_MOTOR_ID);
         encoderSim = motor.getSimState();
         pid.setTolerance(Units.degreesToRadians(2));
@@ -62,7 +64,7 @@ public class TurretBase extends SubsystemBase {
             false,
             Units.degreesToRadians(-360)
         );
-            
+        
         SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
         SmartDashboard.putBoolean("Calibrated", motorCalibrated);
@@ -73,6 +75,11 @@ public class TurretBase extends SubsystemBase {
         SmartDashboard.putData("Set 0 degrees", new InstantCommand(() -> spinTo(0)));
         SmartDashboard.putData("Set 270 degrees", new InstantCommand(() -> spinTo(270)));
 
+        SmartDashboard.putData("Set target (1,1)", new InstantCommand(() -> setTarget(1, 1)));
+        SmartDashboard.putData("Set target (-1,1)", new InstantCommand(() -> setTarget(-1, 1)));
+        SmartDashboard.putData("Set target (-1,-1)", new InstantCommand(() -> setTarget(-1, -1)));
+        SmartDashboard.putData("Set target (1,-1)", new InstantCommand(() -> setTarget(1, -1)));
+
         pid.enableContinuousInput(-Math.PI, Math.PI);
 
     }
@@ -80,6 +87,11 @@ public class TurretBase extends SubsystemBase {
     /** position in degrees of the turret not the turret motor */
     public double getPosition(){
         return position;
+    }
+
+    public void setTarget(double x, double y) {
+        target_x = x;
+        target_y = y;
     }
 
     /** 
@@ -130,11 +142,9 @@ public class TurretBase extends SubsystemBase {
             /** feeding the PID radians */
             power = pid.calculate(Units.degreesToRadians(getPosition()));
             motor.set(power);
-            System.out.println(power);
-            System.out.println("Check " + motor.get());
             sensorTriggered = sensor.get();
-    
             ligament2d.setAngle(position);
+            spinTo(Units.radiansToDegrees(Math.atan2(target_y,target_x)));
         }
     }
 
@@ -145,7 +155,6 @@ public class TurretBase extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         double voltsMotor = power * 12;
-        System.out.println("Motor " + voltsMotor);
         turretSim.setInputVoltage(voltsMotor);
 
         turretSim.update(Constants.LOOP_TIME);
@@ -153,7 +162,6 @@ public class TurretBase extends SubsystemBase {
         double simAngle = turretSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * gearRatio;
-        System.out.println("Rotations " + motorRotations);
         
         encoderSim.setRawRotorPosition(motorRotations);
     }
