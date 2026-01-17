@@ -63,7 +63,7 @@ public class RobotContainer {
 
       default:
 
-      case Wafflehouse:
+      case WaffleHouse:
       
       case SwerveCompetition:
 
