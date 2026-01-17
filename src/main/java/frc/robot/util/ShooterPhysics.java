@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.constants.Constants;
 
-class ShooterPhysics {
+public class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// exit velocity speed in m/s
 	public record TurretState(Rotation2d yaw, double pitch, double exitVel) {

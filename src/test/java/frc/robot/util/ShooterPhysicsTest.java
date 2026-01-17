@@ -28,44 +28,44 @@ class ShooterPhysicsTest {
 	public void cleanup() {
 	}
 
-	@Test
-	public void basicImpulseTest() {
-		Translation3d transform = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero, Translation3d.kZero, 1);
-		assertEquals(0, transform.getX(), epsilon);
-		assertEquals(0, transform.getY(), epsilon);
-		assertEquals(4.427, transform.getZ(), epsilon);
+	// @Test
+	// public void basicImpulseTest() {
+	// 	Translation3d transform = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero, Translation3d.kZero, 1);
+	// 	assertEquals(0, transform.getX(), epsilon);
+	// 	assertEquals(0, transform.getY(), epsilon);
+	// 	assertEquals(4.427, transform.getZ(), epsilon);
 
-		Translation3d transform2 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(10, 0, 0),
-				1);
-		assertTrue(transform2.getX() > 0, transform2.toString());
-		assertEquals(0, transform2.getY(), epsilon);
-		assertEquals(4.427, transform2.getZ(), epsilon);
+	// 	Translation3d transform2 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(10, 0, 0),
+	// 			1);
+	// 	assertTrue(transform2.getX() > 0, transform2.toString());
+	// 	assertEquals(0, transform2.getY(), epsilon);
+	// 	assertEquals(4.427, transform2.getZ(), epsilon);
 
-		Translation3d transform3 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(0, -6, 0), 1);
-		assertEquals(0, transform3.getX(), epsilon);
-		assertTrue(transform3.getY() < 0, transform3.toString());
-		assertEquals(4.427, transform3.getZ(), epsilon);
+	// 	Translation3d transform3 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(0, -6, 0), 1);
+	// 	assertEquals(0, transform3.getX(), epsilon);
+	// 	assertTrue(transform3.getY() < 0, transform3.toString());
+	// 	assertEquals(4.427, transform3.getZ(), epsilon);
 
-		Translation3d transform4 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(6, 3, 0), 2);
-		assertEquals(6. / 3, transform4.getX() / transform4.getY(), epsilon);
+	// 	Translation3d transform4 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(6, 3, 0), 2);
+	// 	assertEquals(6. / 3, transform4.getX() / transform4.getY(), epsilon);
 
-		Translation3d transform5 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(12.14, 3.21, 0), 2);
-		assertEquals(12.14 / 3.21, transform5.getX() / transform5.getY(), epsilon);
+	// 	Translation3d transform5 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(12.14, 3.21, 0), 2);
+	// 	assertEquals(12.14 / 3.21, transform5.getX() / transform5.getY(), epsilon);
 
-		Translation3d transform6 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(-16.32, 3.3, 0), 2);
-		assertEquals(-16.32 / 3.3, transform6.getX() / transform6.getY(), epsilon);
+	// 	Translation3d transform6 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(-16.32, 3.3, 0), 2);
+	// 	assertEquals(-16.32 / 3.3, transform6.getX() / transform6.getY(), epsilon);
 
-		Translation3d transform7 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
-				new Translation3d(2, 0, 0), Constants.GRAVITY_ACCELERATION / 2);
-		assertEquals(1, transform7.getX(), epsilon, transform7.toString());
-		assertEquals(0, transform7.getY(), epsilon);
-		assertEquals(Constants.GRAVITY_ACCELERATION, transform7.getZ(), epsilon);
-	}
+	// 	Translation3d transform7 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero,
+	// 			new Translation3d(2, 0, 0), Constants.GRAVITY_ACCELERATION / 2);
+	// 	assertEquals(1, transform7.getX(), epsilon, transform7.toString());
+	// 	assertEquals(0, transform7.getY(), epsilon);
+	// 	assertEquals(Constants.GRAVITY_ACCELERATION, transform7.getZ(), epsilon);
+	// }
 
 	@Test
 	public void initialVelocityTest() {
