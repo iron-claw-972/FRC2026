@@ -82,7 +82,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             driver.get(PS5Button.LB).onTrue(
             new SequentialCommandGroup(
                 new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-                new WaitCommand(0.4),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
             )
             ).onFalse(
