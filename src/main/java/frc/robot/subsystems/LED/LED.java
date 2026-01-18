@@ -1,6 +1,7 @@
 package frc.robot.subsystems.LED;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 import com.ctre.phoenix.led.CANdle;
@@ -15,7 +16,7 @@ public class LED extends SubsystemBase {
 
     // Constructor
     public LED() {
-        this.candle = new CANdle(IdConstants.CANDLE_ID, "rio");
+        this.candle = new CANdle(IdConstants.CANDLE_ID);
 
         candle.configStatusLedState(false);
         candle.configLOSBehavior(false);
