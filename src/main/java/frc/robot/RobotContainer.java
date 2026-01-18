@@ -13,12 +13,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.DefaultHoodCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
@@ -118,7 +115,6 @@ public class RobotContainer {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
-        //hood.setDefaultCommand(new DefaultHoodCommand(hood, drive));
         break;
       }
 

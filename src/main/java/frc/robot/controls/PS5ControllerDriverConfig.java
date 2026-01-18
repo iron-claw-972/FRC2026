@@ -4,26 +4,18 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
-import frc.robot.commands.DoNothing;
-import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.HoodConstants;
-import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -53,12 +45,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
-    private boolean rumbleEnabled = false;
-    private boolean alignWithTrench = false;
 
-    // Turn on for alignment to the tag
-    private Pose2d alignmentPose = null;
-    private double HOOD_SETPOINT = HoodConstants.START_ANGLE;
     int intakeInt = 1;
 
     public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeReal intake) {
@@ -87,24 +74,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
-        // Toggle rumble on/off
-        driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
-            rumbleEnabled = !rumbleEnabled;
-            if (rumbleEnabled) {
-                startRumble();
-            } else {
-                endRumble();
-            }
-        }));
-
         if (intake != null && shooter != null) {
-
-            // driver.get(PS5Button.LEFT_TRIGGER).onFalse(
-            // new InstantCommand(()-> {
-            // hood.resetDueToSlippingError();
-            // })
-            // );
-
             // shoots it
             driver.get(PS5Button.LB).onTrue(
                     new SequentialCommandGroup(
@@ -117,25 +87,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             }));
 
         }
-
-        driver.get(PS5Button.RB).onTrue(
-                new InstantCommand(() -> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY,
-                        HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))))
-                .onFalse(
-                        new InstantCommand(() -> {
-                            shooter.deactivateShooterAndFeeder();
-                        }));
-
-        // aim hood and drive
-        driver.get(PS5Button.SQUARE).onTrue(
-                new SequentialCommandGroup(
-                        new InstantCommand(() -> setAlignmentPose()),
-                        new ParallelCommandGroup(
-                                new DriveToPose(getDrivetrain(), () -> alignmentPose),
-                                new InstantCommand(() -> hood.setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY,
-                                        HoodConstants.TARGET_HEIGHT, hood.calculateDistanceToTarget(alignmentPose))))));
-
-        if (intake != null) {
+            //Intake
             driver.get(PS5Button.CROSS).onTrue(
                     new InstantCommand(() -> {
                         if (intakeBall != null && intakeBall.isScheduled()) {
@@ -144,21 +96,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             intakeBall = new IntakeBall(intake, shooter);
                             intakeBall.schedule();
                         }
-                    }));
-
-            driver.get(PS5Button.CIRCLE).onTrue(
-                    new InstantCommand(() -> {
-                        intake.outtakeFlyWheel();
-                    }));
-
-            // driver.get(PS5Button.TRIANGLE).onTrue(
-            // new InstantCommand(() -> {
-            // intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
-            // })
-            // );
-            driver.get(PS5Button.TRIANGLE).onTrue(
-                    new InstantCommand(() -> {
-                        toggleAlignWithTrench();
                     }));
         }
 
@@ -180,19 +117,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // alignmentPose = null;
         // CommandScheduler.getInstance().cancelAll();
         // }));
-    }
-
-    public void setAlignmentPose() {
-        Translation2d drivepose = getDrivetrain().getPose().getTranslation();
-        // Uses tag #17
-        int tagNumber = 17;
-        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
-        double YDifference = tagpose.getY() - drivepose.getY();
-        double XDifference = tagpose.getX() - drivepose.getX();
-        double angle = Math.atan(YDifference / XDifference);
-        alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
-        System.out.println("Alignment Angle: " + Units.radiansToDegrees(angle));
-    }
 
     @Override
     public double getRawSideTranslation() {
@@ -231,18 +155,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public boolean getAlignWithTrench() {
-        return alignWithTrench;
-    }
-
-    public void toggleAlignWithTrench() {
-        alignWithTrench = !alignWithTrench;
-    }
-
-    public void startRumble() {
-        driver.rumbleOn();
-    }
-
-    public void endRumble() {
-        driver.rumbleOff();
+        return false;
     }
 }
