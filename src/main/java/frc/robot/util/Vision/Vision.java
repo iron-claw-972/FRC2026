@@ -436,11 +436,8 @@ public class Vision {
       camera = new PhotonCamera(cameraName);
       photonPoseEstimator = new PhotonPoseEstimator(
         aprilTagFieldLayout, 
-        VisionConstants.POSE_STRATEGY, 
         robotToCam
       );
-      photonPoseEstimator.setMultiTagFallbackStrategy(VisionConstants.MULTITAG_FALLBACK_STRATEGY);
-      photonPoseEstimator.setReferencePose(new Pose2d());
       lastPose = null;
     }
   
@@ -450,7 +447,6 @@ public class Vision {
      * @return estimated robot poses
      */
     public ArrayList<EstimatedRobotPose> getEstimatedPose(Pose2d referencePose) {
-      photonPoseEstimator.setReferencePose(referencePose);
 
       ArrayList<EstimatedRobotPose> list = new ArrayList<>();
 
@@ -479,8 +475,33 @@ public class Vision {
         }
 
         // Set strategy to single tag if there is only 1 good tag and update
-        photonPoseEstimator.setPrimaryStrategy(targetsUsed.size() > 1  ? VisionConstants.POSE_STRATEGY : VisionConstants.MULTITAG_FALLBACK_STRATEGY);
-        Optional<EstimatedRobotPose> pose = photonPoseEstimator.update(cameraResult);
+        PhotonPoseEstimator.PoseStrategy poseStrategy = targetsUsed.size() > 1  ? VisionConstants.POSE_STRATEGY : VisionConstants.MULTITAG_FALLBACK_STRATEGY;
+		Optional<EstimatedRobotPose> pose;
+		switch (poseStrategy) {
+			case AVERAGE_BEST_TARGETS:
+				pose = photonPoseEstimator.estimateAverageBestTargetsPose(cameraResult);
+				break;
+			case CLOSEST_TO_CAMERA_HEIGHT:
+				pose = photonPoseEstimator.estimateClosestToCameraHeightPose(cameraResult);
+				break;
+			case CLOSEST_TO_REFERENCE_POSE:
+				pose = photonPoseEstimator.estimateClosestToReferencePose(cameraResult, new Pose3d(referencePose));
+				break;
+			case LOWEST_AMBIGUITY:
+				pose = photonPoseEstimator.estimateLowestAmbiguityPose(cameraResult);
+				break;
+			case MULTI_TAG_PNP_ON_COPROCESSOR:
+				pose = photonPoseEstimator.estimateCoprocMultiTagPose(cameraResult);
+				break;
+			case PNP_DISTANCE_TRIG_SOLVE:
+				pose = photonPoseEstimator.estimatePnpDistanceTrigSolvePose(cameraResult);
+				break;
+			case CLOSEST_TO_LAST_POSE:
+			case CONSTRAINED_SOLVEPNP:
+			case MULTI_TAG_PNP_ON_RIO:
+			default:
+				throw new RuntimeException("Pose estimation method " + poseStrategy.toString() + " is not supported.");
+		}
         
         if(pose.isPresent() && pose.get()!=null && onField(pose.get().estimatedPose.toPose2d())){
           double timestamp = cameraResult.getTimestampSeconds();
