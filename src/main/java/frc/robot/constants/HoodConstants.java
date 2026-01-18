@@ -30,8 +30,6 @@ public class HoodConstants {
 
     public static final Translation2d TRANSLATION_TARGET = new Translation2d(0, 0);
     public static final Rotation2d ROTATION_TARGET_ANGLE = new Rotation2d();
-    public static final int tagNumber = 18;
-    public static final Pose2d TARGET_POSITION = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d(); // meters
     // Other
     public static final double INITIAL_VELOCTIY = 14.9; // meters per second
 

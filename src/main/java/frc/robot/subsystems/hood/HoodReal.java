@@ -59,8 +59,6 @@ public class HoodReal extends HoodBase implements HoodIO {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
-    // for calculating angle
-
     private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
 
     public HoodReal() {
@@ -166,18 +164,6 @@ public class HoodReal extends HoodBase implements HoodIO {
     
     public double getSetpoint() {
         return setpoint;
-    }
-
-    // assuming we are aligned of course, but I need to switch if we don't have a turret
-    // technically, we should have the drivetrain now the distance at all times, and we can grab that instead
-    public double calculateDistanceToTarget(Pose2d robotPose) {
-        double dx = HoodConstants.TARGET_POSITION.getX() - robotPose.getX();
-        double dy = HoodConstants.TARGET_POSITION.getY() - robotPose.getY();
-        return Math.hypot(dx, dy);
-    }
-
-    public void aimToTarget(Pose2d robotPose) {
-        setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, calculateDistanceToTarget(robotPose));
     }
 
     public void setDistance(double distance) {

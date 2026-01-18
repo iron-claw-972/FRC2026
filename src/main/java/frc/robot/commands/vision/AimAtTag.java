@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.FieldConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /**
@@ -39,7 +39,7 @@ public class AimAtTag extends Command {
     double dist = Double.POSITIVE_INFINITY;
     Translation2d closest = new Translation2d();
     Translation2d driveTranslation = drive.getPose().getTranslation();
-    for(AprilTag tag : FieldConstants.APRIL_TAGS){
+    for(AprilTag tag : VisionConstants.field.getTags()){
       Translation2d translation = tag.pose.toPose2d().getTranslation();
       double dist2 = driveTranslation.getDistance(translation);
       if(dist2 < dist){

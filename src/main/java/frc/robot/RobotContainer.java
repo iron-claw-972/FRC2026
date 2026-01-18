@@ -13,23 +13,20 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.DefaultHoodCommand;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.Shooter.shooterReal;
+import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.HoodReal;
-import frc.robot.subsystems.intake.IntakeReal;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -48,8 +45,8 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private HoodReal hood = null;
-  private IntakeReal intake = null;
-  private shooterReal shooter = null;
+  private IntakeAlpha intake = null;
+  private ShooterReal shooter = null;
   private Command auto = new DoNothing(); 
 
   // Controllers are defined here
@@ -90,8 +87,8 @@ public class RobotContainer {
       case WaffleHouse:
       if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
       hood = new HoodReal();
-      intake = new IntakeReal();
-      shooter = new shooterReal();
+      intake = new IntakeAlpha();
+      shooter = new ShooterReal();
 
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
@@ -118,7 +115,6 @@ public class RobotContainer {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
-        //hood.setDefaultCommand(new DefaultHoodCommand(hood, drive));
         break;
       }
 
