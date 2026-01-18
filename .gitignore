@@ -183,3 +183,6 @@ logs/
 # I don't know what this is but it has local paths in it
 .factorypath
 
+# File that has git and version data
+src/main/java/frc/robot/util/BuildData.java
+

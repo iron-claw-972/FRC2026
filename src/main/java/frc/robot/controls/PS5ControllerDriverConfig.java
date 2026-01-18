@@ -2,9 +2,7 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -14,9 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AlphaIntakeBall;
-import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.constants.Constants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -98,7 +94,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             intakeBall.cancel();
                         } else {
                             intakeBall = new AlphaIntakeBall(intake);
-                            intakeBall.schedule();
+                            CommandScheduler.getInstance().schedule(intakeBall);
                         }
                     }));
         }
