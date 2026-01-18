@@ -1,16 +1,17 @@
 package frc.robot.util;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.constants.Constants;
 
@@ -83,7 +84,7 @@ public class MotorFactory {
      *                               the threshold before triggering
      * @return A fully configured TalonFX
      */
-    public static TalonFX createTalonFXFull(int id, String CANBus, boolean StatorLimitEnable,
+    public static TalonFX createTalonFXFull(int id, CANBus CANBus, boolean StatorLimitEnable,
                                                 double StatorCurrentLimit,
                                                 double StatorTriggerThreshold, double StatorTriggerDuration, boolean SupplyLimitEnable, double SupplyCurrentLimit,
                                                 double SupplyTriggerThreshold, double SupplyTriggerDuration) {
@@ -116,7 +117,7 @@ public class MotorFactory {
      * @param id     the id of the motor
      * @param CANBus the CAN bus the TalonFX is on. If connected to the rio it is "rio".
      */
-    public static TalonFX createTalonFX(int id, String CANBus) {
+    public static TalonFX createTalonFX(int id, CANBus CANBus) {
         return createTalonFXFull(id, CANBus, Constants.TALONFX_STATOR_LIMIT_ENABLE, Constants.TALONFX_STATOR_CURRENT_LIMIT,
                                  Constants.TALONFX_STATOR_TRIGGER_THRESHOLD, Constants.TALONFX_STATOR_TRIGGER_DURATION,
                                  Constants.TALONFX_SUPPLY_LIMIT_ENABLE, Constants.TALONFX_SUPPLY_CURRENT_LIMIT,
@@ -135,7 +136,7 @@ public class MotorFactory {
      * @param triggerThreshold the threshold current to trigger the supply limit
      * @param triggerDuration  the duration, in seconds, the current is above the threshold before triggering
      */
-    public static TalonFX createTalonFXSupplyLimit(int id, String CANBus, double currentLimit,
+    public static TalonFX createTalonFXSupplyLimit(int id, CANBus CANBus, double currentLimit,
                                                        double triggerThreshold, double triggerDuration) {
         return createTalonFXFull(id, CANBus, Constants.TALONFX_STATOR_LIMIT_ENABLE, Constants.TALONFX_STATOR_CURRENT_LIMIT,
                                  Constants.TALONFX_STATOR_TRIGGER_THRESHOLD, Constants.TALONFX_STATOR_TRIGGER_DURATION, true, currentLimit,
@@ -154,7 +155,7 @@ public class MotorFactory {
      * @param triggerThreshold the threshold current to trigger the stator limit
      * @param triggerDuration  the duration, in seconds, the current is above the threshold before triggering
      */
-    public static TalonFX createTalonFXStatorLimit(int id, String CANBus, double currentLimit,
+    public static TalonFX createTalonFXStatorLimit(int id, CANBus CANBus, double currentLimit,
                                                        double triggerThreshold, double triggerDuration) {
         return createTalonFXFull(id, CANBus, true, currentLimit, triggerThreshold, triggerDuration,
                                  Constants.TALONFX_SUPPLY_LIMIT_ENABLE, Constants.TALONFX_SUPPLY_CURRENT_LIMIT,
