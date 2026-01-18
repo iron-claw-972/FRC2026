@@ -12,7 +12,7 @@ public class AlphaIntakeBall extends Command {
 
     @Override
     public void initialize(){
-        intake.setPower(1);
+        intake.setPower(-1);
     }
 
     @Override

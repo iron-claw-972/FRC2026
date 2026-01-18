@@ -16,13 +16,13 @@ public class HoodConstants {
     public static final double CENTER_OF_MASS_LENGTH = 0.138; // meters
 
     // public static final double MAX_VELOCITY = 5; // rad/s
-    public static final double MAX_VELOCITY = 0.15; // rad/s
+    public static final double MAX_VELOCITY = 0.30; // rad/s
     public static final double MAX_ACCELERATION = 30; // rad/s^2
 
-    public static final double MAX_ANGLE = 48.48; // degrees
-    public static final double MIN_ANGLE = 29.77; // degrees
+    public static final double MAX_ANGLE = 34.5; // degrees
+    public static final double MIN_ANGLE = 23.1; // degrees
     
-    public static final double START_ANGLE = 51.48; // degrees
+    public static final double START_ANGLE = 34.5; // degrees
 
     // Arena dimensions
     public static final double TARGET_HEIGHT = 2.44; // meters

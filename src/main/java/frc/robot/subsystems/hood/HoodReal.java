@@ -149,7 +149,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     public void setSetpoint(double setpoint) {
         double error = MathUtil.inputModulus(setpoint - getPosition(), -180.0, 180.0);
         double shortestDeg = getPosition() + error;
-        this.setpoint = shortestDeg;
+        this.setpoint = MathUtil.clamp(shortestDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         
         // command the controller with the *wrapped* target
         double motorTargetRotations = Units.degreesToRotations(shortestDeg) * HoodConstants.HOOD_GEAR_RATIO;
