@@ -12,6 +12,7 @@ public class Constants {
 
     // CAN bus names
     public static final String CANIVORE_CAN = "CANivore";
+    public static final String SUBSYSTEM_CANIVORE_CAN = "CANivoreSub";
     public static final String RIO_CAN = "rio";
 
     // Logging 

@@ -24,6 +24,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
@@ -43,6 +44,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Turret turret = null;
+  private Shooter shooter = null;
   private Command auto = new DoNothing();
 
   // Controllers are defined here
@@ -56,6 +58,7 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     turret = new Turret();
+    shooter = new Shooter();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
