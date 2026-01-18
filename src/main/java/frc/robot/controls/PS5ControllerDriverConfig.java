@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.AlphaIntakeBall;
 import frc.robot.commands.gpm.IntakeBall;
 import frc.robot.constants.Constants;
 import frc.robot.constants.HoodConstants;
@@ -20,7 +21,7 @@ import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.HoodReal;
-import frc.robot.subsystems.intake.IntakeReal;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -41,14 +42,14 @@ import lib.controllers.PS5Controller.PS5Button;
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private HoodReal hood;
     private ShooterReal shooter;
-    private IntakeReal intake;
+    private IntakeAlpha intake;
     private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
 
     int intakeInt = 1;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeReal intake) {
+    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeAlpha intake) {
         super(drive);
         this.hood = hood;
         this.shooter = shooter;
@@ -93,7 +94,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         if (intakeBall != null && intakeBall.isScheduled()) {
                             intakeBall.cancel();
                         } else {
-                            intakeBall = new IntakeBall(intake, shooter);
+                            intakeBall = new AlphaIntakeBall(intake);
                             intakeBall.schedule();
                         }
                     }));

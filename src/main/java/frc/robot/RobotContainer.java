@@ -26,7 +26,7 @@ import frc.robot.subsystems.Shooter.ShooterReal;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.HoodReal;
-import frc.robot.subsystems.intake.IntakeReal;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -45,7 +45,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private HoodReal hood = null;
-  private IntakeReal intake = null;
+  private IntakeAlpha intake = null;
   private ShooterReal shooter = null;
   private Command auto = new DoNothing(); 
 
@@ -87,7 +87,7 @@ public class RobotContainer {
       case WaffleHouse:
       if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
       hood = new HoodReal();
-      intake = new IntakeReal();
+      intake = new IntakeAlpha();
       shooter = new ShooterReal();
 
       case Vertigo:
