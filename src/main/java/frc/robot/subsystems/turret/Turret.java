@@ -113,10 +113,10 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
 
-        SmartDashboard.putData("Set to 0 degrees", new InstantCommand(() -> setSetpoint(0)));
-        SmartDashboard.putData("Set to 90 degrees", new InstantCommand(( )-> setSetpoint(90)));
-        SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180)));
-        SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270)));
+        SmartDashboard.putData("Set to 0 degrees", new InstantCommand(() -> setSetpoint(0, 0)));
+        SmartDashboard.putData("Set to 90 degrees", new InstantCommand(( )-> setSetpoint(90, 0)));
+        SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180, 0)));
+        SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270, 0)));
 
         // SmartDashboard.putData("Set to 1,1", new InstantCommand(() -> setTarget(1,1)));
         // SmartDashboard.putData("Set to -1,1", new InstantCommand(( )-> setTarget(-1,1)));
@@ -157,12 +157,19 @@ public class Turret extends SubsystemBase {
          return motor.getPosition().getValueAsDouble() / gearRatio; // Gear ratio
     }
 
-    public void setSetpoint(double setpointDegrees) {
+    public boolean atSetPoint(){
+        return Math.abs(getPosition() - setpoint) < 3.0;
+    }
+
+    public void setSetpoint(double setpointDegrees, double robotRotVel) {
+
+        setpoint = MathUtil.clamp(setpointDegrees, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+
         if (infiniteRotation) {
             // 1. Get current position in degrees
             double currentDegrees = (motor.getPosition().getValueAsDouble() / gearRatio) * 360.0;
             // 2. Calculate the error
-            double error = setpointDegrees - currentDegrees;
+            double error = setpoint - currentDegrees;
             // 3. Wrap the error to [-180, 180]
             // This finds the "remainder" of the distance relative to a full circle
             double optimizedError = Math.IEEEremainder(error, 360.0);
@@ -172,8 +179,11 @@ public class Turret extends SubsystemBase {
             motor.setControl(voltageRequest.withPosition(motorTargetRotations));
         } else {
             // normal limited 0,360
-            double motorTargetRotations = (setpointDegrees / 360.0) * gearRatio;
-            motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+            double motorTargetRotations = (setpoint / 360.0) * gearRatio;
+
+            //Tune this with rotating robot
+            double dV = 0;
+            motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
         }
     }
 

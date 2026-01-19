@@ -1,5 +1,6 @@
 package frc.robot.commands.gpm;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -20,7 +21,7 @@ public class TurretAutoShoot extends Command {
     double yawToTagCamera;
     double yawToTag;
 
-    private boolean turretCamEnabled = true;
+    private boolean turretVisionEnabled = true;
 
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
         this.turret = turret;
@@ -28,26 +29,28 @@ public class TurretAutoShoot extends Command {
         this.turretVision = turretVision;
     }
 
-    public void align() {
+    public void updateTurretSetpoint() {
         Translation2d drivepose = drivetrain.getPose().getTranslation();
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         double D_y = target.getY() - drivepose.getY();
         double D_x = target.getX() - drivepose.getX();
-        double angleRad = Math.atan2(D_y, D_x);
-        System.out.println("Aligning the turn to degree angle: " + Units.radiansToDegrees(angleRad));
-        turretSetpoint = Units.radiansToDegrees(angleRad);
+        double fieldAngle = Math.atan2(D_y, D_x);
+        double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians()));
+        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngle - robotHeading), -180.0,180.0);
+
+        System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
     public void adjustWithTurretCam(){
         if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
             if(Robot.getAlliance() == Alliance.Blue){
-                yawToTagCamera = -1 * turretVision.getYawToTagRad(26).get();
+                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(26).get());
             }
             else{
-                yawToTagCamera = -1 * turretVision.getYawToTagRad(10).get();
+                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(10).get());
             }
             double error = yawToTagCamera - yawToTag;
-            adjustedSetpoint += error;
+            adjustedSetpoint = turretSetpoint + error;
         }
     }
 
@@ -60,20 +63,23 @@ public class TurretAutoShoot extends Command {
 
     @Override
     public void initialize() {
-        // TODO Auto-generated method stub
-        super.initialize();
+        updateTurretSetpoint();
+        turret.setSetpoint(turretSetpoint, drivetrain.getAngularRate(2));
     }
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        super.execute();
+        updateTurretSetpoint();
+        updateYawToTag();
+        if(turretVisionEnabled && turret.atSetPoint()){
+            adjustWithTurretCam();
+        }
+        turret.setSetpoint(turretSetpoint, drivetrain.getAngularRate(2));
     }
 
     @Override
     public void end(boolean interrupted) {
-        // TODO Auto-generated method stub
-        super.end(interrupted);
+        turret.setSetpoint(0, 0);
     }
 
     
