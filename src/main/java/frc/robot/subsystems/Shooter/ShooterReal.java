@@ -85,45 +85,22 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
-
-        SmartDashboard.putData("Shoot Game Piece", new SequentialCommandGroup(
-            new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY)),
-            new WaitCommand(0.5),
-            new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER))
-        ));
-        SmartDashboard.putData("Stop Shooting", new InstantCommand(()-> deactivateShooterAndFeeder()));
-        SmartDashboard.putData("Turn own main shooter motor", new InstantCommand(()-> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
-        SmartDashboard.putData("Turn own feeder motor", new InstantCommand(()-> setFeeder(ShooterConstants.FEEDER_RUN_POWER)));
     }
 
     @Override
     public void periodic(){
-
         updateInputs();
 
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        feederMotor.set(feederPower);
-
-        ballDetected();
-        //SmartDashboard.putNumber("Sensor Distance", sensor.getMeasurement().distance_mm);
-        
-        shooterAtMaxSpeed = shooterAtMaxSpeed();
+        feederMotor.set(feederPower);            
     }
 
     public void deactivateShooterAndFeeder() {
         setFeeder(0);
         setShooter(0);
-        System.out.println("Shooter deactivated");
-    }
-
-    public boolean shooterAtMaxSpeed() {
-        double leftRps = shooterMotorLeft.getVelocity().getValueAsDouble();
-        double rightRps = shooterMotorRight.getVelocity().getValueAsDouble();
-        double average = (leftRps + rightRps) / 2.0;
-        return average >= shooterTargetSpeed * 0.95;
     }
 
     @Override
@@ -133,10 +110,11 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
     }
 
     public void setShooter(double linearVelocityMps) {
-        double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+        double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_WHEEL_DIAMETER;
         shooterTargetSpeed = linearVelocityMps * ShooterConstants.SHOOTER_GEAR_RATIO / wheelCircumference; // rps
     }
 
+    /**@return velocity in m/s */
     @Override
     public double getShooterVelcoity(){
         return inputs.shooterSpeedLeft;
@@ -156,8 +134,8 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
     @Override
     public void updateInputs(){
-        inputs.shooterSpeedLeft = shooterMotorLeft.getVelocity().getValueAsDouble();
-        inputs.shooterSpeedRight = shooterMotorRight.getVelocity().getValueAsDouble();
+        inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_WHEEL_DIAMETER/2;
+        inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_WHEEL_DIAMETER/2;
         inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
         inputs.sensorDistance = sensor.getMeasurement().distance_mm;
 
@@ -166,5 +144,10 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
     public boolean atTargetSpeed(){
         return Math.abs(getShooterVelcoity() - shooterTargetSpeed) < 1.0;
+    }
+
+    @AutoLogOutput(key="Shooter/TargetSpeed")
+    public double getTargetVelocity(){
+        return shooterTargetSpeed;
     }
 }
