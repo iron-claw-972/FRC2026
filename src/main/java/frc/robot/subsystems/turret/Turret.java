@@ -181,7 +181,7 @@ public class Turret extends SubsystemBase {
         Translation2d drivepose = drivetrain.getPose().getTranslation();
         // Using tag #??
         int tagNumber = 17;
-        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
+        Translation2d tagpose = FieldConstants.field.getTagPose(tagNumber ).get().toPose2d().getTranslation();
         double D_y = tagpose.getY() - drivepose.getY();
         double D_x = tagpose.getX() - drivepose.getX();
         double angleRad = Math.atan2(D_y, D_x);
