@@ -523,11 +523,7 @@ public class Vision {
     public void updateInputs() {
       inputs.connected = camera.isConnected();
       inputs.results = camera.getAllUnreadResults();
-      if (!inputs.results.isEmpty()) {
-        System.out.println("working");
-      } else {
-        System.out.println("goob");
-      }
+
 
       Logger.processInputs("Vision/"+camera.getName(), inputs);
 

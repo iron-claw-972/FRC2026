@@ -75,7 +75,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         if (intake != null && shooter != null) {
             // shoots it
-            driver.get(PS5Button.LB).onTrue(
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
             new SequentialCommandGroup(
                 new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
                 new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
@@ -88,7 +88,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         }
             //Intake
-            driver.get(PS5Button.CROSS).onTrue(
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(
                     new InstantCommand(() -> {
                         if (intakeBall != null && intakeBall.isScheduled()) {
                             intakeBall.cancel();

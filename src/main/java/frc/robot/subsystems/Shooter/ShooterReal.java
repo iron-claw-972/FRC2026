@@ -50,6 +50,8 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    double powerModifier;
+
     public ShooterReal(){
 
         updateInputs();
@@ -96,9 +98,13 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
     @Override
     public void periodic(){
+
         updateInputs();
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
+
+        powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
+        SmartDashboard.putNumber("shooter power modifier", powerModifier);
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
         feederMotor.set(feederPower);
 
         ballDetected();
