@@ -73,8 +73,10 @@ public class TurretAutoShoot extends Command {
         updateYawToTag();
         if(turretVisionEnabled && turret.atSetPoint()){
             adjustWithTurretCam();
+            turret.setSetpoint(adjustedSetpoint, drivetrain.getAngularRate(2));
+        } else{
+            turret.setSetpoint(turretSetpoint, drivetrain.getAngularRate(2));
         }
-        turret.setSetpoint(turretSetpoint, drivetrain.getAngularRate(2));
     }
 
     @Override
