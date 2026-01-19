@@ -3,6 +3,7 @@ package frc.robot.commands.gpm;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
@@ -64,6 +65,9 @@ public class AutoShoot extends Command {
         } else {
             shooter.setFeeder(0);
         }
+
+        SmartDashboard.putNumber("Target Hood Angle", target_state.pitch());
+        SmartDashboard.putNumber("Target Exit Velocity", target_state.exitVel());
     }
 
     @Override
