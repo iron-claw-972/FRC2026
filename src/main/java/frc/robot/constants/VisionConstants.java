@@ -174,4 +174,9 @@ public class VisionConstants {
             new Transform3d(
                     new Translation3d(Units.inchesToMeters(10), 0, Units.inchesToMeters(24)),
                     new Rotation3d(0, Units.degreesToRadians(20), 0))));
+
+    // used to cleanly shutdown the OrangePi
+    public static final String[] ORANGEPI_HOSTNAMES = {"photonfront.local", "photonback.local"};
+    public static final String ORANGEPI_USERNAME = "pi";
+    public static final String ORANGEPI_PASSWORD = "raspberry";
 }
