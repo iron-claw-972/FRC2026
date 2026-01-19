@@ -163,4 +163,8 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
         Logger.processInputs("Shooter", inputs);
     }
+
+    public boolean atTargetSpeed(){
+        return Math.abs(getShooterVelcoity() - shooterTargetSpeed) < 1.0;
+    }
 }
