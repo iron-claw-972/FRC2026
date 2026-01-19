@@ -83,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
     // Disables vision for the first few seconds after deploying
     private Timer visionEnableTimer = new Timer();
 
-    // If the robot should algin to the angle
+    // If the robot should align to the angle
     private boolean isAlign = false;
     // Angle to align to, can be null
     private Double alignAngle = null;
