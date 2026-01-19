@@ -16,8 +16,11 @@ public class TurretAutoShoot extends Command {
     private TurretVision turretVision;
 
     double turretSetpoint;
+    double adjustedSetpoint;
     double yawToTagCamera;
     double yawToTag;
+
+    private boolean turretCamEnabled = true;
 
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
         this.turret = turret;
@@ -27,7 +30,7 @@ public class TurretAutoShoot extends Command {
 
     public void align() {
         Translation2d drivepose = drivetrain.getPose().getTranslation();
-        Translation2d target = FieldConstants.HUB_TRANSLATION3D.toTranslation2d();
+        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         double D_y = target.getY() - drivepose.getY();
         double D_x = target.getX() - drivepose.getX();
         double angleRad = Math.atan2(D_y, D_x);
@@ -36,20 +39,23 @@ public class TurretAutoShoot extends Command {
     }
 
     public void adjustWithTurretCam(){
-        if(Robot.getAlliance() == Alliance.Blue){
-            yawToTagCamera = turretVision.getYawToTagRad(26).get();
+        if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
+            if(Robot.getAlliance() == Alliance.Blue){
+                yawToTagCamera = -1 * turretVision.getYawToTagRad(26).get();
+            }
+            else{
+                yawToTagCamera = -1 * turretVision.getYawToTagRad(10).get();
+            }
+            double error = yawToTagCamera - yawToTag;
+            adjustedSetpoint += error;
         }
-        else{
-            yawToTagCamera = turretVision.getYawToTagRad(10).get();
-        }
-        
-
     }
 
     public void updateYawToTag(){
-        double D_y = FieldConstants.HUB_TRANSLATION3D.getY() - drivetrain.getPose().getY();
-        double D_x = FieldConstants.HUB_TRANSLATION3D.getX() - drivetrain.getPose().getX();
-        double angleToTag = Units.radiansToDegrees(Math.atan())
+        double D_y = FieldConstants.getHubTranslation().getY() - drivetrain.getPose().getY();
+        double D_x = FieldConstants.getHubTranslation().getX() - drivetrain.getPose().getX();
+        double angleToTag = Units.radiansToDegrees(Math.atan(D_y / D_x));
+        yawToTag = angleToTag - turretSetpoint;
     }
 
     @Override
