@@ -5,8 +5,9 @@
   "pathFolders": [
     "Center Autos",
     "Left Autos",
-    "Right Autos",
-    "Miscellaneous"
+    "Miscellaneous",
+    "Field Testing Autos",
+    "Right Autos"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,
