@@ -22,10 +22,10 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.Shooter.ShooterReal;
+import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
-import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.intake.IntakeAlpha;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
@@ -44,9 +44,9 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
-  private HoodReal hood = null;
+  private Hood hood = null;
   private IntakeAlpha intake = null;
-  private ShooterReal shooter = null;
+  private Shooter shooter = null;
   private Command auto = new DoNothing(); 
 
   // Controllers are defined here
@@ -80,9 +80,9 @@ public class RobotContainer {
 
       case WaffleHouse:
       if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-      hood = new HoodReal();
+      hood = new Hood();
       intake = new IntakeAlpha();
-      shooter = new ShooterReal();
+      shooter = new Shooter();
 
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());

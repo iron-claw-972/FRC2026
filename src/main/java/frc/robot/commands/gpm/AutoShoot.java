@@ -1,30 +1,28 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
-import frc.robot.subsystems.Shooter.ShooterReal;
+import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.hood.HoodBase;
-import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
 
 public class AutoShoot extends Command {
     Drivetrain drive;
-    HoodReal hood;
-    ShooterReal shooter;
+    Hood hood;
+    Shooter shooter;
     TurretState target_state;
 
     boolean atTarget;
     // apex of parabola in meters
     double peakHeight = 10.0;
 
-    public AutoShoot(Drivetrain drive, HoodReal hood, ShooterReal shooter) {
+    public AutoShoot(Drivetrain drive, Hood hood, Shooter shooter) {
         this.drive = drive;
         this.hood = hood;
         this.shooter = shooter;

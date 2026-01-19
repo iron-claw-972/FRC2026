@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.HoodConstants;
 import frc.robot.constants.IdConstants;
@@ -37,7 +38,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 // tune for gravity and stuff
 // implement live odometry distance reading instead of setting manually
 
-public class HoodReal extends HoodBase implements HoodIO {
+public class Hood extends SubsystemBase implements HoodIO {
     final private TalonFX motor;
     private double position;
     private double velocity;
@@ -61,19 +62,17 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
 
-    public HoodReal() {
+    public Hood() {
         // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
         
         updateInputs();
 
         pid.setTolerance(Units.degreesToRadians(3));
-        System.out.println("Before constructor class position:" + position);
-        System.out.println("Before constructor class position:" + motor.getPosition());
         if (RobotBase.isSimulation()) {
             encoderSim = motor.getSimState();
             System.out.println("Simulation in constructor:" + position);
-            System.out.println(HoodConstants.START_ANGLE + "Start angle in hoodreal");
+            System.out.println(HoodConstants.START_ANGLE + "Start angle in Hood");
             hoodSim = new SingleJointedArmSim(
                 hoodMotorSim,
                 HoodConstants.HOOD_GEAR_RATIO,
@@ -86,8 +85,6 @@ public class HoodReal extends HoodBase implements HoodIO {
             );
         }
 
-        // motor position at power up
-        System.out.println("About to set the position in the constructor to: " + Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setPosition(Units.degreesToRotations(HoodConstants.START_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
         motor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -109,18 +106,9 @@ public class HoodReal extends HoodBase implements HoodIO {
         config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
 
-        // Recommened from chatGPT:
-        // config.Slot0.kP = 8.0;
-        // config.Slot0.kI = 0.0;
-        // config.Slot0.kD = 0.2;
-        // config.Slot0.kS = 0.1;
-        // config.Slot0.kG = 0.25;   // flip sign if hood drops
-        // config.Slot0.kV = 0.12;
-
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * HoodConstants.HOOD_GEAR_RATIO;
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * HoodConstants.HOOD_GEAR_RATIO;
-        //TODO: find which direction is positive
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
         motor.getConfigurator().apply(config);
@@ -132,29 +120,21 @@ public class HoodReal extends HoodBase implements HoodIO {
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(HoodConstants.MIN_ANGLE) * HoodConstants.HOOD_GEAR_RATIO;
 
         SmartDashboard.putData("hood", mechanism2d);
-        SmartDashboard.putData("PID", pid);
         
         SmartDashboard.putData("Set 45 degrees", new InstantCommand(() -> setSetpoint(45.98)));
-        SmartDashboard.putData("Set to 4.0132 distance", new InstantCommand(() -> setToCalculatedAngle(HoodConstants.INITIAL_VELOCTIY, HoodConstants.TARGET_HEIGHT, 4.0132)));
         SmartDashboard.putData("Recalibrate Hood", new InstantCommand(() -> resetDueToSlippingError()));
 
         SmartDashboard.putData("Move to max angle", new InstantCommand(() -> setSetpoint(HoodConstants.MAX_ANGLE)));
         SmartDashboard.putData("Move to min angle", new InstantCommand(() -> setSetpoint(HoodConstants.MIN_ANGLE)));
-
-        SmartDashboard.putNumber("Hood Setpoint", getSetpoint());
-
-        System.out.println("After Constructor motor position: " + position);
     }
 
     public void setSetpoint(double setpoint) {
         double error = MathUtil.inputModulus(setpoint - getPosition(), -180.0, 180.0);
         double shortestDeg = getPosition() + error;
-        this.setpoint = MathUtil.clamp(shortestDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
+        this.setpoint = shortestDeg;
         
-        // command the controller with the *wrapped* target
-        double motorTargetRotations = Units.degreesToRotations(shortestDeg) * HoodConstants.HOOD_GEAR_RATIO;
+        double motorTargetRotations = Units.degreesToRotations(MathUtil.clamp(shortestDeg, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO;
         motor.setControl(voltageRequest.withPosition(motorTargetRotations));
-        
     }
     
 
@@ -180,16 +160,11 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     @Override
     public void periodic() {
-        //try find a way to do with motion magic
-
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
 
         SmartDashboard.putNumber("Hood Position", position);
         
-        //power = pid.calculate(Units.degreesToRadians(getPosition()));
-        //motor.set(power);
-        // System.out.println(position + " degrees");
         ligament2d.setAngle(position);
 
         updateInputs();
@@ -202,7 +177,6 @@ public class HoodReal extends HoodBase implements HoodIO {
     boolean simInitialized = false;
     @Override
     public void simulationPeriodic() {
-        //double voltsMotor = power * 12;
         double voltsMotor = motor.getMotorVoltage().getValueAsDouble();
         hoodSim.setInputVoltage(voltsMotor);
 
@@ -216,7 +190,6 @@ public class HoodReal extends HoodBase implements HoodIO {
         encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * HoodConstants.HOOD_GEAR_RATIO);
     }
     
-    @Override
     public double calculateAngle(double v0, double U, double R) {
         double g = Constants.GRAVITY_ACCELERATION;
         //TODO: change this
@@ -238,10 +211,7 @@ public class HoodReal extends HoodBase implements HoodIO {
         return z;
     }
 
-    
-
-    @Override
-    public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
+        public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
         double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
         double angleDeg = Units.radiansToDegrees(angleRad);
         System.out.println(initialVelocity + " degrees");

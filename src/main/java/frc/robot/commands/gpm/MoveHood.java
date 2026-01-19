@@ -1,13 +1,13 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.hood.Hood;
 
 public class MoveHood extends Command{
-    private HoodReal hood;
+    private Hood hood;
     private double setpoint;
 
-    public MoveHood(HoodReal hood, double setpoint){
+    public MoveHood(Hood hood, double setpoint){
         this.hood = hood;
         this.setpoint = setpoint;
     }

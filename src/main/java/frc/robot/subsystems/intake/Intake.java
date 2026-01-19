@@ -32,7 +32,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
-public class IntakeReal extends SubsystemBase implements IntakeIO{
+public class Intake extends SubsystemBase implements IntakeIO{
     private TalonFX flyWheelMotor = new TalonFX(IdConstants.FLYWHEEL_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private TalonFX baseMotor = new TalonFX(IdConstants.BASE_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
@@ -62,7 +62,7 @@ public class IntakeReal extends SubsystemBase implements IntakeIO{
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-    public IntakeReal() {
+    public Intake() {
         updateInputs();
         encoderSim = baseMotor.getSimState();
         

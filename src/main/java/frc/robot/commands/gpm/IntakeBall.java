@@ -3,12 +3,12 @@ package frc.robot.commands.gpm;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.subsystems.Shooter.ShooterReal;
-import frc.robot.subsystems.intake.IntakeReal;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.intake.Intake;
 
 public class IntakeBall extends Command {
-    private IntakeReal intake;
-    private ShooterReal shooter;
+    private Intake intake;
+    private Shooter shooter;
 
     private enum Phase{
         Intaking, Acquiring, Acquired, Done
@@ -18,7 +18,7 @@ public class IntakeBall extends Command {
 
     private Phase phase;
 
-    public IntakeBall(IntakeReal intake, ShooterReal shooter) {
+    public IntakeBall(Intake intake, Shooter shooter) {
         this.intake = intake;
         this.shooter = shooter;
 

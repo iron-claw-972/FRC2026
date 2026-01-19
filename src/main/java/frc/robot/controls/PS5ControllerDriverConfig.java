@@ -9,14 +9,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AlphaIntakeBall;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
-import frc.robot.subsystems.Shooter.ShooterReal;
+import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.intake.IntakeAlpha;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -36,8 +35,8 @@ import lib.controllers.PS5Controller.PS5Button;
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
-    private HoodReal hood;
-    private ShooterReal shooter;
+    private Hood hood;
+    private Shooter shooter;
     private IntakeAlpha intake;
     private Command intakeBall;
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
@@ -45,7 +44,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     int intakeInt = 1;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, HoodReal hood, ShooterReal shooter, IntakeAlpha intake) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Hood hood, Shooter shooter, IntakeAlpha intake) {
         super(drive);
         this.hood = hood;
         this.shooter = shooter;

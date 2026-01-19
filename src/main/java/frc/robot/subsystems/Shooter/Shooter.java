@@ -22,13 +22,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
 
-public class ShooterReal extends ShooterBase implements ShooterIO {
+public class Shooter extends SubsystemBase implements ShooterIO {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
@@ -52,7 +53,7 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
 
     double powerModifier;
 
-    public ShooterReal(){
+    public Shooter(){
 
         updateInputs();
         //Sensor configs
@@ -103,7 +104,6 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
         setShooter(0);
     }
 
-    @Override
     public void setFeeder(double power){
         System.out.println("VELOCITY: " + getShooterVelcoity()); 
         feederPower = power;
@@ -115,12 +115,10 @@ public class ShooterReal extends ShooterBase implements ShooterIO {
     }
 
     /**@return velocity in m/s */
-    @Override
     public double getShooterVelcoity(){
         return inputs.shooterSpeedLeft;
     }
 
-    @Override
     public double getFeederVelocity(){
         return inputs.feederSpeed;
     }
