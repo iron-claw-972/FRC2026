@@ -177,27 +177,10 @@ public class Turret extends SubsystemBase {
         }
     }
 
-    public void align() {
-        Translation2d drivepose = drivetrain.getPose().getTranslation();
-        // Using tag #??
-        int tagNumber = 17;
-        Translation2d tagpose = FieldConstants.field.getTagPose(tagNumber ).get().toPose2d().getTranslation();
-        double D_y = tagpose.getY() - drivepose.getY();
-        double D_x = tagpose.getX() - drivepose.getX();
-        double angleRad = Math.atan2(D_y, D_x);
-        System.out.println("Aligning the turn to degree angle: " + Units.radiansToDegrees(angleRad));
-        setSetpoint(Units.radiansToDegrees(angleRad));
-    }
-
     @Override
     public void periodic() {
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio; // Gear Ratio
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
-
-        // SmartDashboard.putNumber("Turret Position", position);
-        if (alignOn) {
-            align();
-        }
         
         ligament2d.setAngle(position);
     }
