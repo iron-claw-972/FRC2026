@@ -151,7 +151,7 @@ public class Robot extends LoggedRobot {
 
         // If there is an autonomous command, then schedule it
         if (autoCommand != null) {
-            autoCommand.schedule();
+			CommandScheduler.getInstance().schedule(autoCommand);
         }
     }
 
