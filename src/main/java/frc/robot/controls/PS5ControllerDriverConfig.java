@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AlphaIntakeBall;
+import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.Shooter;
@@ -28,11 +29,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Shooter shooter;
     private IntakeAlpha intake;
+
     private Command intakeBall;
+    private Command autoShoot;
+
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
-
-    int intakeInt = 1;
 
     public PS5ControllerDriverConfig(Drivetrain drive, Hood hood, Shooter shooter, IntakeAlpha intake) {
         super(drive);
@@ -86,6 +88,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     }
                 })
             );
+            if(hood != null){
+                driver.get(PS5Button.CIRCLE).onTrue(
+                    new InstantCommand(()->{
+                        if (autoShoot != null && autoShoot.isScheduled()){
+                            autoShoot.cancel();
+                        } else{
+                            autoShoot = new AutoShoot(getDrivetrain(), hood, shooter);
+                            CommandScheduler.getInstance().schedule(autoShoot);
+                        }
+                    })
+                );
+            }
         }
         }
 

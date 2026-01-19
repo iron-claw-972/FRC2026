@@ -72,5 +72,6 @@ public class AutoShoot extends Command {
     public void end(boolean canceled) {
         drive.setIsAlign(false);
         shooter.setFeeder(0);
+        shooter.setShooter(0);
     }
 }
