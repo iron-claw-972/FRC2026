@@ -68,7 +68,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         Translation2d drivepose = getDrivetrain().getPose().getTranslation();
         // uses tag #??
         int tagNumber = 17;
-        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
+        Translation2d tagpose = FieldConstants.field.getTagPose(tagNumber).get().toPose2d().getTranslation();
         double YDifference = tagpose.getY() - drivepose.getY();
         double XDifference = tagpose.getX() - drivepose.getX();
         double angle = Math.atan(YDifference/XDifference);
