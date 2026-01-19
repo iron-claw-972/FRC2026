@@ -11,6 +11,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -22,16 +23,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class Turret extends SubsystemBase {
-    double D_x = 1;
-    double D_y = 1;
+    // double D_x = 1;
+    // double D_y = 1;
     final private TalonFX motor;
-
+    private boolean infiniteRotation = false;
     private double versaPlanetaryGearRatio = 5.0;
     private double turretGearRatio = 140.0/10.0;
     private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
+
+    private boolean alignOn = false;
 
     private double position;
     private double velocity;
@@ -48,7 +53,10 @@ public class Turret extends SubsystemBase {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret_motor", 25, 0));
 
-    public Turret() {
+    private Drivetrain drivetrain;
+
+    public Turret(Drivetrain drivetrain) {
+        this.drivetrain = drivetrain;
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_CAN); // switch of course
         
         if (RobotBase.isSimulation()) {
@@ -110,45 +118,74 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180)));
         SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270)));
 
-        SmartDashboard.putData("Set to 1,1", new InstantCommand(() -> setTarget(1,1)));
-        SmartDashboard.putData("Set to -1,1", new InstantCommand(( )-> setTarget(-1,1)));
-        SmartDashboard.putData("Set to -1,-1", new InstantCommand(() -> setTarget(-1,-1)));
-        SmartDashboard.putData("Set to 1,-1", new InstantCommand(() -> setTarget(1,-1)));
+        // SmartDashboard.putData("Set to 1,1", new InstantCommand(() -> setTarget(1,1)));
+        // SmartDashboard.putData("Set to -1,1", new InstantCommand(( )-> setTarget(-1,1)));
+        // SmartDashboard.putData("Set to -1,-1", new InstantCommand(() -> setTarget(-1,-1)));
+        // SmartDashboard.putData("Set to 1,-1", new InstantCommand(() -> setTarget(1,-1)));
 
-        SmartDashboard.putData("Print out target position", new InstantCommand(()-> System.out.println(getTargetPosition())));
+        // SmartDashboard.putData("Print out target position", new InstantCommand(()-> System.out.println(getTargetPosition())));
+    }
+    
+    // public void toggleAlignOn() {
+    //     if (alignOn) {
+    //         alignOn = false
+    //     } else {
+    //         alignOn = true
+    //     }
+    // }
+
+    // public void setTarget(double x, double y) {
+    //     D_x = x;
+    //     D_y = y;
+    // }
+
+    // public double[] getTargetPosition() {
+    //     System.out.println("Distance X value is: "+ D_x + "and the Distance Y valye is: " + D_y);
+    //     double[] target = {D_x, D_y};
+    //     return target;
+    // }
+
+    public void turnOnAlignment() {
+        alignOn = true;
     }
 
-    public void setTarget(double x, double y) {
-        D_x = x;
-        D_y = y;
-    }
-
-    public double[] getTargetPosition() {
-        System.out.println("Distance X value is: "+ D_x + "and the Distance Y valye is: " + D_y);
-        double[] target = {D_x, D_y};
-        return target;
+    public void turnOffAlignment() {
+        alignOn = false;
     }
 
     public double getPosition() {
          return motor.getPosition().getValueAsDouble() / gearRatio; // Gear ratio
     }
 
-    // public void setSetpoint(double setpointDegrees) {
-    //     double clampedSetpoint = MathUtil.inputModulus(setpointDegrees, 0, 360);
-    //     this.setpoint = clampedSetpoint;
-    
-    //     // Convert mechanism degrees to motor rotations: (Degrees / 360) * GearRatio
-    //     double motorTargetRotations = (clampedSetpoint / 360.0) * gearRatio;
-    //     motor.setControl(voltageRequest.withPosition(motorTargetRotations));
-    // }
-
     public void setSetpoint(double setpointDegrees) {
-        double motorTargetRotations = (setpointDegrees / 360.0) * gearRatio;
-        motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+        if (infiniteRotation) {
+            // 1. Get current position in degrees
+            double currentDegrees = (motor.getPosition().getValueAsDouble() / gearRatio) * 360.0;
+            // 2. Calculate the error
+            double error = setpointDegrees - currentDegrees;
+            // 3. Wrap the error to [-180, 180]
+            // This finds the "remainder" of the distance relative to a full circle
+            double optimizedError = Math.IEEEremainder(error, 360.0);
+            // 4. Calculate new target in degrees
+            double optimizedSetpointDegrees = currentDegrees + optimizedError;
+            double motorTargetRotations = (optimizedSetpointDegrees / 360.0) * gearRatio;
+            motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+        } else {
+            // normal limited 0,360
+            double motorTargetRotations = (setpointDegrees / 360.0) * gearRatio;
+            motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+        }
     }
 
     public void align() {
+        Translation2d drivepose = drivetrain.getPose().getTranslation();
+        // Using tag #??
+        int tagNumber = 17;
+        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
+        double D_y = tagpose.getY() - drivepose.getY();
+        double D_x = tagpose.getX() - drivepose.getX();
         double angleRad = Math.atan2(D_y, D_x);
+        System.out.println("Aligning the turn to degree angle: " + Units.radiansToDegrees(angleRad));
         setSetpoint(Units.radiansToDegrees(angleRad));
     }
 
@@ -158,7 +195,10 @@ public class Turret extends SubsystemBase {
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
 
         // SmartDashboard.putNumber("Turret Position", position);
-        // align();
+        if (alignOn) {
+            align();
+        }
+        
         ligament2d.setAngle(position);
     }
 
@@ -177,7 +217,7 @@ public class Turret extends SubsystemBase {
 
         double simAngle = turretSim.getAngleRads();
         double simRotations = Units.radiansToRotations(simAngle);
-        double motorRotations = simRotations * gearRatio; // gear ratio is 1
+        double motorRotations = simRotations * gearRatio;
 
         encoderSim.setRawRotorPosition(motorRotations); // MUST set position
         encoderSim.setRotorVelocity(turretSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * gearRatio); // Gear Ratio

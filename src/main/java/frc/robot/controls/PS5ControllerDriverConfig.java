@@ -2,14 +2,22 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -20,12 +28,17 @@ import lib.controllers.PS5Controller.PS5Button;
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
+    private Shooter shooter;
+    private Turret turret;
+    private Pose2d alignmentPose = null;
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter) {
         super(drive);
+        this.shooter = shooter;
+        this.turret = turret;
     }
 
-    public void configureControls() {
+    public void configureControls() { 
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
             new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
@@ -44,8 +57,25 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+
+        driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))).onFalse(new InstantCommand(() -> shooter.setFeeder(0)));
+        driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
+        
+        driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> turret.turnOnAlignment())).onFalse(new InstantCommand(() -> turret.turnOffAlignment()));
     }
     
+    public void setAlignmentPose(){
+        Translation2d drivepose = getDrivetrain().getPose().getTranslation();
+        // uses tag #??
+        int tagNumber = 17;
+        Translation2d tagpose = FieldConstants.APRIL_TAGS.get(tagNumber - 1).pose.toPose2d().getTranslation();
+        double YDifference = tagpose.getY() - drivepose.getY();
+        double XDifference = tagpose.getX() - drivepose.getX();
+        double angle = Math.atan(YDifference/XDifference);
+        alignmentPose = new Pose2d(drivepose.getX(), drivepose.getY(), new Rotation2d(angle));
+        System.out.println("Alignment angle: " + Units.radiansToDegrees(angle));
+    }
+
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
