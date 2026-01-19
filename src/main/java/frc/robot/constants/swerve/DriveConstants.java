@@ -86,6 +86,10 @@ public class DriveConstants {
     
         public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(MODULE_LOCATIONS);
     
+        /**
+         * Default values for SwerveCompetition drivetrain
+         * Sets to correct value later if robotID is different
+         */
         public static double STEER_OFFSET_FRONT_LEFT = 302.646;
         public static double STEER_OFFSET_FRONT_RIGHT = 103.039+180;
         public static double STEER_OFFSET_BACK_LEFT = 165.49+90;
@@ -192,7 +196,7 @@ public class DriveConstants {
         public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
     
         /**
-         * Updates the constants if the RobotId is not the competition robot.
+         * Updates the constants if the RobotId is not the default SwerveCompetition robot.
          */
         public static void update(RobotId robotId) {
             if(robotId == RobotId.WaffleHouse){
