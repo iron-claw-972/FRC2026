@@ -175,7 +175,7 @@ public class HoodReal extends HoodBase implements HoodIO {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(getPosition() - setpoint) < 1.0;
+        return Math.abs(getPosition() - setpoint) < 3.0;
     }
 
     @Override
