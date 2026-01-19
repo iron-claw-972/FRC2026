@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
@@ -133,8 +131,6 @@ public class VisionConstants {
     public static final double HIGHEST_AMBIGUITY = 0.01;
 
     public static final int MAX_EMPTY_TICKS = 10;
-
-	public static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     /**
      * The camera poses

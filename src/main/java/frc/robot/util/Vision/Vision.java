@@ -32,6 +32,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.MathUtils;
@@ -74,7 +75,7 @@ public class Vision {
     NetworkTableInstance.getDefault().startServer();
 
     // Sets the origin to the right side of the blue alliance wall
-    VisionConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    FieldConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 
     if(VisionConstants.ENABLED){
       // Puts the cameras in an array list
@@ -84,7 +85,7 @@ public class Vision {
 
       if(RobotBase.isSimulation()){
         visionSim = new VisionSystemSim("Vision");
-        visionSim.addAprilTags(VisionConstants.field);
+        visionSim.addAprilTags(FieldConstants.field);
         for(VisionCamera c : cameras){
           PhotonCameraSim cameraSim = new PhotonCameraSim(c.camera);
           cameraSim.enableDrawWireframe(true);
@@ -257,7 +258,7 @@ public class Vision {
   }
 
   public AprilTagFieldLayout getAprilTagFieldLayout(){
-    return VisionConstants.field;
+    return FieldConstants.field;
   }
 
   /**
@@ -401,7 +402,7 @@ public class Vision {
    * @return If the pose is on the field
    */
   public static boolean onField(Pose2d pose){
-    return pose!=null && pose.getX()>0 && pose.getX()<VisionConstants.field.getFieldLength() && pose.getY()>0 && pose.getY()<VisionConstants.field.getFieldWidth();
+    return pose!=null && pose.getX()>0 && pose.getX()<FieldConstants.field.getFieldLength() && pose.getY()>0 && pose.getY()<FieldConstants.field.getFieldWidth();
   }
 
   /**
@@ -410,7 +411,7 @@ public class Vision {
    * @return If the pose is within an area with twice the length and width of the field
    */
   public static boolean nearField(Pose2d pose){
-    return pose!=null && pose.getX()>-VisionConstants.field.getFieldLength()/2 && pose.getX()<VisionConstants.field.getFieldLength()*1.5 && pose.getY()>-VisionConstants.field.getFieldWidth()/2 && pose.getY()<VisionConstants.field.getFieldWidth()*1.5;
+    return pose!=null && pose.getX()>-FieldConstants.field.getFieldLength()/2 && pose.getX()<FieldConstants.field.getFieldLength()*1.5 && pose.getY()>-FieldConstants.field.getFieldWidth()/2 && pose.getY()<FieldConstants.field.getFieldWidth()*1.5;
   }
   
   private class VisionCamera implements VisionIO {
@@ -429,7 +430,7 @@ public class Vision {
     public VisionCamera(String cameraName, Transform3d robotToCam) {
       camera = new PhotonCamera(cameraName);
       photonPoseEstimator = new PhotonPoseEstimator(
-        VisionConstants.field, 
+        FieldConstants.field, 
         robotToCam
       );
       lastPose = null;
@@ -630,7 +631,7 @@ public class Vision {
           continue;
         }
         // Stores target pose and robot to camera transformation for easy access later
-        Pose3d targetPose = VisionConstants.field.getTagPose(id).get();
+        Pose3d targetPose = FieldConstants.field.getTagPose(id).get();
         Transform3d robotToCamera = photonPoseEstimator.getRobotToCameraTransform();
 
         double timestamp = result.getTimestampSeconds();
@@ -665,7 +666,7 @@ public class Vision {
 
     public boolean useTag(int id){
       // Never use tags that don't exist
-      if(id <= 0 || id > VisionConstants.field.getTags().size()){
+      if(id <= 0 || id > FieldConstants.field.getTags().size()){
         return false;
       }
       // Return false if it is in the list of tags to ignore
