@@ -21,7 +21,7 @@ public class TurretAutoShoot extends Command {
     double yawToTagCamera;
     double yawToTag;
 
-    private boolean turretVisionEnabled = true;
+    private boolean turretVisionEnabled = false;
 
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
         this.turret = turret;
