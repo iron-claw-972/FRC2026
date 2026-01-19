@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
@@ -151,7 +151,7 @@ public class Robot extends LoggedRobot {
 
         // If there is an autonomous command, then schedule it
         if (autoCommand != null) {
-            autoCommand.schedule();
+			CommandScheduler.getInstance().schedule(autoCommand);
         }
     }
 
