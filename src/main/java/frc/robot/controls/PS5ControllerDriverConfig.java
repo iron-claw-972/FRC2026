@@ -22,16 +22,6 @@ import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
 
 /**
- * Key for shooter + hood + intake controls
- *  SQUARE: Aim hood at target (left button)
- *  CIRCLE: Shoot at target (right button)
- *  TRIANGLE: Align to target (top button)
- *  CROSS: Intake ball (bottom button)
- */
-
-// TODO: Add some sensor logic
-
-/**
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
@@ -58,7 +48,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         )));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(()->null);
             CommandScheduler.getInstance().cancelAll();
@@ -84,38 +74,20 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     shooter.deactivateShooterAndFeeder();
                 })
             );
-
-        }
+            
             //Intake
             driver.get(PS5Button.LEFT_TRIGGER).onTrue(
-                    new InstantCommand(() -> {
-                        if (intakeBall != null && intakeBall.isScheduled()) {
-                            intakeBall.cancel();
-                        } else {
-                            intakeBall = new AlphaIntakeBall(intake);
-                            CommandScheduler.getInstance().schedule(intakeBall);
-                        }
-                    }));
+                new InstantCommand(() -> {
+                    if (intakeBall != null && intakeBall.isScheduled()) {
+                        intakeBall.cancel();
+                    } else {
+                        intakeBall = new AlphaIntakeBall(intake);
+                        CommandScheduler.getInstance().schedule(intakeBall);
+                    }
+                })
+            );
         }
-        
-        //Cancel commands
-        // driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
-        //     if(intake != null){
-        //         intake.stopFlyWheel();
-        //         intake.setSetpoint(IntakeConstants.STOW_ANGLE);
-        //     }
-        //     if(shooter != null){
-        //         shooter.stopFeeder();
-        //         shooter.stopShooter();
-        //     }
-        //     if(hood != null){
-        //         hood.setSetpoint(HoodConstants.START_ANGLE);
-        //     }
-        //     getDrivetrain().setIsAlign(false);
-        //     getDrivetrain().setDesiredPose(()->null);
-        //     alignmentPose = null;
-        //     CommandScheduler.getInstance().cancelAll();
-        // }));
+        }
 
   
     @Override
