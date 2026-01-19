@@ -16,6 +16,7 @@ public class TurretAutoShoot extends Command {
     private Drivetrain drivetrain;
     private TurretVision turretVision;
 
+    double fieldAngleRad;
     double turretSetpoint;
     double adjustedSetpoint;
     double yawToTagCamera;
@@ -34,9 +35,9 @@ public class TurretAutoShoot extends Command {
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         double D_y = target.getY() - drivepose.getY();
         double D_x = target.getX() - drivepose.getX();
-        double fieldAngle = Math.atan2(D_y, D_x);
+        fieldAngleRad = Math.atan2(D_y, D_x);
         double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians()));
-        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngle - robotHeading), -180.0,180.0);
+        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngleRad - robotHeading), -180.0,180.0);
 
         System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
@@ -58,7 +59,7 @@ public class TurretAutoShoot extends Command {
         double D_y = FieldConstants.getHubTranslation().getY() - drivetrain.getPose().getY();
         double D_x = FieldConstants.getHubTranslation().getX() - drivetrain.getPose().getX();
         double angleToTag = Units.radiansToDegrees(Math.atan(D_y / D_x));
-        yawToTag = angleToTag - turretSetpoint;
+        yawToTag = angleToTag - Units.radiansToDegrees(fieldAngleRad);
     }
 
     @Override
