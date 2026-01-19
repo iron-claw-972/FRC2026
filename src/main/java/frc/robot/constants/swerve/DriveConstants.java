@@ -1,5 +1,6 @@
 package frc.robot.constants.swerve;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -110,10 +111,10 @@ public class DriveConstants {
     public static final double PATH_PLANNER_TRANSLATIONAL_D = 0;
 
     // CAN
-    public static String DRIVE_MOTOR_CAN = Constants.CANIVORE_CAN;
-    public static String STEER_MOTOR_CAN = Constants.CANIVORE_CAN;
-    public static String STEER_ENCODER_CAN = Constants.CANIVORE_CAN;
-    public static String PIGEON_CAN = Constants.CANIVORE_CAN;
+    public static CANBus DRIVE_MOTOR_CAN = Constants.CANIVORE_CAN;
+    public static CANBus STEER_MOTOR_CAN = Constants.CANIVORE_CAN;
+    public static CANBus STEER_ENCODER_CAN = Constants.CANIVORE_CAN;
+    public static CANBus PIGEON_CAN = Constants.CANIVORE_CAN;
 
 
     public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
