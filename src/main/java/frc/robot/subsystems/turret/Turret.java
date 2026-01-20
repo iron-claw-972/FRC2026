@@ -91,8 +91,8 @@ public class Turret extends SubsystemBase {
         config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
         
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.degreesToRotations(90) * gearRatio; // max velocity * gear ratio
-        motionMagicConfigs.MotionMagicAcceleration = Units.degreesToRotations(90) * gearRatio; // max Acceleration * gear ratio
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY / TurretConstants.TURRET_RADIUS) * gearRatio; // max velocity * gear ratio
+        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION / TurretConstants.TURRET_RADIUS) * gearRatio; // max Acceleration * gear ratio
 
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         motor.getConfigurator().apply(config);
@@ -180,7 +180,7 @@ public class Turret extends SubsystemBase {
             double motorTargetRotations = (setpoint / 360.0) * gearRatio;
 
             //Tune this with rotating robot
-            double dV = 0;
+            double dV = TurretConstants.ROTATIONAL_VELOCITY_CONSTANT;
             motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
         }
     }
