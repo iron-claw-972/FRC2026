@@ -99,7 +99,7 @@ public class Turret extends SubsystemBase {
 
         // config.ClosedLoopGeneral.ContinuousWrap = true;
 
-        motor.getConfigurator().apply(config);
+        // motor.getConfigurator().apply(config);
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(360) * gearRatio; // max angle * gear ratio
@@ -201,7 +201,7 @@ public class Turret extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         //double voltsMotor = power * 12;
-        double voltsMotor = motor.getMotorVoltage().getValueAsDouble();
+        double voltsMotor = getAppliedVoltage();
         turretSim.setInputVoltage(voltsMotor);
 
         turretSim.update(Constants.LOOP_TIME);
