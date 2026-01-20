@@ -51,6 +51,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return driver.get(PS5Axis.LEFT_X);
     }
 
+    
     @Override
     public double getRawForwardTranslation() {
         return driver.get(PS5Axis.LEFT_Y);
