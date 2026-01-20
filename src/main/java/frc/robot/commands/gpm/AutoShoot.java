@@ -1,10 +1,12 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -28,15 +30,22 @@ public class AutoShoot extends Command {
         this.shooter = shooter;
     }
 
+    private Translation3d getShooterPosition() {
+        return new Translation3d(
+                drive.getPose().getX(),
+                drive.getPose().getY(),
+                HoodConstants.SHOOTER_HEIGHT);
+    }
+
     @Override
     public void initialize() {
         target_state = ShooterPhysics.getShotParams(
                 new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                         drive.getChassisSpeeds().vyMetersPerSecond),
-                drive.getPose().getTranslation(),
+                getShooterPosition(),
                 FieldConstants.HUB_TRANSLATION3D,
                 peakHeight);
-                
+
         hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
         shooter.setShooter(target_state.exitVel());
         drive.setIsAlign(true);
@@ -48,14 +57,13 @@ public class AutoShoot extends Command {
         target_state = ShooterPhysics.getShotParams(
                 new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                         drive.getChassisSpeeds().vyMetersPerSecond),
-                drive.getPose().getTranslation(),
+                getShooterPosition(),
                 FieldConstants.HUB_TRANSLATION3D,
                 peakHeight);
 
         hood.setSetpoint(target_state.pitch());
         shooter.setShooter(target_state.exitVel());
         drive.setAlignAngle(target_state.yaw().getRadians());
-
 
         if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
             shooter.setFeeder(1);

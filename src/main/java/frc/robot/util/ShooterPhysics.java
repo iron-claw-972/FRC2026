@@ -13,8 +13,8 @@ public class ShooterPhysics {
 	public record TurretState(Rotation2d yaw, double pitch, double exitVel) {
 	};
 
-	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target, double peakHeight) {
-		Translation3d robotToTarget = target.minus(new Translation3d(robot));
+	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robot, Translation3d target, double peakHeight) {
+		Translation3d robotToTarget = target.minus(robot);
 		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
 
 		Translation2d as2d = exitVel.toTranslation2d();
