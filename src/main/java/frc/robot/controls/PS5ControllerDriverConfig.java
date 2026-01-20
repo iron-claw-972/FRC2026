@@ -150,3 +150,4 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     public void endRumble() {
         driver.rumbleOff();
     }
+}
