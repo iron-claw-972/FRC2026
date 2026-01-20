@@ -25,12 +25,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class Turret extends SubsystemBase {
     // double D_x = 1;
     // double D_y = 1;
     final private TalonFX motor;
+    // Enable here: BUT PROB wont use it
     private boolean infiniteRotation = false;
     private double versaPlanetaryGearRatio = 5.0;
     private double turretGearRatio = 140.0/10.0;
@@ -53,10 +53,7 @@ public class Turret extends SubsystemBase {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret_motor", 25, 0));
 
-    private Drivetrain drivetrain;
-
-    public Turret(Drivetrain drivetrain) {
-        this.drivetrain = drivetrain;
+    public Turret() {
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_CAN); // switch of course
         
         if (RobotBase.isSimulation()) {
@@ -166,15 +163,16 @@ public class Turret extends SubsystemBase {
         setpoint = MathUtil.clamp(setpointDegrees, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
 
         if (infiniteRotation) {
-            // 1. Get current position in degrees
+            // Get current position in degrees
             double currentDegrees = (motor.getPosition().getValueAsDouble() / gearRatio) * 360.0;
-            // 2. Calculate the error
+            // Calculate the error
             double error = setpoint - currentDegrees;
-            // 3. Wrap the error to [-180, 180]
+            // Wrap the error to [-180, 180]
             // This finds the "remainder" of the distance relative to a full circle
             double optimizedError = Math.IEEEremainder(error, 360.0);
-            // 4. Calculate new target in degrees
+            // Calculate new target in degrees
             double optimizedSetpointDegrees = currentDegrees + optimizedError;
+
             double motorTargetRotations = (optimizedSetpointDegrees / 360.0) * gearRatio;
             motor.setControl(voltageRequest.withPosition(motorTargetRotations));
         } else {
@@ -212,7 +210,7 @@ public class Turret extends SubsystemBase {
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * gearRatio;
 
-        encoderSim.setRawRotorPosition(motorRotations); // MUST set position
+        encoderSim.setRawRotorPosition(motorRotations);
         encoderSim.setRotorVelocity(turretSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * gearRatio); // Gear Ratio
     }
 }

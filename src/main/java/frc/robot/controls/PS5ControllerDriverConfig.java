@@ -7,17 +7,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.TurretAutoShoot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.util.Vision.TurretVision;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -30,12 +33,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = ()->false;
     private Shooter shooter;
     private Turret turret;
-    private Pose2d alignmentPose = null;
+    private TurretVision turretVision;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter) {
+    private Pose2d alignmentPose = null;
+    private Command turretAutoShoot;
+
+    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret, TurretVision turretVision) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
+        this.turretVision = turretVision;
     }
 
     public void configureControls() { 
@@ -61,7 +68,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))).onFalse(new InstantCommand(() -> shooter.setFeeder(0)));
         driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
         
-        driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> turret.turnOnAlignment())).onFalse(new InstantCommand(() -> turret.turnOffAlignment()));
+        driver.get(PS5Button.SQUARE).onTrue(
+            new InstantCommand(()->{
+                        if (turretAutoShoot != null && turretAutoShoot.isScheduled()){
+                            turretAutoShoot.cancel();
+                        } else{
+                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain(), turretVision);
+                            CommandScheduler.getInstance().schedule(turretAutoShoot);
+                        }
+                    })
+        );
     }
     
     public void setAlignmentPose(){

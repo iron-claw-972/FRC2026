@@ -30,6 +30,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
+import frc.robot.util.Vision.TurretVision;
 import frc.robot.util.Vision.Vision;
 
 /**
@@ -46,6 +47,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Turret turret = null;
+  private TurretVision turretVision = null;
   private Shooter shooter = null;
   private Command auto = new DoNothing();
 
@@ -61,6 +63,7 @@ public class RobotContainer {
   public RobotContainer(RobotId robotId) {
     turret = new Turret();
     shooter = new Shooter();
+    turretVision = new TurretVision("SOME CAMERA NAME"); // TODO: Get a real camera
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -80,7 +83,7 @@ public class RobotContainer {
       case Phil:
       case Vertigo:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, turretVision);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain

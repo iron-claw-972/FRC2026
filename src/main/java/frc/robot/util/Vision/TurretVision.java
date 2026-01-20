@@ -24,15 +24,15 @@ public class TurretVision {
         PhotonPipelineResult result = camera.getLatestResult();
 
         if (!result.hasTargets()) {
-        return Optional.empty();
+            return Optional.empty();
         }
 
         for (PhotonTrackedTarget target : result.getTargets()) {
-        if (target.getFiducialId() == tagId) {
-            // PhotonVision yaw is in DEGREES
-            double yawRad = Units.degreesToRadians(target.getYaw());
-            return Optional.of(yawRad);
-        }
+            if (target.getFiducialId() == tagId) {
+                // PhotonVision yaw is in DEGREES
+                double yawRad = Units.degreesToRadians(target.getYaw());
+                return Optional.of(yawRad);
+            }
         }
 
         return Optional.empty();
