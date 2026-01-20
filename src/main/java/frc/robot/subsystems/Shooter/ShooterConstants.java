@@ -2,7 +2,7 @@ package frc.robot.subsystems.Shooter;
 
 public class ShooterConstants {
     //TODO: find these values
-    public static final double FEEDER_RUN_POWER = 0.3; // meters per second??
+    public static final double FEEDER_RUN_POWER = 0.3; // percentage power
     public static final double SHOOTER_VELOCITY = 8.0;
      // meters per second
     public static final double SHOOTER_GEAR_RATIO = 36.0 / 24.0; // gear ratio from motors to shooter wheel
