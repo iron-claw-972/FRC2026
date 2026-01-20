@@ -29,6 +29,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Shooter shooter;
     private IntakeAlpha intake;
+    private boolean rumbleEnabled;
 
     private Command intakeBall;
     private Command autoShoot;
@@ -46,64 +47,67 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
-            new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
-        )));
+                new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RB).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
-            getDrivetrain().setDesiredPose(()->null);
+            getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
         driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-            ()->getDrivetrain().setStateDeadband(false),
-            getDrivetrain()::alignWheels,
-            interrupted->getDrivetrain().setStateDeadband(true),
-            ()->false, getDrivetrain()).withTimeout(2));
-        
+                () -> getDrivetrain().setStateDeadband(false),
+                getDrivetrain()::alignWheels,
+                interrupted -> getDrivetrain().setStateDeadband(true),
+                () -> false, getDrivetrain()).withTimeout(2));
+
+        // Toggle rumble on/off
+        driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
+            rumbleEnabled = !rumbleEnabled;
+            if (rumbleEnabled) {
+                startRumble();
+            } else {
+                endRumble();
+            }
+        }));
 
         if (intake != null && shooter != null) {
             // shoots it
             driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
-            )
-            ).onFalse(
-                new InstantCommand(()->{
-                    shooter.deactivateShooterAndFeeder();
-                })
-            );
-            
-            //Intake
+                    new SequentialCommandGroup(
+                            new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+                            new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))))
+                    .onFalse(
+                            new InstantCommand(() -> {
+                                shooter.deactivateShooterAndFeeder();
+                            }));
+
+            // Intake
             driver.get(PS5Button.LEFT_TRIGGER).onTrue(
-                new InstantCommand(() -> {
-                    if (intakeBall != null && intakeBall.isScheduled()) {
-                        intakeBall.cancel();
-                    } else {
-                        intakeBall = new AlphaIntakeBall(intake);
-                        CommandScheduler.getInstance().schedule(intakeBall);
-                    }
-                })
-            );
-            if(hood != null){
-                driver.get(PS5Button.CIRCLE).onTrue(
-                    new InstantCommand(()->{
-                        if (autoShoot != null && autoShoot.isScheduled()){
-                            autoShoot.cancel();
-                        } else{
-                            autoShoot = new AutoShoot(getDrivetrain(), hood, shooter);
-                            CommandScheduler.getInstance().schedule(autoShoot);
+                    new InstantCommand(() -> {
+                        if (intakeBall != null && intakeBall.isScheduled()) {
+                            intakeBall.cancel();
+                        } else {
+                            intakeBall = new AlphaIntakeBall(intake);
+                            CommandScheduler.getInstance().schedule(intakeBall);
                         }
-                    })
-                );
+                    }));
+            if (hood != null) {
+                driver.get(PS5Button.CIRCLE).onTrue(
+                        new InstantCommand(() -> {
+                            if (autoShoot != null && autoShoot.isScheduled()) {
+                                autoShoot.cancel();
+                            } else {
+                                autoShoot = new AutoShoot(getDrivetrain(), hood, shooter);
+                                CommandScheduler.getInstance().schedule(autoShoot);
+                            }
+                        }));
             }
         }
-        }
+    }
 
-  
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
@@ -138,4 +142,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     public boolean getIsAlign() {
         return false;
     }
-}
+
+    public void startRumble() {
+        driver.rumbleOn();
+    }
+
+    public void endRumble() {
+        driver.rumbleOff();
+    }
