@@ -1,6 +1,7 @@
 package frc.robot.subsystems.turret;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -11,7 +12,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -23,23 +23,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.IdConstants;
 
-public class Turret extends SubsystemBase {
-    // double D_x = 1;
-    // double D_y = 1;
+public class Turret extends SubsystemBase implements TurretIO{
     final private TalonFX motor;
     // Enable here: BUT PROB wont use it
     private boolean infiniteRotation = false;
     private double versaPlanetaryGearRatio = 5.0;
     private double turretGearRatio = 140.0/10.0;
     private final double gearRatio = versaPlanetaryGearRatio * turretGearRatio;
-
-    private boolean alignOn = false;
-
-    private double position;
-    private double velocity;
     double power;
 
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
@@ -52,6 +44,8 @@ public class Turret extends SubsystemBase {
     Mechanism2d mechanism2d = new Mechanism2d(100, 100);
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret_motor", 25, 0));
+
+    private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
     public Turret() {
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN); // switch of course
@@ -110,17 +104,9 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270, 0)));
 
     }
-    
-    public void turnOnAlignment() {
-        alignOn = true;
-    }
-
-    public void turnOffAlignment() {
-        alignOn = false;
-    }
 
     public double getPosition() {
-        return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio; // Gear ratio
+        return inputs.positionDeg;
     }
 
     public boolean atSetPoint(){
@@ -150,28 +136,36 @@ public class Turret extends SubsystemBase {
 
             //Tune this with rotating robot
             double dV = TurretConstants.ROTATIONAL_VELOCITY_CONSTANT;
-            //motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
-            motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+            motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
 
             System.out.println("Workingnnnnngnggdsfadsfsa");
         }
     }
 
     @Override
-    public void periodic() {
-        position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio; // Gear Ratio
-        velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
-        
-        ligament2d.setAngle(position);
+    public void periodic() {        
+        updateInputs();
+        ligament2d.setAngle(getPosition());
 
-        SmartDashboard.putNumber("Turret Position Degrees", getPosition());
+        SmartDashboard.putNumber("Turret Position Degrees", getPosition());        
+    }
+
+    @Override
+    public void updateInputs(){
+        inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio;
+        inputs.velocity =  Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
+        inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
     }
 
     public double getAppliedVoltage() {
         return motor.getMotorVoltage().getValueAsDouble();
     }
 
-    boolean simInitialized = false;
+    @AutoLogOutput(key = "Turret/SetpointDeg")
+    public double getSetpoint(){
+        return setpoint;
+    }
+
     @Override
     public void simulationPeriodic() {
         //double voltsMotor = power * 12;
