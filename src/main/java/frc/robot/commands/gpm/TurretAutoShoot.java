@@ -30,6 +30,11 @@ public class TurretAutoShoot extends Command {
         this.turretVision = turretVision;
     }
 
+    public TurretAutoShoot(Turret turret, Drivetrain drivetrain){
+        this.turret = turret;
+        this.drivetrain = drivetrain;
+    }
+
     public void updateTurretSetpoint() {
         Translation2d drivepose = drivetrain.getPose().getTranslation();
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
@@ -72,7 +77,7 @@ public class TurretAutoShoot extends Command {
     public void execute() {
         updateTurretSetpoint();
         updateYawToTag();
-        if(turretVisionEnabled && turret.atSetPoint()){
+        if(turretVision != null && turretVisionEnabled && turret.atSetPoint()){
             adjustWithTurretCam();
             turret.setSetpoint(adjustedSetpoint, drivetrain.getAngularRate(2));
         } else{
