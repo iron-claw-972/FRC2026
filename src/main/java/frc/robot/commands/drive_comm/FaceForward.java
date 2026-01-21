@@ -74,7 +74,8 @@ public class FaceForward extends Command {
         Rotation2d desiredAngle = new Rotation2d(-driver.getRawSideTranslation(), driver.getRawForwardTranslation()); //this feels better
 
         if (driver.getRawHeadingMagnitude() > CONTROL_DEADZONE) {
-            drive.setAlignAngle(desiredAngle.getRadians());
+            //drive.setAlignAngle(new Rotation2d(new Rotation2d(-driver.getRawHeadingAngle()).getCos(), new Rotation2d(driver.getRawHeadingAngle()).getSin()).getRadians());
+            drive.setAlignAngle(desiredAngle.getRadians()); //TODO test how it feels
         } // else if (robotRelativeVelocity.getNorm() > SPEED_DEADZONE){
         //     drive.setAlignAngle(desiredAngle.getRadians());
         // }
