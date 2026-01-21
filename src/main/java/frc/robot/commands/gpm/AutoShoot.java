@@ -52,7 +52,7 @@ public class AutoShoot extends Command {
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
                         fieldRelVel.vyMetersPerSecond),
                 getShooterPosition(),
-                FieldConstants.HUB_TRANSLATION3D,
+                FieldConstants.HUB_BLUE,
                 peakHeight);
 
         hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
@@ -68,7 +68,7 @@ public class AutoShoot extends Command {
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
                         fieldRelVel.vyMetersPerSecond),
                 getShooterPosition(),
-                FieldConstants.HUB_TRANSLATION3D,
+                FieldConstants.HUB_BLUE,
                 peakHeight);
 
         hood.setSetpoint(target_state.pitch());

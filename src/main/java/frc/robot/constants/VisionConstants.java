@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
@@ -56,7 +54,7 @@ public class VisionConstants {
      * Any April tags we always want to ignore. To ignore a tag, put its id in this
      * array.
      */
-    public static final int[] TAGS_TO_IGNORE = {12, 13, 16, 1, 2, 3};
+    public static final int[] TAGS_TO_IGNORE = {};
 
     /**
      * If multiple cameras return different poses, they will be ignored if the
@@ -134,8 +132,6 @@ public class VisionConstants {
 
     public static final int MAX_EMPTY_TICKS = 10;
 
-	public static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-
     /**
      * The camera poses
      * <p>
@@ -177,4 +173,9 @@ public class VisionConstants {
             new Transform3d(
                     new Translation3d(Units.inchesToMeters(10), 0, Units.inchesToMeters(24)),
                     new Rotation3d(0, Units.degreesToRadians(20), 0))));
+
+    // used to cleanly shutdown the OrangePi
+    public static final String[] ORANGEPI_HOSTNAMES = {"photonfront.local", "photonback.local"};
+    public static final String ORANGEPI_USERNAME = "pi";
+    public static final String ORANGEPI_PASSWORD = "raspberry";
 }
