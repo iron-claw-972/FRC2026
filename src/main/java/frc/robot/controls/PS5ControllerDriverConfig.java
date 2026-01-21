@@ -34,16 +34,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = ()->false;
     private Shooter shooter;
     private Turret turret;
-    private TurretVision turretVision;
 
     private Pose2d alignmentPose = null;
     private Command turretAutoShoot;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret, TurretVision turretVision) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
-        this.turretVision = turretVision;
     }
 
     public void configureControls() { 
@@ -84,7 +82,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         if (turretAutoShoot != null && turretAutoShoot.isScheduled()){
                             turretAutoShoot.cancel();
                         } else{
-                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain(), turretVision);
+                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain());
                             CommandScheduler.getInstance().schedule(turretAutoShoot);
                         }
                     })
