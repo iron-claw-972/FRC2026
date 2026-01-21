@@ -30,7 +30,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
-import frc.robot.util.Vision.TurretVision;
 import frc.robot.util.Vision.Vision;
 
 /**
@@ -47,7 +46,6 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Turret turret = null;
-  private TurretVision turretVision = null;
   private Shooter shooter = null;
   private Command auto = new DoNothing();
 
@@ -83,7 +81,7 @@ public class RobotContainer {
         shooter = new Shooter();
 
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, turretVision);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
