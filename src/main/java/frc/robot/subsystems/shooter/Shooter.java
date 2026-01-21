@@ -9,21 +9,9 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import au.grapplerobotics.ConfigurationFailedException;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
-import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
-import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
-import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
@@ -44,7 +32,7 @@ public class Shooter  {
 
     public Shooter(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0.1; //tune p value
+        config.Slot0.kP = 0.2; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0;
         config.Slot0.kV = 0.12; //Maximum rps = 100 --> 12V/100rps

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.TurretAutoShoot;
 import frc.robot.constants.Constants;
@@ -66,10 +67,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             ()->false, getDrivetrain()).withTimeout(2));
 
         driver.get(PS5Button.LB).onTrue(
-            new InstantCommand(() -> {
-                shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-                shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY);
-            })).onFalse(
+            new SequentialCommandGroup(
+                new InstantCommand(()-> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY)),
+                new WaitCommand(0.8),
+                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
+            )
+            ).onFalse(
                 new InstantCommand(() -> {
                         shooter.setFeeder(0);
                         shooter.setShooter(0);
