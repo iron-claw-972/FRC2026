@@ -36,7 +36,7 @@ public class TurretAutoShoot extends Command {
         double D_y = target.getY() - drivepose.getY();
         double D_x = target.getX() - drivepose.getX();
         fieldAngleRad = Math.atan2(D_y, D_x);
-        double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians()));
+        double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians() + Math.PI)); // Add 180 because drivetrain is backwards
         turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngleRad - robotHeading), -180.0,180.0);
 
         System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
