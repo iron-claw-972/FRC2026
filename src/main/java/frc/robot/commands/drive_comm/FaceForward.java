@@ -69,15 +69,15 @@ public class FaceForward extends Command {
 
         Translation2d robotRelativeVelocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond);
         Rotation2d robotRelativeAngle = new Rotation2d(robotRelativeVelocity.getX(), robotRelativeVelocity.getY());
-        Rotation2d desiredAngle = robotRelativeAngle.rotateBy(drive.getYaw()).rotateBy(new Rotation2d(Math.PI/2));
-        
-        //Rotation2d desiredAngle = new Rotation2d(-driver.getRawSideTranslation(), driver.getRawForwardTranslation());
+
+        //Rotation2d desiredAngle = robotRelativeAngle.rotateBy(drive.getYaw()).rotateBy(new Rotation2d(Math.PI/2));
+        Rotation2d desiredAngle = new Rotation2d(-driver.getRawSideTranslation(), driver.getRawForwardTranslation()); //this feels better
 
         if (driver.getRawHeadingMagnitude() > CONTROL_DEADZONE) {
-            drive.setAlignAngle(new Rotation2d(new Rotation2d(-driver.getRawHeadingAngle()).getCos(), new Rotation2d(driver.getRawHeadingAngle()).getSin()).getRadians());
-        } else if (robotRelativeVelocity.getNorm() > SPEED_DEADZONE){
             drive.setAlignAngle(desiredAngle.getRadians());
-        }
+        } // else if (robotRelativeVelocity.getNorm() > SPEED_DEADZONE){
+        //     drive.setAlignAngle(desiredAngle.getRadians());
+        // }
     }
 
     @Override
