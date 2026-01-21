@@ -2,6 +2,7 @@ package frc.robot.commands.gpm;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,14 +16,16 @@ import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
 
 public class AutoShoot extends Command {
-    Drivetrain drive;
-    Hood hood;
-    Shooter shooter;
-    TurretState target_state;
+    private Drivetrain drive;
+    private Hood hood;
+    private Shooter shooter;
+    private TurretState target_state;
 
-    boolean atTarget;
+    private ChassisSpeeds fieldRelVel;
+
+    private boolean atTarget;
     // apex of parabola in meters
-    double peakHeight = 3.0;
+    private double peakHeight = 3.0;
 
     public AutoShoot(Drivetrain drive, Hood hood, Shooter shooter) {
         this.drive = drive;
@@ -37,11 +40,17 @@ public class AutoShoot extends Command {
                 HoodConstants.SHOOTER_HEIGHT);
     }
 
+    private void updateFieldRelVel(){
+        ChassisSpeeds robotRelVel = drive.getChassisSpeeds();
+        fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drive.getYaw());
+    }
+
     @Override
     public void initialize() {
+        updateFieldRelVel();
         target_state = ShooterPhysics.getShotParams(
-                new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
-                        drive.getChassisSpeeds().vyMetersPerSecond),
+                new Translation2d(fieldRelVel.vxMetersPerSecond,
+                        fieldRelVel.vyMetersPerSecond),
                 getShooterPosition(),
                 FieldConstants.HUB_TRANSLATION3D,
                 peakHeight);
@@ -54,9 +63,10 @@ public class AutoShoot extends Command {
 
     @Override
     public void execute() {
+        updateFieldRelVel();
         target_state = ShooterPhysics.getShotParams(
-                new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
-                        drive.getChassisSpeeds().vyMetersPerSecond),
+                new Translation2d(fieldRelVel.vxMetersPerSecond,
+                        fieldRelVel.vyMetersPerSecond),
                 getShooterPosition(),
                 FieldConstants.HUB_TRANSLATION3D,
                 peakHeight);
