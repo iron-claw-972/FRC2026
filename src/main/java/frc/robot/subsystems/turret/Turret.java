@@ -82,8 +82,8 @@ public class Turret extends SubsystemBase {
 
         // to be frank I just took this from hood because I don't know good values yet
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
-        config.Slot0.kG = 0.25; // Gravity compensation
-        config.Slot0.kV = 0.12; // Velocity gain: 1 rps -> 0.12V
+        config.Slot0.kG = 0.0; // Gravity compensation
+        config.Slot0.kV = 0.0; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
         config.Slot0.kP = Units.radiansToRotations(3.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
