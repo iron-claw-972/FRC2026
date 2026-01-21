@@ -67,15 +67,17 @@ public class RobotContainer {
 
       case WaffleHouse:
       
-      case SwerveCompetition:
+      case SwerveCompetition: // AKA "Vantage"
 
-      case BetaBot:
+      case BetaBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-      case Phil:
-      case Vertigo:
+
+      case Phil: // AKA "IHOP"
+
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
@@ -84,7 +86,6 @@ public class RobotContainer {
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
-        
 
         driver.configureControls();
         operator.configureControls();
@@ -113,7 +114,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
 
-    
+
   }
 
   /**
