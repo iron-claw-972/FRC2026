@@ -107,7 +107,7 @@ public class PS5Controller extends Controller {
         return controller;
     }
     public void rumbleOn(){
-        controller.setRumble(RumbleType.kBothRumble,0.1);
+        controller.setRumble(RumbleType.kBothRumble,1.0);
     }
     public void rumbleOff(){
         controller.setRumble(RumbleType.kBothRumble,0);

@@ -19,7 +19,8 @@ import lib.controllers.PS5Controller.PS5Button;
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->false;
+    private final BooleanSupplier slowModeSupplier = () -> false;
+    private boolean rumbleEnabled = false;
 
     public PS5ControllerDriverConfig(Drivetrain drive) {
         super(drive);
@@ -28,30 +29,38 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
-            new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
-        )));
+                new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
-            getDrivetrain().setDesiredPose(()->null);
+            getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
         driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-            ()->getDrivetrain().setStateDeadband(false),
-            getDrivetrain()::alignWheels,
-            interrupted->getDrivetrain().setStateDeadband(true),
-            ()->false, getDrivetrain()).withTimeout(2));
+                () -> getDrivetrain().setStateDeadband(false),
+                getDrivetrain()::alignWheels,
+                interrupted -> getDrivetrain().setStateDeadband(true),
+                () -> false, getDrivetrain()).withTimeout(2));
+
+        // Toggle rumble on/off
+        driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
+            rumbleEnabled = !rumbleEnabled;
+            if (rumbleEnabled) {
+                startRumble();
+            } else {
+                endRumble();
+            }
+        }));
     }
-    
+
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
     }
 
-    
     @Override
     public double getRawForwardTranslation() {
         return driver.get(PS5Axis.LEFT_Y);
@@ -82,11 +91,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return false;
     }
 
-    public void startRumble(){
+    public void startRumble() {
         driver.rumbleOn();
     }
 
-    public void endRumble(){
+    public void endRumble() {
         driver.rumbleOff();
     }
 }
