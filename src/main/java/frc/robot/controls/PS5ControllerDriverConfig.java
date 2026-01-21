@@ -65,8 +65,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
 
-        driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))).onFalse(new InstantCommand(() -> shooter.setFeeder(0)));
-        driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
+        driver.get(PS5Button.LB).onTrue(
+            new InstantCommand(() -> {
+                shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+                shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY);
+            })).onFalse(
+                new InstantCommand(() -> {
+                        shooter.setFeeder(0);
+                        shooter.setShooter(0);
+                    }));
+        //driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
         
         driver.get(PS5Button.SQUARE).onTrue(
             new InstantCommand(()->{
