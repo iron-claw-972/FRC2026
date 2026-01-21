@@ -19,18 +19,13 @@ public class ClimbClimb extends Command {
     }
 
     @Override
-    public void execute() {
-
-    }
-
-    @Override
     public boolean isFinished() {
         return climb.atSetpoint();
     }
 
     @Override
     public void end(boolean interrupted) {
-        
+        climb.setSetpoint(0);
     }
 
 }
