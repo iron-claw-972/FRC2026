@@ -75,15 +75,14 @@ public class Turret extends SubsystemBase {
 
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        // to be frank I just took this from hood because I don't know good values yet
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0.0; // Gravity compensation
         config.Slot0.kV = 0.0; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
-        config.Slot0.kP = Units.radiansToRotations(3.0 * 12); // If position error is 2.5 rotations, apply 12V (0.5 * 2.5 * 12V)
-        config.Slot0.kI = Units.radiansToRotations(0.00); // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = Units.radiansToRotations(0.00 * 12); // Derivative term (used to dampen oscillations)
+        config.Slot0.kP = 10.0; // If position error is 1 rotation, apply 10V
+        config.Slot0.kI = 0.0; // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = 0.0; // Derivative term (used to dampen oscillations)
         
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY / TurretConstants.TURRET_RADIUS) * gearRatio; // max velocity * gear ratio
@@ -110,33 +109,8 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180, 0)));
         SmartDashboard.putData("Set to 270 degrees", new InstantCommand(() -> setSetpoint(270, 0)));
 
-        // SmartDashboard.putData("Set to 1,1", new InstantCommand(() -> setTarget(1,1)));
-        // SmartDashboard.putData("Set to -1,1", new InstantCommand(( )-> setTarget(-1,1)));
-        // SmartDashboard.putData("Set to -1,-1", new InstantCommand(() -> setTarget(-1,-1)));
-        // SmartDashboard.putData("Set to 1,-1", new InstantCommand(() -> setTarget(1,-1)));
-
-        // SmartDashboard.putData("Print out target position", new InstantCommand(()-> System.out.println(getTargetPosition())));
     }
     
-    // public void toggleAlignOn() {
-    //     if (alignOn) {
-    //         alignOn = false
-    //     } else {
-    //         alignOn = true
-    //     }
-    // }
-
-    // public void setTarget(double x, double y) {
-    //     D_x = x;
-    //     D_y = y;
-    // }
-
-    // public double[] getTargetPosition() {
-    //     System.out.println("Distance X value is: "+ D_x + "and the Distance Y valye is: " + D_y);
-    //     double[] target = {D_x, D_y};
-    //     return target;
-    // }
-
     public void turnOnAlignment() {
         alignOn = true;
     }
