@@ -61,9 +61,6 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    turret = new Turret();
-    shooter = new Shooter();
-    turretVision = new TurretVision("SOME CAMERA NAME"); // TODO: Get a real camera
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -82,6 +79,9 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
+        turret = new Turret();
+        shooter = new Shooter();
+
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, turretVision);
         operator = new Operator(drive);
