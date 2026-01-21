@@ -74,11 +74,6 @@ public class Turret extends SubsystemBase {
         motor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
-        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = 200;
-        limitConfig.StatorCurrentLimitEnable = true;
-
-        motor.getConfigurator().apply(limitConfig);
 
         // to be frank I just took this from hood because I don't know good values yet
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
@@ -151,7 +146,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getPosition() {
-         return motor.getPosition().getValueAsDouble() / gearRatio; // Gear ratio
+        return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio; // Gear ratio
     }
 
     public boolean atSetPoint(){
@@ -181,7 +176,10 @@ public class Turret extends SubsystemBase {
 
             //Tune this with rotating robot
             double dV = TurretConstants.ROTATIONAL_VELOCITY_CONSTANT;
-            motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
+            //motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
+            motor.setControl(voltageRequest.withPosition(motorTargetRotations));
+
+            System.out.println("Workingnnnnngnggdsfadsfsa");
         }
     }
 
@@ -191,6 +189,8 @@ public class Turret extends SubsystemBase {
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         
         ligament2d.setAngle(position);
+
+        SmartDashboard.putNumber("Turret Position Degrees", getPosition());
     }
 
     public double getAppliedVoltage() {
