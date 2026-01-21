@@ -103,8 +103,8 @@ public class DriveConstants {
     public static double STEER_OFFSET_BACK_RIGHT;
 
     // Heading PID.
-    public static final double HEADING_P = 5.5;
-    public static final double HEADING_D = 0;
+    public static final double HEADING_P = 3;
+    public static final double HEADING_D = 0.5;
 
     public static final double HEADING_TOLERANCE = Units.degreesToRadians(1.5);
 

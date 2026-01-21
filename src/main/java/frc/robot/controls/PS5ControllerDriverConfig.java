@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.drive_comm.FaceForward;
 import frc.robot.commands.gpm.AlphaIntakeBall;
 import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.Constants;
@@ -30,7 +31,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Shooter shooter;
     private IntakeAlpha intake;
-    private boolean rumbleEnabled;
+    private boolean rumbleEnabled = false;
 
     private Command intakeBall;
     private Command autoShoot;
@@ -64,17 +65,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
-        // Toggle rumble on/off
-        driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
-            rumbleEnabled = !rumbleEnabled;
-            if (rumbleEnabled) {
-                startRumble();
-            } else {
-                endRumble();
-            }
-            SmartDashboard.putBoolean("Rumble Enabled", rumbleEnabled);
-        }));
-
         if (intake != null && shooter != null) {
             // shoots it
             driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
@@ -87,25 +77,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             }));
 
             // Intake
-            driver.get(PS5Button.LEFT_TRIGGER).onTrue(
-                    new InstantCommand(() -> {
-                        if (intakeBall != null && intakeBall.isScheduled()) {
-                            intakeBall.cancel();
-                        } else {
-                            intakeBall = new AlphaIntakeBall(intake);
-                            CommandScheduler.getInstance().schedule(intakeBall);
-                        }
-                    }));
+            driver.get(PS5Button.LEFT_TRIGGER).whileTrue(new AlphaIntakeBall(intake));
+
             if (hood != null) {
-                driver.get(PS5Button.CIRCLE).onTrue(
-                        new InstantCommand(() -> {
-                            if (autoShoot != null && autoShoot.isScheduled()) {
-                                autoShoot.cancel();
-                            } else {
-                                autoShoot = new AutoShoot(getDrivetrain(), hood, shooter);
-                                CommandScheduler.getInstance().schedule(autoShoot);
-                            }
-                        }));
+                driver.get(PS5Button.CIRCLE).whileTrue(new AutoShoot(getDrivetrain(), hood, shooter));
             }
         }
     }

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
+import frc.robot.commands.drive_comm.FaceForward;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
@@ -116,6 +117,8 @@ public class RobotContainer {
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putData("face forward", new FaceForward(drive, driver));
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
