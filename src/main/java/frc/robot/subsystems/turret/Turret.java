@@ -54,7 +54,7 @@ public class Turret extends SubsystemBase {
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret_motor", 25, 0));
 
     public Turret() {
-        motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_CAN); // switch of course
+        motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN); // switch of course
         
         if (RobotBase.isSimulation()) {
             encoderSim = motor.getSimState();

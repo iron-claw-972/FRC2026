@@ -32,7 +32,7 @@ public class Shooter  {
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
-    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.RIO_CAN);
 
     //rotations/sec
 
