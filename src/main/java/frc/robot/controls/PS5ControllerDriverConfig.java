@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -71,6 +72,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             } else {
                 endRumble();
             }
+            SmartDashboard.putBoolean("Rumble Enabled", rumbleEnabled);
         }));
 
         if (intake != null && shooter != null) {
