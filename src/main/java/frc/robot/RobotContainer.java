@@ -113,8 +113,6 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-
-
   }
 
   /**
