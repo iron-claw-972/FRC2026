@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.commands.drive_comm.FaceForward;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
@@ -54,6 +55,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 endRumble();
             }
         }));
+
+        driver.get(PS5Button.CROSS).whileTrue(new FaceForward(getDrivetrain(), this));
     }
 
     @Override
