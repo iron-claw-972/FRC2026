@@ -87,7 +87,7 @@ public class Turret extends SubsystemBase {
         
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY / TurretConstants.TURRET_RADIUS) * gearRatio; // max velocity * gear ratio
-        motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION / TurretConstants.TURRET_RADIUS) * gearRatio; // max Acceleration * gear ratio
+        motionMagicConfigs.MotionMagicCruiseAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION / TurretConstants.TURRET_RADIUS) * gearRatio; // max Acceleration * gear ratio
 
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         motor.getConfigurator().apply(config);
