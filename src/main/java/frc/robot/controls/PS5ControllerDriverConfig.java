@@ -92,14 +92,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         driver.get(PS5Button.CROSS).onTrue(
             new InstantCommand(()->{
-                        if (turretJoyStickAim == null || !turretJoyStickAim.isScheduled()){
-                            turretJoyStickAim = new TurretJoyStickAim(turret, this.driver);
-                            CommandScheduler.getInstance().schedule(turretAutoShoot);
-                        }
-                    })
+                    if (turretJoyStickAim == null || !turretJoyStickAim.isScheduled()){
+                        turretJoyStickAim = new TurretJoyStickAim(turret, this);
+                        CommandScheduler.getInstance().schedule(turretAutoShoot);
+                    }
+                })
         ).onFalse(
             new InstantCommand(()->{
-                turretJoyStickAim.cancel();
+                if(turretJoyStickAim.isScheduled()){
+                    turretJoyStickAim.cancel();
+                }
             })
         );
     }

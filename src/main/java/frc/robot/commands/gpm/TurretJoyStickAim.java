@@ -11,8 +11,9 @@ public class TurretJoyStickAim extends Command{
     private Turret turret;
     private PS5ControllerDriverConfig driver;
 
-    public TurretJoyStickAim(Turret turret){
+    public TurretJoyStickAim(Turret turret, PS5ControllerDriverConfig driver){
         this.turret = turret;
+        this.driver = driver;
     }
 
     Rotation2d rotation2d = new Rotation2d(driver.getRawSideTranslation(), driver.getRawForwardTranslation());
