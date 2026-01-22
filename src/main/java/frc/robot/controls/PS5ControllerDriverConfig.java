@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.TurretAutoShoot;
+import frc.robot.commands.gpm.TurretJoyStickAim;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -37,6 +38,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     private Pose2d alignmentPose = null;
     private Command turretAutoShoot;
+    private TurretJoyStickAim turretJoyStickAim;
 
     public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret) {
         super(drive);
@@ -86,6 +88,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             CommandScheduler.getInstance().schedule(turretAutoShoot);
                         }
                     })
+        );
+
+        driver.get(PS5Button.CROSS).onTrue(
+            new InstantCommand(()->{
+                        turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain());
+                        CommandScheduler.getInstance().schedule(turretAutoShoot);
+                    })
+        ).onFalse(
+            new InstantCommand(()->{
+                turretAutoShoot.cancel();
+            })
         );
     }
     
