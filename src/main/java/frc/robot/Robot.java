@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
-import frc.robot.util.BuildData;
+// import frc.robot.util.BuildData;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -80,23 +80,23 @@ public class Robot extends LoggedRobot {
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
 
-          // Record metadata
-        Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
-        Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
-        Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
-        Logger.recordMetadata("GitDate", BuildData.GIT_DATE);
-        Logger.recordMetadata("GitBranch", BuildData.GIT_BRANCH);
-        switch (BuildData.DIRTY) {
-        case 0:
-            Logger.recordMetadata("GitDirty", "All changes committed");
-            break;
-        case 1:
-            Logger.recordMetadata("GitDirty", "Uncomitted changes");
-            break;
-        default:
-            Logger.recordMetadata("GitDirty", "Unknown");
-            break;
-        }
+        //   // Record metadata
+        // Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
+        // Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
+        // Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
+        // Logger.recordMetadata("GitDate", BuildData.GIT_DATE);
+        // Logger.recordMetadata("GitBranch", BuildData.GIT_BRANCH);
+        // switch (BuildData.DIRTY) {
+        // case 0:
+        //     Logger.recordMetadata("GitDirty", "All changes committed");
+        //     break;
+        // case 1:
+        //     Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        //     break;
+        // default:
+        //     Logger.recordMetadata("GitDirty", "Unknown");
+        //     break;
+        // }
 
         robotContainer = new RobotContainer(robotId);
         
