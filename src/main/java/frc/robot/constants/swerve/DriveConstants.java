@@ -211,10 +211,9 @@ public class DriveConstants {
             WHEEL_MOI = 0.000326 * ROBOT_MASS;
 
         } else if (robotId == RobotId.Vertigo) {
-            STEER_OFFSET_FRONT_LEFT = 4.185;
-            STEER_OFFSET_FRONT_RIGHT = 101.519+90;
-            STEER_OFFSET_BACK_LEFT = 38.997+180;
-            STEER_OFFSET_BACK_RIGHT = 242.847-90;
+            STEER_OFFSET_FRONT_LEFT = 194.326 + 180.0;
+            STEER_OFFSET_BACK_LEFT = 129.111 + 180.0;
+            STEER_OFFSET_BACK_RIGHT = 107.578;
             
             DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 
