@@ -212,6 +212,7 @@ public class DriveConstants {
 
         } else if (robotId == RobotId.Vertigo) {
             STEER_OFFSET_FRONT_LEFT = 194.326 + 180.0;
+            STEER_OFFSET_FRONT_RIGHT = 289.687 + 180.0;
             STEER_OFFSET_BACK_LEFT = 129.111 + 180.0;
             STEER_OFFSET_BACK_RIGHT = 107.578;
             
