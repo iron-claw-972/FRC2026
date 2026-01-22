@@ -25,7 +25,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -710,7 +709,6 @@ public class Drivetrain extends SubsystemBase {
         return getChassisSpeeds().vyMetersPerSecond;
     }
 
-    @AutoLogOutput(key = "FaceForward/desiredAngle")
     public double getDesiredAngle(){
         Translation2d robotRelativeVelocity = new Translation2d(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond);
         Rotation2d robotRelativeAngle = new Rotation2d(robotRelativeVelocity.getX(), robotRelativeVelocity.getY());

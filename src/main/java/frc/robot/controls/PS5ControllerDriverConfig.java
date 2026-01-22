@@ -2,21 +2,22 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
-import frc.robot.commands.drive_comm.FaceForward;
+import frc.robot.commands.drive_comm.AimAtTarget;
 import frc.robot.commands.gpm.AlphaIntakeBall;
 import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.Shooter.ShooterConstants;
+import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.intake.IntakeAlpha;
@@ -82,6 +83,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             if (hood != null) {
                 driver.get(PS5Button.CIRCLE).whileTrue(new AutoShoot(getDrivetrain(), hood, shooter));
             }
+
+			driver.get(PS5Button.CROSS)
+					.whileTrue(new AimAtTarget(getDrivetrain(),
+							new Pose2d(FieldConstants.HUB_BLUE.toTranslation2d(), Rotation2d.kZero)));
         }
     }
 
