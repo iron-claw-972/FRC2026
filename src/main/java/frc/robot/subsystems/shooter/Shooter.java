@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
         double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         System.out.println("PRINTING WHEEEEEEEEEEEEL CIRUM:" + wheelCircumference);
         shooterTargetSpeed = linearVelocityMps * ShooterConstants.SHOOTER_GEAR_RATIO / wheelCircumference; // rps
-        System.out.println("PRINTING TARGET SPEED:" + shooterTargetSpeed);
+        System.out.println("Shooter is working");
     }
 
     public double getFeederVelocity() {

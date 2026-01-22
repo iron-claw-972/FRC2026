@@ -142,8 +142,6 @@ public class Turret extends SubsystemBase implements TurretIO{
             //Tune this with rotating robot
             double dV = TurretConstants.ROTATIONAL_VELOCITY_CONSTANT;
             motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
-
-            System.out.println("Workingnnnnngnggdsfadsfsa");
         }
     }
 
