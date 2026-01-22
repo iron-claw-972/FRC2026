@@ -103,11 +103,15 @@ public class Turret extends SubsystemBase implements TurretIO{
         SmartDashboard.putData("Set to 180 degrees", new InstantCommand(() -> setSetpoint(180, 0)));
         SmartDashboard.putData("Set to -180 degrees", new InstantCommand(() -> setSetpoint(-180, 0)));
         SmartDashboard.putData("Set to -90 degrees", new InstantCommand(() -> setSetpoint(-90, 0)));
-
+        SmartDashboard.putData("Reset Yaw", new InstantCommand(() -> resetYaw()));
     }
 
     public double getPosition() {
         return inputs.positionDeg;
+    }
+
+    public void resetYaw() {
+        inputs.positionDeg = 0;
     }
 
     public boolean atSetPoint(){

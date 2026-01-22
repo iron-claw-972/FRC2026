@@ -1,5 +1,7 @@
 package frc.robot.subsystems.shooter;
 
+import java.lang.annotation.Target;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -11,11 +13,11 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Shooter  {
+public class Shooter extends SubsystemBase {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.RIO_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.RIO_CAN);
@@ -78,7 +80,9 @@ public class Shooter  {
 
     public void setShooter(double linearVelocityMps) {
         double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+        System.out.println("PRINTING WHEEEEEEEEEEEEL CIRUM:" + wheelCircumference);
         shooterTargetSpeed = linearVelocityMps * ShooterConstants.SHOOTER_GEAR_RATIO / wheelCircumference; // rps
+        System.out.println("PRINTING TARGET SPEED:" + shooterTargetSpeed);
     }
 
     public double getFeederVelocity() {
