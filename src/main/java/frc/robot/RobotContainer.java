@@ -19,6 +19,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.commands.drive_comm.FaceForward;
+import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
@@ -126,6 +127,8 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    SmartDashboard.putData("auto shoot", new AutoShoot(drive, hood, shooter));
+
 
     
   }

@@ -709,6 +709,7 @@ public class Drivetrain extends SubsystemBase {
         return getChassisSpeeds().vyMetersPerSecond;
     }
 
+    // @AutoLogOutput(key = "FaceForward/desiredAngle")p
     public double getDesiredAngle(){
         Translation2d robotRelativeVelocity = new Translation2d(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond);
         Rotation2d robotRelativeAngle = new Rotation2d(robotRelativeVelocity.getX(), robotRelativeVelocity.getY());
