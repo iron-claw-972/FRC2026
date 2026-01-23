@@ -65,7 +65,7 @@ public class VisionConstants {
     /**
      * The maximum distance to the tag to use
      */
-    public static final double MAX_DISTANCE = 2;
+    public static final double MAX_DISTANCE = 5;
 
     /** If vision should use manual calculations */
     public static final boolean USE_MANUAL_CALCULATIONS = true;
@@ -128,7 +128,7 @@ public class VisionConstants {
      * <p>
      * Only affects calculations using PhotonVision, not manual calculations.
      */
-    public static final double HIGHEST_AMBIGUITY = 0.1;
+    public static final double HIGHEST_AMBIGUITY = 0.2;
 
     public static final int MAX_EMPTY_TICKS = 10;
 

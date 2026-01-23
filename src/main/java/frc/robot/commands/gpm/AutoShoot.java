@@ -55,7 +55,7 @@ public class AutoShoot extends Command {
                 FieldConstants.HUB_BLUE,
                 peakHeight);
 
-        // hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
+        hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
         shooter.setShooter(target_state.exitVel());
         drive.setIsAlign(true);
         drive.setAlignAngle(target_state.yaw().getRadians());
@@ -71,10 +71,10 @@ public class AutoShoot extends Command {
                 FieldConstants.HUB_BLUE,
                 peakHeight);
 
-        // hood.setSetpoint(target_state.pitch());
-        shooter.setShooter(target_state.exitVel());
+        hood.setSetpoint(target_state.pitch());
+        shooter.setShooter(-target_state.exitVel());
         drive.setAlignAngle(target_state.yaw().getRadians());
-        shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+        shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);   
 
         if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
             // shooter.setFeeder(1);
