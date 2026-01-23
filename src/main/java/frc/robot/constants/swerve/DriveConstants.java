@@ -257,6 +257,11 @@ public class DriveConstants {
             STEER_OFFSET_FRONT_RIGHT = 0.0;
             STEER_OFFSET_BACK_LEFT = 0.0;
             STEER_OFFSET_BACK_RIGHT = 0.0;
+        } else if(robotId == RobotId.SwerveCompetition){
+                STEER_OFFSET_FRONT_LEFT = 302.646;
+                STEER_OFFSET_FRONT_RIGHT = 103.039+180;
+                STEER_OFFSET_BACK_LEFT = 165.49+90;
+                STEER_OFFSET_BACK_RIGHT = 73.563;
         }
         
         MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
