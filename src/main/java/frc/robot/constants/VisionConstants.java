@@ -153,7 +153,7 @@ public class VisionConstants {
     public static final ArrayList<Pair<String, Transform3d>> APRIL_TAG_CAMERAS = new ArrayList<Pair<String, Transform3d>>(
             List.of(
                 new Pair<String, Transform3d>(
-                        "CameraFront",
+                        "CameraRight",
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(10.485), Units.inchesToMeters(10.217),
                                         Units.inchesToMeters(11.012)),

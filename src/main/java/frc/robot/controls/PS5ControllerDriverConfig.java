@@ -88,6 +88,21 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         }
                     })
         );
+
+        // driver.get(PS5Button.CROSS).onTrue(
+        //     new InstantCommand(()->{
+        //         if(turretJoyStickAim == null || !turretJoyStickAim.isScheduled()){
+        //             turretJoyStickAim = new TurretJoyStickAim(turret, this);
+        //             turretJoyStickAim.schedule();
+        //         }
+        //     })
+        // ).onFalse(
+        //     new InstantCommand(()->{
+        //         if(turretJoyStickAim.isScheduled()){
+        //             turretJoyStickAim.cancel();
+        //         }
+        //     })
+        // );
         
     }
     
