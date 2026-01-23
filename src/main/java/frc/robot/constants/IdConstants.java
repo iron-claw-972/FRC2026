@@ -1,7 +1,5 @@
 package frc.robot.constants;
 
-import edu.wpi.first.wpilibj.I2C;
-
 public class IdConstants {
     // Drivetrain
     public static final int DRIVE_FRONT_LEFT_ID = 1;
@@ -20,8 +18,6 @@ public class IdConstants {
 
     // LEDs
     public static final int CANDLE_ID = 1;
-
-    //TODO: get actual ID constants
 
     //Shooter
     public static final int SHOOTER_LEFT_ID = 6;

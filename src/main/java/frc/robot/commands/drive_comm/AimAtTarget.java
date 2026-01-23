@@ -1,7 +1,5 @@
 package frc.robot.commands.drive_comm;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -37,8 +35,7 @@ public class AimAtTarget extends Command {
 
     @Override
     public boolean isFinished() {
-        // return drivetrain.atAlignAngle();
-        return false;
+        return drivetrain.atAlignAngle();
     }
 
     private double angleToTarget() {
