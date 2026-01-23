@@ -24,7 +24,7 @@ public enum RobotId {
      */
     @Deprecated
     public boolean isClassBot() {
-        return this == WaffleHouse || this == ClassBot1 || this == ClassBot2 || this == ClassBot3 || this == ClassBot4;
+        return this == ClassBot1 || this == ClassBot2 || this == ClassBot3 || this == ClassBot4;
     }
 
     /**
