@@ -60,15 +60,15 @@ public class Climb extends SubsystemBase{
         slot0Configs.kS = 0.0; 
         slot0Configs.kV = 0.0;
         slot0Configs.kA = 0.0;
-        slot0Configs.kP = 10.0; // A position error of 2.5 rotations results in 12 V output
-        slot0Configs.kI = 1.0; // no output for integrated error
-        slot0Configs.kD = 1.0; // A velocity error of 1 rps results in 0.1 V output
+        slot0Configs.kP = 20.0; // A position error of 2.5 rotations results in 12 V output
+        slot0Configs.kI = 0.0; // no output for integrated error
+        slot0Configs.kD = 0.05; // A velocity error of 1 rps results in 0.1 V output
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 0.5; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 0.1; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = 0.05; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = 100; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = 200; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicJerk = 200; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         ClimbMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -100,10 +100,10 @@ public class Climb extends SubsystemBase{
     }
 
     public void ClimbToFirstPosition(){
-        setSetpoint(ClimbConstants.climbFirstStage + ClimbMotor.getPosition().getValueAsDouble()/ClimbConstants.gear_ratio);
+        setSetpoint(ClimbConstants.climbFirstStage + Units.rotationsToDegrees(ClimbMotor.getPosition().getValueAsDouble()/ClimbConstants.gear_ratio));
     }
 
     public void ClimbToSecondPosition(){
-        setSetpoint(ClimbConstants.climbSecondStage + ClimbMotor.getPosition().getValueAsDouble()/ClimbConstants.gear_ratio);
+        setSetpoint(ClimbConstants.climbSecondStage + Units.rotationsToDegrees(ClimbMotor.getPosition().getValueAsDouble()/ClimbConstants.gear_ratio));
     }
 }

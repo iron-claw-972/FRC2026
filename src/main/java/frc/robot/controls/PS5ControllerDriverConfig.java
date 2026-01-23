@@ -7,8 +7,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -21,8 +24,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    private Climb climb;
+
+    public PS5ControllerDriverConfig(Drivetrain drive, Climb climb) {
         super(drive);
+        this.climb = climb;
     }
 
     public void configureControls() {
@@ -44,6 +50,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+            
+        driver.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> climb.ClimbToFirstPosition()),
+            new WaitUntilCommand(climb::atSetpoint),
+            new InstantCommand(() -> climb.ClimbToSecondPosition())
+        ));    
     }
     
     @Override
