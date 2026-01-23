@@ -188,6 +188,9 @@ public class Module implements ModuleIO{
       inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
       inputs.turnCurrentAmps = turnCurrent.getValueAsDouble();
 
+      // Update encoder inputs
+      inputs.encoderOffset = Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble());
+
     // Update odometry inputs
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();

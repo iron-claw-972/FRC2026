@@ -51,9 +51,11 @@ public class DriveConstants {
     // I don't know if this is right 
     public static final double MAX_SPEED = 100.0 / (DRIVE_GEAR_RATIO) * (2 * Math.PI * WHEEL_RADIUS);
 
-    // Need to convert tangential velocity (the m/s of the edge of the robot) to angular velocity (the radians/s of the robot)
-    // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
-    public static final double MAX_ANGULAR_SPEED = MAX_SPEED / ((TRACK_WIDTH / 2) * Math.sqrt(2));
+            } else if(robotId == RobotId.SwerveCompetition){
+                STEER_OFFSET_FRONT_LEFT = 302.646;
+                STEER_OFFSET_FRONT_RIGHT = 103.039+180;
+                STEER_OFFSET_BACK_LEFT = 165.49+90;
+                STEER_OFFSET_BACK_RIGHT = 73.563;
 
     /**
      * Coefficient of static friction
@@ -68,11 +70,11 @@ public class DriveConstants {
     // The maximum angular acceleration of the robot
     public static final double MAX_ANGULAR_ACCEL = MAX_LINEAR_ACCEL / TRACK_WIDTH * Math.sqrt(2);
 
-    /**
-     * If this is false, Drivetrain will use the previous setpoint to calculate the new setpoint.
-     * <p> If this is true, Drivetrain will use the actual current setpoint instead.
-     */
-    public static final boolean USE_ACTUAL_SPEED = false;
+            } else if(robotId == RobotId.BetaBot) {
+                STEER_OFFSET_FRONT_LEFT = 193.884-180;
+                STEER_OFFSET_FRONT_RIGHT = 110.914;
+                STEER_OFFSET_BACK_LEFT = 128.054+180;
+                STEER_OFFSET_BACK_RIGHT = 107.43;
 
     /**
      * Disables the deadband and optimization for the modules.

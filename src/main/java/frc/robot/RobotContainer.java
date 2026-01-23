@@ -98,7 +98,6 @@ public class RobotContainer {
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
-        
 
         driver.configureControls();
         operator.configureControls();
