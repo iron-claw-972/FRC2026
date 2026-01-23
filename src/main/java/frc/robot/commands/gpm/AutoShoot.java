@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -64,12 +66,20 @@ public class AutoShoot extends Command {
     @Override
     public void execute() {
         updateFieldRelVel();
+
+        Logger.recordOutput("FieldRelativeVelocity", new Translation2d(fieldRelVel.vxMetersPerSecond,
+                        fieldRelVel.vyMetersPerSecond));
+        Logger.recordOutput("HubLocation", FieldConstants.HUB_BLUE);
+        
+
         target_state = ShooterPhysics.getShotParams(
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
                         fieldRelVel.vyMetersPerSecond),
                 getShooterPosition(),
                 FieldConstants.HUB_BLUE,
                 peakHeight);
+
+        Logger.recordOutput("ShooterPhysics", target_state);
 
         hood.setSetpoint(target_state.pitch());
         shooter.setShooter(-target_state.exitVel());
