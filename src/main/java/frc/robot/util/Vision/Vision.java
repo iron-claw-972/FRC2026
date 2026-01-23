@@ -47,8 +47,6 @@ public class Vision {
   private NetworkTableEntry objectClass;
   private NetworkTableEntry cameraIndex;
   
-  // The field layout. Instance variable
-  private AprilTagFieldLayout aprilTagFieldLayout;
   // A list of the cameras on the robot.
   private ArrayList<VisionCamera> cameras = new ArrayList<>();
 
@@ -76,11 +74,8 @@ public class Vision {
     // Start NetworkTables server
     NetworkTableInstance.getDefault().startServer();
 
-    // Load field layout
-    aprilTagFieldLayout = new AprilTagFieldLayout(FieldConstants.APRIL_TAGS, FieldConstants.FIELD_LENGTH, FieldConstants.FIELD_WIDTH);
-
     // Sets the origin to the right side of the blue alliance wall
-    aprilTagFieldLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    FieldConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 
     if(VisionConstants.ENABLED){
       // Puts the cameras in an array list
@@ -90,7 +85,7 @@ public class Vision {
 
       if(RobotBase.isSimulation()){
         visionSim = new VisionSystemSim("Vision");
-        visionSim.addAprilTags(aprilTagFieldLayout);
+        visionSim.addAprilTags(FieldConstants.field);
         for(VisionCamera c : cameras){
           PhotonCameraSim cameraSim = new PhotonCameraSim(c.camera);
           cameraSim.enableDrawWireframe(true);
@@ -263,7 +258,7 @@ public class Vision {
   }
 
   public AprilTagFieldLayout getAprilTagFieldLayout(){
-    return aprilTagFieldLayout;
+    return FieldConstants.field;
   }
 
   /**
@@ -407,7 +402,7 @@ public class Vision {
    * @return If the pose is on the field
    */
   public static boolean onField(Pose2d pose){
-    return pose!=null && pose.getX()>0 && pose.getX()<FieldConstants.FIELD_LENGTH && pose.getY()>0 && pose.getY()<FieldConstants.FIELD_WIDTH;
+    return pose!=null && pose.getX()>0 && pose.getX()<FieldConstants.field.getFieldLength() && pose.getY()>0 && pose.getY()<FieldConstants.field.getFieldWidth();
   }
 
   /**
@@ -416,7 +411,7 @@ public class Vision {
    * @return If the pose is within an area with twice the length and width of the field
    */
   public static boolean nearField(Pose2d pose){
-    return pose!=null && pose.getX()>-FieldConstants.FIELD_LENGTH/2 && pose.getX()<FieldConstants.FIELD_LENGTH*1.5 && pose.getY()>-FieldConstants.FIELD_WIDTH/2 && pose.getY()<FieldConstants.FIELD_WIDTH*1.5;
+    return pose!=null && pose.getX()>-FieldConstants.field.getFieldLength()/2 && pose.getX()<FieldConstants.field.getFieldLength()*1.5 && pose.getY()>-FieldConstants.field.getFieldWidth()/2 && pose.getY()<FieldConstants.field.getFieldWidth()*1.5;
   }
   
   private class VisionCamera implements VisionIO {
@@ -435,7 +430,7 @@ public class Vision {
     public VisionCamera(String cameraName, Transform3d robotToCam) {
       camera = new PhotonCamera(cameraName);
       photonPoseEstimator = new PhotonPoseEstimator(
-        aprilTagFieldLayout, 
+        FieldConstants.field, 
         robotToCam
       );
       lastPose = null;
@@ -636,7 +631,7 @@ public class Vision {
           continue;
         }
         // Stores target pose and robot to camera transformation for easy access later
-        Pose3d targetPose = FieldConstants.APRIL_TAGS.get(id-1).pose;
+        Pose3d targetPose = FieldConstants.field.getTagPose(id).get();
         Transform3d robotToCamera = photonPoseEstimator.getRobotToCameraTransform();
 
         double timestamp = result.getTimestampSeconds();
@@ -671,7 +666,7 @@ public class Vision {
 
     public boolean useTag(int id){
       // Never use tags that don't exist
-      if(id <= 0 || id > FieldConstants.APRIL_TAGS.size()){
+      if(id <= 0 || id > FieldConstants.field.getTags().size()){
         return false;
       }
       // Return false if it is in the list of tags to ignore
