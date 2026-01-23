@@ -28,11 +28,12 @@ public class TurretAutoShoot extends Command {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.turretVision = turretVision;
+
+        addRequirements(turret);
     }
 
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain){
-        this.turret = turret;
-        this.drivetrain = drivetrain;
+        this(turret, drivetrain, null);
     }
 
     public void updateTurretSetpoint() {
@@ -87,7 +88,7 @@ public class TurretAutoShoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        turret.setSetpoint(0, 0);
+        
     }
 
     
