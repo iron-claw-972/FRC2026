@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void setFeeder(double power){
-        System.out.println("VELOCITY: " + getShooterVelcoity()); 
+        // System.out.println("VELOCITY: " + getShooterVelcoity()); 
         feederPower = power;
     }
 

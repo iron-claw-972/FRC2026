@@ -18,7 +18,7 @@ public class FieldConstants {
 
   /** Location of hub target */
   public static final Translation3d HUB_BLUE =
-      new Translation3d(Units.inchesToMeters(156.8), 4.035, Units.inchesToMeters(72));
+      new Translation3d(Units.inchesToMeters(158.6), Units.inchesToMeters(158.85), Units.inchesToMeters(72));
 
   public static Translation3d getHubTranslation() {
     if (Robot.getAlliance() == Alliance.Blue) {
