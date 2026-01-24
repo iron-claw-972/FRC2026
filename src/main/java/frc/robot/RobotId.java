@@ -71,6 +71,10 @@ public enum RobotId {
             }
         }
 
+		if (robotId == RobotId.Default) {
+			throw new RuntimeException("RobotId is set to Default (or was unset)! Please set it to something.");
+		}
+
         // return the robot identity
         return robotId;
     }
