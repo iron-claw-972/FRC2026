@@ -3,13 +3,11 @@ package frc.robot.commands.gpm;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.FieldConstants;
-import frc.robot.constants.HoodConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -34,11 +32,8 @@ public class AutoShoot extends Command {
         this.shooter = shooter;
     }
 
-    private Translation3d getShooterPosition() {
-        return new Translation3d(
-                drive.getPose().getX(),
-                drive.getPose().getY(),
-                HoodConstants.SHOOTER_HEIGHT);
+    private Translation2d getRobotPosition() {
+        return drive.getPose().getTranslation();
     }
 
     private void updateFieldRelVel(){
@@ -52,7 +47,7 @@ public class AutoShoot extends Command {
         target_state = ShooterPhysics.getShotParams(
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
                         fieldRelVel.vyMetersPerSecond),
-                getShooterPosition(),
+                getRobotPosition(),
                 FieldConstants.HUB_BLUE,
                 peakHeight);
 
@@ -74,7 +69,7 @@ public class AutoShoot extends Command {
         target_state = ShooterPhysics.getShotParams(
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
                         fieldRelVel.vyMetersPerSecond),
-                getShooterPosition(),
+                getRobotPosition(),
                 FieldConstants.HUB_BLUE,
                 peakHeight);
 

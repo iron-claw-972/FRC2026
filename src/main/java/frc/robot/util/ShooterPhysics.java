@@ -13,14 +13,23 @@ public class ShooterPhysics {
 	public record TurretState(Rotation2d yaw, double pitch, double exitVel) {
 	};
 
-	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robot, Translation3d target,
-			double peakHeight) {
-		Translation3d robotToTarget = target.minus(robot);
-		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
+	/**
+	 * Calculates shot parameters for SOTM using Physics™.
+	 *
+	 * @param robotVelocity The x and y velocity of the robot, field relative.
+	 * @param robot         The position of the center of the robot, field relative.
+	 * @param target        The position of the target, field relative.
+	 * @param height        The peak height the trajectory should reach.
+	 * @return A TurretState that represents the shot the robot should take.
+	 */
+	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target,
+			double height) {
+		Translation3d robotToTarget = target.minus(new Translation3d(robot));
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
 
-		Translation2d as2d = exitVel.toTranslation2d();
-		Rotation2d yaw = as2d.getAngle();
-		double magnitude2d = as2d.getDistance(Translation2d.kZero);
+		Translation2d onGround = exitVel.toTranslation2d();
+		Rotation2d yaw = onGround.getAngle();
+		double magnitude2d = onGround.getNorm();
 
 		double pitch = new Translation2d(magnitude2d, exitVel.getZ()).getAngle().getRadians();
 		pitch %= Math.PI * 2;
@@ -29,10 +38,24 @@ public class ShooterPhysics {
 		return new TurretState(yaw, pitch, speed);
 	}
 
-	// assumes shot from (0, 0, 0)
-	// only public for unit testing, don't actually use this directly
+	/**
+	 * Actually does the SOTM math. Assumes shots are from (0, 0, 0). This is only
+	 * public so it can be unit tested, and shouldn't be called directly.
+	 *
+	 * @param robotVelocity The velocity of the robot, field relative.
+	 * @param target        The translation from the robot to the target, field
+	 *                      relative. Aka, the position of the target if the robot
+	 *                      was at the origin.
+	 * @param peakZ         The height of the highest point of the generated
+	 *                      trajectory.
+	 * @return Velocity that should be imparted on the ball, field relative.
+	 */
 	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
 			double peakZ) {
+		if (target.getZ() > peakZ)
+			throw new IllegalArgumentException(
+					"The target (" + target + ") cannot be higher than the max trajectory height (" + peakZ + ").");
+
 		// z = v_z_exit_vel * t - .5 * g * t²
 		// want vertex of this equation to equal peakZ
 		// t_vertex = -v_z_exit_vel / -g
@@ -92,16 +115,22 @@ public class ShooterPhysics {
 		}
 
 		// guess a peak height
-		double guess = 10;
+		double guess = target.getZ() + 2;
 		int maxIters = 20;
 		while (maxIters >= 0) {
 			maxIters--;
+
+			// this will throw an exception, so avoid it
+			// we still might have just overshot, so keep checking
+			if (guess < target.getZ())
+				guess = target.getZ();
+
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
 			double guessSpeed = guessVelocity.getNorm();
 			double difference = speed - guessSpeed;
 
-			// we've already hit zero height and are trying to go lower
-			if (guess <= 0 && difference < 0)
+			// we've already hit minimum height and are trying to go lower
+			if (guess <= target.getZ() && difference < 0)
 				return Optional.empty();
 
 			if (Math.abs(difference) <= tolerance)
