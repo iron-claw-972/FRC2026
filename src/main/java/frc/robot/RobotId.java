@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Preferences;
  */
 public enum RobotId {
     Default,
-    WaffleHouse, SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
+    CompBot, WaffleHouse, SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
     ClassBot1, ClassBot2, ClassBot3, ClassBot4,
     TestBed1, TestBed2;
 

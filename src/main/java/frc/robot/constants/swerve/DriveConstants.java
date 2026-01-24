@@ -136,7 +136,7 @@ public class DriveConstants {
     
         /* Motor inversions */
         public static final InvertedValue INVERT_DRIVE_MOTOR = InvertedValue.CounterClockwise_Positive;
-        public static final InvertedValue INVERT_STEER_MOTOR = InvertedValue.Clockwise_Positive;
+        public static InvertedValue INVERT_STEER_MOTOR = InvertedValue.Clockwise_Positive;
     
         /* Neutral Modes */
         public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
@@ -200,12 +200,29 @@ public class DriveConstants {
          * Updates the constants if the RobotId is not the default SwerveCompetition robot.
          */
         public static void update(RobotId robotId) {
-            if(robotId == RobotId.WaffleHouse){
+            if (robotId == RobotId.CompBot) {
+                STEER_OFFSET_FRONT_LEFT = 0;
+                STEER_OFFSET_FRONT_RIGHT = 0;
+                STEER_OFFSET_BACK_LEFT = 0;
+                STEER_OFFSET_BACK_RIGHT = 0;
+                
+                // MK5n 
+                INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
+                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
+                STEER_GEAR_RATIO = 287.0 / 11.0;
+
+                MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
+
+            } else if(robotId == RobotId.WaffleHouse){
                 STEER_OFFSET_FRONT_LEFT = 300.058594 - 350 + 180;
                 STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
                 STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
                 STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
-    
+                
+                // MK5n gear ratio 
+                INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
                 DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
                 STEER_GEAR_RATIO = 287.0 / 11.0;
 
