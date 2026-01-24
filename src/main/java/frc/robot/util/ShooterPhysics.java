@@ -102,14 +102,15 @@ public class ShooterPhysics {
 	public static Optional<Translation3d> getExitVelocityForSpeed(Translation2d initialVelocity, Translation3d target,
 			double speed, double tolerance) {
 
-		// Check minimum velocity needed (when peak height = target height, i.e., flat
-		// trajectory)
-		// This is the absolute minimum velocity physically possible
-		double minPeakHeight = Math.max(0, target.getZ());
-		Translation3d minVelocity = getRequiredExitVelocity(initialVelocity, target, minPeakHeight);
-		double minSpeed = minVelocity.getNorm();
+		// calculate minimum velocity: v² = g * (R + √(R² + h²))
+		double horizontalDist = target.toTranslation2d().getNorm();
+		double verticalDist = target.getZ();
+		double g = Constants.GRAVITY_ACCELERATION;
+		double robotSpeed = initialVelocity.getNorm();
 
-		// If requested speed is less than minimum, it's physically impossible
+		double minProjectileSpeed = Math.sqrt(g * (horizontalDist + Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist)));
+		double minSpeed = Math.max(0, minProjectileSpeed - robotSpeed);
+
 		if (speed < minSpeed - tolerance) {
 			return Optional.empty();
 		}
