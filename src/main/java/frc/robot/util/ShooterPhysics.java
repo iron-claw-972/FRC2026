@@ -13,7 +13,8 @@ public class ShooterPhysics {
 	public record TurretState(Rotation2d yaw, double pitch, double exitVel) {
 	};
 
-	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robot, Translation3d target, double peakHeight) {
+	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robot, Translation3d target,
+			double peakHeight) {
 		Translation3d robotToTarget = target.minus(robot);
 		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
 
@@ -78,7 +79,8 @@ public class ShooterPhysics {
 	public static Optional<Translation3d> getExitVelocityForSpeed(Translation2d initialVelocity, Translation3d target,
 			double speed, double tolerance) {
 
-		// Check minimum velocity needed (when peak height = target height, i.e., flat trajectory)
+		// Check minimum velocity needed (when peak height = target height, i.e., flat
+		// trajectory)
 		// This is the absolute minimum velocity physically possible
 		double minPeakHeight = Math.max(0, target.getZ());
 		Translation3d minVelocity = getRequiredExitVelocity(initialVelocity, target, minPeakHeight);
