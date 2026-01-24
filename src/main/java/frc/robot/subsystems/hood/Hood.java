@@ -31,13 +31,6 @@ import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
-// TODO:
-// check if NaN is because of drivetrain or velocity being too low
-// get sim to work of course
-// fix config for motion magic
-// tune for gravity and stuff
-// implement live odometry distance reading instead of setting manually
-
 public class Hood extends SubsystemBase implements HoodIO {
     final private TalonFX motor;
     private double position;
@@ -45,8 +38,6 @@ public class Hood extends SubsystemBase implements HoodIO {
     double power;
     
     private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-
-    // Hood gear ratio from ShooterConstants
 
     private SingleJointedArmSim hoodSim;
     private static final DCMotor hoodMotorSim = DCMotor.getKrakenX60(1);
@@ -63,7 +54,6 @@ public class Hood extends SubsystemBase implements HoodIO {
     private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
 
     public Hood() {
-        // allocate the motor
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
         
         updateInputs();
@@ -186,46 +176,10 @@ public class Hood extends SubsystemBase implements HoodIO {
         double simRotations = Units.radiansToRotations(simAngle);
         double motorRotations = simRotations * HoodConstants.HOOD_GEAR_RATIO;
 
-        encoderSim.setRawRotorPosition(motorRotations); // MUST set position
+        encoderSim.setRawRotorPosition(motorRotations);
         encoderSim.setRotorVelocity(hoodSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * HoodConstants.HOOD_GEAR_RATIO);
     }
-    
-    public double calculateAngle(double v0, double U, double R) {
-        double g = Constants.GRAVITY_ACCELERATION;
-        //TODO: change this
-        double shooterHeight = HoodConstants.SHOOTER_HEIGHT;
-        double h = U - shooterHeight;
-    
-        double inside = v0*v0*v0*v0 - g * (g * R * R + 2 * h * v0 * v0);
-        if (inside < 0) return Double.NaN;
-        double sqrtTerm = Math.sqrt(inside);
-    
-        // match Desmos: v0² + sqrt(...)
-        double numerator = (v0 * v0) - sqrtTerm;
-    
-        double denominator = g * R;
-    
-        double z = Math.atan(numerator / denominator);
-    
-        System.out.println("CalculatedAngle = " + z);
-        return z;
-    }
 
-        public void setToCalculatedAngle(double initialVelocity, double goalHeight, double goalDistance) {
-        double angleRad = calculateAngle(initialVelocity, goalHeight, goalDistance);
-        double angleDeg = Units.radiansToDegrees(angleRad);
-        System.out.println(initialVelocity + " degrees");
-        System.out.println("Goal Height = " + goalHeight + " meters");
-        System.out.println("Goal Distance = " + goalDistance + " meters");
-        System.out.println("AIM angle = " + angleDeg + "degrees");
-
-        // in case we can't reach the target with our velocity:
-        if (angleDeg != Double.NaN || Double.isInfinite(angleDeg)) {
-            setSetpoint(MathUtil.clamp(angleDeg + 360, HoodConstants.MIN_ANGLE + 360, HoodConstants.MAX_ANGLE + 360));
-        } else {
-            System.out.println("Angle is not able to reach the target with given velocity.");
-        }
-    }
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
         while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
