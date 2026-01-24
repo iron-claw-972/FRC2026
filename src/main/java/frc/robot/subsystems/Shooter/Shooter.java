@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     

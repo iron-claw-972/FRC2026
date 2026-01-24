@@ -25,7 +25,6 @@ public class AutoShoot extends Command {
 
     private ChassisSpeeds fieldRelVel;
 
-    private boolean atTarget;
     // apex of parabola in meters
     private double peakHeight = 3.0;
 
