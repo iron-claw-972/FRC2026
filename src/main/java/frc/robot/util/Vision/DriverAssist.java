@@ -55,7 +55,7 @@ public class DriverAssist {
         Pose2d currentPose = drive.getPose();
         Rotation2d yaw = drive.getYaw();
         ChassisSpeeds driveSpeeds = drive.getChassisSpeeds();
-        driveSpeeds = ChassisSpeeds. fromFieldRelativeSpeeds(driveSpeeds,yaw); // Changing this does not cause problems because getChassisSpeeds() creates a new object
+        driveSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(driveSpeeds, yaw); // Convert to field-relative for motion profiling
         State xState = new State(currentPose.getX(), driveSpeeds.vxMetersPerSecond);
         State yState = new State(currentPose.getY(), driveSpeeds.vyMetersPerSecond);
         State angleState = new State(currentPose.getRotation().getRadians(), driveSpeeds.omegaRadiansPerSecond);
@@ -78,9 +78,9 @@ public class DriverAssist {
             yProfile.calculate(Constants.LOOP_TIME, yState, yGoal).velocity,
             angleProfile.calculate(Constants.LOOP_TIME, angleState, angleGoal).velocity
         );
-        // Robot-relataive goal
+        // Convert field-relative goal to robot-relative
         ChassisSpeeds goalRobot = goal.times(1);
-        goalRobot = ChassisSpeeds. fromRobotRelativeSpeeds(goalRobot, yaw);
+        goalRobot = ChassisSpeeds.fromFieldRelativeSpeeds(goalRobot, yaw);
 
         // This calculates the actual acceleration we can get
         // This is the only thing that needs to be robot relative
@@ -147,7 +147,7 @@ public class DriverAssist {
         Translation2d difference = desiredPose.getTranslation().minus(drivePose.getTranslation());
         double distance = difference.getNorm();
         double velocityAngle = difference.getAngle().getRadians();
-        double targetAngle = keepAngle ? desiredPose.getRotation().getRadians() : MathUtil.angleModulus(velocityAngle + Math.PI/2);
+        double targetAngle = keepAngle ? desiredPose.getRotation().getRadians() : velocityAngle;
         double inputSpeed = Math.hypot(driverInput.vxMetersPerSecond, driverInput.vyMetersPerSecond);
         double driverAngle = Math.atan2(driverInput.vyMetersPerSecond, driverInput.vxMetersPerSecond);
         double velocityAngleError = MathUtil.angleModulus(velocityAngle - driverAngle);

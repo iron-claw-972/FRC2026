@@ -51,7 +51,7 @@ public class Hood extends SubsystemBase implements HoodIO {
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("hoodMotor", 25, 0));
 
-    private final HoodInputsIOAutoLogged inputs = new HoodInputsIOAutoLogged();
+    private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
     public Hood() {
         motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
