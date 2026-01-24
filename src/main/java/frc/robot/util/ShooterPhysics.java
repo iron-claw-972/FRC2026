@@ -78,7 +78,16 @@ public class ShooterPhysics {
 	public static Optional<Translation3d> getExitVelocityForSpeed(Translation2d initialVelocity, Translation3d target,
 			double speed, double tolerance) {
 
-		// TODO: detect when the given velocity is insufficient and exit before maxIters
+		// Check minimum velocity needed (when peak height = target height, i.e., flat trajectory)
+		// This is the absolute minimum velocity physically possible
+		double minPeakHeight = Math.max(0, target.getZ());
+		Translation3d minVelocity = getRequiredExitVelocity(initialVelocity, target, minPeakHeight);
+		double minSpeed = minVelocity.getNorm();
+
+		// If requested speed is less than minimum, it's physically impossible
+		if (speed < minSpeed - tolerance) {
+			return Optional.empty();
+		}
 
 		// guess a peak height
 		double guess = 10;
