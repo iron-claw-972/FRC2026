@@ -39,10 +39,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Command turretAutoShoot;
     private TurretJoyStickAim turretJoyStickAim;
 
+    private boolean SOTM;
+
     public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
+        SOTM = false;
     }
 
     public void configureControls() { 
@@ -50,6 +53,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
             new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
         )));
+
+        driver.get(PS5Button.MUTE).onTrue(new InstantCommand(() -> toggleSOTM()));
 
         // Cancel commands
         driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
@@ -83,7 +88,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         if (turretAutoShoot != null && turretAutoShoot.isScheduled()){
                             turretAutoShoot.cancel();
                         } else{
-                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain());
+                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain(), SOTM);
                             CommandScheduler.getInstance().schedule(turretAutoShoot);
                         }
                     })
@@ -159,5 +164,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     public void endRumble(){
         driver.rumbleOff();
+    }
+
+    public void toggleSOTM() {
+        if (SOTM) {
+            SOTM = false;
+        } else {
+            SOTM = true;
+        }
     }
 }
