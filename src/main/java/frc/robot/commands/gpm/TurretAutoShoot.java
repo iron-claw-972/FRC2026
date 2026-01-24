@@ -48,7 +48,8 @@ public class TurretAutoShoot extends Command {
         double D_y;
         double D_x;
         if (SOTM) {
-            ChassisSpeeds chassisSpeed = drivetrain.getChassisSpeeds();
+            ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
+            fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
             double xVel = chassisSpeed.vxMetersPerSecond;
             double yVel = chassisSpeed.vyMetersPerSecond;
             
