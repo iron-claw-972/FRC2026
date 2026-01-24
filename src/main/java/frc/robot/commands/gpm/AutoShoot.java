@@ -24,7 +24,7 @@ public class AutoShoot extends Command {
     private ChassisSpeeds fieldRelVel;
 
     // apex of parabola in meters
-    private double peakHeight = 3.0;
+    private double peakHeight = FieldConstants.HUB_BLUE.getZ() + .5;
 
     public AutoShoot(Drivetrain drive, Hood hood, Shooter shooter) {
         this.drive = drive;
