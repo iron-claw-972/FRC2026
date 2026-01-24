@@ -65,17 +65,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
 
-        driver.get(PS5Button.LB).onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-                new WaitCommand(0.8),
-                new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
-            )
-            ).onFalse(
-                new InstantCommand(() -> {
-                        shooter.setFeeder(0);
-                        shooter.setShooter(0);
-                    }));
+        // driver.get(PS5Button.LB).onTrue(
+        //     new SequentialCommandGroup(
+        //         new InstantCommand(()-> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+        //         new WaitCommand(0.8),
+        //         new InstantCommand(()-> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))
+        //     )
+        //     ).onFalse(
+        //         new InstantCommand(() -> {
+        //                 shooter.setFeeder(0);
+        //                 shooter.setShooter(0);
+        //             }));
         //driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
         
         driver.get(PS5Button.SQUARE).onTrue(
@@ -87,6 +87,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             CommandScheduler.getInstance().schedule(turretAutoShoot);
                         }
                     })
+        );
+
+        driver.get(PS5Button.LB).onTrue(new InstantCommand(() -> shooter.setFeeder(1))).onFalse(
+            new InstantCommand(()->{
+                shooter.setFeeder(0);
+            })
         );
 
         // driver.get(PS5Button.CROSS).onTrue(

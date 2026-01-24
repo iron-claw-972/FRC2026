@@ -65,7 +65,7 @@ public class VisionConstants {
     /**
      * The maximum distance to the tag to use
      */
-    public static final double MAX_DISTANCE = 2;
+    public static final double MAX_DISTANCE = 4;
 
     /** If vision should use manual calculations */
     public static final boolean USE_MANUAL_CALCULATIONS = true;
@@ -128,7 +128,7 @@ public class VisionConstants {
      * <p>
      * Only affects calculations using PhotonVision, not manual calculations.
      */
-    public static final double HIGHEST_AMBIGUITY = 0.01;
+    public static final double HIGHEST_AMBIGUITY = 0.1;
 
     public static final int MAX_EMPTY_TICKS = 10;
 
@@ -155,15 +155,15 @@ public class VisionConstants {
                 new Pair<String, Transform3d>(
                         "CameraRight",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(0.75), Units.inchesToMeters(11.5),
-                                        Units.inchesToMeters(9.75)),
-                                new Rotation3d(0, Units.degreesToRadians(27), Units.degreesToRadians(10)))),
+                                new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-1),
+                                        Units.inchesToMeters(10.5)),
+                                new Rotation3d(0, Units.degreesToRadians(-29), Units.degreesToRadians(190)))),
                 new Pair<String, Transform3d>(
                         "CameraLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-13.5), Units.inchesToMeters(10.375),
-                                        Units.inchesToMeters(11.625)),
-                                new Rotation3d(0, Units.degreesToRadians(27), 0)))));
+                                new Translation3d(Units.inchesToMeters(-9.5), Units.inchesToMeters(13.5),
+                                        Units.inchesToMeters(13)),
+                                new Rotation3d(0, Units.degreesToRadians(-29), Math.PI)))));
 
     /**
      * The transformations from the robot to object detection cameras
@@ -174,7 +174,7 @@ public class VisionConstants {
                     new Rotation3d(0, Units.degreesToRadians(20), 0))));
 
     // used to cleanly shutdown the OrangePi
-    public static final String[] ORANGEPI_HOSTNAMES = {"photonfront.local", "photonback.local"};
+    public static final String[] ORANGEPI_HOSTNAMES = {"photonvision.local"};
     public static final String ORANGEPI_USERNAME = "pi";
     public static final String ORANGEPI_PASSWORD = "raspberry";
 }

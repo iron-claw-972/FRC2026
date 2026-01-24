@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Turret extends SubsystemBase implements TurretIO{
     final private TalonFX motor;
@@ -46,6 +47,11 @@ public class Turret extends SubsystemBase implements TurretIO{
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("turret_motor", 25, 0));
 
     private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+    private double dV = 2.0;
+    private double kP = 10.0;
+    private double kI = 0.0;
+    private double kD = 0.0;
 
     public Turret() {
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN); // switch of course
@@ -74,15 +80,15 @@ public class Turret extends SubsystemBase implements TurretIO{
         config.Slot0.kV = 0.0; // Velocity gain: 1 rps -> 0.12V
         config.Slot0.kA = 0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
-        config.Slot0.kP = 10.0; // If position error is 1 rotation, apply 10V
-        config.Slot0.kI = 0.0; // Integral term (usually left at 0 for MotionMagic)
-        config.Slot0.kD = 0.0; // Derivative term (used to dampen oscillations)
+        config.Slot0.kP = kP; // If position error is 1 rotation, apply 10V
+        config.Slot0.kI = kI; // Integral term (usually left at 0 for MotionMagic)
+        config.Slot0.kD = kD; // Derivative term (used to dampen oscillations)
         
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY / TurretConstants.TURRET_RADIUS) * gearRatio; // max velocity * gear ratio
         motionMagicConfigs.MotionMagicAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION / TurretConstants.TURRET_RADIUS) * gearRatio; // max Acceleration * gear ratio
 
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         motor.getConfigurator().apply(config);
 
         // config.ClosedLoopGeneral.ContinuousWrap = true;
@@ -104,6 +110,7 @@ public class Turret extends SubsystemBase implements TurretIO{
         SmartDashboard.putData("Set to -180 degrees", new InstantCommand(() -> setSetpoint(-180, 0)));
         SmartDashboard.putData("Set to -90 degrees", new InstantCommand(() -> setSetpoint(-90, 0)));
         SmartDashboard.putData("Reset Yaw", new InstantCommand(() -> resetYaw()));
+        SmartDashboard.putNumber("Shooter Velocity", ShooterConstants.SHOOTER_VELOCITY);
     }
 
     public double getPosition() {
@@ -140,7 +147,6 @@ public class Turret extends SubsystemBase implements TurretIO{
             double motorTargetRotations = (setpoint / 360.0) * gearRatio;
 
             //Tune this with rotating robot
-            double dV = TurretConstants.ROTATIONAL_VELOCITY_CONSTANT;
             motor.setControl(voltageRequest.withPosition(motorTargetRotations).withFeedForward(dV * robotRotVel));
         }
     }
@@ -150,7 +156,20 @@ public class Turret extends SubsystemBase implements TurretIO{
         updateInputs();
         ligament2d.setAngle(getPosition());
 
-        SmartDashboard.putNumber("Turret Position Degrees", getPosition());        
+        dV = SmartDashboard.getNumber("FF Constant", dV);
+        kP = SmartDashboard.getNumber("kP Value", kP);
+        kI = SmartDashboard.getNumber("kI Value", kI);
+        kD = SmartDashboard.getNumber("kD Value", kD);
+
+        SmartDashboard.putNumber("Turret Position Degrees", getPosition());  
+        SmartDashboard.putNumber("FF Constant", dV);
+        SmartDashboard.putNumber("kP Value", kP);
+        SmartDashboard.putNumber("kI Value", kI);
+        SmartDashboard.putNumber("kD Value", kD);
+
+
+        ShooterConstants.SHOOTER_VELOCITY = SmartDashboard.getNumber("Shooter Velocity", ShooterConstants.SHOOTER_VELOCITY);
+        
     }
 
     @Override

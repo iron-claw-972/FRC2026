@@ -65,6 +65,8 @@ public class Shooter extends SubsystemBase {
     public void periodic(){
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
+        shooterMotorLeft.set(-1);
+        shooterMotorRight.set(-1);
         feederMotor.set(feederPower);
     }
 
