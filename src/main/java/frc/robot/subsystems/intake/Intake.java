@@ -16,11 +16,9 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -45,8 +43,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     private final ArmFeedforward feedforward = new ArmFeedforward(0, IntakeConstants.MASS*IntakeConstants.CENTER_OF_MASS_LENGTH/IntakeConstants.PIVOT_GEAR_RATIO/baseIntakeMotorSim.KtNMPerAmp*baseIntakeMotorSim.rOhms, 0);
 
-    private PIDController pid = new PIDController(0.2, 0.0, 0.05);
-    
     private SingleJointedArmSim intakeSim;
     private static final DCMotor baseIntakeMotorSim = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
