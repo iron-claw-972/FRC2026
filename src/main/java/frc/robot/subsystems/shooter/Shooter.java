@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;;
+import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     
@@ -93,7 +93,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     public double getFeederVelocity() {
         return inputs.feederVelocity;
     }
-    
+
     public double getShooterVelcoity() {
         return inputs.leftShooterVelocity; // assuming they are the same rn
     }
