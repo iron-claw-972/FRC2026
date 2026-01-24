@@ -16,8 +16,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements ShooterIO {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.RIO_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.RIO_CAN);
@@ -31,6 +32,8 @@ public class Shooter extends SubsystemBase {
     private double feederPower = 0;
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
+
+    private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     public Shooter(){
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -63,6 +66,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public void periodic(){
+        updateInputs();
+
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorLeft.set(-1);
@@ -88,9 +93,19 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getFeederVelocity() {
-        return feederMotor.getVelocity().getValueAsDouble();
+        return inputs.feederVelocity;
     }
+
     public double getShooterVelcoity() {
-        return shooterMotorLeft.getVelocity().getValueAsDouble();
+        return inputs.leftShooterVelocity; // assuming they are the same rn
+    }
+
+    public void updateInputs() {
+        inputs.leftShooterVelocity = shooterMotorLeft.getVelocity().getValueAsDouble();
+        inputs.rightShooterVelocity = shooterMotorRight.getVelocity().getValueAsDouble();
+        inputs.feederVelocity = feederMotor.getVelocity().getValueAsDouble();
+        inputs.leftShooterCurrent = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.rightShooterVelocity = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+        inputs.feederVelocity = feederMotor.getStatorCurrent().getValueAsDouble();
     }
 }

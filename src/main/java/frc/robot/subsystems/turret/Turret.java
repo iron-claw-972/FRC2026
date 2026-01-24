@@ -126,7 +126,6 @@ public class Turret extends SubsystemBase implements TurretIO{
     }
 
     public void setSetpoint(double setpointDegrees, double robotRotVel) {
-
         setpoint = MathUtil.clamp(setpointDegrees, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
 
         if (infiniteRotation) {
