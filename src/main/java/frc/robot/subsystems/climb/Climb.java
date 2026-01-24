@@ -18,11 +18,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
+import frc.robot.constants.Constants;
+import frc.robot.constants.IdConstants;
 
 public class Climb extends SubsystemBase{
     private TalonFX ClimbMotor;
     private DutyCycleEncoder ClimbEncoder;
-
 
     private final MotionMagicVoltage request = new MotionMagicVoltage(0);
 
@@ -31,12 +32,14 @@ public class Climb extends SubsystemBase{
     MechanismRoot2d mechanismRoot = mechanism2d.getRoot("pivot", 50, 50);
     MechanismLigament2d ligament2d = mechanismRoot.append(new MechanismLigament2d("baseMotor", 25, 0));
 
+    private double setpoint;
+
     private TalonFXSimState simEncoder;
     private DCMotor simMotor = DCMotor.getKrakenX60(1);
 
     public Climb(){
-        ClimbMotor = new TalonFX(ClimbConstants.ClimbMotorID);
-        ClimbEncoder = new DutyCycleEncoder(ClimbConstants.ClimbEncoderID);
+        ClimbMotor = new TalonFX(IdConstants.CLIMB_ID, Constants.RIO_CAN);
+        ClimbEncoder = new DutyCycleEncoder(IdConstants.CLIMB_ENCODER_ID);
 
         simEncoder = ClimbMotor.getSimState();
 
@@ -66,28 +69,37 @@ public class Climb extends SubsystemBase{
 
         // set Motion Magic settings
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 100; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = 200; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = 200; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = ClimbConstants.MAX_VELOCITY * ClimbConstants.gear_ratio; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = ClimbConstants.MAX_ACCELERATION * ClimbConstants.gear_ratio; // Target acceleration of 160 rps/s (0.5 seconds)
 
         ClimbMotor.getConfigurator().apply(talonFXConfigs);
 
-        ClimbMotor.setPosition( (ClimbEncoder.get() - ClimbConstants.absoluteOffsetAngle) * ClimbConstants.gear_ratio);
+        ClimbMotor.setPosition((Units.rotationsToDegrees(ClimbEncoder.get()) - ClimbConstants.absoluteOffsetAngle) * ClimbConstants.gear_ratio);
 
         SmartDashboard.putData("Climb to First Position" , new InstantCommand(() -> ClimbToFirstPosition()));
         SmartDashboard.putData("Set Climb 90 degrees", new InstantCommand(() -> setSetpoint(90))); 
     }
 
     public void setSetpoint(double setpoint){
+        this.setpoint = setpoint;
         ClimbMotor.setControl(request.withPosition(Units.degreesToRotations(setpoint) * ClimbConstants.gear_ratio));
     }
 
     public boolean atSetpoint(){
-        return Math.abs( request.Position - ClimbMotor.getPosition().getValueAsDouble() ) < ClimbConstants.tolerance;
+        return Math.abs(setpoint - getPosition()) < ClimbConstants.tolerance;
+    }
+
+    public double getPosition(){
+        return Units.rotationsToDegrees(ClimbMotor.getPosition().getValueAsDouble());
+    }
+
+    public double getEncoderValue(){
+        return Units.rotationsToDegrees(ClimbEncoder.get());
     }
 
     public void periodic(){
-        //System.out.println("Position Setpoint: " + request.Position + " Motor Position: " + ClimbMotor.getPosition());
+        SmartDashboard.putNumber("Climb Position", getPosition());
+        SmartDashboard.putNumber("Encoder Value", getEncoderValue());
     }
 
     public void simulationPeriodic(){

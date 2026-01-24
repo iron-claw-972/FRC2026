@@ -18,4 +18,8 @@ public class IdConstants {
 
     // LEDs
     public static final int CANDLE_ID = 1;
+
+    // Climb
+    public static final int CLIMB_ID = 21;
+    public static final int CLIMB_ENCODER_ID = 1;
 }
