@@ -38,7 +38,7 @@ public class TurretAutoShoot extends Command {
     }
 
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, boolean SOTM){
-        this(turret, drivetrain, null);
+        this(turret, drivetrain, null, SOTM);
         this.SOTM = SOTM;
     }
 
@@ -52,8 +52,8 @@ public class TurretAutoShoot extends Command {
             double xVel = chassisSpeed.vxMetersPerSecond;
             double yVel = chassisSpeed.vyMetersPerSecond;
             
-            D_y = target.getY() - drivepose.getY() + (Units.secondsToMilliseconds(yVel) * 20); // every periodic predict where the robot will be in one periodic into the future
-            D_x = target.getX() - drivepose.getX() + (Units.secondsToMilliseconds(xVel) * 20);
+            D_y = target.getY() - drivepose.getY() + (0.92) * yVel;
+            D_x = target.getX() - drivepose.getX() + (0.92) * xVel;
         } else {
             D_y = target.getY() - drivepose.getY();
             D_x = target.getX() - drivepose.getX();

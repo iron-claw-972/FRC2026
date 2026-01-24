@@ -48,8 +48,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-    private double dV = 2.0;
-    private double kP = 10.0;
+    private double dV = 1.0;
+    private double kP = 15.0;
     private double kI = 0.0;
     private double kD = 0.0;
 
