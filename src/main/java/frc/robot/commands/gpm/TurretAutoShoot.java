@@ -17,8 +17,6 @@ public class TurretAutoShoot extends Command {
     private Drivetrain drivetrain;
     private TurretVision turretVision;
 
-    public boolean SOTM;
-
     double fieldAngleRad;
     double turretSetpoint;
     double adjustedSetpoint;
@@ -26,20 +24,18 @@ public class TurretAutoShoot extends Command {
     double yawToTag;
 
     private boolean turretVisionEnabled = false;
+    private boolean SOTM = true;
 
-    public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision, boolean SOTM){
+    public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.turretVision = turretVision;
         
-        this.SOTM = SOTM;
-
         addRequirements(turret);
     }
 
-    public TurretAutoShoot(Turret turret, Drivetrain drivetrain, boolean SOTM){
-        this(turret, drivetrain, null, SOTM);
-        this.SOTM = SOTM;
+    public TurretAutoShoot(Turret turret, Drivetrain drivetrain){
+        this(turret, drivetrain, null);
     }
 
     public void updateTurretSetpoint() {
@@ -49,12 +45,12 @@ public class TurretAutoShoot extends Command {
         double D_x;
         if (SOTM) {
             ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
-            fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
-            double xVel = chassisSpeed.vxMetersPerSecond;
-            double yVel = chassisSpeed.vyMetersPerSecond;
+            ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
+            double xVel = fieldRelVel.vxMetersPerSecond;
+            double yVel = fieldRelVel.vyMetersPerSecond;
             
-            D_y = target.getY() - drivepose.getY() + (0.92) * yVel;
-            D_x = target.getX() - drivepose.getX() + (0.92) * xVel;
+            D_y = target.getY() - drivepose.getY() - (0.92) * yVel;
+            D_x = target.getX() - drivepose.getX() - (0.92) * xVel;
         } else {
             D_y = target.getY() - drivepose.getY();
             D_x = target.getX() - drivepose.getX();
@@ -106,7 +102,7 @@ public class TurretAutoShoot extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        
+        turret.setSetpoint(0, 0);
     }
 
     
