@@ -3,6 +3,8 @@ package frc.robot.subsystems.climb;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -72,12 +74,13 @@ public class Climb extends SubsystemBase{
         motionMagicConfigs.MotionMagicCruiseVelocity = ClimbConstants.MAX_VELOCITY * ClimbConstants.gear_ratio; // Target cruise velocity of 80 rps
         motionMagicConfigs.MotionMagicAcceleration = ClimbConstants.MAX_ACCELERATION * ClimbConstants.gear_ratio; // Target acceleration of 160 rps/s (0.5 seconds)
 
+        ClimbMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
         ClimbMotor.getConfigurator().apply(talonFXConfigs);
 
-        ClimbMotor.setPosition((Units.rotationsToDegrees(ClimbEncoder.get()) - ClimbConstants.absoluteOffsetAngle) * ClimbConstants.gear_ratio);
-
-        SmartDashboard.putData("Climb to First Position" , new InstantCommand(() -> ClimbToFirstPosition()));
-        SmartDashboard.putData("Set Climb 90 degrees", new InstantCommand(() -> setSetpoint(90))); 
+        ClimbMotor.setPosition(0 * ClimbConstants.gear_ratio);
     }
 
     public void setSetpoint(double setpoint){
@@ -90,7 +93,7 @@ public class Climb extends SubsystemBase{
     }
 
     public double getPosition(){
-        return Units.rotationsToDegrees(ClimbMotor.getPosition().getValueAsDouble());
+        return Units.rotationsToDegrees(ClimbMotor.getPosition().getValueAsDouble()) / ClimbConstants.gear_ratio;
     }
 
     public double getEncoderValue(){
@@ -99,7 +102,6 @@ public class Climb extends SubsystemBase{
 
     public void periodic(){
         SmartDashboard.putNumber("Climb Position", getPosition());
-        SmartDashboard.putNumber("Encoder Value", getEncoderValue());
     }
 
     public void simulationPeriodic(){

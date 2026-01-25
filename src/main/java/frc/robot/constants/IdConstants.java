@@ -21,5 +21,5 @@ public class IdConstants {
 
     // Climb
     public static final int CLIMB_ID = 21;
-    public static final int CLIMB_ENCODER_ID = 1;
+    public static final int CLIMB_ENCODER_ID = 21;
 }

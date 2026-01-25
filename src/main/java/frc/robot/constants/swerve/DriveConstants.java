@@ -111,10 +111,10 @@ public class DriveConstants {
     public static final double PATH_PLANNER_TRANSLATIONAL_D = 0;
 
     // CAN
-    public static CANBus DRIVE_MOTOR_CAN = Constants.CANIVORE_CAN;
-    public static CANBus STEER_MOTOR_CAN = Constants.CANIVORE_CAN;
-    public static CANBus STEER_ENCODER_CAN = Constants.CANIVORE_CAN;
-    public static CANBus PIGEON_CAN = Constants.CANIVORE_CAN;
+    public static CANBus DRIVE_MOTOR_CAN = Constants.RIO_CAN;
+    public static CANBus STEER_MOTOR_CAN = Constants.RIO_CAN;
+    public static CANBus STEER_ENCODER_CAN = Constants.RIO_CAN;
+    public static CANBus PIGEON_CAN = Constants.RIO_CAN;
 
 
     public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);

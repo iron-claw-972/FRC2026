@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Robot;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -56,6 +57,26 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             new WaitUntilCommand(climb::atSetpoint),
             new InstantCommand(() -> climb.ClimbToSecondPosition())
         ));    
+
+        driver.get(PS5Button.CROSS).onTrue(
+            new InstantCommand(()->{
+                climb.setSetpoint(ClimbConstants.climbSecondStage);
+            })
+        ).onFalse(
+            new InstantCommand(()->{
+                climb.setSetpoint(climb.getPosition());
+            })
+        );
+
+        driver.get(PS5Button.CIRCLE).onTrue(
+            new InstantCommand(()->{
+                climb.setSetpoint(0);
+            })
+        ).onFalse(
+            new InstantCommand(()->{
+                climb.setSetpoint(climb.getPosition());
+            })
+        );
     }
     
     @Override
