@@ -77,6 +77,8 @@ public class RobotContainer {
 
       case Phil: // AKA "IHOP"
 
+      case PrimeJr:
+
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
@@ -102,6 +104,8 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
+
+
       }
 
     // This is really annoying so it's disabled

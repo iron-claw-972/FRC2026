@@ -80,7 +80,7 @@ public class Robot extends LoggedRobot {
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
 
-        // RobotId.setRobotId(RobotId.CompBot);
+        RobotId.setRobotId(RobotId.PrimeJr);
 
         // // Record metadata
         // Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);

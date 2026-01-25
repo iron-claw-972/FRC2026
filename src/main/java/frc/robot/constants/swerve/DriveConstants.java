@@ -200,7 +200,7 @@ public class DriveConstants {
          * Updates the constants if the RobotId is not the default SwerveCompetition robot.
          */
         public static void update(RobotId robotId) {
-            if (robotId == RobotId.CompBot) {
+            if (robotId == RobotId.PrimeJr) {
                 STEER_OFFSET_FRONT_LEFT = 0;
                 STEER_OFFSET_FRONT_RIGHT = 0;
                 STEER_OFFSET_BACK_LEFT = 0;
