@@ -38,6 +38,25 @@ public class ShooterPhysics {
 		return new TurretState(yaw, pitch, speed);
 	}
 
+	public static Optional<TurretState> getShotParamsBySpeed(Translation2d robotVelocity, Translation2d robot, Translation3d target,
+			double speed) {
+		Translation3d robotToTarget = target.minus(new Translation3d(robot));
+		Optional<Translation3d> exitVelOpt = getExitVelocityForSpeed(robotVelocity, robotToTarget, speed);
+
+		if (exitVelOpt.isEmpty()) return Optional.empty();
+		Translation3d exitVel = exitVelOpt.get();
+
+		Translation2d onGround = exitVel.toTranslation2d();
+		Rotation2d yaw = onGround.getAngle();
+		double magnitude2d = onGround.getNorm();
+
+		double pitch = new Translation2d(magnitude2d, exitVel.getZ()).getAngle().getRadians();
+		pitch %= Math.PI * 2;
+		double speed2 = exitVel.getDistance(Translation3d.kZero);
+
+		return Optional.of(new TurretState(yaw, pitch, speed2));
+	}
+
 	/**
 	 * Actually does the SOTM math. Assumes shots are from (0, 0, 0). This is only
 	 * public so it can be unit tested, and shouldn't be called directly.

@@ -155,10 +155,12 @@ public class Hood extends SubsystemBase implements HoodIO {
         position = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
         velocity = Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         
-        setSetpoint(SmartDashboard.getNumber("hood setpoint", getSetpoint()));
+        setSetpoint(SmartDashboard.getNumber("hood setpoint", Units.degreesToRadians(getSetpoint())));
 
         SmartDashboard.putNumber("Hood Position", position);
         SmartDashboard.putNumber("hood setpoint", getSetpoint());
+
+        Logger.recordOutput("HoodPitch", getPosition());
 
         ligament2d.setAngle(position);
 

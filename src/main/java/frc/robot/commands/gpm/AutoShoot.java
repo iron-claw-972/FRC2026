@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,7 +26,8 @@ public class AutoShoot extends Command {
     private ChassisSpeeds fieldRelVel;
 
     // apex of parabola in meters
-    private double peakHeight = FieldConstants.HUB_BLUE.getZ() + .5;
+    private double speed = 8;
+    private double height = 2.2;
 
     public AutoShoot(Drivetrain drive, Hood hood, Shooter shooter) {
         this.drive = drive;
@@ -44,17 +47,6 @@ public class AutoShoot extends Command {
     @Override
     public void initialize() {
         updateFieldRelVel();
-        target_state = ShooterPhysics.getShotParams(
-                new Translation2d(fieldRelVel.vxMetersPerSecond,
-                        fieldRelVel.vyMetersPerSecond),
-                getRobotPosition(),
-                FieldConstants.HUB_BLUE,
-                peakHeight);
-
-        hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
-        shooter.setShooter(target_state.exitVel());
-        drive.setIsAlign(true);
-        drive.setAlignAngle(target_state.yaw().getRadians());
     }
 
     @Override
@@ -66,29 +58,41 @@ public class AutoShoot extends Command {
         Logger.recordOutput("HubLocation", FieldConstants.HUB_BLUE);
         
 
-        target_state = ShooterPhysics.getShotParams(
+        // var state = ShooterPhysics.getShotParamsBySpeed(
+        //         new Translation2d(fieldRelVel.vxMetersPerSecond,
+        //                 fieldRelVel.vyMetersPerSecond),
+        //         getRobotPosition(),
+        //         FieldConstants.HUB_BLUE,
+        //         speed);
+
+        Optional<ShooterPhysics.TurretState> state = Optional.of(ShooterPhysics.getShotParams(
                 new Translation2d(fieldRelVel.vxMetersPerSecond,
-                        fieldRelVel.vyMetersPerSecond),
+                        fieldRelVel.vyMetersPerSecond).times(2.0),
                 getRobotPosition(),
                 FieldConstants.HUB_BLUE,
-                peakHeight);
+                height));
 
-        Logger.recordOutput("ShooterPhysics", target_state);
+        Logger.recordOutput("TurretState", state.get());
 
-        hood.setSetpoint(target_state.pitch());
-        shooter.setShooter(-target_state.exitVel());
-        drive.setAlignAngle(target_state.yaw().getRadians());
-        shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);   
+        if (state.isPresent()) {
+            target_state = state.get();
 
-        if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
-            // shooter.setFeeder(1);
-            // shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
-        } else {
-            // shooter.setFeeder(0);
+            hood.setSetpoint(Units.radiansToDegrees(target_state.pitch()));
+            shooter.setShooter(-target_state.exitVel());
+            drive.setIsAlign(true);
+            drive.setAlignAngle(target_state.yaw().getRadians());
+            shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+
+            if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
+                // shooter.setFeeder(1);
+                // shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+            } else {
+                // shooter.setFeeder(0);
+            }
+            
+            SmartDashboard.putNumber("Target Hood Angle", target_state.pitch());
+            SmartDashboard.putNumber("Target Exit Velocity", target_state.exitVel());
         }
-
-        SmartDashboard.putNumber("Target Hood Angle", target_state.pitch());
-        SmartDashboard.putNumber("Target Exit Velocity", target_state.exitVel());
     }
 
     @Override
