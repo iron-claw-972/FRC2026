@@ -1,6 +1,7 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -17,11 +18,11 @@ public class TurretAutoShoot extends Command {
     private Drivetrain drivetrain;
     private TurretVision turretVision;
 
-    double fieldAngleRad;
-    double turretSetpoint;
-    double adjustedSetpoint;
-    double yawToTagCamera;
-    double yawToTag;
+    private double fieldAngleRad;
+    private double turretSetpoint;
+    private double adjustedSetpoint;
+    private double yawToTagCamera;
+    private double yawToTag;
 
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
@@ -43,27 +44,36 @@ public class TurretAutoShoot extends Command {
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         double D_y;
         double D_x;
+        
+        // If the robot is moving, adjust the target position based on velocity
         if (SOTM) {
             ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
             ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
             double xVel = fieldRelVel.vxMetersPerSecond;
             double yVel = fieldRelVel.vyMetersPerSecond;
             
-            D_y = target.getY() - drivepose.getY() - (0.92) * yVel;
-            D_x = target.getX() - drivepose.getX() - (0.92) * xVel;
+            D_y = target.getY() - drivepose.getY() - (0.67) * yVel;
+            D_x = target.getX() - drivepose.getX() - (0.67) * xVel;
         } else {
             D_y = target.getY() - drivepose.getY();
             D_x = target.getX() - drivepose.getX();
         }
+
+        // Calculate the field-relative angle
         fieldAngleRad = Math.atan2(D_y, D_x);
-        double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians() + Math.PI)); // Add 180 because drivetrain is backwards
-        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngleRad - robotHeading), -180.0,180.0);
+
+        // Calculate robot heading and adjust for reverse drive
+        double robotHeading = MathUtil.angleModulus((drivetrain.getYaw().getRadians() + Math.PI)); // Reverse drive adjustment
+
+        // Calculate turret setpoint (angle relative to robot heading)
+        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngleRad - robotHeading), -180.0, 180.0);
 
         System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
     public void adjustWithTurretCam(){
         if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
+            // Adjust turret setpoint based on vision input
             if(Robot.getAlliance() == Alliance.Blue){
                 yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(26).get());
             }
@@ -76,6 +86,7 @@ public class TurretAutoShoot extends Command {
     }
 
     public void updateYawToTag(){
+        // Calculate the yaw offset to the tag
         double D_y = FieldConstants.getHubTranslation().getY() - drivetrain.getPose().getY();
         double D_x = FieldConstants.getHubTranslation().getX() - drivetrain.getPose().getX();
         double angleToTag = Units.radiansToDegrees(Math.atan(D_y / D_x));
@@ -84,26 +95,28 @@ public class TurretAutoShoot extends Command {
 
     @Override
     public void initialize() {
+        // Initialize setpoint calculation and set the initial goal for the turret
         updateTurretSetpoint();
-        turret.setSetpoint(turretSetpoint, drivetrain.getAngularRate(2));
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), drivetrain.getAngularRate(2));
     }
 
     @Override
     public void execute() {
+        // Continuously update setpoints and adjust based on vision if available
         updateTurretSetpoint();
         updateYawToTag();
-        if(turretVision != null && turretVisionEnabled && turret.atSetPoint()){
+
+        if(turretVision != null && turretVisionEnabled && turret.atGoal()){
             adjustWithTurretCam();
-            turret.setSetpoint(adjustedSetpoint, -drivetrain.getAngularRate(2));
+            turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(adjustedSetpoint)), -drivetrain.getAngularRate(2));
         } else{
-            turret.setSetpoint(turretSetpoint, -drivetrain.getAngularRate(2));
+            turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        turret.setSetpoint(0, 0);
+        // Set the turret to a safe position when the command ends
+        turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
     }
-
-    
 }
