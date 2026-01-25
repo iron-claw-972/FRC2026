@@ -1,5 +1,7 @@
 package frc.robot.subsystems.turret;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -124,6 +126,7 @@ public class Turret extends SubsystemBase implements TurretIO{
         return inputs.positionDeg;
     }
 
+    @AutoLogOutput
     public double getSetpointDeg(){
         return Units.radiansToDegrees(setpoint.position);
     }
