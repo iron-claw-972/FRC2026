@@ -126,13 +126,6 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
-        MAX_VEL_RAD_PER_SEC = SmartDashboard.getNumber("Max Velocity", MAX_VEL_RAD_PER_SEC);
-        MAX_ACCEL_RAD_PER_SEC2 = SmartDashboard.getNumber("Max Accleration", MAX_ACCEL_RAD_PER_SEC2);
-        kP = SmartDashboard.getNumber("kP Value", MAX_VEL_RAD_PER_SEC);
-        SmartDashboard.putNumber("Max Velocity", MAX_VEL_RAD_PER_SEC);
-        SmartDashboard.putNumber("Max Acceleration", MAX_ACCEL_RAD_PER_SEC2);
-        SmartDashboard.putNumber("kP Value", kP);
-
         double robotRelativeGoal = goalAngle.getRadians();
 
         // MA-style continuous optimization
