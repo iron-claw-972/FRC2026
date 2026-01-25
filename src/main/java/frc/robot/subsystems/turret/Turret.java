@@ -27,8 +27,8 @@ import frc.robot.constants.IdConstants;
 public class Turret extends SubsystemBase {
     /* ---------------- Constants ---------------- */
 
-    private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-180.0);
-    private static final double MAX_ANGLE_RAD = Units.degreesToRadians(180.0);
+    private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
+    private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
     private static double MAX_VEL_RAD_PER_SEC = 4*Units.degreesToRadians(360);
     private static double MAX_ACCEL_RAD_PER_SEC2 = 4*Units.degreesToRadians(720);
