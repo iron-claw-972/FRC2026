@@ -201,10 +201,10 @@ public class DriveConstants {
          */
         public static void update(RobotId robotId) {
             if (robotId == RobotId.PrimeJr) {
-                STEER_OFFSET_FRONT_LEFT = 0;
-                STEER_OFFSET_FRONT_RIGHT = 0;
-                STEER_OFFSET_BACK_LEFT = 0;
-                STEER_OFFSET_BACK_RIGHT = 0;
+                STEER_OFFSET_FRONT_LEFT = 187.03125;
+                STEER_OFFSET_FRONT_RIGHT = 161.982421+180;
+                STEER_OFFSET_BACK_LEFT = 196.69921875;
+                STEER_OFFSET_BACK_RIGHT = 357.714843+180;
                 
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
