@@ -152,8 +152,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 
         for (int i = -2; i <= 2; i++) {
             double candidate = robotRelativeGoal + Math.PI * 2 * i;
-            if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD) continue;
-
+            if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD) {
+                continue;
+            }
             if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
                 best = candidate;
                 found = true;
