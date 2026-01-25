@@ -206,8 +206,9 @@ public class DriveConstants {
                 STEER_OFFSET_BACK_LEFT = 196.69921875;
                 STEER_OFFSET_BACK_RIGHT = 357.714843+180;
                 
-                // MK5n 
+                // MK5n it was CCW originally
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
 
                 DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
                 STEER_GEAR_RATIO = 287.0 / 11.0;
