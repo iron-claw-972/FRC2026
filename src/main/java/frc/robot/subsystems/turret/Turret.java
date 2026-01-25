@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Turret extends SubsystemBase {
+public class Turret extends SubsystemBase implements TurretIO{
     /* ---------------- Constants ---------------- */
 
     private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
@@ -36,6 +36,8 @@ public class Turret extends SubsystemBase {
     private static final double VERSA_RATIO = 5.0;
     private static final double TURRET_RATIO = 140.0 / 10.0;
     private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
+
+    private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
     /* ---------------- Hardware ---------------- */
 
@@ -118,14 +120,27 @@ public class Turret extends SubsystemBase {
         return Math.abs(setpoint.position - lastGoalRad) < Units.degreesToRadians(1.5);
     }
 
-    public double getPositionRad() {
-        return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+    public double getPositionDeg() {
+        return inputs.positionDeg;
+    }
+
+    public double getSetpointDeg(){
+        return Units.radiansToDegrees(setpoint.position);
+    }
+
+    @Override
+    public void updateInputs(){
+        inputs.motorCurrent = motor.getTorqueCurrent().getValueAsDouble();
+        inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+        inputs.velocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) * TurretConstants.TURRET_RADIUS / GEAR_RATIO;
     }
 
     /* ---------------- Periodic ---------------- */
 
     @Override
     public void periodic() {
+        updateInputs();
+
         double robotRelativeGoal = goalAngle.getRadians();
 
         // MA-style continuous optimization
@@ -160,9 +175,9 @@ public class Turret extends SubsystemBase {
 
         motor.setControl(mmRequest.withPosition(motorRot));
 
-        ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
+        ligament.setAngle(getPositionDeg());
 
-        SmartDashboard.putNumber("Turret Pos Deg", Units.radiansToDegrees(getPositionRad()));
+        SmartDashboard.putNumber("Turret Pos Deg", getPositionDeg());
         SmartDashboard.putNumber("Turret Goal Deg", Units.radiansToDegrees(best));
     }
 
