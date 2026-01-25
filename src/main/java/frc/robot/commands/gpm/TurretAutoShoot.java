@@ -44,6 +44,8 @@ public class TurretAutoShoot extends Command {
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         double D_y;
         double D_x;
+        // TODO: Change time to goal on actual comp bot
+        double timeToGoal = 0.67;
         
         // If the robot is moving, adjust the target position based on velocity
         if (SOTM) {
@@ -52,8 +54,8 @@ public class TurretAutoShoot extends Command {
             double xVel = fieldRelVel.vxMetersPerSecond;
             double yVel = fieldRelVel.vyMetersPerSecond;
             
-            D_y = target.getY() - drivepose.getY() - (0.67) * yVel;
-            D_x = target.getX() - drivepose.getX() - (0.67) * xVel;
+            D_y = target.getY() - drivepose.getY() - timeToGoal * yVel;
+            D_x = target.getX() - drivepose.getX() - timeToGoal * xVel;
         } else {
             D_y = target.getY() - drivepose.getY();
             D_x = target.getX() - drivepose.getX();
