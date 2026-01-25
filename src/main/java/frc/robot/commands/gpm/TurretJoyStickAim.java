@@ -21,7 +21,7 @@ public class TurretJoyStickAim extends Command{
 
     @Override
     public void execute() {
-        turret.setSetpoint(angle, 0);
+        //turret.setSetpoint(angle, 0);
     }
 
 }

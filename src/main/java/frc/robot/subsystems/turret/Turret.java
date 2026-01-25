@@ -30,8 +30,8 @@ public class Turret extends SubsystemBase {
     private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-180.0);
     private static final double MAX_ANGLE_RAD = Units.degreesToRadians(180.0);
 
-    private static final double MAX_VEL_RAD_PER_SEC = Units.degreesToRadians(360);
-    private static final double MAX_ACCEL_RAD_PER_SEC2 = Units.degreesToRadians(720);
+    private static double MAX_VEL_RAD_PER_SEC = 4*Units.degreesToRadians(360);
+    private static double MAX_ACCEL_RAD_PER_SEC2 = 4*Units.degreesToRadians(720);
 
     private static final double VERSA_RATIO = 5.0;
     private static final double TURRET_RATIO = 140.0 / 10.0;
@@ -126,6 +126,13 @@ public class Turret extends SubsystemBase {
 
     @Override
     public void periodic() {
+        MAX_VEL_RAD_PER_SEC = SmartDashboard.getNumber("Max Velocity", MAX_VEL_RAD_PER_SEC);
+        MAX_ACCEL_RAD_PER_SEC2 = SmartDashboard.getNumber("Max Accleration", MAX_ACCEL_RAD_PER_SEC2);
+        kP = SmartDashboard.getNumber("kP Value", MAX_VEL_RAD_PER_SEC);
+        SmartDashboard.putNumber("Max Velocity", MAX_VEL_RAD_PER_SEC);
+        SmartDashboard.putNumber("Max Acceleration", MAX_ACCEL_RAD_PER_SEC2);
+        SmartDashboard.putNumber("kP Value", kP);
+
         double robotRelativeGoal = goalAngle.getRadians();
 
         // MA-style continuous optimization

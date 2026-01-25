@@ -38,7 +38,7 @@ public class AimAtPose extends Command {
   @Override
   public void execute() {
     //Logger.recordOutput("TurretPose", new Pose2d(drive.getPose().getTranslation(), turret.getPosition()));
-    turret.setSetpoint(-target.getTranslation().minus(drive.getPose().getTranslation()).getAngle().getDegrees(), 0);
+    //.setSetpoint(-target.getTranslation().minus(drive.getPose().getTranslation()).getAngle().getDegrees(), 0);
   }
 
   /**
