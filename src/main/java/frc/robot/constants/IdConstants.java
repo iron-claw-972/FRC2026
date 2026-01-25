@@ -26,4 +26,8 @@ public class IdConstants {
     public static final int SHOOTER_LEFT_ID = 22;
     public static final int SHOOTER_RIGHT_ID = 23;
     public static final int FEEDER_ID = 21;
+
+    // Climb
+    public static final int CLIMB_MOTOR_LEFT = 48;
+    public static final int CLIMB_MOTOR_RIGHT = 49;
 }
