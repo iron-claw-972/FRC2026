@@ -84,6 +84,10 @@
     {
       "waypointRelativePos": 2.0778523489932774,
       "rotationDegrees": 45.0
+    },
+    {
+      "waypointRelativePos": 2.521700223713649,
+      "rotationDegrees": -51.12369435851797
     }
   ],
   "constraintZones": [
@@ -126,7 +130,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "Field Testing Autos",
