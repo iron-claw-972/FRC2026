@@ -158,28 +158,34 @@ gradle-app.setting
 .settings/
 bin/
 
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Fleet
+.fleet
+
 # Simulation GUI and other tools window save file
-*-window.json
-*simgui.json
-simgui-ds.json
 networktables.json
-networktables.json.bck
+simgui.json
+*-window.json
 
-# Simulation puts log files in root of repo
-*.wpilog
+# Simulation data log directory
+logs/
 
-# Don't commit ctre_sim directory
-ctre_sim/*
+# Folder that has CTRE Phoenix Sim device config storage
+ctre_sim/
+
+# clangd
+/.cache
+compile_commands.json
+
+# Eclipse generated file for annotation processors
+.factorypath
 
 # File that has git and version data
 src/main/java/frc/robot/util/BuildData.java
-
-# Log files from simulation
-logs/
-
-# IntelliJ IDEA files
-.idea/
-
-# I don't know what this is but it has local paths in it
-.factorypath
 
