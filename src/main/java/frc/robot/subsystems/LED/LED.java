@@ -105,4 +105,39 @@ public class LED extends SubsystemBase {
 			}
 		}
 	}
+
+	/**
+	 * Creates a two-color wave pattern across the LEDs.
+	 * TODO: Implement actual wave animation
+	 *
+	 * @param r1 Red value of the first color (0-255)
+	 * @param g1 Green value of the first color (0-255)
+	 * @param b1 Blue value of the first color (0-255)
+	 * @param r2 Red value of the second color (0-255)
+	 * @param g2 Green value of the second color (0-255)
+	 * @param b2 Blue value of the second color (0-255)
+	 */
+	public void setTwoColorWave(int r1, int g1, int b1, int r2, int g2, int b2) {
+
+	}
+
+	/**
+	 * Sets strobe lights effect.
+	 * TODO: Implement actual strobe animation
+	 *
+	 * @param red   Red value (0-255)
+	 * @param green Green value (0-255)
+	 * @param blue  Blue value (0-255)
+	 */
+	public void setStrobeLights(int red, int green, int blue) {
+
+	}
+
+	/**
+	 * Sets defense lights pattern.
+	 * TODO: Implement actual defense lights pattern
+	 */
+	public void defenseLights() {
+
+	}
 }
