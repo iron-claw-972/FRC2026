@@ -397,6 +397,19 @@ public class Vision {
   }
 
   /**
+   * Checks if one or more cameras are disconnected
+   * @return true if at least one camera is disconnected, false otherwise
+   */
+  public boolean oneCameraDisconnected(){
+    for(VisionCamera camera : cameras){
+      if(!camera.inputs.connected){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Checks if a pose is on the field
    * @param pose The pose to check
    * @return If the pose is on the field

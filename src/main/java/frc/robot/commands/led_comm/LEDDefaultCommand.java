@@ -18,7 +18,7 @@ public class LEDDefaultCommand extends Command {
 
     public LEDDefaultCommand(LED led, Drivetrain drivetrain, Vision vision) {
         this.led = led;
-        // this.outtake = outtake; // TODO: Outtake subsystem not yet implemented
+        // this.outtake = outtake;
         this.drivetrain = drivetrain;
         this.vision = vision;
 
