@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import java.lang.reflect.Field;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,6 +13,7 @@ import frc.robot.Robot;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.util.ShootingTarget;
 import frc.robot.util.Vision.TurretVision;
 
 public class TurretAutoShoot extends Command {
@@ -26,7 +29,7 @@ public class TurretAutoShoot extends Command {
 
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
-
+    private Translation2d drivepose = drivetrain.getPose().getTranslation();
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
         this.turret = turret;
         this.drivetrain = drivetrain;
@@ -39,9 +42,22 @@ public class TurretAutoShoot extends Command {
         this(turret, drivetrain, null);
     }
 
-    public void updateTurretSetpoint() {
-        Translation2d drivepose = drivetrain.getPose().getTranslation();
-        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+    public void updateTurretSetpoint(Translation2d drivepose) {
+        ShootingTarget shootingTarget = getZone(drivepose);
+        Translation2d target;
+        switch (shootingTarget) {
+            case HUB: 
+                target = FieldConstants.getHubTranslation().toTranslation2d();
+            case NEUTRAL:
+                target = FieldConstants.getNeutralTranslation(leftSide(drivepose)).toTranslation2d();
+            case ALLIANCE:
+                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
+            case OPPOSITION:
+                target = FieldConstants.getOppositionTranslation(leftSide(drivepose)).toTranslation2d();
+            default:
+                target = FieldConstants.getHubTranslation().toTranslation2d();
+        }
+
         double D_y;
         double D_x;
         // TODO: Change time to goal on actual comp bot
@@ -98,14 +114,14 @@ public class TurretAutoShoot extends Command {
     @Override
     public void initialize() {
         // Initialize setpoint calculation and set the initial goal for the turret
-        updateTurretSetpoint();
+        updateTurretSetpoint(drivepose);
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), drivetrain.getAngularRate(2));
     }
 
     @Override
     public void execute() {
         // Continuously update setpoints and adjust based on vision if available
-        updateTurretSetpoint();
+        updateTurretSetpoint(drivepose);
         updateYawToTag();
 
         if(turretVision != null && turretVisionEnabled && turret.atGoal()){
@@ -121,4 +137,17 @@ public class TurretAutoShoot extends Command {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
     }
+
+    public boolean leftSide(Translation2d drivepose) {
+        if (drivepose.getY() > (FieldConstants.FIELD_WIDTH / 2)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ShootingTarget getZone(Translation2d drivepose) {
+        return FieldConstants.getZone(drivepose);
+    }
 }
+
