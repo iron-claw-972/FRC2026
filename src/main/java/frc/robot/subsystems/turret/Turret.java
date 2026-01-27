@@ -15,6 +15,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -111,6 +116,26 @@ public class Turret extends SubsystemBase implements TurretIO{
         SmartDashboard.putData("Turret Mech", mech);
     }
 
+    public void setVoltage(Voltage volts) {
+        motor.setVoltage(volts.magnitude());
+    }
+    
+    public Voltage getVolts() {
+        return motor.getMotorVoltage().getValue();
+    }
+
+    public Angle getPosition() {
+        return motor.getPosition().getValue();
+    }
+
+    public AngularVelocity getVelocity() {
+        return motor.getVelocity().getValue();
+    }
+
+    public AngularAcceleration getAccel() {
+        return motor.getAcceleration().getValue();
+    }
+    
     /* ---------------- Public API ---------------- */
 
     public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
