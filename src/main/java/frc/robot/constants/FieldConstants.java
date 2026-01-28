@@ -12,6 +12,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
 
 public class FieldConstants {
@@ -36,7 +37,7 @@ public class FieldConstants {
     new Translation3d(field.getFieldLength()*0.5, field.getFieldWidth() - NEUTRAL_LEFT.getX(), 0);
 
   public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(156.8+20+50, field.getFieldWidth()*0.25, 0); // previous hub + a few feet
+    new Translation3d(156.8+20+50, field.getFieldWidth()*0.25, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
     new Translation3d(158.8+20+50, field.getFieldWidth() - ALLIANCE_LEFT_BLUE.getX(), 0);
@@ -88,23 +89,23 @@ public class FieldConstants {
     }
   }
 
-  public static ShootingTarget getZone(Translation2d drivepose) {
+  public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
     double y = drivepose.getY();
     if(x < FieldConstants.RedAllianceLine) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
-        return ShootingTarget.ALLIANCE;
+        return FieldZone.ALLIANCE;
       } else {
-        return ShootingTarget.OPPOSITION;
+        return FieldZone.OPPOSITION;
       }
     } else if (x > FieldConstants.BlueAllianceLine) {
       if (Robot.getAlliance() == Alliance.Blue) {
-        return ShootingTarget.ALLIANCE;
+        return FieldZone.ALLIANCE;
       } else {
-        return ShootingTarget.OPPOSITION;
+        return FieldZone.OPPOSITION;
       }
     } else {
-      return ShootingTarget.NEUTRAL;
+      return FieldZone.NEUTRAL;
     }
   }
 

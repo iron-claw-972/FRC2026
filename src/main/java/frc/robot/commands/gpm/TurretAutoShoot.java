@@ -13,6 +13,7 @@ import frc.robot.Robot;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
 import frc.robot.util.Vision.TurretVision;
 
@@ -30,7 +31,7 @@ public class TurretAutoShoot extends Command {
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
     private Translation2d drivepose = drivetrain.getPose().getTranslation();
-    public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision){
+    public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.turretVision = turretVision;
@@ -38,24 +39,26 @@ public class TurretAutoShoot extends Command {
         addRequirements(turret);
     }
 
-    public TurretAutoShoot(Turret turret, Drivetrain drivetrain){
+    public TurretAutoShoot(Turret turret, Drivetrain drivetrain) {
         this(turret, drivetrain, null);
     }
 
     public void updateTurretSetpoint(Translation2d drivepose) {
-        ShootingTarget shootingTarget = getZone(drivepose);
+        
+        FieldZone currentZone = getZone(drivepose);
         Translation2d target;
-        switch (shootingTarget) {
-            case HUB: 
-                target = FieldConstants.getHubTranslation().toTranslation2d();
+        switch (currentZone) {
             case NEUTRAL:
-                target = FieldConstants.getNeutralTranslation(leftSide(drivepose)).toTranslation2d();
-            case ALLIANCE:
                 target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
             case OPPOSITION:
-                target = FieldConstants.getOppositionTranslation(leftSide(drivepose)).toTranslation2d();
+                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
+            case ALLIANCE:
+                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d(); // For the shooter we will want to check if active but turret should be fine
             default:
                 target = FieldConstants.getHubTranslation().toTranslation2d();
+            
+            // I also made this for if we want to shoot to the opposing teams area (though we would never haha):
+            // target = FieldConstants.getOppositionTranslation(leftSide(drivepose)).toTranslation2d();
         }
 
         double D_y;
@@ -89,7 +92,7 @@ public class TurretAutoShoot extends Command {
         System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
-    public void adjustWithTurretCam(){
+    public void adjustWithTurretCam() {
         if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
             // Adjust turret setpoint based on vision input
             if(Robot.getAlliance() == Alliance.Blue){
@@ -146,7 +149,7 @@ public class TurretAutoShoot extends Command {
         }
     }
 
-    public ShootingTarget getZone(Translation2d drivepose) {
+    public FieldZone getZone(Translation2d drivepose) {
         return FieldConstants.getZone(drivepose);
     }
 }
