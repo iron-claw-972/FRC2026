@@ -70,9 +70,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
-        shooterMotorLeft.set(-1);
-        shooterMotorRight.set(-1);
-        feederMotor.set(feederPower);
+        //shooterMotorLeft.set(-1);
+        //shooterMotorRight.set(-1);
+        //feederMotor.set(feederPower);
     }
 
     public void deactivateShooterAndFeeder() {

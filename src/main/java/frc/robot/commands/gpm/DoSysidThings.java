@@ -2,6 +2,7 @@ package frc.robot.commands.gpm;
 
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.subsystems.turret.Turret;
@@ -17,15 +18,16 @@ public class DoSysidThings extends SequentialCommandGroup {
 		SysIdRoutine routine = new SysIdRoutine(conf, mech);
 
 		addCommands(
-				turret.goTo(TurretConstants.MIN_ANGLE + 10),
-				routine.quasistatic(SysIdRoutine.Direction.kForward).withDeadline(turret.runTillEdge()),
-				turret.goTo(TurretConstants.MAX_ANGLE - 10),
-				routine.quasistatic(SysIdRoutine.Direction.kReverse).withDeadline(turret.runTillEdge()),
-				turret.goTo(TurretConstants.MIN_ANGLE + 10),
-				routine.dynamic(SysIdRoutine.Direction.kForward).withDeadline(turret.runTillEdge()),
-				turret.goTo(TurretConstants.MAX_ANGLE - 10),
-				routine.dynamic(SysIdRoutine.Direction.kReverse).withDeadline(turret.runTillEdge()),
-				turret.goTo(0));
+				// turret.goTo(TurretConstants.MIN_ANGLE + 10),
+				routine.quasistatic(SysIdRoutine.Direction.kForward).withDeadline(new WaitCommand(4)),
+				// turret.goTo(TurretConstants.MAX_ANGLE - 10),
+				routine.quasistatic(SysIdRoutine.Direction.kReverse).withDeadline(new WaitCommand(4)),
+				// turret.goTo(TurretConstants.MIN_ANGLE + 10),
+				routine.dynamic(SysIdRoutine.Direction.kForward).withDeadline(new WaitCommand(2)),
+				// turret.goTo(TurretConstants.MAX_ANGLE - 10),
+				routine.dynamic(SysIdRoutine.Direction.kReverse).withDeadline(new WaitCommand(2))
+				// turret.goTo(0)
+				);
 	}
 
 	private void doLog(SysIdRoutineLog log) {

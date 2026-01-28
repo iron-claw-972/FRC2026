@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AimAtPose;
+import frc.robot.commands.gpm.DoSysidThings;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -124,6 +125,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
     SmartDashboard.putData("Aim at thingy", new AimAtPose(drive, turret, new Pose2d(FieldConstants.field.getTagPose(26).get().getTranslation().toTranslation2d(), Rotation2d.kZero)));
+    SmartDashboard.putData("sysid", new DoSysidThings(turret));
   }
 
   /**

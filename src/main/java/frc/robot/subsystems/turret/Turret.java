@@ -14,6 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.ImmutableAngle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -65,6 +66,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 	// root.append(new MechanismLigament2d("barrel", 30, 0));
 
 	private double target = 0;
+	private Angle initPos;
 
 	/* ---------------- Tuning ---------------- */
 
@@ -87,7 +89,10 @@ public class Turret extends SubsystemBase implements TurretIO {
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
 		mm.MotionMagicAcceleration = Units.radiansToRotations(MAX_ACCEL_RAD_PER_SEC2) * GEAR_RATIO;
 
-		motor.getConfigurator().apply(cfg);
+		// motor.getConfigurator().apply(cfg);
+
+		target = Double.NaN;
+		initPos = motor.getPosition().getValue();
 
 		// if (RobotBase.isSimulation()) {
 		// simState = motor.getSimState();
@@ -118,6 +123,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 	public Command goTo(double degrees) {
 		return new FunctionalCommand(() -> {
 		}, () -> {
+			System.out.println("Going to " + degrees + " from " + getPosition() + " init " + initPos);
 			goToPos(Units.degreesToRadians(degrees));
 		}, (b) -> {
 		}, this::atSetpoint, this);
@@ -132,7 +138,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 	}
 
 	public boolean atSetpoint() {
-		return (Math.abs(target - getPosition().in(edu.wpi.first.units.Units.Radians)) < .1);
+		return atGoal();
 	}
 
 	public void setVoltage(Voltage volts) {
@@ -145,7 +151,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 	}
 
 	public Angle getPosition() {
-		return motor.getPosition().getValue();
+		return motor.getPosition().getValue().minus(initPos);
 	}
 
 	public AngularVelocity getVelocity() {
@@ -164,9 +170,9 @@ public class Turret extends SubsystemBase implements TurretIO {
 	}
 
 	public boolean atGoal() {
-		return atSetpoint();
-		// return Math.abs(setpoint.position - lastGoalRad) <
-		// Units.degreesToRadians(1.5);
+		// return atSetpoint();
+		return Math.abs(target - getPosition().in(edu.wpi.first.units.Units.Radians)) <
+		Units.degreesToRadians(1.5);
 	}
 
 	public double getPositionDeg() {
@@ -224,12 +230,12 @@ public class Turret extends SubsystemBase implements TurretIO {
 		// setpoint,
 		// goal);
 
-		if (Double.isNaN(target))
-			return;
+		// if (Double.isNaN(target))
+		// 	return;
 
-		double motorRot = Units.radiansToRotations(target) * GEAR_RATIO;
+		// double motorRot = Units.radiansToRotations(target) * GEAR_RATIO;
 
-		motor.setControl(mmRequest.withPosition(motorRot));
+		// motor.setControl(mmRequest.withPosition(motorRot));
 
 		// ligament.setAngle(getPositionDeg());
 
