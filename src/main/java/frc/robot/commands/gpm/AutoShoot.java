@@ -27,7 +27,7 @@ public class AutoShoot extends Command {
 
     // apex of parabola in meters
     private double speed = 8;
-    private double height = 2.2;
+    private double height = 1.85;
 
     public AutoShoot(Drivetrain drive, Hood hood, Shooter shooter) {
         this.drive = drive;

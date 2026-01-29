@@ -140,6 +140,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     @AutoLogOutput(key="Shooter/TargetSpeed")
     public double getTargetVelocity(){
-        return shooterTargetSpeed;
+        return Units.rotationsToRadians(shooterTargetSpeed) * ShooterConstants.SHOOTER_WHEEL_DIAMETER / 2;
     }
 }
