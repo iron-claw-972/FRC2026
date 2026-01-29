@@ -22,8 +22,8 @@ public class DoSysidThings extends SequentialCommandGroup {
             routine.quasistatic(SysIdRoutine.Direction.kForward),
             routine.quasistatic(SysIdRoutine.Direction.kReverse),
             routine.dynamic(SysIdRoutine.Direction.kForward),
-            routine.dynamic(SysIdRoutine.Direction.kReverse),
-        )
+            routine.dynamic(SysIdRoutine.Direction.kReverse)
+        );
     }
 
     private void doLog(SysIdRoutineLog log) {

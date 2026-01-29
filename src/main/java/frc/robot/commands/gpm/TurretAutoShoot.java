@@ -30,11 +30,12 @@ public class TurretAutoShoot extends Command {
 
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
-    private Translation2d drivepose = drivetrain.getPose().getTranslation();
+    private Translation2d drivepose;
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain, TurretVision turretVision) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.turretVision = turretVision;
+        drivepose  = drivetrain.getPose().getTranslation();
         
         addRequirements(turret);
     }
@@ -89,7 +90,7 @@ public class TurretAutoShoot extends Command {
         // Calculate turret setpoint (angle relative to robot heading)
         turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(fieldAngleRad - robotHeading), -180.0, 180.0);
 
-        System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
+        // System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
     public void adjustWithTurretCam() {
@@ -131,7 +132,7 @@ public class TurretAutoShoot extends Command {
             adjustWithTurretCam();
             turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(adjustedSetpoint)), -drivetrain.getAngularRate(2));
         } else{
-            turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
+            turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2) * 1.0);
         }
     }
 

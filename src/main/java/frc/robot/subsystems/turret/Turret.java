@@ -37,8 +37,8 @@ public class Turret extends SubsystemBase implements TurretIO{
     private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
     private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
-    private static double MAX_VEL_RAD_PER_SEC = 4*Units.degreesToRadians(360);
-    private static double MAX_ACCEL_RAD_PER_SEC2 = 4*Units.degreesToRadians(720);
+    private static double MAX_VEL_RAD_PER_SEC = 100;
+    private static double MAX_ACCEL_RAD_PER_SEC2 = 500000000;
 
     private static final double VERSA_RATIO = 5.0;
     private static final double TURRET_RATIO = 140.0 / 10.0;
@@ -76,14 +76,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     /* ---------------- Tuning ---------------- */
 
-    private double kP = 15.0;
+    private double kP = 12.0;
     private double kD = 0.0;
 
     /* ---------------- Constructor ---------------- */
 
     public Turret() {
+		SmartDashboard.putNumber("FF Value", 0.1);
+
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN);
         motor.setNeutralMode(NeutralModeValue.Brake);
+		motor.setPosition(0);
 
         TalonFXConfiguration cfg = new TalonFXConfiguration();
         cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -165,6 +168,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     /* ---------------- Periodic ---------------- */
 
+	double FFValue;
     @Override
     public void periodic() {
         updateInputs();
@@ -202,9 +206,12 @@ public class Turret extends SubsystemBase implements TurretIO{
         double motorRot =
             Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
 
-        motor.setControl(mmRequest.withPosition(motorRot));
+		FFValue = SmartDashboard.getNumber("FF Value", FFValue);
+        motor.setControl(mmRequest.withPosition(motorRot).withFeedForward(FFValue));
 
         ligament.setAngle(getPositionDeg());
+
+		FFValue = SmartDashboard.getNumber("FF Value", FFValue);
 
         SmartDashboard.putNumber("Turret Pos Deg", getPositionDeg());
         SmartDashboard.putNumber("Turret Goal Deg", Units.radiansToDegrees(best));
