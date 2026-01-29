@@ -17,14 +17,13 @@ public class ShooterPhysics {
 	 * Calculates shot parameters for SOTM using Physics™.
 	 *
 	 * @param robotVelocity The x and y velocity of the robot, field relative.
-	 * @param robot         The position of the center of the robot, field relative.
-	 * @param target        The position of the target, field relative.
+	 * @param robotToTarget The robot to target transform. Angles are field
+	 *                      relative, positions are with the robot as the origin.
 	 * @param height        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
-	public static TurretState getShotParams(Translation2d robotVelocity, Translation2d robot, Translation3d target,
+	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			double height) {
-		Translation3d robotToTarget = target.minus(new Translation3d(robot));
 		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
 
 		Translation2d onGround = exitVel.toTranslation2d();
@@ -38,12 +37,14 @@ public class ShooterPhysics {
 		return new TurretState(yaw, pitch, speed);
 	}
 
-	public static Optional<TurretState> getShotParamsBySpeed(Translation2d robotVelocity, Translation2d robot, Translation3d target,
+	public static Optional<TurretState> getShotParamsBySpeed(Translation2d robotVelocity, Translation2d robot,
+			Translation3d target,
 			double speed) {
 		Translation3d robotToTarget = target.minus(new Translation3d(robot));
 		Optional<Translation3d> exitVelOpt = getExitVelocityForSpeed(robotVelocity, robotToTarget, speed);
 
-		if (exitVelOpt.isEmpty()) return Optional.empty();
+		if (exitVelOpt.isEmpty())
+			return Optional.empty();
 		Translation3d exitVel = exitVelOpt.get();
 
 		Translation2d onGround = exitVel.toTranslation2d();
@@ -127,7 +128,8 @@ public class ShooterPhysics {
 		double g = Constants.GRAVITY_ACCELERATION;
 		double robotSpeed = initialVelocity.getNorm();
 
-		double minProjectileSpeed = Math.sqrt(g * (horizontalDist + Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist)));
+		double minProjectileSpeed = Math
+				.sqrt(g * (horizontalDist + Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist)));
 		double minSpeed = Math.max(0, minProjectileSpeed - robotSpeed);
 
 		if (speed < minSpeed - tolerance) {
