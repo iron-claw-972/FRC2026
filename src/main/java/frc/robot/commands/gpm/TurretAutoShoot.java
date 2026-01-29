@@ -65,6 +65,8 @@ public class TurretAutoShoot extends Command {
         double timeOfFlight;
         Pose2d lookaheadPose = turretPosition;
         double lookaheadTurretToTargetDistance = turretToTargetDistance;
+
+        // Loop (20) until lookahreadTurretToTargetDistance converges
         for (int i = 0; i < 20; i++) {
             timeOfFlight = ShotInterpolation.timeOfFlightMap.get(lookaheadTurretToTargetDistance);
             double offsetX = turretVelocityX * timeOfFlight;
