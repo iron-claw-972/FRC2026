@@ -88,7 +88,9 @@ public class RobotContainer {
       intake = new IntakeAlpha();
       shooter = new Shooter();
 
-      case Vertigo:
+      case PrimeJr:
+
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
         operator = new Operator(drive);

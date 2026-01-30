@@ -25,26 +25,26 @@ public class DriveConstants {
      */
     public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.832;
 
-    public static double ROBOT_MASS = 25;
+    public static double ROBOT_MASS = 31;
 
     /** Radius of the drive wheels [meters]. */
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
 
     public static double WHEEL_MOI = 0.000326 * ROBOT_MASS;
 
-    
+
     /** Distance between the left and right wheels [meters]. */
     public static double TRACK_WIDTH = Units.inchesToMeters(20.75);//22.75 swerve bot, 20.75 comp bot
 
     /**
-     * Drive gear ratio for MK5n swerve module 
+     * Drive gear ratio for MK5n swerve module
      */
-    public static double DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); 
- 
-    /** 
-     * Steer gear ratio for MK5n swerve module 
+    public static double DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
+
+    /**
+     * Steer gear ratio for MK5n swerve module
      */
-    public static final double STEER_GEAR_RATIO = 287.0 / 11.0; // TODO: make an enum for all these drivetrain/module constants 
+    public static double STEER_GEAR_RATIO = 287.0 / 11.0; // TODO: make an enum for all these drivetrain/module constants 
 
     /** Theoretical maximum speed of the robot based on maximum motor RPM, gear ratio, and wheel radius in m/s */
     // Kraken x60 has 100.0 rotations per second max velocity 
@@ -141,7 +141,7 @@ public class DriveConstants {
 
     /* Motor inversions */
     public static final InvertedValue INVERT_DRIVE_MOTOR = InvertedValue.CounterClockwise_Positive;
-    public static final InvertedValue INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+    public static InvertedValue INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
     /* Neutral Modes */
     public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
@@ -205,13 +205,35 @@ public class DriveConstants {
      * Updates the constants if the RobotId is not the competition robot.
      */
     public static void update(RobotId robotId) {
-        if(robotId == RobotId.WaffleHouse){
+        if (robotId == RobotId.PrimeJr) {
+            STEER_OFFSET_FRONT_LEFT = 187.03125+180;
+            STEER_OFFSET_FRONT_RIGHT = 161.982421+180+180;
+            STEER_OFFSET_BACK_LEFT = 196.69921875+180;
+            STEER_OFFSET_BACK_RIGHT = 357.714843+180+180;
+
+            // MK5n
+            INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
+            DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
+            STEER_GEAR_RATIO = 287.0 / 11.0;
+
+            MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
+
+        } else if(robotId == RobotId.WaffleHouse){
             STEER_OFFSET_FRONT_LEFT = 300.058594 - 360 + 180;
             STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
             STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
             STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
-        }
-        if(robotId == RobotId.BetaBot) {
+
+            // MK5n gear ratio
+            INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
+            DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
+            STEER_GEAR_RATIO = 287.0 / 11.0;
+
+            MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
+
+        } else if(robotId == RobotId.BetaBot) {
             STEER_OFFSET_FRONT_LEFT = 193.884-180;
             STEER_OFFSET_FRONT_RIGHT = 110.914;
             STEER_OFFSET_BACK_LEFT = 128.054+180;
@@ -230,13 +252,13 @@ public class DriveConstants {
             STEER_OFFSET_FRONT_RIGHT = 101.519+90;
             STEER_OFFSET_BACK_LEFT = 38.997+180;
             STEER_OFFSET_BACK_RIGHT = 242.847-90;
-            
+
             DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 
             ROBOT_MASS = 20;
 
             WHEEL_MOI = 0.000326 * ROBOT_MASS;
-            
+
             // Falcon Speed
             Constants.MAX_RPM = 6080.0;
         } else if (robotId == RobotId.Phil) {
@@ -263,7 +285,7 @@ public class DriveConstants {
                 STEER_OFFSET_BACK_LEFT = 165.49+90;
                 STEER_OFFSET_BACK_RIGHT = 73.563;
         }
-        
+
         MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
     }
 }
