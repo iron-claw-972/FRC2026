@@ -8,6 +8,6 @@ public class ShotInterpolation {
 
     static{
         timeOfFlightMap.put(0.0, 0.67);
-        timeOfFlightMap.put(0.0, 0.67);
+        timeOfFlightMap.put(1.0, 0.67);
     }
 }
