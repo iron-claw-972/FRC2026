@@ -63,13 +63,11 @@ public class Turret extends SubsystemBase {
     private double goalVelocityRadPerSec = 0.0;
     private double lastGoalRad = 0.0;
 
-    /* ---------------- Gains (ALPHABOT, MA-converted) ---------------- */
+    /* ---------------- Gains ---------------- */
 
-    // 3500 / rad  → × 2π
-    private static final double kP = 22_000.0;
+    private static final double kP = 3500.0;
 
-    // 150 / (rad/s) → × 2π
-    private static final double kD = 943.0;
+    private static final double kD = 150.0;
 
     /* ---------------- Visualization ---------------- */
 
@@ -81,7 +79,7 @@ public class Turret extends SubsystemBase {
     /* ---------------- Constructor ---------------- */
 
     public Turret() {
-        motor.setNeutralMode(NeutralModeValue.Brake);
+        motor.setNeutralMode(NeutralModeValue.Coast);
         motor.setPosition(0.0);
 
         motor.getConfigurator().apply(
