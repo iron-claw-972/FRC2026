@@ -110,7 +110,6 @@ public class TurretAutoShoot extends Command {
     public void execute() {
         updateDrivePose();
         updateTurretSetpoint(drivepose);
-
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
     }
 
