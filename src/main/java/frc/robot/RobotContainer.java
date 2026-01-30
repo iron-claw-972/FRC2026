@@ -104,8 +104,6 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-
-
       }
 
     // This is really annoying so it's disabled
