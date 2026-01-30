@@ -525,6 +525,7 @@ public class Vision {
       inputs.connected = camera.isConnected();
       inputs.results = camera.getAllUnreadResults();
 
+
       Logger.processInputs("Vision/"+camera.getName(), inputs);
 
       // Mechanical Advantage's vision logging
@@ -616,12 +617,9 @@ public class Vision {
       // The latest camera results
       for(PhotonPipelineResult result : inputs.results){
         // TODO: This could be improved by averaging all targets instead of only using 1
-
-        // Continue if the target doesn't exist or it should be ignored
-        if (!result.hasTargets()) continue;
         // Gets the best target to use for the calculations
         PhotonTrackedTarget target = result.getBestTarget();
-        // I don't know why this would happen, but keep it in just in case
+        // Continue if the target doesn't exist or it should be ignored
         if(target==null){
           continue;
         }

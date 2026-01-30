@@ -58,12 +58,17 @@ public class PhoenixOdometryThread extends Thread {
     setDaemon(true);
   }
 
+  private boolean started = false;
+  
+  //Changed because this was giving error messages
   @Override
-  public void start() {
-    if (timestampQueues.size() > 0) {
-      super.start();
-    }
+  public synchronized void start() {
+      if (!started && timestampQueues.size() > 0) {
+          started = true;
+          super.start();
+      }
   }
+  
 
   /** Registers a Phoenix signal to be read from the thread. */
   public Queue<Double> registerSignal(StatusSignal<Angle> signal) {

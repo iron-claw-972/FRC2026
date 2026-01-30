@@ -2,13 +2,23 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.drive_comm.AimAtTarget;
+import frc.robot.commands.gpm.AlphaIntakeBall;
+import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import lib.controllers.GameController;
 import lib.controllers.GameController.Axis;
 import lib.controllers.GameController.Button;
@@ -19,9 +29,15 @@ import lib.controllers.GameController.Button;
 public class GameControllerDriverConfig extends BaseDriverConfig {
   private final GameController driver = new GameController(Constants.DRIVER_JOY);
   private final BooleanSupplier slowModeSupplier = driver.get(Button.RIGHT_JOY);
+  private Hood hood;
+  private Shooter shooter;
+  private IntakeAlpha intake;
 
-  public GameControllerDriverConfig(Drivetrain drive) {
+  public GameControllerDriverConfig(Drivetrain drive, Hood hood, Shooter shooter, IntakeAlpha intake) {
     super(drive);
+    this.hood = hood;
+    this.shooter = shooter;
+    this.intake = intake;
   }
 
   @Override
@@ -36,6 +52,36 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
       getDrivetrain().setDesiredPose(() -> null);
       CommandScheduler.getInstance().cancelAll();
     }));
+
+    // Align wheels
+    // driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
+    // () -> getDrivetrain().setStateDeadband(false),
+    // getDrivetrain()::alignWheels,
+    // interrupted -> getDrivetrain().setStateDeadband(true),
+    // () -> false, getDrivetrain()).withTimeout(2));
+
+    if (intake != null && shooter != null) {
+      // shoots it
+      driver.get(driver.RIGHT_TRIGGER_BUTTON).onTrue(
+          new SequentialCommandGroup(
+              new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+              new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))))
+          .onFalse(
+              new InstantCommand(() -> {
+                shooter.deactivateShooterAndFeeder();
+              }));
+
+      // Intake
+      driver.get(driver.RIGHT_TRIGGER_BUTTON).whileTrue(new AlphaIntakeBall(intake));
+
+      if (hood != null) {
+        driver.get(Button.B).whileTrue(new AutoShoot(getDrivetrain(), hood, shooter));
+      }
+
+      driver.get(Button.A)
+          .whileTrue(new AimAtTarget(getDrivetrain(),
+              new Pose2d(FieldConstants.HUB_BLUE.toTranslation2d(), Rotation2d.kZero)));
+    }
   }
 
   @Override
