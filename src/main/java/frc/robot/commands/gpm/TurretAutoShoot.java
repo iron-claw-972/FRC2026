@@ -16,7 +16,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
-import frc.robot.util.FieldZone;
+// import frc.robot.util.FieldZone;
 
 public class TurretAutoShoot extends Command {
     private Turret turret;
@@ -127,8 +127,8 @@ public class TurretAutoShoot extends Command {
         }
     }
 
-    public FieldZone getZone(Translation2d drivepose) {
-        return FieldConstants.getZone(drivepose);
-    }
+    // public FieldZone getZone(Translation2d drivepose) {
+    //     return FieldConstants.getZone(drivepose);
+    // }
 }
 

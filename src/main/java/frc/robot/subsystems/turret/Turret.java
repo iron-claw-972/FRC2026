@@ -1,9 +1,11 @@
 package frc.robot.subsystems.turret;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.constants.Constants;
@@ -33,7 +36,7 @@ public class Turret extends SubsystemBase {
         Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
     private static final double MAX_VEL_RAD_PER_SEC = 16.0;
-    private static final double MAX_ACCEL_RAD_PER_SEC2 = 1e7;
+    private static final double MAX_ACCEL_RAD_PER_SEC2 = 80.0;
 
     private static final double VERSA_RATIO = 5.0;
     private static final double TURRET_RATIO = 140.0 / 10.0;
@@ -91,6 +94,15 @@ public class Turret extends SubsystemBase {
             new com.ctre.phoenix6.configs.TalonFXConfiguration() {{
             MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
             }});
+        
+        motor.getConfigurator().apply(
+            new TalonFXConfiguration() {{
+                Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+            }}
+        );
+
+        setpoint = new State(getPositionRad(), 0.0);
+        lastGoalRad = setpoint.position;
 
         if (RobotBase.isSimulation()) {
         simState = motor.getSimState();
@@ -175,10 +187,18 @@ public class Turret extends SubsystemBase {
         // --- Visualization ---
         ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-        SmartDashboard.putNumber("Turret/GoalDeg",
+        SmartDashboard.putNumber("Turret GoalDeg",
             Units.radiansToDegrees(best));
-        SmartDashboard.putNumber("Turret/SetpointDeg",
+        SmartDashboard.putNumber("Turret SetpointDeg",
             Units.radiansToDegrees(setpoint.position));
+        SmartDashboard.putNumber("Turret motorPosRot",
+            Units.radiansToDegrees(motorPosRot));
+        SmartDashboard.putNumber("Turret motorVelRotPerSec",
+            Units.radiansToDegrees(motorVelRotPerSec));
+        SmartDashboard.putNumber("Turret Position Deg",
+            Units.radiansToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
+
+        // SmartDashboard.putData("Spin to 90 deg", new InstantCommand(()->{setFieldRelativeTarget(new Rotation2d(Math.PI), 0);}));
     }
 
     /* ---------------- Simulation ---------------- */

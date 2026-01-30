@@ -95,6 +95,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             })
         );
 
+        driver.get(PS5Button.CIRCLE).onTrue(
+            new InstantCommand(()->{
+                turret.setFieldRelativeTarget(new Rotation2d(Math.PI), 0);
+            })
+        ).onFalse(
+            new InstantCommand(()->{
+                turret.setFieldRelativeTarget(new Rotation2d(0), 0);
+            })
+        );
+
         // driver.get(PS5Button.CROSS).onTrue(
         //     new InstantCommand(()->{
         //         if(turretJoyStickAim == null || !turretJoyStickAim.isScheduled()){
