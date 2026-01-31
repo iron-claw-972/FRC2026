@@ -1,8 +1,11 @@
 package frc.robot.subsystems.turret;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.swerve.DriveConstants;
 
 public class Turret extends SubsystemBase {
 
@@ -61,6 +65,8 @@ public class Turret extends SubsystemBase {
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
 
+    private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
+
 	/* ---------------- Gains ---------------- */
 
 	private static final double kP = 3500.0;
@@ -81,7 +87,9 @@ public class Turret extends SubsystemBase {
 		motor.getConfigurator().apply(
 				new Slot0Configs()
 						.withKP(kP)
-						.withKD(kD));
+						.withKD(kD)
+                        .withKV(1)
+                        .withKA(1));
 
 		motor.getConfigurator().apply(
 				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
@@ -96,6 +104,12 @@ public class Turret extends SubsystemBase {
 						Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 					}
 				});
+
+        var talonFXConfigs = new TalonFXConfiguration();
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 10.0;
+        motionMagicConfigs.MotionMagicAcceleration = 50.0;
+        motor.getConfigurator().apply(talonFXConfigs);
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
@@ -174,10 +188,12 @@ public class Turret extends SubsystemBase {
 				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians) * GEAR_RATIO,
 				setpoint.position * GEAR_RATIO);
 
-		var request = new MotionMagicVelocityVoltage(Units.radiansToRotations(targetVelocity));
+		var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
+        Logger.recordOutput("Turret Voltage", motor.getMotorVoltage().getValue());
 
 		// --- Position + velocity feedforward (MA-style) ---
 		motor.setControl(request);
+        // motor.clearStickyFaults();
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
@@ -190,6 +206,8 @@ public class Turret extends SubsystemBase {
 				Units.radiansToDegrees(motorPosRot));
 		SmartDashboard.putNumber("Turret motorVelRotPerSec",
 				Units.radiansToDegrees(motorVelRotPerSec));
+        SmartDashboard.putNumber("Turret targetVelocity",
+				Units.radiansToDegrees(targetVelocity));
 		SmartDashboard.putNumber("Turret Position Deg",
 				Units.radiansToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 
