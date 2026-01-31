@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
-import frc.robot.constants.VisionConstants;
+// import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.BuildData;
 
@@ -142,7 +142,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         // Disable vision if the constant is false.
-        robotContainer.setVisionEnabled(VisionConstants.ENABLED_AUTO);
+        // robotContainer.setVisionEnabled(VisionConstants.ENABLED_AUTO);
 
         // Get the autonomous command.
         // This access is fast (about 14 microseconds) because the value is already resident in the Network Tables.
@@ -168,7 +168,7 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void teleopInit() {
-        robotContainer.setVisionEnabled(true);
+        // robotContainer.setVisionEnabled(true);
 
         // This makes sure that the autonomous stops running when
         // teleop starts running. If you want the autonomous to
