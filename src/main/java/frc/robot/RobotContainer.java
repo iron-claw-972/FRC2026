@@ -1,13 +1,13 @@
 package frc.robot;
 
-import java.io.IOException;
+// import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.parser.ParseException;
+// import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -15,18 +15,18 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
-import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.constants.AutoConstants;
+// import frc.robot.commands.drive_comm.DefaultDriveCommand;
+// import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.VisionConstants;
-import frc.robot.controls.BaseDriverConfig;
-import frc.robot.controls.Operator;
-import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
-import frc.robot.util.PathGroupLoader;
-import frc.robot.util.Vision.DetectedObject;
-import frc.robot.util.Vision.Vision;
+// import frc.robot.constants.VisionConstants;
+// import frc.robot.controls.BaseDriverConfig;
+// import frc.robot.controls.Operator;
+// import frc.robot.controls.PS5ControllerDriverConfig;
+// import frc.robot.subsystems.drivetrain.Drivetrain;
+// import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+// import frc.robot.util.PathGroupLoader;
+// import frc.robot.util.Vision.DetectedObject;
+// import frc.robot.util.Vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -39,13 +39,13 @@ import frc.robot.util.Vision.Vision;
  */
 public class RobotContainer {
   // The robot's subsystems are defined here...
-  private Drivetrain drive = null;
-  private Vision vision = null;
+  // private Drivetrain drive = null;
+  // private Vision vision = null;
   private Command auto = new DoNothing();
 
   // Controllers are defined here
-  private BaseDriverConfig driver = null;
-  private Operator operator = null;
+  // private BaseDriverConfig driver = null;
+  // private Operator operator = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -65,36 +65,36 @@ public class RobotContainer {
       case SwerveCompetition:
 
       case BetaBot:
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
       case Phil:
       case Vertigo:
-        drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
-        operator = new Operator(drive);
+        // drive = new Drivetrain(vision, new GyroIOPigeon2());
+        // driver = new PS5ControllerDriverConfig(drive);
+        // operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
-        DetectedObject.setDrive(drive);
-        
-        // SignalLogger.start();
-        
+        // DetectedObject.setDrive(drive);
 
-        driver.configureControls();
-        operator.configureControls();
-        
-        initializeAutoBuilder();
-        registerCommands();
-        PathGroupLoader.loadPathGroups();
+        // SignalLogger.start();
+
+
+        // driver.configureControls();
+        // operator.configureControls();
+
+        // initializeAutoBuilder();
+        // registerCommands();
+        // PathGroupLoader.loadPathGroups();
         // Load the auto command
-        try {
-          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-          auto = new PathPlannerAuto("Path Name");
-        } catch (IOException | ParseException e) {
-          e.printStackTrace();
-        }
-        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        // try {
+        //   PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+        //   auto = new PathPlannerAuto("Path Name");
+        // } catch (IOException | ParseException e) {
+        //   e.printStackTrace();
+        // }
+        // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
       }
 
@@ -111,28 +111,28 @@ public class RobotContainer {
   /**
    * Sets whether the drivetrain uses vision toupdate odometry
    */
-  public void setVisionEnabled(boolean enabled) {
-    if (drive != null)
-      drive.setVisionEnabled(enabled);
-  }
+  // public void setVisionEnabled(boolean enabled) {
+  //   if (drive != null)
+  //     drive.setVisionEnabled(enabled);
+  // }
 
 
-  public void initializeAutoBuilder() {
-    AutoBuilder.configure(
-        () -> drive.getPose(),
-        (pose) -> {
-          drive.resetOdometry(pose);
-        },
-        () -> drive.getChassisSpeeds(),
-        (chassisSpeeds) -> {
-          Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
-          drive.setChassisSpeeds(chassisSpeeds, false); // problem??
-        },
-        AutoConstants.AUTO_CONTROLLER,
-        AutoConstants.CONFIG,
-        getAllianceColorBooleanSupplier(),
-        drive);
-  }
+  // public void initializeAutoBuilder() {
+  //   AutoBuilder.configure(
+  //       () -> drive.getPose(),
+  //       (pose) -> {
+  //         drive.resetOdometry(pose);
+  //       },
+  //       () -> drive.getChassisSpeeds(),
+  //       (chassisSpeeds) -> {
+  //         Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
+  //         drive.setChassisSpeeds(chassisSpeeds, false); // problem??
+  //       },
+  //       AutoConstants.AUTO_CONTROLLER,
+  //       AutoConstants.CONFIG,
+  //       getAllianceColorBooleanSupplier(),
+  //       drive);
+  // }
 
   public void registerCommands() {
 
