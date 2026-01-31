@@ -7,7 +7,7 @@ import frc.robot.constants.Constants;
 
 public class CANRangeSensorTest extends TimedRobot {
 
-    private static final int SENSOR_ID = 0;
+    private static final int SENSOR_ID = 27;
 
     private CANrange rangeSensor;
     private boolean sensorConnected = false;
@@ -15,7 +15,7 @@ public class CANRangeSensorTest extends TimedRobot {
     @Override
     public void robotInit() {
         try {
-            rangeSensor = new CANrange(SENSOR_ID, Constants.CANIVORE_CAN);
+            rangeSensor = new CANrange(SENSOR_ID, "Default Name");
             sensorConnected = true;
         } catch (Exception e) {
             sensorConnected = false;
