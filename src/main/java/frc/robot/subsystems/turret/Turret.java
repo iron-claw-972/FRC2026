@@ -45,7 +45,9 @@ public class Turret extends SubsystemBase {
 	private static final double TURRET_RATIO = 140.0 / 10.0;
 	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
 
-	private static final PIDController velocityPid = new PIDController(15, 0, 0.2);
+	private static final PIDController velocityPid = new PIDController(15, 0, 0.25);
+
+    private double lastFrameVelocity = 0;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -81,7 +83,9 @@ public class Turret extends SubsystemBase {
 	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
+    // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
+    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
+
 
 	/* ---------------- Constructor ---------------- */
 
@@ -95,12 +99,12 @@ public class Turret extends SubsystemBase {
         //                 .withKV(1)
         //                 .withKA(1));
 
-		// motor.getConfigurator().apply(
-		// 		new com.ctre.phoenix6.configs.TalonFXConfiguration() {
-		// 			{
-		// 				MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		// 			}
-		// 		});
+		motor.getConfigurator().apply(
+				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
+					{
+						MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+					}
+				});
 
 		// motor.getConfigurator().apply(
 		// 		new TalonFXConfiguration() {
@@ -155,8 +159,6 @@ public class Turret extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-
-
 		double robotRelativeGoal = goalAngle.getRadians();
 
 		// --- MA-style continuous wrap selection ---
@@ -196,9 +198,11 @@ public class Turret extends SubsystemBase {
 				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
 				setpoint.position * GEAR_RATIO);
         
-        targetVelocity += Units.radiansToRotations(motorVelRotPerSec);
+        targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
 
+        // double voltage = feedForward.calculateWithVelocities(lastFrameVelocity, targetVelocity);
         double voltage = feedForward.calculate(targetVelocity);
+        lastFrameVelocity = targetVelocity;
 
         motor.setVoltage(voltage);
 
@@ -224,7 +228,7 @@ public class Turret extends SubsystemBase {
         SmartDashboard.putNumber("Turret targetVelocity",
 				Units.radiansToDegrees(targetVelocity));
 		SmartDashboard.putNumber("Turret Position Deg",
-				Units.radiansToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
+				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 
 		// SmartDashboard.putData("Spin to 90 deg", new
 		// InstantCommand(()->{setFieldRelativeTarget(new Rotation2d(Math.PI), 0);}));
