@@ -46,21 +46,21 @@ public class TurretAutoShoot extends Command {
 
     public void updateTurretSetpoint(Translation2d drivepose) {
         
-        FieldZone currentZone = getZone(drivepose);
-        Translation2d target;
-        switch (currentZone) {
-            case NEUTRAL:
-                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
-            case OPPOSITION:
-                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
-            case ALLIANCE:
-                target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d(); // For the shooter we will want to check if active but turret should be fine
-            default:
-                target = FieldConstants.getHubTranslation().toTranslation2d();
+        //FieldZone currentZone = getZone(drivepose);
+        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+        // switch (currentZone) {
+        //     case NEUTRAL:
+        //         target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
+        //     case OPPOSITION:
+        //         target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d();
+        //     case ALLIANCE:
+        //         target = FieldConstants.getAllianceTranslation(leftSide(drivepose)).toTranslation2d(); // For the shooter we will want to check if active but turret should be fine
+        //     default:
+        //         target = FieldConstants.getHubTranslation().toTranslation2d();
             
-            // I also made this for if we want to shoot to the opposing teams area (though we would never haha):
-            // target = FieldConstants.getOppositionTranslation(leftSide(drivepose)).toTranslation2d();
-        }
+        //     // I also made this for if we want to shoot to the opposing teams area (though we would never haha):
+        //     // target = FieldConstants.getOppositionTranslation(leftSide(drivepose)).toTranslation2d();
+        // }
 
         double D_y;
         double D_x;
@@ -125,6 +125,7 @@ public class TurretAutoShoot extends Command {
     @Override
     public void execute() {
         // Continuously update setpoints and adjust based on vision if available
+        drivepose = drivetrain.getPose().getTranslation();
         updateTurretSetpoint(drivepose);
         updateYawToTag();
 
