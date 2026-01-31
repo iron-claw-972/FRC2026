@@ -91,9 +91,9 @@ public class COTSFalconSwerveConstants {
     }
 
     /**
-     * Swerve Drive Specialties - MK5N Module
+     * Swerve Drive Specialties - MK5n Module
      */
-    public static COTSFalconSwerveConstants SDSMK5n(double driveGearRatio){
+    public static COTSFalconSwerveConstants SDSMK5n(double driveGearRatio) {
         double wheelDiameter = Units.inchesToMeters(4.0);
 
         /** (287 / 11) : 1 */
@@ -158,13 +158,13 @@ public class COTSFalconSwerveConstants {
         /**
          * SDS MK5n - 7.13 : 1
          */
-        public static final double SDSMK5n_L1_PLUS = (7.13);
+        public static final double SDSMK5n_L1_PLUS = (8.13);
         /**
-         * SDS MK5n - 5.9 : 1
+         * SDS MK4i - 5.9 : 1
          */
         public static final double SDSMK5n_L2_PLUS = (5.9);
         /**
-         * SDS MK5n - 5.36 : 1
+         * SDS MK4i - 5.36 : 1
          */
         public static final double SDSMK5n_L3_PLUS = (5.35);
     }

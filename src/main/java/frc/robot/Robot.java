@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
@@ -81,23 +81,23 @@ public class Robot extends LoggedRobot {
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
 
-          // Record metadata
-        // Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
-        // Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
-        // Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
-        // Logger.recordMetadata("GitDate", BuildData.GIT_DATE);
-        // Logger.recordMetadata("GitBranch", BuildData.GIT_BRANCH);
-        // switch (BuildData.DIRTY) {
-        // case 0:
-        //     Logger.recordMetadata("GitDirty", "All changes committed");
-        //     break;
-        // case 1:
-        //     Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        //     break;
-        // default:
-        //     Logger.recordMetadata("GitDirty", "Unknown");
-        //     break;
-        // }
+        // Record metadata
+        Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildData.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildData.GIT_BRANCH);
+        switch (BuildData.DIRTY) {
+        case 0:
+            Logger.recordMetadata("GitDirty", "All changes committed");
+            break;
+        case 1:
+            Logger.recordMetadata("GitDirty", "Uncomitted changes");
+            break;
+        default:
+            Logger.recordMetadata("GitDirty", "Unknown");
+            break;
+        }
 
         robotContainer = new RobotContainer(robotId);
         
@@ -152,7 +152,7 @@ public class Robot extends LoggedRobot {
 
         // If there is an autonomous command, then schedule it
         if (autoCommand != null) {
-            autoCommand.schedule();
+			CommandScheduler.getInstance().schedule(autoCommand);
         }
     }
 

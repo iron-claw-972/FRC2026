@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.DefaultHoodCommand;
+import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
@@ -76,24 +77,20 @@ public class RobotContainer {
 
       default:
 
+      case WaffleHouse:
+      
+      case SwerveCompetition: // AKA "Vantage"
 
-      case SwerveCompetition:
-        
-
-      case BetaBot:
+      case BetaBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
 
       case Vivace:
 
-      case Phil:
+      case Phil: // AKA "IHOP"
 
-      case WaffleHouse:
-      if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-      hood = new HoodReal();
-      intake = new IntakeReal();
-      shooter = new ShooterReal();
+      case PrimeJr:
 
-      case Vertigo:
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
         operator = new Operator(drive);
@@ -102,7 +99,6 @@ public class RobotContainer {
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
-        
 
         driver.configureControls();
         operator.configureControls();
@@ -129,7 +125,8 @@ public class RobotContainer {
     // LiveWindow is causing periodic loop overruns
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
-    
+
+    SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
   }
 
   /**
