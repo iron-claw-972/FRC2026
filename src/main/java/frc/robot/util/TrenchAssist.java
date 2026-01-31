@@ -1,4 +1,4 @@
-package frc.robot.commands.drive_comm;
+package frc.robot.util;
 
 import static edu.wpi.first.units.Units.Rotation;
 
@@ -151,8 +151,10 @@ public class TrenchAssist extends Command {
 
     Translation2d calculateCorrection(Rectangle2d[] rectangles) {
         Pose2d pose = drive.getPose();
-        Translation2d velocity = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
+        Translation2d velocityRobotRelative = new Translation2d(drive.getChassisSpeeds().vxMetersPerSecond,
                 drive.getChassisSpeeds().vyMetersPerSecond);
+
+        Translation2d velocity = velocityRobotRelative.rotateBy(drive.getYaw().times(-1));
 
         double robotCornerRadius = 0.5 * Math.sqrt(2 * Math.pow(DriveConstants.ROBOT_WIDTH_WITH_BUMPERS, 2));
         double halfRobotWidth = 0.5 * DriveConstants.ROBOT_WIDTH_WITH_BUMPERS;
@@ -171,10 +173,10 @@ public class TrenchAssist extends Command {
                     // correction to push perpendicular to rectangle
                     if (drive.getPose().getY() > rectangle.getCenter().getY() + (rectangle.getYWidth() / 2)) {
                         // above rectangle
-                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(90))).times(distanceOptional.get() / velocity.getNorm());
+                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(90))).times(distanceOptional.get() / velocity.getNorm()).rotateBy(drive.getYaw());
                     } else if (drive.getPose().getY() <= rectangle.getCenter().getY() - (rectangle.getYWidth() / 2)) {
                         // below rectangle
-                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(-90))).times(distanceOptional.get() / velocity.getNorm()); // meters / (meters / second) -> (meters * seconds) / meters -> seconds, between 0 and 1 because time value to raycast is 1
+                        return velocity.rotateBy(new Rotation2d(Units.degreesToRadians(-90))).times(distanceOptional.get() / velocity.getNorm()).rotateBy(drive.getYaw()); // meters / (meters / second) -> (meters * seconds) / meters -> seconds, between 0 and 1 because time value to raycast is 1
 
                         // Are these last two necessary?
                         
