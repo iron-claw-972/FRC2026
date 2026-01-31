@@ -47,6 +47,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
+    public double timeToGoal = 0.67;
+
     /* ---------------- Hardware ---------------- */
 
     private final TalonFX motor;
@@ -84,6 +86,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     public Turret() {
 		SmartDashboard.putNumber("FF Value", 0.1);
+        SmartDashboard.putNumber("Time To Goal", timeToGoal);
+        timeToGoal = SmartDashboard.getNumber("Time To Goal", timeToGoal);
 
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN);
         motor.setNeutralMode(NeutralModeValue.Brake);
