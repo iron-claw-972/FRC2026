@@ -14,7 +14,9 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
@@ -43,7 +45,7 @@ public class Turret extends SubsystemBase {
 	private static final double TURRET_RATIO = 140.0 / 10.0;
 	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
 
-	private static final PIDController velocityPid = new PIDController(1, 0, 0);
+	private static final PIDController velocityPid = new PIDController(15, 0, 0.2);
 
 	/* ---------------- Hardware ---------------- */
 
@@ -65,13 +67,13 @@ public class Turret extends SubsystemBase {
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
 
-    private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
+    // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
 	/* ---------------- Gains ---------------- */
 
-	private static final double kP = 3500.0;
+	// private static final double kP = 3500.0;
 
-	private static final double kD = 150.0;
+	// private static final double kD = 150.0;
 
 	/* ---------------- Visualization ---------------- */
 
@@ -79,37 +81,41 @@ public class Turret extends SubsystemBase {
 	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
+    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
+
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
 		motor.setNeutralMode(NeutralModeValue.Coast);
 
-		motor.getConfigurator().apply(
-				new Slot0Configs()
-						.withKP(kP)
-						.withKD(kD)
-                        .withKV(1)
-                        .withKA(1));
+		// motor.getConfigurator().apply(
+		// 		new Slot0Configs()
+		// 				.withKP(kP)
+		// 				.withKD(kD)
+        //                 .withKV(1)
+        //                 .withKA(1));
 
-		motor.getConfigurator().apply(
-				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
-					{
-						MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-					}
-				});
+		// motor.getConfigurator().apply(
+		// 		new com.ctre.phoenix6.configs.TalonFXConfiguration() {
+		// 			{
+		// 				MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		// 			}
+		// 		});
 
-		motor.getConfigurator().apply(
-				new TalonFXConfiguration() {
-					{
-						Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-					}
-				});
+		// motor.getConfigurator().apply(
+		// 		new TalonFXConfiguration() {
+		// 			{
+		// 				Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+		// 			}
+		// 		});
 
-        var talonFXConfigs = new TalonFXConfiguration();
-        var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 10.0;
-        motionMagicConfigs.MotionMagicAcceleration = 50.0;
-        motor.getConfigurator().apply(talonFXConfigs);
+        // var talonFXConfigs = new TalonFXConfiguration();
+        // var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        // motionMagicConfigs.MotionMagicCruiseVelocity = 10.0;
+        // motionMagicConfigs.MotionMagicAcceleration = 50.0;
+        // motor.getConfigurator().apply(talonFXConfigs);
+
+
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
@@ -150,6 +156,7 @@ public class Turret extends SubsystemBase {
 	@Override
 	public void periodic() {
 
+
 		double robotRelativeGoal = goalAngle.getRadians();
 
 		// --- MA-style continuous wrap selection ---
@@ -184,20 +191,28 @@ public class Turret extends SubsystemBase {
 
 		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
 
+        // in rad/sec
 		double targetVelocity = velocityPid.calculate(
-				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians) * GEAR_RATIO,
+				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
 				setpoint.position * GEAR_RATIO);
+        
+        targetVelocity += Units.radiansToRotations(motorVelRotPerSec);
 
-		var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
+        double voltage = feedForward.calculate(targetVelocity);
+
+        motor.setVoltage(voltage);
+
+		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret Voltage", motor.getMotorVoltage().getValue());
 
 		// --- Position + velocity feedforward (MA-style) ---
-		motor.setControl(request);
+		// motor.setControl(request);
         // motor.clearStickyFaults();
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
+        SmartDashboard.putData(velocityPid);
 		SmartDashboard.putNumber("Turret GoalDeg",
 				Units.radiansToDegrees(best));
 		SmartDashboard.putNumber("Turret SetpointDeg",
