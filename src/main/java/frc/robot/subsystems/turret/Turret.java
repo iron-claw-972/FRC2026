@@ -1,220 +1,213 @@
 package frc.robot.subsystems.turret;
 
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class Turret extends SubsystemBase {
 
-    /* ---------------- Constants ---------------- */
+	/* ---------------- Constants ---------------- */
 
-    private static final double MIN_ANGLE_RAD =
-        Units.degreesToRadians(TurretConstants.MIN_ANGLE);
-    private static final double MAX_ANGLE_RAD =
-        Units.degreesToRadians(TurretConstants.MAX_ANGLE);
+	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
+	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
-    private static final double MAX_VEL_RAD_PER_SEC = 16.0;
-    private static final double MAX_ACCEL_RAD_PER_SEC2 = 80.0;
+	private static final double MAX_VEL_RAD_PER_SEC = 16.0;
+	private static final double MAX_ACCEL_RAD_PER_SEC2 = 80.0;
 
-    private static final double VERSA_RATIO = 5.0;
-    private static final double TURRET_RATIO = 140.0 / 10.0;
-    private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
+	private static final double VERSA_RATIO = 5.0;
+	private static final double TURRET_RATIO = 140.0 / 10.0;
+	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
 
-    /* ---------------- Hardware ---------------- */
+	private static final PIDController velocityPid = new PIDController(1, 0, 0);
 
-    private final TalonFX motor =
-        new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN);
+	/* ---------------- Hardware ---------------- */
 
-    private TalonFXSimState simState;
-    private SingleJointedArmSim turretSim;
+	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN);
 
-    /* ---------------- Control ---------------- */
+	private TalonFXSimState simState;
+	private SingleJointedArmSim turretSim;
 
-    private final TrapezoidProfile profile =
-        new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(
-                MAX_VEL_RAD_PER_SEC,
-                MAX_ACCEL_RAD_PER_SEC2));
+	/* ---------------- Control ---------------- */
 
-    private State setpoint = new State();
+	private final TrapezoidProfile profile = new TrapezoidProfile(
+			new TrapezoidProfile.Constraints(
+					MAX_VEL_RAD_PER_SEC,
+					MAX_ACCEL_RAD_PER_SEC2));
 
-    private Rotation2d goalAngle = Rotation2d.kZero;
-    private double goalVelocityRadPerSec = 0.0;
-    private double lastGoalRad = 0.0;
+	private State setpoint = new State();
 
-    public PositionVoltage voltageRequest;
+	private Rotation2d goalAngle = Rotation2d.kZero;
+	private double goalVelocityRadPerSec = 0.0;
+	private double lastGoalRad = 0.0;
 
-    /* ---------------- Gains ---------------- */
+	/* ---------------- Gains ---------------- */
 
-    private static final double kP = 3500.0;
+	private static final double kP = 3500.0;
 
-    private static final double kD = 150.0;
+	private static final double kD = 150.0;
 
-    /* ---------------- Visualization ---------------- */
+	/* ---------------- Visualization ---------------- */
 
-    private final Mechanism2d mech = new Mechanism2d(100, 100);
-    private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
-    private final MechanismLigament2d ligament =
-        root.append(new MechanismLigament2d("barrel", 30, 0));
+	private final Mechanism2d mech = new Mechanism2d(100, 100);
+	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
+	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
-    /* ---------------- Constructor ---------------- */
+	/* ---------------- Constructor ---------------- */
 
-    public Turret() {
-        motor.setNeutralMode(NeutralModeValue.Coast);
-        motor.setPosition(0.0);
+	public Turret() {
+		motor.setNeutralMode(NeutralModeValue.Coast);
 
-        motor.getConfigurator().apply(
-            new Slot0Configs()
-                .withKP(kP)
-                .withKD(kD));
+		motor.getConfigurator().apply(
+				new Slot0Configs()
+						.withKP(kP)
+						.withKD(kD));
 
-        motor.getConfigurator().apply(
-            new com.ctre.phoenix6.configs.TalonFXConfiguration() {{
-            MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-            }});
-        
-        motor.getConfigurator().apply(
-            new TalonFXConfiguration() {{
-                Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-            }}
-        );
-        
-        voltageRequest = new PositionVoltage(0);
+		motor.getConfigurator().apply(
+				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
+					{
+						MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+					}
+				});
 
-        setpoint = new State(getPositionRad(), 0.0);
-        lastGoalRad = setpoint.position;
+		motor.getConfigurator().apply(
+				new TalonFXConfiguration() {
+					{
+						Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+					}
+				});
 
-        if (RobotBase.isSimulation()) {
-        simState = motor.getSimState();
-        turretSim =
-            new SingleJointedArmSim(
-                edu.wpi.first.math.system.plant.DCMotor.getKrakenX60(1),
-                GEAR_RATIO,
-                0.01,
-                0.15,
-                MIN_ANGLE_RAD,
-                MAX_ANGLE_RAD,
-                false,
-                0.0);
-        }
+		setpoint = new State(getPositionRad(), 0.0);
+		lastGoalRad = setpoint.position;
 
-        SmartDashboard.putData("Turret Mech", mech);
-    }
+		if (RobotBase.isSimulation()) {
+			simState = motor.getSimState();
+			turretSim = new SingleJointedArmSim(
+					edu.wpi.first.math.system.plant.DCMotor.getKrakenX60(1),
+					GEAR_RATIO,
+					0.01,
+					0.15,
+					MIN_ANGLE_RAD,
+					MAX_ANGLE_RAD,
+					false,
+					0.0);
+		}
 
-    /* ---------------- Public API ---------------- */
+		SmartDashboard.putData("Turret Mech", mech);
+	}
 
-    public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
-        goalAngle = angle;
-        goalVelocityRadPerSec = velocityRadPerSec;
-    }
+	/* ---------------- Public API ---------------- */
 
-    public boolean atGoal() {
-        return Math.abs(setpoint.position - lastGoalRad) < Units.degreesToRadians(1.5);
-    }
+	public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
+		goalAngle = angle;
+		goalVelocityRadPerSec = velocityRadPerSec;
+	}
 
-    public double getPositionRad() {
-        return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
-    }
+	public boolean atGoal() {
+		return Math.abs(setpoint.position - lastGoalRad) < Units.degreesToRadians(1.5);
+	}
 
-    /* ---------------- Periodic ---------------- */
+	public double getPositionRad() {
+		return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+	}
 
-    @Override
-    public void periodic() {
+	/* ---------------- Periodic ---------------- */
 
-        double robotRelativeGoal = goalAngle.getRadians();
+	@Override
+	public void periodic() {
 
-        // --- MA-style continuous wrap selection ---
-        double best = lastGoalRad;
-        boolean found = false;
+		double robotRelativeGoal = goalAngle.getRadians();
 
-        for (int i = -2; i <= 2; i++) {
-        double candidate = robotRelativeGoal + 2.0 * Math.PI * i;
-        if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD) continue;
+		// --- MA-style continuous wrap selection ---
+		double best = lastGoalRad;
+		boolean found = false;
 
-        if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
-            best = candidate;
-            found = true;
-        }
-        }
+		for (int i = -2; i <= 2; i++) {
+			double candidate = robotRelativeGoal + 2.0 * Math.PI * i;
+			if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD)
+				continue;
 
-        lastGoalRad = best;
+			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
+				best = candidate;
+				found = true;
+			}
+		}
 
-        // --- Profile in MECHANISM SPACE ---
-        State goalState =
-            new State(
-                MathUtil.clamp(best, MIN_ANGLE_RAD, MAX_ANGLE_RAD),
-                goalVelocityRadPerSec);
+		lastGoalRad = best;
 
-        setpoint =
-            profile.calculate(
-                Constants.LOOP_TIME,
-                setpoint,
-                goalState);
+		// --- Profile in MECHANISM SPACE ---
+		State goalState = new State(
+				MathUtil.clamp(best, MIN_ANGLE_RAD, MAX_ANGLE_RAD),
+				goalVelocityRadPerSec);
 
-        // --- Convert to MOTOR SPACE ---
-        double motorPosRot =
-            Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
+		setpoint = profile.calculate(
+				Constants.LOOP_TIME,
+				setpoint,
+				goalState);
 
-        double motorVelRotPerSec =
-            Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
+		// --- Convert to MOTOR SPACE ---
+		double motorPosRot = Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
 
-        // --- Position + velocity feedforward (MA-style) ---
-        motor.setControl(voltageRequest.withPosition(Rotations.of(motorPosRot)).withVelocity(RotationsPerSecond.of(motorVelRotPerSec)));
+		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
 
-        // --- Visualization ---
-        ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
+		double targetVelocity = velocityPid.calculate(
+				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians) * GEAR_RATIO,
+				setpoint.position * GEAR_RATIO);
 
-        SmartDashboard.putNumber("Turret GoalDeg",
-            Units.radiansToDegrees(best));
-        SmartDashboard.putNumber("Turret SetpointDeg",
-            Units.radiansToDegrees(setpoint.position));
-        SmartDashboard.putNumber("Turret motorPosRot",
-            Units.radiansToDegrees(motorPosRot));
-        SmartDashboard.putNumber("Turret motorVelRotPerSec",
-            Units.radiansToDegrees(motorVelRotPerSec));
-        SmartDashboard.putNumber("Turret Position Deg",
-            Units.radiansToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
+		var request = new MotionMagicVelocityVoltage(Units.radiansToRotations(targetVelocity));
 
-        // SmartDashboard.putData("Spin to 90 deg", new InstantCommand(()->{setFieldRelativeTarget(new Rotation2d(Math.PI), 0);}));
-    }
+		// --- Position + velocity feedforward (MA-style) ---
+		motor.setControl(request);
 
-    /* ---------------- Simulation ---------------- */
+		// --- Visualization ---
+		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-    @Override
-    public void simulationPeriodic() {
-        turretSim.setInputVoltage(motor.getMotorVoltage().getValueAsDouble());
-        turretSim.update(Constants.LOOP_TIME);
+		SmartDashboard.putNumber("Turret GoalDeg",
+				Units.radiansToDegrees(best));
+		SmartDashboard.putNumber("Turret SetpointDeg",
+				Units.radiansToDegrees(setpoint.position));
+		SmartDashboard.putNumber("Turret motorPosRot",
+				Units.radiansToDegrees(motorPosRot));
+		SmartDashboard.putNumber("Turret motorVelRotPerSec",
+				Units.radiansToDegrees(motorVelRotPerSec));
+		SmartDashboard.putNumber("Turret Position Deg",
+				Units.radiansToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 
-        simState.setRawRotorPosition(
-            Units.radiansToRotations(turretSim.getAngleRads()) * GEAR_RATIO);
+		// SmartDashboard.putData("Spin to 90 deg", new
+		// InstantCommand(()->{setFieldRelativeTarget(new Rotation2d(Math.PI), 0);}));
+	}
 
-        simState.setRotorVelocity(
-            Units.radiansToRotations(turretSim.getVelocityRadPerSec()) * GEAR_RATIO);
-    }
+	/* ---------------- Simulation ---------------- */
+
+	@Override
+	public void simulationPeriodic() {
+		turretSim.setInputVoltage(motor.getMotorVoltage().getValueAsDouble());
+		turretSim.update(Constants.LOOP_TIME);
+
+		simState.setRawRotorPosition(
+				Units.radiansToRotations(turretSim.getAngleRads()) * GEAR_RATIO);
+
+		simState.setRotorVelocity(
+				Units.radiansToRotations(turretSim.getVelocityRadPerSec()) * GEAR_RATIO);
+	}
 }
