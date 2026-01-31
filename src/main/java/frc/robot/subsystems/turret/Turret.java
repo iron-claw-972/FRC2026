@@ -1,5 +1,8 @@
 package frc.robot.subsystems.turret;
 
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -14,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -50,8 +54,6 @@ public class Turret extends SubsystemBase {
     private TalonFXSimState simState;
     private SingleJointedArmSim turretSim;
 
-    private final PositionVoltage positionRequest = new PositionVoltage(0.0);
-
     /* ---------------- Control ---------------- */
 
     private final TrapezoidProfile profile =
@@ -65,6 +67,8 @@ public class Turret extends SubsystemBase {
     private Rotation2d goalAngle = Rotation2d.kZero;
     private double goalVelocityRadPerSec = 0.0;
     private double lastGoalRad = 0.0;
+
+    public PositionVoltage voltageRequest;
 
     /* ---------------- Gains ---------------- */
 
@@ -100,6 +104,8 @@ public class Turret extends SubsystemBase {
                 Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
             }}
         );
+        
+        voltageRequest = new PositionVoltage(0);
 
         setpoint = new State(getPositionRad(), 0.0);
         lastGoalRad = setpoint.position;
@@ -179,10 +185,7 @@ public class Turret extends SubsystemBase {
             Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
 
         // --- Position + velocity feedforward (MA-style) ---
-        motor.setControl(
-            positionRequest
-                .withPosition(motorPosRot)
-                .withVelocity(motorVelRotPerSec));
+        motor.setControl(voltageRequest.withPosition(Rotations.of(motorPosRot)).withVelocity(RotationsPerSecond.of(motorVelRotPerSec)));
 
         // --- Visualization ---
         ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
