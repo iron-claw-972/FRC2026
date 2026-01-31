@@ -25,29 +25,9 @@ import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.DriverAssist;
 
-public class TrenchAssist extends Command {
+public class TrenchAssist {
 
-    protected final Drivetrain drive;
-    protected final BaseDriverConfig driver;
 
-    private boolean trenchAlign;
-    private boolean trenchAssist;
-
-    public TrenchAssist(
-            Drivetrain swerve,
-            BaseDriverConfig driver) {
-        this.drive = swerve;
-        this.driver = driver;
-
-        addRequirements(swerve);
-    }
-
-    @Override
-    public void initialize() {
-        drive.setStateDeadband(true);
-    }
-
-    @Override
     public void execute() {
         trenchAlign = SmartDashboard.getBoolean("trench aligning", trenchAlign);
         trenchAssist = SmartDashboard.getBoolean("trench aligning", trenchAssist);
@@ -99,30 +79,6 @@ public class TrenchAssist extends Command {
             drive(corrected);
         }
 
-    }
-
-    /**
-     * Drives the robot
-     * 
-     * @param speeds The ChassisSpeeds to drive at
-     */
-    protected void drive(ChassisSpeeds speeds) {
-        // If the driver is pressing the align button or a command set the drivetrain to
-        // align, then align to speaker
-        if (driver.getIsAlign() || drive.getIsAlign()) {
-            drive.driveHeading(
-                    speeds.vxMetersPerSecond,
-                    speeds.vyMetersPerSecond,
-                    drive.getAlignAngle(),
-                    true);
-        } else {
-            drive.drive(
-                    speeds.vxMetersPerSecond,
-                    speeds.vyMetersPerSecond,
-                    speeds.omegaRadiansPerSecond,
-                    true,
-                    false);
-        }
     }
 
     /**
@@ -202,4 +158,7 @@ public class TrenchAssist extends Command {
 
     }
 
+    public static ChassisSpeeds calculate(Drivetrain drive, ChassisSpeeds chassisSpeeds){
+        return new ChassisSpeeds();
+    }
 }

@@ -2,11 +2,13 @@ package frc.robot.commands.drive_comm;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.util.TrenchAssist;
 import frc.robot.util.Vision.DriverAssist;
 
 
@@ -31,8 +33,17 @@ public class DefaultDriveCommand extends Command {
         swerve.setStateDeadband(true);
     }
 
+    private boolean trenchAlign = false;
+    private boolean trenchAssist = true;
+
     @Override
     public void execute() {
+        trenchAlign = SmartDashboard.getBoolean("trench aligning", trenchAlign);
+        trenchAssist = SmartDashboard.getBoolean("trench aligning", trenchAssist);
+
+        SmartDashboard.putBoolean("trench aligning", trenchAlign);
+        SmartDashboard.putBoolean("trench assisting", trenchAssist);
+
         double forwardTranslation = driver.getForwardTranslation();
         double sideTranslation = driver.getSideTranslation();
         double rotation = -driver.getRotation();
@@ -50,7 +61,9 @@ public class DefaultDriveCommand extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(swerve, driverInput, swerve.getDesiredPose(), true);
 
-        drive(corrected);
+        ChassisSpeeds assisted = TrenchAssist.calculate(swerve, corrected);
+
+        drive(assisted);
     }
 
     /**

@@ -65,7 +65,7 @@ public class HoodReal extends HoodBase implements HoodIO {
 
     public HoodReal() {
         // allocate the motor
-        motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+        motor = null;
         
         updateInputs();
 
