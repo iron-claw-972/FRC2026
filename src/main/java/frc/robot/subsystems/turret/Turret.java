@@ -189,17 +189,17 @@ public class Turret extends SubsystemBase {
 
 		double targetVelocity;
 
-		if(Math.abs(setpoint.position * GEAR_RATIO - Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) > Math.PI/2){
-			// in rad/sec
-			targetVelocity = longVelocityPID.calculate(
-					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-					setpoint.position * GEAR_RATIO);
+		// if(Math.abs(setpoint.position * GEAR_RATIO - Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) > Math.PI/2){
+		// 	// in rad/sec
+		// 	targetVelocity = longVelocityPID.calculate(
+		// 			motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
+		// 			setpoint.position * GEAR_RATIO);
 			
-			targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		// 	targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
 
-			double voltage = feedForward.calculate(targetVelocity);
-			motor.setVoltage(voltage);
-		} else{
+		// 	double voltage = feedForward.calculate(targetVelocity);
+		// 	motor.setVoltage(voltage);
+		// } else{
 			// in rad/sec
 			targetVelocity = velocityPID.calculate(
 					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
@@ -209,7 +209,7 @@ public class Turret extends SubsystemBase {
 
 			double voltage = feedForward.calculate(targetVelocity);
 			motor.setVoltage(voltage);
-		}
+		// }
 
 		lastFrameVelocity = targetVelocity;
 
