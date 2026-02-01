@@ -85,7 +85,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         if (simpleTurretAutoShoot != null && simpleTurretAutoShoot.isScheduled()){
                             simpleTurretAutoShoot.cancel();
                         } else{
-                            simpleTurretAutoShoot = new SimpleAutoShoot(turret, getDrivetrain());
+                            simpleTurretAutoShoot = new SimpleAutoShoot(turret, getDrivetrain(), shooter);
                             CommandScheduler.getInstance().schedule(simpleTurretAutoShoot);
                         }
                     })

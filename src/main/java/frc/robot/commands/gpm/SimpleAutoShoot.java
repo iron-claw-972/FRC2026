@@ -3,15 +3,20 @@ package frc.robot.commands.gpm;
 import java.lang.reflect.Field;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
@@ -21,6 +26,7 @@ public class SimpleAutoShoot extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
     private TurretVision turretVision;
+    private Shooter shooter;
 
     private double fieldAngleRad;
     private double turretSetpoint;
@@ -31,9 +37,15 @@ public class SimpleAutoShoot extends Command {
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
     private Translation2d drivepose;
-    public SimpleAutoShoot(Turret turret, Drivetrain drivetrain) {
+
+    private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
+    private double lastTurretAngle = 0;
+    private double lastTurretVelocity = 0;
+
+    public SimpleAutoShoot(Turret turret, Drivetrain drivetrain, Shooter shooter) {
         this.turret = turret;
         this.drivetrain = drivetrain;
+        this.shooter = shooter;
         drivepose  = drivetrain.getPose().getTranslation();
         
         addRequirements(turret);
@@ -47,7 +59,7 @@ public class SimpleAutoShoot extends Command {
         double D_y;
         double D_x;
         // TODO: Change time to goal on actual comp bot
-        double timeToGoal = 1.0;
+        double timeToGoal = 0.0;
         
         // If the robot is moving, adjust the target position based on velocity
         if (SOTM) {
@@ -107,12 +119,24 @@ public class SimpleAutoShoot extends Command {
 
     @Override
     public void execute() {
+        //shooter.setShooterPower(ShotInterpolation.shooterPowerMap.get(FieldConstants.getHubTranslation().toTranslation2d().getDistance(drivetrain.getPose().getTranslation())));
         // Continuously update setpoints and adjust based on vision if available
         drivepose = drivetrain.getPose().getTranslation();
         updateTurretSetpoint(drivepose);
         updateYawToTag();
 
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2) * 1.0);
+        // double turretVelocity =
+        // turretAngleFilter.calculate(
+        //     new Rotation2d(Units.degreesToRadians(turretSetpoint)).minus(new Rotation2d(Units.degreesToRadians(lastTurretAngle))).getRadians() / Constants.LOOP_TIME);
+
+        double turretAcceleration = ((-drivetrain.getAngularRate(2)) - (lastTurretVelocity)) / Constants.LOOP_TIME;
+        
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
+        // turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), (-drivetrain.getAngularRate(2)) + turretAcceleration * 0.3);
+        //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
+
+        lastTurretAngle = turretSetpoint;
+        lastTurretVelocity = -drivetrain.getAngularRate(2);
     }
 
     @Override

@@ -30,6 +30,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
     private double feederPower = 0;
+
+    public double shooterPower = 1.0;
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
@@ -67,11 +69,13 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public void periodic(){
         updateInputs();
+        SmartDashboard.putNumber("Shot Power", shooterPower);
+        shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
         shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
         shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed));
-        shooterMotorLeft.set(-1);
-        shooterMotorRight.set(-1);
+        // shooterMotorLeft.set(-shooterPower);
+        // shooterMotorRight.set(-shooterPower);
         feederMotor.set(feederPower);
     }
 
@@ -85,11 +89,13 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         feederPower = power;
     }
 
-    public void setShooter(double linearVelocityMps) {
-        double wheelCircumference = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
-        System.out.println("PRINTING WHEEEEEEEEEEEEL CIRUM:" + wheelCircumference);
-        shooterTargetSpeed = linearVelocityMps * ShooterConstants.SHOOTER_GEAR_RATIO / wheelCircumference; // rps
+    public void setShooter(double velocityRPS) {
+        shooterTargetSpeed = velocityRPS;
         System.out.println("Shooter is working");
+    }
+
+    public void setShooterPower(double power){
+        this.shooterPower = power;
     }
 
     public double getFeederVelocity() {
