@@ -6,7 +6,7 @@ public interface TurretIO {
     @AutoLog
     public static class TurretIOInputs{
         public double positionDeg = 0;
-        public double velocity = 0;
+        public double velocityRadPerSec = 0;
         public double motorCurrent = 0;
     }
 
