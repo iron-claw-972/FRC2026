@@ -2,9 +2,10 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
-    public static final double HOOD_GEAR_RATIO = (3.75) * (24 / 18) * (163 / 10); // 81.5
+    public static final double HOOD_GEAR_RATIO = (1 / 4) * (0.15625);
 
     public static final double MASS = 2.46; // kilograms
     public static final double LENGTH = 0.138 * 2; // meters
@@ -16,8 +17,8 @@ public class HoodConstants {
     public static final double MAX_VELOCITY = 0.30; // rad/s
     public static final double MAX_ACCELERATION = 30; // rad/s^2
 
-    public static final double MAX_ANGLE = 90-22.9; // degrees
-    public static final double MIN_ANGLE = 90-39.8; // degrees 
+    public static final double MAX_ANGLE = Units.rotationsToDegrees(-4.306152); // degrees
+    public static final double MIN_ANGLE = Units.rotationsToDegrees(-0.282715); // degrees 
 
     public static final double START_ANGLE = 90-22.9; // degrees
 

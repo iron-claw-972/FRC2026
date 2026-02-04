@@ -20,13 +20,13 @@ public class IdConstants {
     public static final int CANDLE_ID = 1;
 
     //Shooter
-    public static final int SHOOTER_LEFT_ID = 6;
-    public static final int SHOOTER_RIGHT_ID = 4;
+    public static final int SHOOTER_LEFT_ID = 9;
+    public static final int SHOOTER_RIGHT_ID = 10;
     public static final int FEEDER_ID = 3;
     public static final int SHOOTER_SENSOR_ID = 1;
 
     //Hood
-    public static final int HOOD_MOTOR_ID = 5;
+    public static final int HOOD_MOTOR_ID = 11;
     
     //Intake
     public static final int BASE_MOTOR_ID = 7;
