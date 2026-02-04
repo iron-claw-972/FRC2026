@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase {
         double motorPosition = getPosition();
         double currentPosition = Units.rotationsToRadians(motorPosition/gearRatio);
         double power = pid.calculate(currentPosition);
-       
+       // THIS IS THE WRONG MOTOR
         rollerMotor.set(MathUtil.clamp(power, -1, 1));
     }
 
@@ -45,8 +45,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setPosition(double position) {
-
-
+        this.position = position;
     }
 
     public double getPosition(){
