@@ -1,6 +1,12 @@
 package frc.robot.subsystems.Intake;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -13,11 +19,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class Intake extends SubsystemBase {
     private TalonFX rollerMotor; 
-    private TalonFX rightMotor;
+    private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
     private double position;
-    private double maxExtension;
-    private double current;
+    private double maxExtension; //rotations
     private PIDController pid;
     private double gearRatio;
 
@@ -26,8 +31,24 @@ public class Intake extends SubsystemBase {
         rollerMotor = new TalonFX(0);
         rightMotor = new TalonFX(0);
         leftMotor = new TalonFX(0);
-        pid = new PIDController(0, 0, 0);
+        var config = new TalonFXConfiguration();
+        var slot0Configs = config.Slot0;
+        //find values later
+        //friction, maybe?
+        slot0Configs.kP = 0;
+        slot0Configs.kI = 0;
+        slot0Configs.kD = 0;
+        slot0Configs.kV = 0;
+        slot0Configs.kA = 0;
 
+
+        rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+        rightMotor.getConfigurator().apply(config);
+
+        leftMotor.getConfigurator().apply(config);
+        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+        leftMotor.setControl(new Follower(rightMotor.getDeviceID(), true));
+       
 
     }
 
@@ -36,8 +57,8 @@ public class Intake extends SubsystemBase {
         double motorPosition = getPosition();
         double currentPosition = Units.rotationsToRadians(motorPosition/gearRatio);
         double power = pid.calculate(currentPosition);
-       // THIS IS THE WRONG MOTOR
-        rollerMotor.set(MathUtil.clamp(power, -1, 1));
+
+     
     }
 
     public void simulationPeriodic(){
@@ -66,12 +87,9 @@ public class Intake extends SubsystemBase {
        if (position == maxExtension) {
         leftMotor.set(0);
         rightMotor.set(0);
-       }
-
-       
+       } 
 
     }
-
     public void retract(){
         setPosition(0);
         
