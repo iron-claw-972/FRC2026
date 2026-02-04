@@ -28,6 +28,8 @@ public class Intake extends SubsystemBase {
         leftMotor = new TalonFX(0);
         pid = new PIDController(0, 0, 0);
 
+    
+
     }
 
     public void periodic() {
@@ -35,7 +37,7 @@ public class Intake extends SubsystemBase {
         double motorPosition = getPosition();
         double currentPosition = Units.rotationsToRadians(motorPosition/gearRatio);
         double power = pid.calculate(currentPosition);
-       
+       // THIS IS THE WRONG MOTOR
         rollerMotor.set(MathUtil.clamp(power, -1, 1));
     }
 
@@ -44,8 +46,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void setPosition(double position) {
-
-
+        this.position = position;
     }
 
     public double getPosition(){
@@ -60,6 +61,8 @@ public class Intake extends SubsystemBase {
 
     public void extend() {
        setPosition(maxExtension);
+
+
 
     }
 
