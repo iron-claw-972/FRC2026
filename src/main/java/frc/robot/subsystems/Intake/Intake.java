@@ -28,6 +28,7 @@ public class Intake extends SubsystemBase {
         leftMotor = new TalonFX(0);
         pid = new PIDController(0, 0, 0);
 
+
     }
 
     public void periodic() {
@@ -60,6 +61,15 @@ public class Intake extends SubsystemBase {
 
     public void extend() {
        setPosition(maxExtension);
+
+       // add tolerance
+       // double check
+       if (position == maxExtension) {
+        leftMotor.set(0);
+        rightMotor.set(0);
+       }
+
+       
 
     }
 
