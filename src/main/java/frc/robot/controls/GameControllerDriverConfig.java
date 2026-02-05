@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
 import frc.robot.commands.drive_comm.AimAtTarget;
 import frc.robot.commands.gpm.AlphaIntakeBall;
@@ -63,12 +62,10 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
     if (intake != null && shooter != null) {
       // shoots it
       driver.get(driver.RIGHT_TRIGGER_BUTTON).onTrue(
-          new SequentialCommandGroup(
-              new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
-              new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))))
+          new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)))
           .onFalse(
               new InstantCommand(() -> {
-                shooter.deactivateShooterAndFeeder();
+                shooter.deactivateShooter();
               }));
 
       // Intake

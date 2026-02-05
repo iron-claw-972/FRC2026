@@ -3,12 +3,10 @@ package frc.robot.commands.gpm;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.intake.Intake;
 
 public class IntakeBall extends Command {
     private Intake intake;
-    private Shooter shooter;
 
     private enum Phase{
         Intaking, Acquiring, Acquired, Done
@@ -18,17 +16,15 @@ public class IntakeBall extends Command {
 
     private Phase phase;
 
-    public IntakeBall(Intake intake, Shooter shooter) {
+    public IntakeBall(Intake intake) {
         this.intake = intake;
-        this.shooter = shooter;
 
-        addRequirements(intake, shooter);
+        addRequirements(intake);
     }
 
     @Override
     public void initialize(){
         intake.setFlyWheel();
-        shooter.setFeeder(0.2);
         intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
         phase = Phase.Intaking;
     }
@@ -46,11 +42,9 @@ public class IntakeBall extends Command {
                 if (acquiredTimer.get() > 1.0){
                     phase = Phase.Acquired;
                 }
-                shooter.setFeeder(0.05);
             break;
             case Acquired:
                 intake.stopFlyWheel();
-                shooter.setFeeder(0);
                 intake.setSetpoint(IntakeConstants.STOW_ANGLE);
                 phase = Phase.Done;
             break;
@@ -69,6 +63,5 @@ public class IntakeBall extends Command {
         //in case its interrupted
         intake.setSetpoint(IntakeConstants.STOW_ANGLE);
         intake.stopFlyWheel();
-        shooter.setFeeder(0);
     }
 }

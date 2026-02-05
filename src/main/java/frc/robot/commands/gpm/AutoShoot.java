@@ -81,7 +81,7 @@ public class AutoShoot extends Command {
 			shooter.setShooter(-target_state.exitVel());
 			drive.setIsAlign(true);
 			drive.setAlignAngle(target_state.yaw().getRadians());
-			shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
+			// shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER);
 
 			if (hood.atSetpoint() && drive.atAlignAngle() && shooter.atTargetSpeed()) {
 				// shooter.setFeeder(1);
@@ -98,7 +98,6 @@ public class AutoShoot extends Command {
 	@Override
 	public void end(boolean canceled) {
 		drive.setIsAlign(false);
-		shooter.setFeeder(0);
 		shooter.setShooter(0);
 	}
 }
