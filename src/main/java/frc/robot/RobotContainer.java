@@ -26,6 +26,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.indexer.Spindexer;
@@ -52,6 +53,7 @@ public class RobotContainer {
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private Intake intake = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -70,6 +72,8 @@ public class RobotContainer {
       default:
 
       case WaffleHouse:
+        intake = new Intake();
+
       
       case SwerveCompetition: // AKA "Vantage"
 

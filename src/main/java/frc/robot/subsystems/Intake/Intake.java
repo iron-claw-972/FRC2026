@@ -10,13 +10,18 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Intake extends SubsystemBase {
+
+    private Mechanism2d mechanism;
+    private MechanismLigament2d mechanismLigament2d;
     // set actual IDs
     final int rightID = 1;
     final int leftID = 2;
@@ -29,11 +34,17 @@ public class Intake extends SubsystemBase {
     private double startingPoint; // this should go in a constants file
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
+    final MechanismLigament2d extensionLigament;
+    final double kMaxRotations = 37.5;
+    final double kMaxVisualLength = 0.75;
+
 
     public Intake() {
         rightMotor = new TalonFX(rightID);
         leftMotor = new TalonFX(leftID);
         rollerMotor = new TalonFX(rollerID); 
+
+        
 
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
@@ -60,6 +71,16 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
         SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
 
+        
+
+        Mechanism2d mechanism = new Mechanism2d(1.2, 0.6);
+
+        MechanismRoot2d root = mechanism.getRoot("ExtensionRoot", 0.1, 0.3);
+
+        extensionLigament = root.append(new MechanismLigament2d("Extension", 0.0, 0.0)); // horizontal
+
+        SmartDashboard.putData("Extension Mechanism", mechanism);
+
        
     }
 
@@ -68,7 +89,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void simulationPeriodic(){
+        double percentExtended = getPosition() / kMaxRotations;
 
+        percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
+
+        extensionLigament.setLength(percentExtended * kMaxVisualLength);
     }
 
     /**
