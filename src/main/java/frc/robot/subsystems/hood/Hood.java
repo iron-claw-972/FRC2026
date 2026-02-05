@@ -115,7 +115,14 @@ public class Hood extends SubsystemBase {
 
     // Intended to be used for the slipping of the bands that are on the gears
     public void resetDueToSlippingError() {
+        long startTime = System.currentTimeMillis();
+        long timeout = 5000;
+
         while (motor.getSupplyCurrent().getValueAsDouble() < HoodConstants.CURRENT_SPIKE_THRESHHOLD) {
+            if (System.currentTimeMillis() - startTime > timeout) {
+                System.err.println("Hood reset timeout: current spike threshold not reached");
+                break;
+            }
             motor.setVoltage(4);
         }
         position = HoodConstants.START_ANGLE;
