@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -21,10 +22,11 @@ public class Intake extends SubsystemBase {
     private TalonFX rollerMotor; 
     private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
-    private double position;
-    private double maxExtension; //rotations
-    private PIDController pid;
-    private double gearRatio;
+    private double maxExtension; // this should go in a constants file
+    private double startingPoint; // this should go in a constants file
+    private double setpoint; // in rotations
+    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+
 
     public Intake() {
        // set actual IDs
@@ -41,7 +43,6 @@ public class Intake extends SubsystemBase {
         slot0Configs.kV = 0;
         slot0Configs.kA = 0;
 
-
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         rightMotor.getConfigurator().apply(config);
 
@@ -49,29 +50,31 @@ public class Intake extends SubsystemBase {
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         leftMotor.setControl(new Follower(rightMotor.getDeviceID(), true));
        
-
     }
 
     public void periodic() {
-        // current threshold + PID stuff
-        double motorPosition = getPosition();
-        double currentPosition = Units.rotationsToRadians(motorPosition/gearRatio);
-        double power = pid.calculate(currentPosition);
+        rightMotor.setControl(voltageRequest.withPosition(setpoint));
 
-     
     }
 
     public void simulationPeriodic(){
 
     }
 
-    public void setPosition(double position) {
-        this.position = position;
+    /**
+     * in rotations
+     * @param setpoint
+     */
+    public void setSetpoint(double setpoint) {
+        this.setpoint = setpoint;
     }
 
+    /**
+     * gets the position in rotations
+     */
     public double getPosition(){
         // position is in rotations
-        double position = rollerMotor.getPosition().getValueAsDouble();
+        double position = rightMotor.getPosition().getValueAsDouble();
         return position;
     }
 
@@ -80,19 +83,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void extend() {
-       setPosition(maxExtension);
-
-       // add tolerance
-       // double check
-       if (position == maxExtension) {
-        leftMotor.set(0);
-        rightMotor.set(0);
-       } 
+       setSetpoint(maxExtension);
 
     }
     public void retract(){
-        setPosition(0);
+        setSetpoint(startingPoint);
         
     }
+    
     
 }
