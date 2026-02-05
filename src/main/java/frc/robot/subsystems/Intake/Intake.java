@@ -1,39 +1,40 @@
 package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 
 
 public class Intake extends SubsystemBase {
+    final int rightID = 1;
+    final int leftID = 2;
+    final int rollerID = 3;
+    final String canBus = "CANivoreSub";
+
     private TalonFX rollerMotor; 
     private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
     private double maxExtension; // this should go in a constants file
     private double startingPoint; // this should go in a constants file
-    private double setpoint; // in rotations
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
 
     public Intake() {
        // set actual IDs
-        rollerMotor = new TalonFX(0);
-        rightMotor = new TalonFX(0);
-        leftMotor = new TalonFX(0);
-        var config = new TalonFXConfiguration();
+        rightMotor = new TalonFX(rightID, canBus);
+        leftMotor = new TalonFX(leftID, canBus);
+        rollerMotor = new TalonFX(rollerID, canBus); 
+        TalonFXConfiguration config = new TalonFXConfiguration();
         var slot0Configs = config.Slot0;
         //find values later
         //friction, maybe?
@@ -48,13 +49,18 @@ public class Intake extends SubsystemBase {
 
         leftMotor.getConfigurator().apply(config);
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+
+        Follower follower = new Follower(rightMotor.getDeviceID(), true);
         leftMotor.setControl(new Follower(rightMotor.getDeviceID(), true));
+
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+
        
     }
 
     public void periodic() {
-        rightMotor.setControl(voltageRequest.withPosition(setpoint));
-
+        SmartDashboard.putNumber("Intake Position:", getPosition());
     }
 
     public void simulationPeriodic(){
@@ -65,15 +71,14 @@ public class Intake extends SubsystemBase {
      * in rotations
      * @param setpoint
      */
-    public void setSetpoint(double setpoint) {
-        this.setpoint = setpoint;
+    public void setPosition(double setpoint) {
+        rightMotor.setControl(voltageRequest.withPosition(setpoint));
     }
 
     /**
      * gets the position in rotations
      */
     public double getPosition(){
-        // position is in rotations
         double position = rightMotor.getPosition().getValueAsDouble();
         return position;
     }
@@ -83,11 +88,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void extend() {
-       setSetpoint(maxExtension);
+       setPosition(maxExtension);
 
     }
     public void retract(){
-        setSetpoint(startingPoint);
+        setPosition(startingPoint);
         
     }
     
