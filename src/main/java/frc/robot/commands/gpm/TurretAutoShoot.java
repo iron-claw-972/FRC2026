@@ -87,7 +87,8 @@ public class TurretAutoShoot extends Command {
         lastTurretAngle = turretAngle;
 
         // Add 180 since drivetrain is backwards
-        turretSetpoint = MathUtil.inputModulus(turretAngle.getDegrees() + 180, -180.0, 180.0);
+        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() + Math.PI);
+        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint), -180.0, 180.0);
     }
 
     public void updateDrivePose(){
@@ -103,14 +104,14 @@ public class TurretAutoShoot extends Command {
     public void initialize() {
         updateDrivePose();
         updateTurretSetpoint(drivepose);
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
     }
 
     @Override
     public void execute() {
         updateDrivePose();
         updateTurretSetpoint(drivepose);
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
     }
 
     @Override
@@ -119,16 +120,5 @@ public class TurretAutoShoot extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
     }
 
-    public boolean leftSide(Translation2d drivepose) {
-        if (drivepose.getY() > (FieldConstants.FIELD_WIDTH / 2)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // public FieldZone getZone(Translation2d drivepose) {
-    //     return FieldConstants.getZone(drivepose);
-    // }
 }
 
