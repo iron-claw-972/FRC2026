@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Intake extends SubsystemBase {
+    // set actual IDs
     final int rightID = 1;
     final int leftID = 2;
     final int rollerID = 3;
@@ -30,38 +31,26 @@ public class Intake extends SubsystemBase {
 
 
     public Intake() {
-       // set actual IDs
         rightMotor = new TalonFX(rightID);
         leftMotor = new TalonFX(leftID);
         rollerMotor = new TalonFX(rollerID); 
 
         // right motor configs
-        TalonFXConfiguration rightConfig = new TalonFXConfiguration();
-        var slot0RightConfigs = rightConfig.Slot0;
+        TalonFXConfiguration Config = new TalonFXConfiguration();
+        var slot0Configs = Config.Slot0;
         //find values later
         //friction, maybe?
-        slot0RightConfigs.kP = 0;
-        slot0RightConfigs.kI = 0;
-        slot0RightConfigs.kD = 0;
-        slot0RightConfigs.kV = 0;
-        slot0RightConfigs.kA = 0;
-
-        // left motor configs
-        TalonFXConfiguration leftConfig = new TalonFXConfiguration();
-        var slot0LeftConfigs = leftConfig.Slot0;
-
-        slot0LeftConfigs.kP = 0;
-        slot0LeftConfigs.kI = 0;
-        slot0LeftConfigs.kD = 0;
-        slot0LeftConfigs.kV = 0;
-        slot0LeftConfigs.kA = 0;
-
+        slot0Configs.kP = 0;
+        slot0Configs.kI = 0;
+        slot0Configs.kD = 0;
+        slot0Configs.kV = 0;
+        slot0Configs.kA = 0;
 
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-        rightMotor.getConfigurator().apply(rightConfig);
+        rightMotor.getConfigurator().apply(Config);
 
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-        leftMotor.getConfigurator().apply(leftConfig);
+        leftMotor.getConfigurator().apply(Config);
 
 
         //Follower follower = new Follower(rightMotor.getDeviceID(), true);
