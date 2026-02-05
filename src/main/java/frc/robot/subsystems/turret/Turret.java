@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.ImmutableAngle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -25,6 +26,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import yams.units.EasyCRT;
+import yams.units.EasyCRTConfig;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Degrees;
+
 
 public class Turret extends SubsystemBase implements TurretIO{
     final private TalonFX motor;
@@ -52,6 +59,8 @@ public class Turret extends SubsystemBase implements TurretIO{
     private double kP = 15.0;
     private double kI = 0.0;
     private double kD = 0.0;
+
+	final EasyCRT easyCrt;
 
     public Turret() {
         motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN); // switch of course
@@ -100,7 +109,22 @@ public class Turret extends SubsystemBase implements TurretIO{
         
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(0) * gearRatio; // min angle * gear ratio
-        
+
+		EasyCRTConfig crt_cfg = new EasyCRTConfig(null, null)
+			.withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
+			.withAbsoluteEncoderOffsets(Rotations.of(Units.degreesToRotations(TurretConstants.LEFT_ENCODER_OFFSET)), Rotations.of(Units.degreesToRotations(TurretConstants.RIGHT_ENCODER_OFFSET)))
+			.withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
+			.withMatchTolerance(Degrees.of(2)) // Tune this
+			.withAbsoluteEncoderInversions(false, false)
+		// shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
+		// turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
+			.withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
+		
+		this.easyCrt = new EasyCRT(crt_cfg);
+		
+		this.easyCrt.getAngleOptional().ifPresent(angle -> {
+			motor.setPosition(angle.in(Rotations) * gearRatio);
+		});
         SmartDashboard.putData("turret", mechanism2d);
         SmartDashboard.putData("PID", pid);
 
@@ -130,7 +154,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
         if (infiniteRotation) {
             // Get current position in degrees
-            double currentDegrees = (motor.getPosition().getValueAsDouble() / gearRatio) * 360.0;
+            double currentDegrees = inputs.positionDeg;
             // Calculate the error
             double error = setpoint - currentDegrees;
             // Wrap the error to [-180, 180]
@@ -173,7 +197,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     @Override
     public void updateInputs(){
-        inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / gearRatio;
+		easyCrt.getAngleOptional().ifPresent(mechAngle -> {
+			inputs.positionDeg = mechAngle.in(Degrees);
+		});
         inputs.velocity =  Units.rotationsPerMinuteToRadiansPerSecond(motor.getVelocity().getValueAsDouble() * 60);
         inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
     }
@@ -185,7 +211,8 @@ public class Turret extends SubsystemBase implements TurretIO{
     @AutoLogOutput(key = "Turret/SetpointDeg")
     public double getSetpoint(){
         return setpoint;
-    }
+	}
+
 
     @Override
     public void simulationPeriodic() {
@@ -202,4 +229,5 @@ public class Turret extends SubsystemBase implements TurretIO{
         encoderSim.setRawRotorPosition(motorRotations);
         encoderSim.setRotorVelocity(turretSim.getVelocityRadPerSec() * Units.radiansToRotations(1) * gearRatio); // Gear Ratio
     }
+
 }
