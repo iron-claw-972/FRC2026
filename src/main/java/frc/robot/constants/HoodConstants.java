@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
-    public static final double HOOD_GEAR_RATIO = (1 / 4) * (0.15625);
+    public static final double HOOD_GEAR_RATIO = 0.15625;
 
     public static final double MASS = 2.46; // kilograms
     public static final double LENGTH = 0.138 * 2; // meters

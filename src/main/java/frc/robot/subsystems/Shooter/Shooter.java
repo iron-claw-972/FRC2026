@@ -19,23 +19,20 @@ import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Shooter extends SubsystemBase implements ShooterIO {
+public class Shooter extends SubsystemBase {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-
-    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-    private LaserCan sensor = new LaserCan(IdConstants.SHOOTER_SENSOR_ID);
 
     //rotations/sec
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
-    private double feederPower = 0;
 
 
     public boolean shooterAtMaxSpeed = false;
@@ -43,21 +40,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
-    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
-
     double powerModifier;
 
     public Shooter(){
-
-        updateInputs();
-        //Sensor configs
-        try {
-            sensor.setRangingMode(RangingMode.SHORT);
-            sensor.setTimingBudget(TimingBudget.TIMING_BUDGET_20MS);
-            sensor.setRegionOfInterest(new RegionOfInterest(-4, -4, 8, 8));
-        } catch (ConfigurationFailedException e) {
-            DriverStation.reportError("Indexer LaserCan configuration error", true);
-        }
         
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 0.1; //tune p value
@@ -76,31 +61,28 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
-        feederMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
-        );
+        SmartDashboard.putData("shoot", new InstantCommand(() -> setShooter(10 * powerModifier)));
+
     }
 
     @Override
     public void periodic(){
-        updateInputs();
-
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        feederMotor.set(feederPower);            
+
+
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(-shooterTargetSpeed * powerModifier));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(-shooterTargetSpeed * powerModifier));
     }
 
     public void deactivateShooterAndFeeder() {
-        setFeeder(0);
+        // setFeeder(0);
         setShooter(0);
     }
 
     public void setFeeder(double power){
         // System.out.println("VELOCITY: " + getShooterVelcoity()); 
-        feederPower = power;
+        // feederPower = power;
     }
 
     public void setShooter(double linearVelocityMps) {
@@ -110,28 +92,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     /**@return velocity in m/s */
     public double getShooterVelcoity(){
-        return inputs.shooterSpeedLeft;
+        return Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_WHEEL_DIAMETER/2;
     }
 
     public double getFeederVelocity(){
-        return inputs.feederSpeed;
-    }
-
-    @AutoLogOutput
-    public boolean ballDetected() {
-        Measurement measurement = sensor.getMeasurement();
-        ballDetected =  measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && measurement.distance_mm <= 45;
-        return ballDetected;
-    }
-
-    @Override
-    public void updateInputs(){
-        inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_WHEEL_DIAMETER/2;
-        inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_WHEEL_DIAMETER/2;
-        inputs.feederSpeed = feederMotor.getVelocity().getValueAsDouble();
-        inputs.sensorDistance = sensor.getMeasurement().distance_mm;
-
-        Logger.processInputs("Shooter", inputs);
+        // return feederMotor.getVelocity().getValueAsDouble();
+        return 0;
     }
 
     public boolean atTargetSpeed(){

@@ -51,7 +51,7 @@ public class RobotContainer {
   private Hood hood = null;
   private IntakeAlpha intake = null;
   private Shooter shooter = null;
-  private Command auto = new DoNothing(); 
+  private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -64,7 +64,7 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     switch (robotId) {
-       
+
       case TestBed1:
         break;
 
@@ -74,7 +74,7 @@ public class RobotContainer {
       default:
 
       case SwerveCompetition:
-        
+
       case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
 
@@ -83,10 +83,11 @@ public class RobotContainer {
       case Phil:
 
       case WaffleHouse:
-      if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-      hood = new Hood();
-      intake = new IntakeAlpha();
-      shooter = new Shooter();
+        if (vision == null)
+          vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        hood = new Hood();
+        // intake = new IntakeAlpha();
+        shooter = new Shooter();
 
       case PrimeJr:
 
@@ -97,13 +98,12 @@ public class RobotContainer {
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
-        
 
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -116,7 +116,7 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -131,8 +131,6 @@ public class RobotContainer {
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
     SmartDashboard.putData("auto shoot", new AutoShoot(drive, hood, shooter));
 
-
-    
   }
 
   /**
@@ -142,7 +140,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -181,28 +178,25 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
+  public Command getAutoCommand() {
     return auto;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-

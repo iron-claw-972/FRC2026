@@ -35,10 +35,10 @@ public class IntakeBall extends Command {
 
     @Override
     public void execute(){
-        if (shooter.ballDetected()) {
-            acquiredTimer.start();
-            phase = Phase.Acquiring;
-        }
+        // if (shooter.ballDetected()) {
+        //     acquiredTimer.start();
+        //     phase = Phase.Acquiring;
+        // }
         switch (phase){
             case Intaking:
             break;
