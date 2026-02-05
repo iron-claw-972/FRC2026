@@ -99,11 +99,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         driver.get(PS5Button.CIRCLE).onTrue(
             new InstantCommand(()->{
-                turret.setFieldRelativeTarget(new Rotation2d(Math.PI), 0);
+                turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(180)), 0);
             })
         ).onFalse(
             new InstantCommand(()->{
-                turret.setFieldRelativeTarget(new Rotation2d(0), 0);
+                turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(-170)), 0);
             })
         );
 

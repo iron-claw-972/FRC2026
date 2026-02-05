@@ -2,6 +2,8 @@ package frc.robot.commands.gpm;
 
 import java.lang.reflect.Field;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,10 +39,13 @@ public class SimpleAutoShoot extends Command {
     private boolean turretVisionEnabled = false;
     private boolean SOTM = true;
     private Translation2d drivepose;
+    private double lastPos = 0;
 
     private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     private double lastTurretAngle = 0;
     private double lastTurretVelocity = 0;
+
+    private double lastFrameVelocity;
 
     public SimpleAutoShoot(Turret turret, Drivetrain drivetrain, Shooter shooter) {
         this.turret = turret;
@@ -129,14 +134,20 @@ public class SimpleAutoShoot extends Command {
         // turretAngleFilter.calculate(
         //     new Rotation2d(Units.degreesToRadians(turretSetpoint)).minus(new Rotation2d(Units.degreesToRadians(lastTurretAngle))).getRadians() / Constants.LOOP_TIME);
 
-        double turretAcceleration = ((-drivetrain.getAngularRate(2)) - (lastTurretVelocity)) / Constants.LOOP_TIME;
+        double velocityAdjustment = 0;
+        double turretAcceleration = ((-drivetrain.getAngularRate(2)) - (lastFrameVelocity)) / Constants.LOOP_TIME;
+        if (Math.abs(lastTurretAngle - turretSetpoint) > 90) {
+            velocityAdjustment = -drivetrain.getAngularRate(2) * 1.4;
+        }
+        Logger.recordOutput("Spinny accel", drivetrain.getAngularRate(2));
+        Logger.recordOutput("Original Turret Setpoint", turretSetpoint);
         
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2) - velocityAdjustment);
         // turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), (-drivetrain.getAngularRate(2)) + turretAcceleration * 0.3);
         //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
 
         lastTurretAngle = turretSetpoint;
-        lastTurretVelocity = -drivetrain.getAngularRate(2);
+        lastFrameVelocity = drivetrain.getAngularRate(2);
     }
 
     @Override

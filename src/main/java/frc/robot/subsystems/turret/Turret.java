@@ -40,8 +40,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
-	private static final double MAX_VEL_RAD_PER_SEC = 16.0;
-	private static final double MAX_ACCEL_RAD_PER_SEC2 = 80.0;
+	private static final double MAX_VEL_RAD_PER_SEC = 25;
+	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
 	private static final double VERSA_RATIO = 5.0;
 	private static final double TURRET_RATIO = 140.0 / 10.0;
@@ -53,6 +53,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+	private double lastFrameVelocity = 0.0;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -115,6 +117,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 						MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 					}
 				});
+
+		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC, feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO), goalVelocityRadPerSec))))
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
@@ -204,9 +208,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// 	motor.setVoltage(voltage);
 		// } else{
 			// in rad/sec
+			//double robotRotAcceleration = (Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) - lastFrameVelocity) / Constants.LOOP_TIME;
+			double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
+
 			targetVelocity = positionPID.calculate(
 					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-					setpoint.position * GEAR_RATIO);
+					motorSetpointPosition);
 			
 			targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
 
@@ -217,6 +224,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 			motor.setVoltage(voltage);
 		// }
+		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
 		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
@@ -235,6 +243,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 				Units.radiansToDegrees(best));
 		SmartDashboard.putNumber("Turret SetpointDeg",
 				Units.radiansToDegrees(setpoint.position));
+		SmartDashboard.putNumber("Turret Raw Setpoint", Units.radiansToDegrees(best));
 		SmartDashboard.putNumber("Turret motorPosRot",
 				Units.radiansToDegrees(motorPosRot));
 		SmartDashboard.putNumber("Turret motorVelRotPerSec",
