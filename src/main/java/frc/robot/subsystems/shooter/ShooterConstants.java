@@ -16,6 +16,8 @@ public class ShooterConstants {
     // in m/s
     public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
 
+    // for bang bang
+    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 20; // 20 amps
 
 }
 // 8 velcocity is too little
