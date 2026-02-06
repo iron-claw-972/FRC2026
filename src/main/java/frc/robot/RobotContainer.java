@@ -64,6 +64,7 @@ public class RobotContainer {
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
+        intake = new Intake();
         break;
 
       case TestBed2:

@@ -78,28 +78,30 @@ public class Intake extends SubsystemBase {
         mechanism = new Mechanism2d(80, 80);
         MechanismRoot2d root = mechanism.getRoot("Root", 0, 1);
         robotPos = root.append(new MechanismLigament2d("robotPos", 40, 0.0, 1, new Color8Bit(0, 0, 0)));
-        robotFrame = robotPos.append(new MechanismLigament2d("Robot Frame",28,0.0, 2, new Color8Bit(0, 0, 255)));
-        robotHeight = robotPos.append(new MechanismLigament2d("Robot Height", 22.5, 90, 1, new Color8Bit(0,0,255)));
-        robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 12, 180,2, new Color8Bit(255, 0, 0) ));
+        robotFrame = robotPos.append(new MechanismLigament2d("Robot Frame",28,0.0, 2, new Color8Bit(0, 255, 255)));
+        robotHeight = robotPos.append(new MechanismLigament2d("Robot Height", 22.5, 90, 1, new Color8Bit(0,255,255)));
+        // extensiion is initially retracted.
+        robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
+
         SmartDashboard.putData("Extension Mechanism", mechanism);
         SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
         SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
-}
-
-
-       
-    
+    }
 
     public void periodic() {
         SmartDashboard.putNumber("Intake Position:", getPosition());
-    }
 
-    public void simulationPeriodic(){
+        // report the position of the extension
         double percentExtended = getPosition() / kMaxRotations;
 
         percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
 
-        robotExtension.setLength(percentExtended * maxExtension);
+        // robotExtension.setLength(percentExtended * maxExtension);
+
+    }
+
+    public void simulationPeriodic(){
+        // simulate the motor activity
     }
 
     /**
@@ -108,6 +110,9 @@ public class Intake extends SubsystemBase {
      */
     public void setPosition(double setpoint) {
         rightMotor.setControl(voltageRequest.withPosition(setpoint));
+
+        // set the position quickly (should be in simultation and move slowly)
+        robotExtension.setLength(12.0 * setpoint/kMaxRotations);
     }
 
     /**
@@ -126,6 +131,7 @@ public class Intake extends SubsystemBase {
        setPosition(maxExtension);
 
     }
+
     public void retract(){
         setPosition(startingPoint);
         

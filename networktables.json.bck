@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "name": "/Preferences/RobotId",
+    "type": "string",
+    "value": "TestBed1",
+    "properties": {
+      "persistent": true
+    }
+  }
+]
