@@ -57,7 +57,7 @@ public class ShooterPhysics {
 
 		// the only reason this is empty is if the highest posible trajectory is too low
 		// to intersect the goal
-		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
+		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.maxPitch());
 		if (withMaxPitchOpt.isEmpty())
 			return Optional.empty();
 		TurretState withMaxPitch = withMaxPitchOpt.get();
@@ -91,7 +91,7 @@ public class ShooterPhysics {
 		// now we binary search the new range
 		TurretState lastValid = newRange.getFirst();
 		// use a 5cm tolerance
-		while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) < .05) {
+		while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) > .05) {
 			double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
 			TurretState guess = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight), avgHeight);
 			if (guess.satisfies(constraints)) {
