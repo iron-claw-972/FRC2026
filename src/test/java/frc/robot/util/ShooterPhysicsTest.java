@@ -9,7 +9,6 @@ import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -152,7 +151,7 @@ class ShooterPhysicsTest {
 				state1.height() - 0.1);
 		assertTrue(state1.exitVel() < state1Plus.exitVel(), state1Plus.toString());
 		assertTrue(state1.exitVel() < state1Minus.exitVel(), state1Minus.toString());
-		assertEquals(Math.PI/4, state1.pitch(), epsilon);
+		assertEquals(Math.PI / 4, state1.pitch(), epsilon);
 
 		var t2 = new Translation3d(1, 1, 100);
 		var state2 = ShooterPhysics.withMinimumSpeed(Translation2d.kZero, t2);
@@ -175,8 +174,8 @@ class ShooterPhysicsTest {
 	@Test
 	public void angleTest() {
 
-		// var t1 = new Translation3d(100, 0, 0);
-		// for (int i = 0; i < 1000; i++) {
+		// var t1 = new Translation3d(1, 2, 3);
+		// for (int i = 31; i < 1000; i++) {
 		// var x = ShooterPhysics.getShotParams(Translation2d.kZero, t1, i / 10.);
 		// System.out.println(i / 10. + ", " + x.pitch());
 		// }
@@ -187,8 +186,10 @@ class ShooterPhysicsTest {
 		assertTrue(state1.isPresent());
 		assertEquals(state1.get().pitch(), Units.degreesToRadians(30), epsilon);
 		// get this as a velocity vector
-		Translation3d v1 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero, t1, state1.get().height());
-		assertEquals(ShooterPhysics.cvtShot(v1, state1.get().height()), state1.get());
+		Translation3d v1 = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero, t1,
+				state1.get().height());
+		assertEquals(ShooterPhysics.cvtShot(v1, state1.get().height()),
+				state1.get());
 		checkTrajectory(Translation3d.kZero, v1, t1, state1.get().height());
 
 		var t2 = new Translation3d(1, -1, 100);
@@ -203,20 +204,30 @@ class ShooterPhysicsTest {
 		assertTrue(state3.isPresent());
 		assertEquals(state3.get().pitch(), Units.degreesToRadians(45), epsilon);
 		// get this as a velocity vector
-		Translation3d v3 = ShooterPhysics.getRequiredExitVelocity(iv3, t3, state3.get().height());
-		assertEquals(ShooterPhysics.cvtShot(v3, state3.get().height()), state3.get());
-		checkTrajectory(Translation3d.kZero, v3.plus(new Translation3d(iv3)), t3, state3.get().height());
+		Translation3d v3 = ShooterPhysics.getRequiredExitVelocity(iv3, t3,
+				state3.get().height());
+		assertEquals(ShooterPhysics.cvtShot(v3, state3.get().height()),
+				state3.get());
+		checkTrajectory(Translation3d.kZero, v3.plus(new Translation3d(iv3)), t3,
+				state3.get().height());
 	}
 
-	@Disabled
 	@Test
 	public void simpleConstraintsTest() {
-		Constraints constraints = new Constraints(3, 20, .1, Math.PI - .1);
-		var val1 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(1, 2, 3), constraints);
+		// a test where the optimal shot is just plain height
+		Constraints constraints1 = new Constraints(3, 20, .1, Math.PI - .1);
+		var val1 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(1, 2, 3), constraints1);
 		assertTrue(val1.isPresent());
 		var direct1 = ShooterPhysics.getShotParams(Translation2d.kZero, new Translation3d(1, 2, 3),
-				constraints.height());
-		assertEquals(direct1, val1);
+				constraints1.height());
+		assertEquals(direct1.pitch(), val1.get().pitch(), epsilon);
+		assertEquals(direct1.yaw().getRadians(), val1.get().yaw().getRadians(), epsilon);
+		assertEquals(direct1.exitVel(), val1.get().exitVel(), epsilon);
+
+		Constraints constraints2 = new Constraints(3, 20, Units.degreesToRadians(45), Math.PI - .2);
+		var val2 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(2, 2, 3), constraints2);
+		assertTrue(val2.isPresent());
+		assertEquals(Units.degreesToRadians(45), val2.get().pitch(), epsilon);
 	}
 
 	// test using a simple physics simulation

@@ -94,7 +94,8 @@ public class ShooterPhysics {
 			double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
 			TurretState guess = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight), avgHeight);
 			if (guess.satisfies(constraints)) {
-				if (guess.height() < lastValid.height()) lastValid = guess;
+				if (guess.height() < lastValid.height())
+					lastValid = guess;
 				newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
 			} else {
 				newRange = new Pair<TurretState, TurretState>(newRange.getFirst(), guess);
@@ -142,7 +143,10 @@ public class ShooterPhysics {
 		// peakZ = .5 * v_z_exit_vel² / g
 		// v_z_exit_vel² = 2 * peakZ * g
 		// v_z_exit_vel = √(2 * peakZ * g)
-		double zExitVel = Math.sqrt(2 * peakZ * Constants.GRAVITY_ACCELERATION);
+		// keep a second variable to avoid floating point precision issues where the
+		// sqrt for t ends up being NaN sometimes when peakZ = target.getZ()
+		double zExitVelSquared = 2 * peakZ * Constants.GRAVITY_ACCELERATION;
+		double zExitVel = Math.sqrt(zExitVelSquared);
 
 		// now we need time to hit target
 		// z_target = v_z_exit_vel * t - .5 * g * t²
@@ -153,10 +157,11 @@ public class ShooterPhysics {
 		// t = (-v_z_exit_vel ± √(v_z_exit_vel² - 2 * g * z_target)) / -g
 		// onlz use - because we only want the part where it's coming down, and that
 		// gives the longer time
-		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
+		double t = (-zExitVel - Math.sqrt(zExitVelSquared - 2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
 				/ -Constants.GRAVITY_ACCELERATION;
 
-		if (t < 0)
+		// this is not equivalent to t <= 0 because of NaNs
+		if (!(t > 0))
 			throw new RuntimeException("Time should never be negative (got t=" + t + ").");
 
 		// calculate x and z exit_vel
@@ -194,7 +199,8 @@ public class ShooterPhysics {
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
 			Translation3d guessVelocityMore = getRequiredExitVelocity(initialVelocity, target, guess + 0.1);
 			double derivative = (guessVelocityMore.getNorm() - guessVelocity.getNorm()) / 0.1;
-			// System.out.println(guess + "\t\t" + guessVelocity.getNorm() + "\t\t" + derivative);
+			// System.out.println(guess + "\t\t" + guessVelocity.getNorm() + "\t\t" +
+			// derivative);
 
 			// we've already hit minimum height and are trying to go lower
 			if (guess <= effectiveMinHeight && derivative > 0)
@@ -217,7 +223,6 @@ public class ShooterPhysics {
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
-
 		// guess a peak height
 		double guess = target.getZ() + 2;
 		int maxIters = 50;
@@ -232,7 +237,8 @@ public class ShooterPhysics {
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
 			TurretState polar = cvtShot(guessVelocity, guess);
 			double difference = pitch - polar.pitch();
-			// System.out.println(guess + "\t\t" + difference);
+			// System.out.println(guess + "\t\t" + guessVelocity + "\t\t" + polar.pitch() +
+			// "\t\t" + difference);
 
 			// we've already hit minimum height and are trying to go lower
 			if (guess <= target.getZ() && difference < 0)
