@@ -174,44 +174,39 @@ public class ShooterPhysics {
 
 	// call with default tolerance
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
-		return withMinimumSpeed(initialVelocity, target, 0.1);
+		return withMinimumSpeed(initialVelocity, target, 0.001);
 	}
 
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
-
-		// calculate minimum velocity: v² = g * (R + √(R² + h²))
-		double horizontalDist = target.toTranslation2d().getNorm();
-		double verticalDist = target.getZ();
-		double g = Constants.GRAVITY_ACCELERATION;
-		double robotSpeed = initialVelocity.getNorm();
-
-		double minProjectileSpeed = Math.sqrt(g * (horizontalDist + Math.hypot(horizontalDist, verticalDist)));
-		double minSpeed = Math.max(0, minProjectileSpeed - robotSpeed);
+		// trying to calculate a shot for height=0 returns NaN
+		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
 		// guess a peak height
 		double guess = target.getZ() + 2;
-		int maxIters = 20;
+		int maxIters = 50;
 		while (maxIters >= 0) {
 			maxIters--;
 
 			// this will throw an exception, so avoid it
 			// we still might have just overshot, so keep checking
-			if (guess < target.getZ())
-				guess = target.getZ();
+			if (guess < effectiveMinHeight)
+				guess = effectiveMinHeight;
 
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
-			double guessSpeed = guessVelocity.getNorm();
-			double difference = minSpeed - guessSpeed;
+			Translation3d guessVelocityMore = getRequiredExitVelocity(initialVelocity, target, guess + 0.1);
+			double derivative = (guessVelocityMore.getNorm() - guessVelocity.getNorm()) / 0.1;
+			// System.out.println(guess + "\t\t" + guessVelocity.getNorm() + "\t\t" + derivative);
 
 			// we've already hit minimum height and are trying to go lower
-			if (guess <= target.getZ() && difference < 0)
-				throw new RuntimeException("Incorrect minimum speed calculation in ShooterPhysics.java");
-
-			if (Math.abs(difference) <= tolerance)
+			if (guess <= effectiveMinHeight && derivative > 0)
 				return cvtShot(guessVelocity, guess);
 
-			guess += difference * 1.7; // experimentally determined value
+			if (Math.abs(derivative) <= tolerance)
+				return cvtShot(guessVelocity, guess);
+
+			// desmos guesstimation indicates this works quite well
+			guess -= derivative * (Math.pow(guess, 2) + 1) / 10;
 		}
 
 		throw new RuntimeException("Failed to compute a trajectory for a minimum speed.");

@@ -134,13 +134,39 @@ class ShooterPhysicsTest {
 
 	@Test
 	public void velocityTest() {
-		var t1 = new Translation3d(1, 0, 2);
+
+		// var t1 = new Translation3d(100, 0, 0);
+		// for (int i = 0; i < 1000; i++) {
+		// var x = ShooterPhysics.getShotParams(Translation2d.kZero, t1, i / 10.);
+		// System.out.println(i / 10. + ", " + x.exitVel());
+		// }
+
+		var t1 = new Translation3d(100, 0, 0);
 		var state1 = ShooterPhysics.withMinimumSpeed(Translation2d.kZero, t1);
 		// check moving either way is higher velocity
-		assertTrue(state1.exitVel() < ShooterPhysics.getShotParams(Translation2d.kZero, t1, state1.height() + 0.1)
-				.exitVel());
-		assertTrue(state1.exitVel() < ShooterPhysics.getShotParams(Translation2d.kZero, t1, state1.height() - 0.1)
-				.exitVel());
+		var state1Plus = ShooterPhysics.getShotParams(Translation2d.kZero, t1,
+				state1.height() + 0.1);
+		var state1Minus = ShooterPhysics.getShotParams(Translation2d.kZero, t1,
+				state1.height() - 0.1);
+		assertTrue(state1.exitVel() < state1Plus.exitVel(), state1Plus.toString());
+		assertTrue(state1.exitVel() < state1Minus.exitVel(), state1Minus.toString());
+
+		var t2 = new Translation3d(1, 1, 100);
+		var state2 = ShooterPhysics.withMinimumSpeed(Translation2d.kZero, t2);
+		// this should get to the minimum height
+		var state2Plus = ShooterPhysics.getShotParams(Translation2d.kZero, t2, state2.height() + 0.1);
+		assertTrue(state2.exitVel() < state2Plus.exitVel(), state2Plus.toString());
+		assertEquals(t2.getZ(), state2.height(), epsilon);
+
+		// test with an initial velocity
+		var t3 = new Translation3d(100, 0, 0);
+		var v3 = new Translation2d(10, -20);
+		var state3 = ShooterPhysics.withMinimumSpeed(v3, t3);
+		// check moving either way is higher velocity
+		var state3Plus = ShooterPhysics.getShotParams(v3, t3, state3.height() + 0.1);
+		var state3Minus = ShooterPhysics.getShotParams(v3, t3, state3.height() - 0.1);
+		assertTrue(state3.exitVel() < state3Plus.exitVel(), state3Plus.toString());
+		assertTrue(state3.exitVel() < state3Minus.exitVel(), state3Minus.toString());
 	}
 
 	@Test
