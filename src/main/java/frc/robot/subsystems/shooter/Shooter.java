@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         if (Math.abs(shooterMotorLeft.getVelocity().getValueAsDouble() - shooterTargetSpeed) < ShooterConstants.TORQUE_CURRENT_CONTROL_TOLERANCE) {
             phase = FlywheelPhase.MAX; // we need to recover from ball velocity in order to be back to idle
         } else {
-            phase = FlywheelPhase.CONSTANT_TORQUE; 
+            phase = FlywheelPhase.CONSTANT_TORQUE;                                                             
         }
     }
 
