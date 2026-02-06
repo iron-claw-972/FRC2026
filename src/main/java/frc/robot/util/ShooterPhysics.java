@@ -111,7 +111,6 @@ public class ShooterPhysics {
 		double magnitude2d = onGround.getNorm();
 
 		double pitch = new Translation2d(magnitude2d, velocity.getZ()).getAngle().getRadians();
-		pitch %= Math.PI * 2;
 		double speed = velocity.getDistance(Translation3d.kZero);
 
 		return new TurretState(yaw, pitch, speed, height);
@@ -204,9 +203,9 @@ public class ShooterPhysics {
 			double guessSpeed = guessVelocity.getNorm();
 			double difference = minSpeed - guessSpeed;
 
-			// we've already hit minimum height and are trying to go lower
-			if (guess <= target.getZ() && difference < 0)
-				throw new RuntimeException("Incorrect minimum speed calculation in ShooterPhysics.java");
+			// If we're at minimum height and still need more speed, it's impossible
+			if (guess <= target.getZ() && difference > 0)
+				throw new RuntimeException("Impossible to achieve minimum speed for target " + target);
 
 			if (Math.abs(difference) <= tolerance)
 				return cvtShot(guessVelocity, guess);

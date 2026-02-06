@@ -144,11 +144,6 @@ class ShooterPhysicsTest {
 	}
 
 	@Test
-	public void angleTest() {
-
-	}
-
-	@Test
 	public void simpleConstraintsTest() {
 		Constraints constraints = new Constraints(3, 20, .1, Math.PI - .1);
 		var val1 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(1, 2, 3), constraints);
