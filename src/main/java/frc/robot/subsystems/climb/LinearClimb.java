@@ -11,6 +11,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.Climb.ClimbConstants;
@@ -18,6 +20,8 @@ import frc.robot.constants.swerve.DriveConstants;
 
 public class LinearClimb {
     private TalonFX motor;
+
+    private double rotationalSetpoint = 0;
 
     private double kP = 0.1;
     private double kI = 0.0;
@@ -29,7 +33,7 @@ public class LinearClimb {
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(0) * gearRatio); // gear ratio
 
-    ElevatorFeedforward feedforward = new ElevatorFeedforward(0, (((DriveConstants.ROBOT_MASS * Constants.GRAVITY_ACCELERATION * ClimbConstants.RADIUS) / gearRatio) / motorConstant.KtNMPerAmp) * motorConstant.rOhms, 0, 0);
+    // ElevatorFeedforward feedforward = new ElevatorFeedforward(0, (((DriveConstants.ROBOT_MASS * Constants.GRAVITY_ACCELERATION * ClimbConstants.RADIUS) / gearRatio) / motorConstant.KtNMPerAmp) * motorConstant.rOhms, 0, 0);
 
     public LinearClimb() {
         motor = new TalonFX(IdConstants.CLIMB_ID, Constants.RIO_CAN);
@@ -54,20 +58,41 @@ public class LinearClimb {
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         motor.getConfigurator().apply(config);
-       
-    }
-
-    public void periodic() {
-
+        SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
+        SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
+        SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
     }
 
     public void setSetpoint(double setpoint) {
         setpoint = MathUtil.clamp(setpoint, ClimbConstants.MIN_HEIGHT, ClimbConstants.MAX_HEIGHT);
 
-        motor.setControl(voltageRequest.withPosition((setpoint / (2 * Math.PI * ClimbConstants.RADIUS)) * gearRatio).withFeedForward(feedforward.calculate(0)));
+        rotationalSetpoint = (setpoint / (2 * Math.PI * ClimbConstants.RADIUS)) * gearRatio;
+
+        // motor.setControl(voltageRequest.withPosition(rotationalSetpoint).withFeedForward(feedforward.calculate(0)));
+        motor.setControl(voltageRequest.withPosition(rotationalSetpoint));
+    }
+
+    public boolean atSetPoint(){
+        return Math.abs(motor.getPosition().getValueAsDouble() - rotationalSetpoint) < 3.0;
+    }
+
+    public double getPosition() {
+        return (motor.getPosition().getValueAsDouble() / gearRatio) * 2 * Math.PI * ClimbConstants.RADIUS;
+    }
+
+    public void goUp() {
+        setSetpoint(ClimbConstants.MAX_HEIGHT);
+    }
+
+    public void goDown() {
+        setSetpoint(ClimbConstants.MIN_HEIGHT);
     }
 
     public void climb() {
+        setSetpoint(ClimbConstants.CLIMB_HEIGHT);
+    }
+
+    public void periodic() {
 
     }
 }
