@@ -110,7 +110,6 @@ public class ShooterPhysics {
 		double magnitude2d = onGround.getNorm();
 
 		double pitch = new Translation2d(magnitude2d, velocity.getZ()).getAngle().getRadians();
-		pitch %= Math.PI * 2;
 		double speed = velocity.getDistance(Translation3d.kZero);
 
 		return new TurretState(yaw, pitch, speed, height);
