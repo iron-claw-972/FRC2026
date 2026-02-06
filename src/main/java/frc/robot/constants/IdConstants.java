@@ -30,4 +30,7 @@ public class IdConstants {
     // Climb
     public static final int CLIMB_MOTOR_LEFT = 48;
     public static final int CLIMB_MOTOR_RIGHT = 49;
+
+    // Hood
+    public static final int HOOD_ID = 50;
 }
