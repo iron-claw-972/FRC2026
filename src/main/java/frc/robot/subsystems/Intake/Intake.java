@@ -14,14 +14,19 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Intake extends SubsystemBase {
-
-    private Mechanism2d mechanism;
-    private MechanismLigament2d mechanismLigament2d;
+    private final Mechanism2d mechanism;
+    private final MechanismLigament2d robotExtension;
+    private final MechanismLigament2d robotFrame; 
+    private final MechanismLigament2d robotHeight; 
+    private final MechanismLigament2d robotPos;
+    
+    
     // set actual IDs
     final int rightID = 1;
     final int leftID = 2;
@@ -30,11 +35,10 @@ public class Intake extends SubsystemBase {
     private TalonFX rollerMotor; 
     private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
-    private double maxExtension; // this should go in a constants file
+    private double maxExtension = 12.0; // this should go in a constants file
     private double startingPoint; // this should go in a constants file
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
-    final MechanismLigament2d extensionLigament;
     final double kMaxRotations = 37.5;
     final double kMaxVisualLength = 0.75;
 
@@ -43,8 +47,6 @@ public class Intake extends SubsystemBase {
         rightMotor = new TalonFX(rightID);
         leftMotor = new TalonFX(leftID);
         rollerMotor = new TalonFX(rollerID); 
-
-        
 
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
@@ -73,16 +75,20 @@ public class Intake extends SubsystemBase {
 
         
 
-        Mechanism2d mechanism = new Mechanism2d(1.2, 0.6);
-
-        MechanismRoot2d root = mechanism.getRoot("ExtensionRoot", 0.1, 0.3);
-
-        extensionLigament = root.append(new MechanismLigament2d("Extension", 0.0, 0.0)); // horizontal
-
+        mechanism = new Mechanism2d(80, 80);
+        MechanismRoot2d root = mechanism.getRoot("Root", 0, 1);
+        robotPos = root.append(new MechanismLigament2d("robotPos", 40, 0.0, 1, new Color8Bit(0, 0, 0)));
+        robotFrame = robotPos.append(new MechanismLigament2d("Robot Frame",28,0.0, 2, new Color8Bit(0, 0, 255)));
+        robotHeight = robotPos.append(new MechanismLigament2d("Robot Height", 22.5, 90, 1, new Color8Bit(0,0,255)));
+        robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 12, 180,2, new Color8Bit(255, 0, 0) ));
         SmartDashboard.putData("Extension Mechanism", mechanism);
+        SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
+}
+
 
        
-    }
+    
 
     public void periodic() {
         SmartDashboard.putNumber("Intake Position:", getPosition());
@@ -93,7 +99,7 @@ public class Intake extends SubsystemBase {
 
         percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
 
-        extensionLigament.setLength(percentExtended * kMaxVisualLength);
+        robotExtension.setLength(percentExtended * maxExtension);
     }
 
     /**
@@ -124,6 +130,7 @@ public class Intake extends SubsystemBase {
         setPosition(startingPoint);
         
     }
-    
-    
+
 }
+    
+

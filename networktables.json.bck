@@ -1,10 +1,1 @@
-[
-  {
-    "name": "/Preferences/RobotId",
-    "type": "string",
-    "value": "default",
-    "properties": {
-      "persistent": true
-    }
-  }
-]
+[]
