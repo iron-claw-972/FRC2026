@@ -6,7 +6,6 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.constants.Constants;
 
 public class ShooterPhysics {
@@ -214,7 +213,7 @@ public class ShooterPhysics {
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch) {
-		return withAngle(initialVelocity, target, pitch, Units.degreesToRadians(1));
+		return withAngle(initialVelocity, target, pitch, .01);
 	}
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
@@ -222,7 +221,7 @@ public class ShooterPhysics {
 
 		// guess a peak height
 		double guess = target.getZ() + 2;
-		int maxIters = 20;
+		int maxIters = 50;
 		while (maxIters >= 0) {
 			maxIters--;
 
@@ -234,6 +233,7 @@ public class ShooterPhysics {
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
 			TurretState polar = cvtShot(guessVelocity, guess);
 			double difference = pitch - polar.pitch();
+			// System.out.println(guess + "\t\t" + difference);
 
 			// we've already hit minimum height and are trying to go lower
 			if (guess <= target.getZ() && difference < 0)
@@ -242,7 +242,7 @@ public class ShooterPhysics {
 			if (Math.abs(difference) <= tolerance)
 				return Optional.of(polar);
 
-			guess += difference * 0.7; // TODO: find better value
+			guess += difference * 10;
 		}
 
 		throw new RuntimeException("Solving for angle did not converge.");
