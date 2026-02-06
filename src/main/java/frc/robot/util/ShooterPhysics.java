@@ -186,8 +186,7 @@ public class ShooterPhysics {
 		double g = Constants.GRAVITY_ACCELERATION;
 		double robotSpeed = initialVelocity.getNorm();
 
-		double minProjectileSpeed = Math
-				.sqrt(g * (horizontalDist + Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist)));
+		double minProjectileSpeed = Math.sqrt(g * (horizontalDist + Math.hypot(horizontalDist, verticalDist)));
 		double minSpeed = Math.max(0, minProjectileSpeed - robotSpeed);
 
 		// guess a peak height
