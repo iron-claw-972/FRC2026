@@ -32,6 +32,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.swerve.DriveConstants;
+import yams.units.EasyCRT;
+import yams.units.EasyCRTConfig;
 
 public class Turret extends SubsystemBase implements TurretIO{
 
@@ -55,6 +57,8 @@ public class Turret extends SubsystemBase implements TurretIO{
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private double lastFrameVelocity = 0.0;
+
+    EasyCRT easyCRT;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -122,6 +126,22 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
+
+        EasyCRTConfig crt_cfg = new EasyCRTConfig(null, null)
+        .withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
+        .withAbsoluteEncoderOffsets(Rotations.of(Units.degreesToRotations(TurretConstants.LEFT_ENCODER_OFFSET)), Rotations.of(Units.degreesToRotations(TurretConstants.RIGHT_ENCODER_OFFSET)))
+        .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
+        .withMatchTolerance(Degrees.of(2)) // Tune this
+        .withAbsoluteEncoderInversions(false, false)
+        // shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
+        // turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
+            .withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
+        
+        this.easyCRT = new EasyCRT(crt_cfg);
+        
+        this.easyCRT.getAngleOptional().ifPresent(angle -> {
+            motor.setPosition(angle.in(Rotations) * gearRatio);
+        });
 
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
