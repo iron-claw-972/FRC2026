@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.Climb.ClimbConstants;
 import frc.robot.constants.swerve.DriveConstants;
 
 public class LinearClimb {
@@ -38,7 +39,7 @@ public class LinearClimb {
     ElevatorFeedforward feedforward = new ElevatorFeedforward(0, resistance, 0, 0);
 
     public LinearClimb() {
-        motor = new TalonFX(IdConstants.CLIMB_ID, Constants.RIO_CAN);
+        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID, Constants.RIO_CAN);
 
         motor.setPosition(Units.degreesToRotations(0) * gearRatio); // gear ratio
         motor.setNeutralMode(NeutralModeValue.Brake);
