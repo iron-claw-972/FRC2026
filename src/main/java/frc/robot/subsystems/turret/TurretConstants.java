@@ -18,5 +18,5 @@ public class TurretConstants {
 
     public static Translation2d DISTANCE_FROM_ROBOT_CENTER = new Translation2d(0, 0);
 
-    Translation3d TURRET_TO_CENTER_OF_ROBOT = new Translation3d(x, y, 0.32)
+    Translation3d TURRET_TO_CENTER_OF_ROBOT = new Translation3d(Units.inchesToMeters(4.875), Units.inchesToMeters(y), 0.32)
 }
