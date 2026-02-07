@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import java.lang.annotation.Target;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -73,10 +71,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         phase = FlywheelPhase.START_UP;
 
         SmartDashboard.putData("Turn on shooter", new InstantCommand(() -> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
-        SmartDashboard.putData("Turn on feeder", new InstantCommand(() -> setFeeder(ShooterConstants.FEEDER_RUN_POWER)));
         SmartDashboard.putData("Turn ALL off", new InstantCommand(() -> deactivateShooterAndFeeder()));
         SmartDashboard.putData("Turn off Shooter", new InstantCommand(() -> setShooter(0)));
-        SmartDashboard.putData("Turn off feeder", new InstantCommand(() -> setFeeder(0)));
     }
 
     public void periodic(){
@@ -107,12 +103,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void deactivateShooterAndFeeder() {
-        setFeeder(0);
         setShooter(0);
         System.out.println("Shooter deactivated");
-    }
-    public void setFeeder(double power){
-        System.out.println("VELOCITY: " + getShooterVelcoity()); 
     }
 
     public void setShooter(double velocityRPS) {
