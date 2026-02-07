@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.IntakeConstants;
 
 
 public class Intake extends SubsystemBase {
@@ -25,28 +26,17 @@ public class Intake extends SubsystemBase {
     private final MechanismLigament2d robotFrame; 
     private final MechanismLigament2d robotHeight; 
     private final MechanismLigament2d robotPos;
-    
-    
-    // set actual IDs
-    final int rightID = 1;
-    final int leftID = 2;
-    final int rollerID = 3;
 
     private TalonFX rollerMotor; 
     private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
-    private double maxExtension = 12.0; // this should go in a constants file
-    private double startingPoint; // this should go in a constants file
+
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
-    final double kMaxRotations = 37.5;
-    final double kMaxVisualLength = 0.75;
-
-
     public Intake() {
-        rightMotor = new TalonFX(rightID);
-        leftMotor = new TalonFX(leftID);
-        rollerMotor = new TalonFX(rollerID); 
+        rightMotor = new TalonFX(IntakeConstants.rightID);
+        leftMotor = new TalonFX(IntakeConstants.leftID);
+        rollerMotor = new TalonFX(IntakeConstants.rollerID); 
 
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
@@ -65,15 +55,8 @@ public class Intake extends SubsystemBase {
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         leftMotor.getConfigurator().apply(Config);
 
-
         //Follower follower = new Follower(rightMotor.getDeviceID(), true);
         leftMotor.setControl(new Follower(rightMotor.getDeviceID(), MotorAlignmentValue.Opposed));
-        
-
-        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
-
-        
 
         mechanism = new Mechanism2d(80, 80);
         MechanismRoot2d root = mechanism.getRoot("Root", 0, 1);
@@ -92,7 +75,7 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putNumber("Intake Position:", getPosition());
 
         // report the position of the extension
-        double percentExtended = getPosition() / kMaxRotations;
+        double percentExtended = getPosition() / IntakeConstants.kMaxRotations;
 
         percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
 
@@ -112,7 +95,7 @@ public class Intake extends SubsystemBase {
         rightMotor.setControl(voltageRequest.withPosition(setpoint));
 
         // set the position quickly (should be in simultation and move slowly)
-        robotExtension.setLength(12.0 * setpoint/kMaxRotations);
+        robotExtension.setLength(12.0 * setpoint/IntakeConstants.kMaxRotations);
     }
 
     /**
@@ -128,12 +111,12 @@ public class Intake extends SubsystemBase {
     }
 
     public void extend() {
-       setPosition(maxExtension);
+       setPosition(IntakeConstants.maxExtension);
 
     }
 
     public void retract(){
-        setPosition(startingPoint);
+        setPosition(IntakeConstants.startingPoint);
         
     }
 
