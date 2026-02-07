@@ -22,6 +22,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -36,6 +37,9 @@ import frc.robot.constants.swerve.DriveConstants;
 import yams.units.EasyCRT;
 import yams.units.EasyCRTConfig;
 import static edu.wpi.first.units.Units.Rotations;
+
+import java.util.function.Supplier;
+
 import static edu.wpi.first.units.Units.Degrees;
 
 public class Turret extends SubsystemBase implements TurretIO{
@@ -130,12 +134,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
 
-        double initialEncoderOffsetLeft = encoderLeft.get();
-        double initialEncoderOffsetRight = encoderRight.get();
-
-        EasyCRTConfig crt_cfg = new EasyCRTConfig(null, null)
+        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.get()), () -> Rotations.of(encoderRight.get()))
         .withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
-        .withAbsoluteEncoderOffsets(Rotations.of(initialEncoderOffsetLeft), Rotations.of(initialEncoderOffsetRight))
+        .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
         .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
         .withMatchTolerance(Degrees.of(2)) // Tune this
         .withAbsoluteEncoderInversions(false, false)
