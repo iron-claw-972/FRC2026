@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class ShooterConstants {
     //TODO: find these values
     public static final double FEEDER_RUN_POWER = 0.5; // meters per second??

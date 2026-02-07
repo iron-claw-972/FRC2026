@@ -11,6 +11,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,6 +40,15 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     // for tracking current phase: used to adjust the setting
     private FlywheelPhase phase;
+
+    private double torqueCurrentControlTolerance = 20.0;
+    private double torqueCurrentDebounceTime = 0.025;
+    private double atGoalStateDebounceTime = 0.2;
+    private Debouncer torqueCurrentDebouncer = new Debouncer(torqueCurrentDebounceTime, DebounceType.kFalling);
+    private Debouncer atGoalStateDebouncer = new Debouncer(atGoalStateDebounceTime, DebounceType.kFalling);
+    private boolean atGoal = false;
+    @AutoLogOutput private long launchCount = 0;
+    private boolean lastTorqueCurrentControl = false;
 
     public enum FlywheelPhase {
         MAX,
@@ -77,6 +90,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public void periodic(){
         updateInputs();
+        //updatePhase();
         SmartDashboard.putNumber("Shot Power", shooterPower);
         shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
@@ -102,6 +116,28 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         }
     }
 
+    /** Run closed loop at the specified velocity. */
+    private void runVelocity(double velocityRadsPerSec) {
+        boolean inTolerance =
+            Math.abs(Units.rotationsToRadians(getShooterVelcoity()) - velocityRadsPerSec)
+                <= torqueCurrentControlTolerance;
+        boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance);
+        atGoal = atGoalStateDebouncer.calculate(inTolerance);
+
+        if (!torqueCurrentControl && lastTorqueCurrentControl) {
+        launchCount++;
+        }
+        lastTorqueCurrentControl = torqueCurrentControl;
+
+        outputs.mode =
+            torqueCurrentControl
+                ? FlywheelIOOutputMode.TORQUE_CURRENT_BANG_BANG
+                : FlywheelIOOutputMode.DUTY_CYCLE_BANG_BANG;
+        outputs.velocityRadsPerSec = velocityRadsPerSec;
+        Logger.recordOutput("Shooter/Setpoint", velocityRadsPerSec);
+    }
+
+
     public void deactivateShooterAndFeeder() {
         setShooter(0);
         System.out.println("Shooter deactivated");
@@ -116,10 +152,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         this.shooterPower = power;
     }
 
-    public double getFeederVelocity() {
-        return inputs.feederVelocity;
-    }
-
     public double getShooterVelcoity() {
         return inputs.leftShooterVelocity; // assuming they are the same rn
     }
@@ -128,6 +160,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         inputs.leftShooterVelocity = shooterMotorLeft.getVelocity().getValueAsDouble();
         inputs.rightShooterVelocity = shooterMotorRight.getVelocity().getValueAsDouble();
         inputs.leftShooterCurrent = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-        inputs.rightShooterVelocity = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+        inputs.rightShooterCurrent = shooterMotorRight.getStatorCurrent().getValueAsDouble();
     }
 }
