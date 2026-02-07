@@ -18,6 +18,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -31,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 
 public class Turret extends SubsystemBase implements TurretIO{
@@ -52,7 +56,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
 
-    private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+    private final TurretIOInputs inputs = new TurretIOInputs();
 
 	private double lastFrameVelocity = 0.0;
 
@@ -152,6 +156,21 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	public double getPositionRad() {
 		return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+	}
+
+	public java.util.function.Supplier<Transform3d> getCameraLocationSupplier() {
+		return () -> {
+			double turretAngle = getPositionRad();
+			Translation3d translation = new Translation3d(
+					VisionConstants.TURRET_CAMERA_X_OFFSET,
+					VisionConstants.TURRET_CAMERA_Y_OFFSET,
+					VisionConstants.TURRET_CAMERA_Z_OFFSET);
+			Rotation3d rotation = new Rotation3d(
+					0,
+					VisionConstants.TURRET_CAMERA_PITCH,
+					turretAngle + VisionConstants.TURRET_CAMERA_ROLL);
+			return new Transform3d(translation, rotation);
+		};
 	}
 
 	/* ---------------- Periodic ---------------- */

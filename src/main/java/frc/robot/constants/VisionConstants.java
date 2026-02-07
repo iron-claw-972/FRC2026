@@ -177,4 +177,11 @@ public class VisionConstants {
     public static final String[] ORANGEPI_HOSTNAMES = {"photonvision.local"};
     public static final String ORANGEPI_USERNAME = "pi";
     public static final String ORANGEPI_PASSWORD = "raspberry";
+
+    public static final String TURRET_CAMERA_NAME = "TurretCamera";
+    public static final double TURRET_CAMERA_X_OFFSET = 0.0;
+    public static final double TURRET_CAMERA_Y_OFFSET = 0.0;
+    public static final double TURRET_CAMERA_Z_OFFSET = 0.0;
+    public static final double TURRET_CAMERA_PITCH = 0.0;
+    public static final double TURRET_CAMERA_ROLL = 0.0;
 }
