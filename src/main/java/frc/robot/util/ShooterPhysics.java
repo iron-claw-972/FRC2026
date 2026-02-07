@@ -185,11 +185,14 @@ public class ShooterPhysics {
 
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
+		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:" + tolerance);
 		// trying to calculate a shot for height=0 returns NaN
-		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
+		double effectiveMinHeight = Math.max(target.getZ(), 0.001);
 
 		// guess a peak height
-		double guess = target.getZ() + 2;
+		double guess = effectiveMinHeight + 5;
+		double lastDerivative = Double.NaN;
+		double lastGuess = Double.NaN;
 		int maxIters = 50;
 		while (maxIters >= 0) {
 			maxIters--;
@@ -201,9 +204,8 @@ public class ShooterPhysics {
 
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
 			Translation3d guessVelocityMore = getRequiredExitVelocity(initialVelocity, target, guess + 0.1);
+
 			double derivative = (guessVelocityMore.getNorm() - guessVelocity.getNorm()) / 0.1;
-			// System.out.println(guess + "\t\t" + guessVelocity.getNorm() + "\t\t" +
-			// derivative);
 
 			// we've already hit minimum height and are trying to go lower
 			if (guess <= effectiveMinHeight && derivative > 0)
@@ -212,8 +214,21 @@ public class ShooterPhysics {
 			if (Math.abs(derivative) <= tolerance)
 				return cvtShot(guessVelocity, guess);
 
-			// desmos guesstimation indicates this works quite well
-			guess -= derivative * (Math.pow(guess, 2) + 1) / 10;
+			double secondDerivative;
+			if (Double.isNaN(lastDerivative) || Double.isNaN(lastGuess))
+				secondDerivative = 0;
+			else
+				secondDerivative = (lastDerivative - derivative) / (lastGuess - guess);
+
+			assert Double.isFinite(secondDerivative);
+			lastGuess = guess;
+			lastDerivative = derivative;
+
+			// System.out.println(guess + "\t\t" + "\t\t" + derivative + "\t\t" + secondDerivative);
+			if (secondDerivative == 0)
+				guess -= derivative * 2;
+			else
+				guess -= derivative / Math.abs(secondDerivative);
 		}
 
 		throw new RuntimeException("Failed to compute a trajectory for a minimum speed.");

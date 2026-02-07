@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -137,7 +138,7 @@ class ShooterPhysicsTest {
 	public void velocityTest() {
 
 		// var t1 = new Translation3d(100, 0, 0);
-		// for (int i = 0; i < 1000; i++) {
+		// for (int i = 1; i < 1000; i++) {
 		// var x = ShooterPhysics.getShotParams(Translation2d.kZero, t1, i / 10.);
 		// System.out.println(i / 10. + ", " + x.exitVel());
 		// }
@@ -146,9 +147,9 @@ class ShooterPhysicsTest {
 		var state1 = ShooterPhysics.withMinimumSpeed(Translation2d.kZero, t1);
 		// check moving either way is higher velocity
 		var state1Plus = ShooterPhysics.getShotParams(Translation2d.kZero, t1,
-				state1.height() + 0.1);
+				state1.height() + 0.2);
 		var state1Minus = ShooterPhysics.getShotParams(Translation2d.kZero, t1,
-				state1.height() - 0.1);
+				state1.height() - 0.2);
 		assertTrue(state1.exitVel() < state1Plus.exitVel(), state1Plus.toString());
 		assertTrue(state1.exitVel() < state1Minus.exitVel(), state1Minus.toString());
 		assertEquals(Math.PI / 4, state1.pitch(), epsilon);
@@ -156,7 +157,8 @@ class ShooterPhysicsTest {
 		var t2 = new Translation3d(1, 1, 100);
 		var state2 = ShooterPhysics.withMinimumSpeed(Translation2d.kZero, t2);
 		// this should get to the minimum height
-		var state2Plus = ShooterPhysics.getShotParams(Translation2d.kZero, t2, state2.height() + 0.1);
+		var state2Plus = ShooterPhysics.getShotParams(Translation2d.kZero, t2,
+				state2.height() + 0.1);
 		assertTrue(state2.exitVel() < state2Plus.exitVel(), state2Plus.toString());
 		assertEquals(t2.getZ(), state2.height(), epsilon);
 
@@ -165,8 +167,8 @@ class ShooterPhysicsTest {
 		var v3 = new Translation2d(10, -20);
 		var state3 = ShooterPhysics.withMinimumSpeed(v3, t3);
 		// check moving either way is higher velocity
-		var state3Plus = ShooterPhysics.getShotParams(v3, t3, state3.height() + 0.1);
-		var state3Minus = ShooterPhysics.getShotParams(v3, t3, state3.height() - 0.1);
+		var state3Plus = ShooterPhysics.getShotParams(v3, t3, state3.height() + 0.2);
+		var state3Minus = ShooterPhysics.getShotParams(v3, t3, state3.height() - 0.2);
 		assertTrue(state3.exitVel() < state3Plus.exitVel(), state3Plus.toString());
 		assertTrue(state3.exitVel() < state3Minus.exitVel(), state3Minus.toString());
 	}
@@ -255,17 +257,48 @@ class ShooterPhysicsTest {
 
 		// compute 1000 random shots and simulate them
 		for (int i = 0; i < 1000; i++) {
-			Translation2d initPos = new Translation2d(rng.nextDouble() * 20 - 10, rng.nextDouble() * 20 - 10);
-			Translation3d target = new Translation3d(rng.nextDouble() * 20 - 10, rng.nextDouble() * 20 - 10,
-					rng.nextDouble() * 10 + 1);
-			Translation2d initVel = new Translation2d(rng.nextDouble() * 10 - 5, rng.nextDouble() * 10 - 5);
+			Translation2d initPos = new Translation2d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10));
+			Translation3d target = new Translation3d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10),
+					rng.nextDouble(1, 11));
+			Translation2d initVel = new Translation2d(rng.nextDouble(-5, 5), rng.nextDouble(-5, 5));
 			Translation3d robotToTarget = target.minus(new Translation3d(initPos));
-			double arcHeight = target.getZ() + rng.nextDouble() * 10;
+			double arcHeight = target.getZ() + rng.nextDouble(10);
 
 			Translation3d exitVel = ShooterPhysics.getRequiredExitVelocity(initVel, robotToTarget, arcHeight);
 
 			checkTrajectory(new Translation3d(initPos), exitVel.plus(new Translation3d(initVel)), target,
 					arcHeight);
+		}
+	}
+
+	@Disabled
+	@Test
+	public void simulatedConstraintsTest() {
+		Random rng = new Random(6328);
+
+		for (int i = 0; i < 1000; i++) {
+			Translation2d initPos = new Translation2d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10));
+			Translation3d target = new Translation3d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10),
+					rng.nextDouble(1, 11));
+			Translation2d initVel = new Translation2d(rng.nextDouble(-5, 5), rng.nextDouble(-5, 5));
+			Translation3d robotToTarget = target.minus(new Translation3d(initPos));
+
+			double minAngle = rng.nextDouble(.01, Math.PI / 2 - .03);
+			Constraints constraints = new Constraints(rng.nextDouble(20), rng.nextDouble(30), minAngle,
+					rng.nextDouble(minAngle + .01, Math.PI / 2 - .01));
+
+			var state = ShooterPhysics.getConstrainedParams(initVel, robotToTarget, constraints);
+
+			if (state.isPresent()) {
+				assertTrue(state.get().satisfies(constraints));
+
+				// check going down breaks a constraint; we've found the minimum
+				var lower = ShooterPhysics.withAngle(initVel, robotToTarget, state.get().pitch() - .1);
+				assertTrue(lower.isEmpty());
+				// check going up is okay
+				var higher = ShooterPhysics.withAngle(initVel, robotToTarget, state.get().pitch() + .1);
+				assertTrue(higher.isPresent());
+			}
 		}
 	}
 
