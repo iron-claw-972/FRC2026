@@ -28,7 +28,7 @@ import frc.robot.constants.IdConstants;
 
 public class Hood extends SubsystemBase {
     TalonFX motor = new TalonFX(IdConstants.HOOD_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-    double gearRatio = 67/1;
+    double gearRatio = HoodConstants.HOOD_GEAR_RATIO;
 
     private double position;
     private double velocity;
