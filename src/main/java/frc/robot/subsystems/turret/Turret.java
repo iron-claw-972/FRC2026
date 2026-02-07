@@ -235,7 +235,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 			motor.setVoltage(voltage);
 		// }
-		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
+		// lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
 		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
