@@ -27,6 +27,8 @@ public class LinearClimb {
     private double kI = 0.0;
     private double kD = 0.0;  
 
+    private double resistance = -0.1;
+
     private final DCMotor motorConstant = DCMotor.getKrakenX44(1);
     
     private double gearRatio = ClimbConstants.CLIMB_GEAR_RATIO;
@@ -34,6 +36,7 @@ public class LinearClimb {
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(0) * gearRatio); // gear ratio
 
     // ElevatorFeedforward feedforward = new ElevatorFeedforward(0, (((DriveConstants.ROBOT_MASS * Constants.GRAVITY_ACCELERATION * ClimbConstants.RADIUS) / gearRatio) / motorConstant.KtNMPerAmp) * motorConstant.rOhms, 0, 0);
+    ElevatorFeedforward feedforward = new ElevatorFeedforward(0, resistance, 0, 0);
 
     public LinearClimb() {
         motor = new TalonFX(IdConstants.CLIMB_ID, Constants.RIO_CAN);
@@ -68,8 +71,7 @@ public class LinearClimb {
 
         rotationalSetpoint = (setpoint / (2 * Math.PI * ClimbConstants.RADIUS)) * gearRatio;
 
-        // motor.setControl(voltageRequest.withPosition(rotationalSetpoint).withFeedForward(feedforward.calculate(0)));
-        motor.setControl(voltageRequest.withPosition(rotationalSetpoint));
+        motor.setControl(voltageRequest.withPosition(rotationalSetpoint).withFeedForward(feedforward.calculate(0)));
     }
 
     public boolean atSetPoint(){
