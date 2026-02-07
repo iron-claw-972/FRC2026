@@ -4,7 +4,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -16,7 +15,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -30,9 +28,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.constants.VisionConstants;
 
-public class Turret extends SubsystemBase implements TurretIO{
+public class Turret extends SubsystemBase implements TurretIO {
 
 	/* ---------------- Constants ---------------- */
 
@@ -47,11 +44,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
 
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
-	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
+	// private static final PIDController longVelocityPID = new PIDController(15, 0,
+	// 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
-
-    private final TurretIOInputs inputs = new TurretIOInputs();
+	private final TurretIOInputs inputs = new TurretIOInputs();
 
 	/* ---------------- Hardware ---------------- */
 
@@ -73,7 +70,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
 
-    // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
+	// private final MotionMagicVelocityVoltage velocityRequest = new
+	// MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
 	/* ---------------- Gains ---------------- */
 
@@ -87,9 +85,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
-    // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
-
+	// private final SimpleMotorFeedforward feedForward = new
+	// SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt,
+	// 0.010);
+	private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1,
+			1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
 
 	/* ---------------- Constructor ---------------- */
 
@@ -103,9 +103,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
-        motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
-        motor.getConfigurator().apply(config);
+		motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
+		motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
+		motor.getConfigurator().apply(config);
 
 		motor.getConfigurator().apply(
 				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
@@ -114,7 +114,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 					}
 				});
 
-		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC, feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO), goalVelocityRadPerSec))))
+		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC,
+		// feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO),
+		// goalVelocityRadPerSec))))
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
@@ -150,19 +152,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 		return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 	}
 
-	public java.util.function.Supplier<Transform3d> getCameraLocationSupplier() {
-		return () -> {
-			double turretAngle = getPositionRad();
-			Translation3d translation = new Translation3d(
-					VisionConstants.TURRET_CAMERA_X_OFFSET,
-					VisionConstants.TURRET_CAMERA_Y_OFFSET,
-					VisionConstants.TURRET_CAMERA_Z_OFFSET);
-			Rotation3d rotation = new Rotation3d(
-					0,
-					VisionConstants.TURRET_CAMERA_PITCH,
-					turretAngle + VisionConstants.TURRET_CAMERA_ROLL);
-			return new Transform3d(translation, rotation);
-		};
+	// currently ignores time
+	public Transform3d cameraLocationAtTime(double t) {
+		double turretAngle = getPositionRad();
+		Rotation3d asRot = new Rotation3d(0, 0, turretAngle);
+		return new Transform3d(TurretConstants.TURRET_TO_CENTER_OF_ROBOT.unaryMinus(), Rotation3d.kZero)
+				.plus(new Transform3d(TurretConstants.CAMERA_TO_CENTER_OF_TURRET.unaryMinus().rotateBy(asRot),
+						TurretConstants.CAMERA_ROTATION.rotateBy(asRot)));
 	}
 
 	/* ---------------- Periodic ---------------- */
@@ -170,7 +166,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	@Override
 	public void periodic() {
 		updateInputs();
-		
+
 		double robotRelativeGoal = goalAngle.getRadians();
 
 		// --- MA-style continuous wrap selection ---
@@ -207,48 +203,55 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		double targetVelocity;
 
-		// if(Math.abs(setpoint.position * GEAR_RATIO - Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) > Math.PI/2){
-		// 	// in rad/sec
-		// 	targetVelocity = longVelocityPID.calculate(
-		// 			motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-		// 			setpoint.position * GEAR_RATIO);
-			
-		// 	targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		// if(Math.abs(setpoint.position * GEAR_RATIO -
+		// Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) >
+		// Math.PI/2){
+		// // in rad/sec
+		// targetVelocity = longVelocityPID.calculate(
+		// motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
+		// setpoint.position * GEAR_RATIO);
 
-		// 	double voltage = feedForward.calculate(targetVelocity);
-		// 	motor.setVoltage(voltage);
+		// targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+
+		// double voltage = feedForward.calculate(targetVelocity);
+		// motor.setVoltage(voltage);
 		// } else{
-			// in rad/sec
-			//double robotRotAcceleration = (Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) - lastFrameVelocity) / Constants.LOOP_TIME;
-			double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
+		// in rad/sec
+		// double robotRotAcceleration =
+		// (Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) -
+		// lastFrameVelocity) / Constants.LOOP_TIME;
+		double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
 
-			targetVelocity = positionPID.calculate(
-					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-					motorSetpointPosition);
-			
-			targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		targetVelocity = positionPID.calculate(
+				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
+				motorSetpointPosition);
 
-			double voltage = feedForward.calculate(targetVelocity);
+		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
 
-			double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-			voltage += velocityCorrectionVoltage;
+		double voltage = feedForward.calculate(targetVelocity);
 
-			motor.setVoltage(voltage);
+		double velocityCorrectionVoltage = velocityPID
+				.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
+		voltage += velocityCorrectionVoltage;
+
+		motor.setVoltage(voltage);
 		// }
-		// lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
+		// lastFrameVelocity =
+		// Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
-		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
-        Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+		// var request =
+		// velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
+		Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
 
 		// --- Position + velocity feedforward (MA-style) ---
 		// motor.setControl(request);
-        // motor.clearStickyFaults();
+		// motor.clearStickyFaults();
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-        SmartDashboard.putData(positionPID);
+		SmartDashboard.putData(positionPID);
 		SmartDashboard.putData(velocityPID);
 		SmartDashboard.putNumber("Turret GoalDeg",
 				Units.radiansToDegrees(best));
@@ -259,7 +262,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 				Units.radiansToDegrees(motorPosRot));
 		SmartDashboard.putNumber("Turret motorVelRotPerSec",
 				Units.radiansToDegrees(motorVelRotPerSec));
-        SmartDashboard.putNumber("Turret targetVelocity",
+		SmartDashboard.putNumber("Turret targetVelocity",
 				Units.radiansToDegrees(targetVelocity));
 		SmartDashboard.putNumber("Turret Position Deg",
 				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);

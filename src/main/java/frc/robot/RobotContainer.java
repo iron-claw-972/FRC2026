@@ -64,7 +64,6 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    climb = new Climb();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:

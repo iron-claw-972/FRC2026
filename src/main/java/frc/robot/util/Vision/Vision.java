@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Function;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
@@ -60,7 +61,7 @@ public class Vision {
   /**
    * Creates a new instance of Vision and sets up the cameras and field layout
    */
-  public Vision(ArrayList<Pair<String, Transform3d>> camList) {
+  public Vision(ArrayList<Pair<String, Function<Double, Transform3d>>> camList) {
     // Initialize object_detection NetworkTable
     objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
 
@@ -421,6 +422,7 @@ public class Vision {
   }
   
   private class VisionCamera implements VisionIO {
+	  private Function<Double, Transform3d> robotToCam;
     private PhotonCamera camera;
     private PhotonPoseEstimator photonPoseEstimator;
     private Pose2d lastPose;
@@ -433,11 +435,12 @@ public class Vision {
      * @param cameraName The name of the camera on PhotonVision
      * @param robotToCam The transformation from the robot to the camera
      */
-    public VisionCamera(String cameraName, Transform3d robotToCam) {
+    public VisionCamera(String cameraName, Function<Double, Transform3d> robotToCam) {
       camera = new PhotonCamera(cameraName);
+	  this.robotToCam = robotToCam;
       photonPoseEstimator = new PhotonPoseEstimator(
         FieldConstants.field, 
-        robotToCam
+		robotToCam.apply(Timer.getTimestamp())
       );
       lastPose = null;
     }
@@ -450,6 +453,7 @@ public class Vision {
     public ArrayList<EstimatedRobotPose> getEstimatedPose(Pose2d referencePose) {
 
       ArrayList<EstimatedRobotPose> list = new ArrayList<>();
+	  photonPoseEstimator.setRobotToCameraTransform(robotToCam.apply(Timer.getTimestamp()));
 
       if(!enabled){
         return list;

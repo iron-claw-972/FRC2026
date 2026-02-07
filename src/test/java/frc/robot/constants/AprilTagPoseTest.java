@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class AprilTagPoseTest {
   public void testTagPoses() {
     // Construct the vision instance
     //   makes the field layout
-    Vision vision = new Vision(new ArrayList<Pair<String, Transform3d>>());
+    Vision vision = new Vision(new ArrayList<Pair<String, Function<Double, Transform3d>>>());
 
     // we should have 32 tags
     assertEquals(32, FieldConstants.field.getTags().size());
