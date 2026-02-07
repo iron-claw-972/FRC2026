@@ -237,6 +237,11 @@ class ShooterPhysicsTest {
 		var val2 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(10, 10, 3), constraints2);
 		assertTrue(val2.isPresent());
 		assertEquals(45, Units.radiansToDegrees(val2.get().pitch()), .1);
+
+		// something impossible
+		Constraints constraints3 = new Constraints(3, 3, Units.degreesToRadians(45), Math.PI / 2 - .1);
+		var val3 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(10, 10, 3), constraints3);
+		assertTrue(val3.isEmpty(), val3.toString());
 	}
 
 	// test using a simple physics simulation

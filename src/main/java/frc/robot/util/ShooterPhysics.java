@@ -66,6 +66,8 @@ public class ShooterPhysics {
 		// now we need to satisfy the speed constraint
 
 		TurretState withMinSpeed = withMinimumSpeed(robotVelocity, robotToTarget);
+		if (withMinSpeed.exitVel() > constraints.maxVel())
+			return Optional.empty();
 		// ordered such that the first element is valid and the second is not
 		Pair<TurretState, TurretState> newRange;
 
