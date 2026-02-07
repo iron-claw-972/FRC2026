@@ -8,8 +8,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.fasterxml.jackson.databind.ser.std.InetAddressSerializer;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -30,6 +33,9 @@ public class Intake extends SubsystemBase {
     private TalonFX rollerMotor; 
     private TalonFX rightMotor; //leader
     private TalonFX leftMotor; //invert this one
+    private double maxVelocity;
+    private double maxAcceleration;
+    private DCMotorSim intakeSim;
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
@@ -37,6 +43,7 @@ public class Intake extends SubsystemBase {
         rightMotor = new TalonFX(IntakeConstants.rightID);
         leftMotor = new TalonFX(IntakeConstants.leftID);
         rollerMotor = new TalonFX(IntakeConstants.rollerID); 
+        DCMotor dcmotor = DCMotor.getKrakenX44(2);
 
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
@@ -49,6 +56,17 @@ public class Intake extends SubsystemBase {
         slot0Configs.kV = 0;
         slot0Configs.kA = 0;
 
+
+        var currentLimits = Config.CurrentLimits;
+        currentLimits.StatorCurrentLimitEnable = true;
+        currentLimits.StatorCurrentLimit = IntakeConstants.statorLimitAmps;
+        currentLimits.SupplyCurrentLimitEnable = true;
+        currentLimits.SupplyCurrentLimit = IntakeConstants.supplyLimitAmps;
+
+        var motionMagicConfigs = Config.MotionMagic;
+
+        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radius/Math.PI/2;
+        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radius/Math.PI/2;
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         rightMotor.getConfigurator().apply(Config);
 
@@ -76,7 +94,7 @@ public class Intake extends SubsystemBase {
 
         // report the position of the extension
         double percentExtended = getPosition() / IntakeConstants.kMaxRotations;
-
+        double distance = percentExtended/IntakeConstants.gearRatio * 1/IntakeConstants.rackPitch; // in inches
         percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
 
         // robotExtension.setLength(percentExtended * maxExtension);
@@ -85,6 +103,17 @@ public class Intake extends SubsystemBase {
 
     public void simulationPeriodic(){
         // simulate the motor activity
+        double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
+        intakeSim.setInputVoltage(voltage);
+        intakeSim.update(0.02);
+        // rackPitch in teeth/inch
+        double mechanicalRotation = intakeSim.getAngularPositionRotations();
+        double motorRotation = mechanicalRotation * IntakeConstants.gearRatio; 
+        //convert motor rotation to distance
+      
+
+
+
     }
 
     /**
@@ -99,7 +128,7 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * gets the position in rotations
+     * gets motor position in inches
      */
     public double getPosition(){
         double position = rightMotor.getPosition().getValueAsDouble();
@@ -107,7 +136,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void spin(double speed) {
-        rollerMotor.set(0.2);
+        rollerMotor.set(IntakeConstants.speed);
     }
 
     public void extend() {
