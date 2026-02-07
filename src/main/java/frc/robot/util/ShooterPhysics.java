@@ -44,11 +44,11 @@ public class ShooterPhysics {
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			Constraints constraints) {
 		// establish a lower bound
-		double minHeight = Math.max(robotToTarget.getZ(), constraints.height());
+		double minHeight = Math.max(Math.max(robotToTarget.getZ(), constraints.height()), 0.01);
 		Optional<TurretState> withMinPitch = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
-		if (withMinPitch.isPresent()) {
-			minHeight = Math.min(minHeight, withMinPitch.get().height());
-		}
+		if (withMinPitch.isPresent())
+			minHeight = Math.max(minHeight, withMinPitch.get().height());
+
 		TurretState withMinHeight = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, minHeight),
 				minHeight);
 		if (withMinHeight.satisfies(constraints))
@@ -162,7 +162,8 @@ public class ShooterPhysics {
 
 		// this is not equivalent to t <= 0 because of NaNs
 		if (!(t > 0))
-			throw new RuntimeException("Time should never be negative (got t=" + t + ").");
+			throw new RuntimeException("Time should never be negative (got t=" + t + " with target: " + target
+					+ " and peakZ: " + peakZ + ").");
 
 		// calculate x and z exit_vel
 		// x = (v_x_robot + v_x_exit_vel) * t
@@ -223,33 +224,53 @@ public class ShooterPhysics {
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
-		// guess a peak height
-		double guess = target.getZ() + 2;
+		if (pitch <= 0 || pitch >= Math.PI / 2)
+			throw new IllegalArgumentException("Pitch must be in the range 0 < pitch < pi/2 (got: " + pitch + ").");
+
+		// System.out.println(
+		// "Solving for pitch=" + pitch + " with target=" + target + " and
+		// initialVelocity=" + initialVelocity);
+
+		// trying to calculate a shot for height=0 returns NaN
+		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
+
+		TurretState first = cvtShot(getRequiredExitVelocity(initialVelocity, target, effectiveMinHeight),
+				effectiveMinHeight);
+		// if a shot requires going up a kilometer, it's probably not doable
+		TurretState second = cvtShot(getRequiredExitVelocity(initialVelocity, target, 1000.), 1000.);
+
+		if (first.pitch() > pitch + tolerance)
+			return Optional.empty();
+		else if (second.pitch() < pitch)
+			return Optional.of(second); // it's close enough
+
 		int maxIters = 50;
+		var range = new Pair<TurretState, TurretState>(first, second);
 		while (maxIters >= 0) {
 			maxIters--;
+			assert range.getSecond().height() > range.getFirst().height();
 
-			// this will throw an exception, so avoid it
-			// we still might have just overshot, so keep checking
-			if (guess < target.getZ())
-				guess = target.getZ();
+			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
+			TurretState guess = cvtShot(getRequiredExitVelocity(initialVelocity, target, guessHeight), guessHeight);
 
-			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
-			TurretState polar = cvtShot(guessVelocity, guess);
-			double difference = pitch - polar.pitch();
-			// System.out.println(guess + "\t\t" + guessVelocity + "\t\t" + polar.pitch() +
-			// "\t\t" + difference);
+			// System.out.println(range + "\t\tguess=" + guess);
 
-			// we've already hit minimum height and are trying to go lower
-			if (guess <= target.getZ() && difference < 0)
-				return Optional.empty();
+			if (range.getSecond().pitch() - range.getFirst().pitch() <= tolerance) {
+				// we've found a valid angle
+				if (Math.abs(guess.pitch() - pitch) <= tolerance)
+					return Optional.of(guess);
+				// we've narrowed the range but haven't found a valid angle
+				// should be covered by the checks before the loop
+				assert false;
+			}
 
-			if (Math.abs(difference) <= tolerance)
-				return Optional.of(polar);
-
-			guess += difference * 10;
+			if (guess.pitch() > pitch)
+				range = new Pair<TurretState, TurretState>(range.getFirst(), guess);
+			else
+				range = new Pair<TurretState, TurretState>(guess, range.getSecond());
 		}
 
-		throw new RuntimeException("Solving for angle did not converge.");
+		throw new RuntimeException("Solving for angle did not converge (velocity: " + initialVelocity + ", target: "
+				+ target + ", pitch: " + pitch + ", tolerance: " + tolerance + ").");
 	}
 }

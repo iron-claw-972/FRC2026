@@ -174,13 +174,13 @@ class ShooterPhysicsTest {
 	@Test
 	public void angleTest() {
 
-		// var t1 = new Translation3d(1, 2, 3);
+		// var t1 = new Translation3d(10, 10, 3);
 		// for (int i = 31; i < 1000; i++) {
 		// var x = ShooterPhysics.getShotParams(Translation2d.kZero, t1, i / 10.);
 		// System.out.println(i / 10. + ", " + x.pitch());
 		// }
 
-		var t1 = new Translation3d(100, 0, 0);
+		var t1 = new Translation3d(10, 0, 0);
 		var state1 = ShooterPhysics.withAngle(Translation2d.kZero, t1,
 				Units.degreesToRadians(30));
 		assertTrue(state1.isPresent());
@@ -192,7 +192,7 @@ class ShooterPhysicsTest {
 				state1.get());
 		checkTrajectory(Translation3d.kZero, v1, t1, state1.get().height());
 
-		var t2 = new Translation3d(1, -1, 100);
+		var t2 = new Translation3d(1, -1, 10);
 		var state2 = ShooterPhysics.withAngle(Translation2d.kZero, t2,
 				Units.degreesToRadians(60));
 		assertTrue(state2.isEmpty());
@@ -210,12 +210,20 @@ class ShooterPhysicsTest {
 				state3.get());
 		checkTrajectory(Translation3d.kZero, v3.plus(new Translation3d(iv3)), t3,
 				state3.get().height());
+
+		// just check this converges
+		var state4 = ShooterPhysics.withAngle(Translation2d.kZero, new Translation3d(10, 10, 3), Math.PI / 2 - 0.01);
+		assertTrue(state4.isPresent());
+		assertEquals(state4.get().pitch(), Math.PI / 2 - 0.01, epsilon);
+		var state5 = ShooterPhysics.withAngle(Translation2d.kZero, new Translation3d(10, -10, 0), 0.01);
+		assertTrue(state5.isPresent());
+		assertEquals(state5.get().pitch(), 0.01, epsilon);
 	}
 
 	@Test
 	public void simpleConstraintsTest() {
 		// a test where the optimal shot is just plain height
-		Constraints constraints1 = new Constraints(3, 20, .1, Math.PI - .1);
+		Constraints constraints1 = new Constraints(3, 20, .1, Math.PI / 2 - .1);
 		var val1 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(1, 2, 3), constraints1);
 		assertTrue(val1.isPresent());
 		var direct1 = ShooterPhysics.getShotParams(Translation2d.kZero, new Translation3d(1, 2, 3),
@@ -224,10 +232,11 @@ class ShooterPhysicsTest {
 		assertEquals(direct1.yaw().getRadians(), val1.get().yaw().getRadians(), epsilon);
 		assertEquals(direct1.exitVel(), val1.get().exitVel(), epsilon);
 
-		Constraints constraints2 = new Constraints(3, 20, Units.degreesToRadians(45), Math.PI - .2);
-		var val2 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(2, 2, 3), constraints2);
+		// optimal is the minimum angle
+		Constraints constraints2 = new Constraints(3, 30, Units.degreesToRadians(45), Math.PI / 2 - .1);
+		var val2 = ShooterPhysics.getConstrainedParams(Translation2d.kZero, new Translation3d(10, 10, 3), constraints2);
 		assertTrue(val2.isPresent());
-		assertEquals(Units.degreesToRadians(45), val2.get().pitch(), epsilon);
+		assertEquals(45, Units.radiansToDegrees(val2.get().pitch()), .1);
 	}
 
 	// test using a simple physics simulation
