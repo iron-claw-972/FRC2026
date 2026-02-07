@@ -51,7 +51,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private boolean lastTorqueCurrentControl = false;
 
     public enum FlywheelPhase {
-        MAX,
+        BANG_BANG,
         CONSTANT_TORQUE,
         START_UP
     }    
@@ -90,11 +90,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public void periodic(){
         updateInputs();
-        //updatePhase();
+        runVelocity(Units.rotationsToRadians(getShooterVelcoity()));
         SmartDashboard.putNumber("Shot Power", shooterPower);
         shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
-        if (phase == FlywheelPhase.MAX) { // shooter target speed is in RPS
+        if (phase == FlywheelPhase.BANG_BANG) { // shooter target speed is in RPS
             // Duty-cycle bang-bang (apply to both)
             shooterMotorLeft.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // spin as fast as possible shooter target speed
             shooterMotorRight.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // same here
@@ -106,14 +106,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         // shooterMotorLeft.set(-shooterPower);
         // shooterMotorRight.set(-shooterPower);
-    }
-
-    public void updatePhase() {
-        if (Math.abs(shooterMotorLeft.getVelocity().getValueAsDouble() - shooterTargetSpeed) < ShooterConstants.TORQUE_CURRENT_CONTROL_TOLERANCE) {
-            phase = FlywheelPhase.MAX; // we need to recover from ball velocity in order to be back to idle
-        } else {
-            phase = FlywheelPhase.CONSTANT_TORQUE;                                                             
-        }
     }
 
     /** Run closed loop at the specified velocity. */
@@ -129,11 +121,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         }
         lastTorqueCurrentControl = torqueCurrentControl;
 
-        outputs.mode =
+        phase =
             torqueCurrentControl
-                ? FlywheelIOOutputMode.TORQUE_CURRENT_BANG_BANG
-                : FlywheelIOOutputMode.DUTY_CYCLE_BANG_BANG;
-        outputs.velocityRadsPerSec = velocityRadsPerSec;
+                ? FlywheelPhase.BANG_BANG
+                : FlywheelPhase.CONSTANT_TORQUE;
+        shooterTargetSpeed = Units.radiansToRotations(velocityRadsPerSec);
         Logger.recordOutput("Shooter/Setpoint", velocityRadsPerSec);
     }
 
