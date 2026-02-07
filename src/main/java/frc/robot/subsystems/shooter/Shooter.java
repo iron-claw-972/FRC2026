@@ -42,6 +42,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     // for tracking current phase: used to adjust the setting
     private FlywheelPhase phase;
 
+    public enum FlywheelPhase {
+        MAX,
+        CONSTANT_TORQUE,
+        START_UP
+    }    
+
     public Shooter(){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 676767.0; //tune p value
