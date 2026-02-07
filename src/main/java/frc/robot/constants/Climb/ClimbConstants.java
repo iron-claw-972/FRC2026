@@ -9,5 +9,5 @@ public class ClimbConstants {
     public final static double MIN_HEIGHT = 0;
     public final static double MAX_HEIGHT = 1;
     public final static double RADIUS = 1;
-    public final static double CLIMB_HEIGHT = 1;
+    public final static double CLIMB_HEIGHT = 0.5;
 }
