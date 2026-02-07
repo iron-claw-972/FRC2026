@@ -52,7 +52,6 @@ public class RobotContainer {
   private Vision vision = null;
   private Turret turret = null;
   private Shooter shooter = null;
-  private Climb climb = null;
   private Command auto = new DoNothing();
 
   // Controllers are defined here

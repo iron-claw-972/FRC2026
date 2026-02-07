@@ -4,12 +4,8 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -35,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.VisionConstants;
-import frc.robot.constants.swerve.DriveConstants;
 
 public class Turret extends SubsystemBase implements TurretIO{
 
@@ -57,8 +52,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 
     private final TurretIOInputs inputs = new TurretIOInputs();
-
-	private double lastFrameVelocity = 0.0;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -96,7 +89,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
-	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 
 	/* ---------------- Constructor ---------------- */

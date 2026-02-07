@@ -7,7 +7,9 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constants.VisionConstants;
 
@@ -19,11 +21,11 @@ public class TurretVision {
     public TurretVision(String cameraName) {
         camera = new PhotonCamera(cameraName);
         cameraLocationSupplier = () -> new Transform3d(
-            new edu.wpi.first.math.geometry.Translation3d(
+            new Translation3d(
                 VisionConstants.TURRET_CAMERA_X_OFFSET,
                 VisionConstants.TURRET_CAMERA_Y_OFFSET,
                 VisionConstants.TURRET_CAMERA_Z_OFFSET),
-            new edu.wpi.first.math.geometry.Rotation3d(0, VisionConstants.TURRET_CAMERA_PITCH, VisionConstants.TURRET_CAMERA_ROLL));
+            new Rotation3d(0, VisionConstants.TURRET_CAMERA_PITCH, VisionConstants.TURRET_CAMERA_ROLL));
     }
 
     public TurretVision(String cameraName, Supplier<Transform3d> cameraLocationSupplier) {
