@@ -25,13 +25,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.RIO_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.RIO_CAN);
 
-    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.RIO_CAN);
-
     //rotations/sec
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
-    private double feederPower = 0;
 
     public double shooterPower = 1.0;
     //Velocity in rotations per second
@@ -72,11 +69,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
-        feederMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
-        );
-
         // set start up for phase initially:
         phase = FlywheelPhase.START_UP;
 
@@ -104,7 +96,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         // shooterMotorLeft.set(-shooterPower);
         // shooterMotorRight.set(-shooterPower);
-        feederMotor.set(feederPower);
     }
 
     public void updatePhase() {
@@ -122,7 +113,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
     public void setFeeder(double power){
         System.out.println("VELOCITY: " + getShooterVelcoity()); 
-        feederPower = power;
     }
 
     public void setShooter(double velocityRPS) {
@@ -145,9 +135,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     public void updateInputs() {
         inputs.leftShooterVelocity = shooterMotorLeft.getVelocity().getValueAsDouble();
         inputs.rightShooterVelocity = shooterMotorRight.getVelocity().getValueAsDouble();
-        inputs.feederVelocity = feederMotor.getVelocity().getValueAsDouble();
         inputs.leftShooterCurrent = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
         inputs.rightShooterVelocity = shooterMotorRight.getStatorCurrent().getValueAsDouble();
-        inputs.feederVelocity = feederMotor.getStatorCurrent().getValueAsDouble();
     }
 }
