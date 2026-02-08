@@ -1,6 +1,8 @@
 package frc.robot.subsystems.turret;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 
 public class TurretConstants {
     public static double MAX_ANGLE = 180;
@@ -21,4 +23,7 @@ public class TurretConstants {
 
     public static double LEFT_ENCODER_OFFSET = 0; // degrees
     public static double RIGHT_ENCODER_OFFSET = 0; // degrees
+
+    public static Translation2d DISTANCE_FROM_ROBOT_CENTER = new Translation2d(0,0);
+
 }

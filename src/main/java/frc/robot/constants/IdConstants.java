@@ -23,8 +23,8 @@ public class IdConstants {
     public static final int TURRET_MOTOR_ID = 20;
 
     // Shooter
-    public static final int SHOOTER_LEFT_ID = 22;
-    public static final int SHOOTER_RIGHT_ID = 23;
+    public static final int SHOOTER_LEFT_ID = 10;
+    public static final int SHOOTER_RIGHT_ID =4;
     public static final int FEEDER_ID = 21;
 
     // Climb
@@ -32,5 +32,5 @@ public class IdConstants {
     public static final int CLIMB_MOTOR_RIGHT = 49;
 
     // Hood
-    public static final int HOOD_ID = 50;
+    public static final int HOOD_ID = 11;
 }

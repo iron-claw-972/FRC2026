@@ -33,6 +33,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -52,6 +53,7 @@ public class RobotContainer {
   private Vision vision = null;
   private Turret turret = null;
   private Shooter shooter = null;
+  private Hood hood = null;
   private Climb climb = null;
   private Command auto = new DoNothing();
 
@@ -65,7 +67,7 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    climb = new Climb();
+    // climb = new Climb();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -84,12 +86,11 @@ public class RobotContainer {
       case Vivace:
       case Phil:
       case Vertigo:
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        turret = new Turret();
+        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         shooter = new Shooter();
-
+        hood = new Hood();
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
@@ -123,7 +124,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    SmartDashboard.putData("Aim at thingy", new AimAtPose(drive, turret, new Pose2d(FieldConstants.field.getTagPose(26).get().getTranslation().toTranslation2d(), Rotation2d.kZero)));
+    //SmartDashboard.putData("Aim at thingy", new AimAtPose(drive, turret, new Pose2d(FieldConstants.field.getTagPose(26).get().getTranslation().toTranslation2d(), Rotation2d.kZero)));
   }
 
   /**
