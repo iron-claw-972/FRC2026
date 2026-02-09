@@ -36,4 +36,9 @@ public class IdConstants {
 
     // Spindexer
     public static final int SPINDEXER_ID = 12;
+
+    // Intake
+    public static final int INTAKE_BASE_ID = 13;
+    public static final int INTAKE_FLYWHEEL_ID = 14;
+    public static final int INTAKE_ENCODER_ID = 2;
 }

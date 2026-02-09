@@ -8,7 +8,6 @@ public interface IntakeIO {
         public double measuredAngle = IntakeConstants.START_ANGLE;
         public double currentAmps = 0.0;
         public double flyWheelVelocity = 0.0;
-
     }
 
     public void updateInputs();
