@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.fasterxml.jackson.databind.ser.std.InetAddressSerializer;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -21,7 +22,10 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IntakeConstants;
-
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.system.LinearSystem;
+import org.ejml.simple.SimpleMatrix;
 
 public class Intake extends SubsystemBase {
     private final Mechanism2d mechanism;
@@ -44,18 +48,29 @@ public class Intake extends SubsystemBase {
         leftMotor = new TalonFX(IntakeConstants.leftID);
         rollerMotor = new TalonFX(IntakeConstants.rollerID); 
         DCMotor dcmotor = DCMotor.getKrakenX44(2);
+     
+        intakeSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+            DCMotor.getKrakenX44(2),      // motor model
+        0.001,                        // MOI (kg·m²) – tune later
+            IntakeConstants.gearRatio
+         ),
+        DCMotor.getKrakenX44(2)
+);
+        rightMotor.getSimState().setSupplyVoltage(12.0);
 
 
         double mechFreeSpeed = 125.0/ IntakeConstants.gearRatio;
         maxVelocity = 0.5 * mechFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
+
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
         var slot0Configs = Config.Slot0;
         //find values later
         //friction, maybe?
-        slot0Configs.kP = 0.1;
+        slot0Configs.kP = 0;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0;
         slot0Configs.kV = 0;

@@ -19,7 +19,7 @@ public class IntakeConstants {
 
     // Intake positions
 
-    public static final double maxExtension = 12; // in inches: convert to rotations later
+    public static final double maxExtension = 14.856; // in inches: convert to rotations later
     public static final double startingPoint = 0;
 
     public static final double rackPitch = 10;
