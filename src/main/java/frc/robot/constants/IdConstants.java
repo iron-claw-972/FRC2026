@@ -24,7 +24,7 @@ public class IdConstants {
 
     // Shooter
     public static final int SHOOTER_LEFT_ID = 10;
-    public static final int SHOOTER_RIGHT_ID =4;
+    public static final int SHOOTER_RIGHT_ID = 4;
     public static final int FEEDER_ID = 21;
 
     // Climb
@@ -33,4 +33,7 @@ public class IdConstants {
 
     // Hood
     public static final int HOOD_ID = 11;
+
+    // Spindexer
+    public static final int SPINDEXER_ID = 12;
 }

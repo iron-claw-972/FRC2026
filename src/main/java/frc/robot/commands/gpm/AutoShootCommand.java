@@ -74,7 +74,7 @@ public class AutoShootCommand extends Command {
     public void updateSetpoints(Pose2d drivepose) {
 
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
-        Pose2d turretPosition = drivepose.transformBy(new Transform2d((TurretConstants.DISTANCE_FROM_ROBOT_CENTER), new Rotation2d()));
+        Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
         double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
         
         // If the robot is moving, adjust the target position based on velocity
