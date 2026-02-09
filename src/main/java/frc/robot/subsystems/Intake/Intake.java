@@ -45,12 +45,17 @@ public class Intake extends SubsystemBase {
         rollerMotor = new TalonFX(IntakeConstants.rollerID); 
         DCMotor dcmotor = DCMotor.getKrakenX44(2);
 
+
+        double mechFreeSpeed = 125.0/ IntakeConstants.gearRatio;
+        maxVelocity = 0.5 * mechFreeSpeed;
+        maxAcceleration = maxVelocity / 0.25;
+
         // right motor configs
         TalonFXConfiguration Config = new TalonFXConfiguration();
         var slot0Configs = Config.Slot0;
         //find values later
         //friction, maybe?
-        slot0Configs.kP = 0;
+        slot0Configs.kP = 0.1;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0;
         slot0Configs.kV = 0;
@@ -110,10 +115,7 @@ public class Intake extends SubsystemBase {
         double mechanicalRotation = intakeSim.getAngularPositionRotations();
         double motorRotation = mechanicalRotation * IntakeConstants.gearRatio; 
         //convert motor rotation to distance
-      
-
-
-
+    
     }
 
     /**
