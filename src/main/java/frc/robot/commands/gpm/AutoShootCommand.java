@@ -18,6 +18,7 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
@@ -30,6 +31,7 @@ public class AutoShootCommand extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
     private Hood hood;
+    private Shooter shooter;
 
     //TODO: find maximum interpolation
     private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
@@ -54,11 +56,17 @@ public class AutoShootCommand extends Command {
 
     private final double phaseDelay = 0.03;
 
-    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood) {
+    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.hood = hood;
+        this.shooter = shooter;
         drivepose  = drivetrain.getPose();
+
+        goalState = ShooterPhysics.getShotParams(
+				new Translation2d(0, 0),
+				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
+				8.0);
         
         addRequirements(turret, hood);
     }
@@ -114,13 +122,24 @@ public class AutoShootCommand extends Command {
             turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         lastTurretAngle = turretAngle;
 
-        // Add 180 since drivetrain is backwards
-        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() + Math.PI);
-        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint), -180.0, 180.0);
+        // Shortest path
+        double error = MathUtil.inputModulus(turretAngle.getDegrees() - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
+        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
+        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
+        if (potentialSetpoint > turretRange/2) {
+            potentialSetpoint -= 360;
+        } else if (potentialSetpoint < -turretRange/2) {
+            potentialSetpoint += 360;
+        }
+
+        turretSetpoint = potentialSetpoint;
 
         // Hood stuff
-        hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
-        hoodSetpoint = MathUtil.clamp(hoodAngle, Units.radiansToDegrees(HoodConstants.MIN_ANGLE), Units.radiansToDegrees(HoodConstants.MAX_ANGLE));
+        //hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
+        // Pitch is in radians
+        hoodAngle = goalState.pitch();
+        hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
     }
@@ -140,6 +159,7 @@ public class AutoShootCommand extends Command {
         updateSetpoints(drivepose);
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
+        shooter.setShooter(Units.radiansToRotations(goalState.exitVel() / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)));
     }
 
     @Override
