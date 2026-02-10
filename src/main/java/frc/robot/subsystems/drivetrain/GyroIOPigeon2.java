@@ -41,7 +41,7 @@ public class GyroIOPigeon2 implements GyroIO {
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
   private final StatusSignal<AngularVelocity> yawVelocity = pigeon.getAngularVelocityZWorld();
-  private Pigeon2Configuration config = new Pigeon2Configuration(); 
+  private final Pigeon2Configuration config = new Pigeon2Configuration(); 
 
   public GyroIOPigeon2() {
     config.MountPose.MountPoseRoll = DriveConstants.GYRO_MOUNT_POSE_ROLL; 
