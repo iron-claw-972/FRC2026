@@ -32,8 +32,10 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -55,6 +57,9 @@ public class RobotContainer {
   private Shooter shooter = null;
   private Hood hood = null;
   private Climb climb = null;
+  private Intake intake = null;
+  private Spindexer spindexer = null;
+
   private Command auto = new DoNothing();
 
   // Controllers are defined here
