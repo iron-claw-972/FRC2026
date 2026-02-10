@@ -106,6 +106,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         } else {
             // Torque-current bang-bang
             shooterMotorLeft.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
+            shooterMotorRight.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
         }
     }
 
