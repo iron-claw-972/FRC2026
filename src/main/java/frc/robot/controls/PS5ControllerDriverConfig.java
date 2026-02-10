@@ -22,9 +22,11 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
+import frc.robot.subsystems.intake.Intake;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -38,6 +40,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Shooter shooter;
     private Turret turret;
     private Hood hood;
+    private Intake intake;
+    private Spindexer spindexer;
 
     private Pose2d alignmentPose = null;
     private Command turretAutoShoot;
@@ -70,6 +74,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+
+        if(intake != null){
+            
+        }
 
         // driver.get(PS5Button.LB).onTrue(
         //     new SequentialCommandGroup(
