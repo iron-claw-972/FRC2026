@@ -36,7 +36,6 @@ public class FieldConstants {
   public static final Translation3d HUB_RED =
       new Translation3d(FIELD_LENGTH - Units.inchesToMeters(156.8 + 20), 4.035 + .67, Units.inchesToMeters(72));
     
-  // TODO: Update all of this
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
 

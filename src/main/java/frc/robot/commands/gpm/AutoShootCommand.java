@@ -20,6 +20,7 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
@@ -32,6 +33,7 @@ public class AutoShootCommand extends Command {
     private Drivetrain drivetrain;
     private Hood hood;
     private Shooter shooter;
+    private Spindexer spindexer;
 
     //TODO: find maximum interpolation
     private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
@@ -56,11 +58,12 @@ public class AutoShootCommand extends Command {
 
     private final double phaseDelay = 0.03;
 
-    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter) {
+    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.hood = hood;
         this.shooter = shooter;
+        this.spindexer = spindexer;
         drivepose  = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
@@ -135,7 +138,7 @@ public class AutoShootCommand extends Command {
 
         turretSetpoint = potentialSetpoint;
 
-        // Hood stuff
+        /** Hood Stuff!! */
         //hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
         // Pitch is in radians
         hoodAngle = goalState.pitch();
@@ -160,6 +163,11 @@ public class AutoShootCommand extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         shooter.setShooter(Units.radiansToRotations(goalState.exitVel() / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)));
+
+        /** Spindexer Stuff!! */
+        if(spindexer != null){
+            spindexer.turnOnSpindexer();
+        }
     }
 
     @Override
@@ -167,6 +175,9 @@ public class AutoShootCommand extends Command {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
+        if(spindexer != null){
+            spindexer.stopSpindexer();
+        }
     }
 
 }

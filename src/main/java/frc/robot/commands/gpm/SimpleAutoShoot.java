@@ -63,7 +63,6 @@ public class SimpleAutoShoot extends Command {
 
         double D_y;
         double D_x;
-        // TODO: Change time to goal on actual comp bot
         double timeToGoal = 0.0;
         
         // If the robot is moving, adjust the target position based on velocity
