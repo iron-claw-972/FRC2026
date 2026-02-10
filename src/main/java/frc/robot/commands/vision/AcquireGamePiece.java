@@ -15,7 +15,6 @@ public class AcquireGamePiece extends SequentialCommandGroup {
      * @param drive The drivetrain
      */
     public AcquireGamePiece(Supplier<DetectedObject> gamePiece, Drivetrain drive){
-        // TODO: Replace DoNothing with next year's intake command
         addCommands(new DoNothing().deadlineFor(new DriveToGamePiece(gamePiece, drive)));
     }
 }

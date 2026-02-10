@@ -10,7 +10,6 @@ public class TurretConstants {
     public static double MAX_VELOCITY = 10000000; // m/s
     public static double MAX_ACCELERATION = 10000000; // m/s^2
 
-    // TODO: FIND THE TURRET WIDTH
     public static double TURRET_WIDTH = Units.inchesToMeters(6.4);
     public static double TURRET_RADIUS = TURRET_WIDTH / 2;
 
