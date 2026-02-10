@@ -82,18 +82,22 @@ public class RobotContainer {
         break;
 
       default:
-      case SwerveCompetition:
 
-      case BetaBot:
-        
+      case WaffleHouse:
+      
+      case SwerveCompetition: // AKA "Vantage"
+
+      case BetaBot: // AKA "Pancake"
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-      case Phil:
-      case Vertigo:
-        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        shooter = new Shooter();
-        hood = new Hood();
+
+      case Phil: // AKA "IHOP"
+
+      case PrimeJr:
+
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood);
         operator = new Operator(drive);
@@ -102,7 +106,6 @@ public class RobotContainer {
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
-        
         driver.configureControls();
         operator.configureControls();
         
