@@ -75,5 +75,4 @@ public abstract class BaseDriverConfig {
     public abstract boolean getIsSlowMode();
 
     public abstract boolean getIsAlign();
-
 }

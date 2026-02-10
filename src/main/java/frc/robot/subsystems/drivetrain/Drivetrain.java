@@ -16,6 +16,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -83,7 +84,7 @@ public class Drivetrain extends SubsystemBase {
     // Disables vision for the first few seconds after deploying
     private Timer visionEnableTimer = new Timer();
 
-    // If the robot should algin to the angle
+    // If the robot should align to the angle
     private boolean isAlign = false;
     // Angle to align to, can be null
     private Double alignAngle = null;
@@ -697,4 +698,23 @@ public class Drivetrain extends SubsystemBase {
             state, state, state, state
         }, false);
     }
+
+    @AutoLogOutput(key = "FaceForward/XVelocity")
+    public double getXVelocity(){
+        return getChassisSpeeds().vxMetersPerSecond;
+    }
+
+    @AutoLogOutput(key = "FaceForward/YVelocity")
+    public double getYVelocity(){
+        return getChassisSpeeds().vyMetersPerSecond;
+    }
+
+    // @AutoLogOutput(key = "FaceForward/desiredAngle")p
+    public double getDesiredAngle(){
+        Translation2d robotRelativeVelocity = new Translation2d(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond);
+        Rotation2d robotRelativeAngle = new Rotation2d(robotRelativeVelocity.getX(), robotRelativeVelocity.getY());
+        return robotRelativeAngle.rotateBy(getYaw()).getDegrees();
+
+    }
+
 }

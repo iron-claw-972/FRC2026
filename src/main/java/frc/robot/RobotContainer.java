@@ -18,14 +18,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
+import frc.robot.commands.drive_comm.FaceForward;
+import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -43,7 +48,10 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
-  private Command auto = new DoNothing();
+  private Hood hood = null;
+  private IntakeAlpha intake = null;
+  private Shooter shooter = null;
+  private Command auto = new DoNothing(); 
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -55,8 +63,8 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    // dispatch on the robot
     switch (robotId) {
+       
       case TestBed1:
         break;
 
@@ -65,29 +73,33 @@ public class RobotContainer {
 
       default:
 
-      case WaffleHouse:
-      
-      case SwerveCompetition: // AKA "Vantage"
-
-      case BetaBot: // AKA "Pancake"
+      case SwerveCompetition:
+        
+      case BetaBot:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        // fall-through
 
       case Vivace:
 
-      case Phil: // AKA "IHOP"
+      case Phil:
+
+      case WaffleHouse:
+      if (vision == null) vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+      hood = new Hood();
+      intake = new IntakeAlpha();
+      shooter = new Shooter();
 
       case PrimeJr:
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, hood, shooter, intake);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
+        
 
         driver.configureControls();
         operator.configureControls();
@@ -109,12 +121,18 @@ public class RobotContainer {
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
 
+    SmartDashboard.putData("face forward", new FaceForward(drive, driver));
+
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    SmartDashboard.putData("auto shoot", new AutoShoot(drive, hood, shooter));
+
+
+    
   }
 
   /**

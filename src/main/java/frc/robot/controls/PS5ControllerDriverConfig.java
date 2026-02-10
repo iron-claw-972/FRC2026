@@ -2,14 +2,24 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.commands.drive_comm.AimAtTarget;
+import frc.robot.commands.gpm.AlphaIntakeBall;
+import frc.robot.commands.gpm.AutoShoot;
 import frc.robot.constants.Constants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.ShooterConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.intake.IntakeAlpha;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -18,34 +28,63 @@ import lib.controllers.PS5Controller.PS5Button;
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
-    private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = ()->false;
+    private Hood hood;
+    private Shooter shooter;
+    private IntakeAlpha intake;
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
+    private final BooleanSupplier slowModeSupplier = () -> false;
+
+    public PS5ControllerDriverConfig(Drivetrain drive, Hood hood, Shooter shooter, IntakeAlpha intake) {
         super(drive);
+        this.hood = hood;
+        this.shooter = shooter;
+        this.intake = intake;
     }
 
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
         driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
-            new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI)
-        )));
+                new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(()->{
+        driver.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
-            getDrivetrain().setDesiredPose(()->null);
+            getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
         driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-            ()->getDrivetrain().setStateDeadband(false),
-            getDrivetrain()::alignWheels,
-            interrupted->getDrivetrain().setStateDeadband(true),
-            ()->false, getDrivetrain()).withTimeout(2));
+                () -> getDrivetrain().setStateDeadband(false),
+                getDrivetrain()::alignWheels,
+                interrupted -> getDrivetrain().setStateDeadband(true),
+                () -> false, getDrivetrain()).withTimeout(2));
+
+        if (intake != null && shooter != null) {
+            // shoots it
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
+                    new SequentialCommandGroup(
+                            new InstantCommand(() -> shooter.setShooter(-ShooterConstants.SHOOTER_VELOCITY)),
+                            new InstantCommand(() -> shooter.setFeeder(ShooterConstants.FEEDER_RUN_POWER))))
+                    .onFalse(
+                            new InstantCommand(() -> {
+                                shooter.deactivateShooterAndFeeder();
+                            }));
+
+            // Intake
+            driver.get(PS5Button.LEFT_TRIGGER).whileTrue(new AlphaIntakeBall(intake));
+
+            if (hood != null) {
+                driver.get(PS5Button.CIRCLE).whileTrue(new AutoShoot(getDrivetrain(), hood, shooter));
+            }
+
+			driver.get(PS5Button.CROSS)
+					.whileTrue(new AimAtTarget(getDrivetrain(),
+							new Pose2d(FieldConstants.HUB_BLUE.toTranslation2d(), Rotation2d.kZero)));
+        }
     }
-    
+
     @Override
     public double getRawSideTranslation() {
         return driver.get(PS5Axis.LEFT_X);
@@ -81,11 +120,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return false;
     }
 
-    public void startRumble(){
+    public void startRumble() {
         driver.rumbleOn();
     }
 
-    public void endRumble(){
+    public void endRumble() {
         driver.rumbleOff();
     }
 }

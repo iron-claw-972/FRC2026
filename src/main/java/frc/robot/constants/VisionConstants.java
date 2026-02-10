@@ -65,7 +65,7 @@ public class VisionConstants {
     /**
      * The maximum distance to the tag to use
      */
-    public static final double MAX_DISTANCE = 2;
+    public static final double MAX_DISTANCE = 5;
 
     /** If vision should use manual calculations */
     public static final boolean USE_MANUAL_CALCULATIONS = true;
@@ -128,7 +128,7 @@ public class VisionConstants {
      * <p>
      * Only affects calculations using PhotonVision, not manual calculations.
      */
-    public static final double HIGHEST_AMBIGUITY = 0.01;
+    public static final double HIGHEST_AMBIGUITY = 0.2;
 
     public static final int MAX_EMPTY_TICKS = 10;
 
@@ -153,19 +153,18 @@ public class VisionConstants {
     public static final ArrayList<Pair<String, Transform3d>> APRIL_TAG_CAMERAS = new ArrayList<Pair<String, Transform3d>>(
             List.of(
                 new Pair<String, Transform3d>(
-                        "CameraFront",
+                        "CameraLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(10.485), Units.inchesToMeters(10.217),
-                                        Units.inchesToMeters(11.012)),
-                                new Rotation3d(0, Units.degreesToRadians(-11),
-                                        Math.PI/2 + Units.degreesToRadians(20)))),
+                                new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(6.5),
+                                        Units.inchesToMeters(24.0)),
+                                new Rotation3d(0, Units.degreesToRadians(-23),0))),
                 new Pair<String, Transform3d>(
-                        "CameraBack",
+                        "CameraRight",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-9.538), Units.inchesToMeters(7.474),
-                                        Units.inchesToMeters(8.719)),
-                                new Rotation3d(0, Units.degreesToRadians(-19.5),
-                                        Math.PI/2-Units.degreesToRadians(25))))));
+                                new Translation3d(Units.inchesToMeters(0.0), Units.inchesToMeters(6.5),
+                                        Units.inchesToMeters(23.5)),
+                                new Rotation3d(0, Units.degreesToRadians(26),
+                                       0)))));
 
     /**
      * The transformations from the robot to object detection cameras
