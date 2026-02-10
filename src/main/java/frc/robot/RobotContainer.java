@@ -9,9 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -19,11 +17,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.AimAtPose;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
@@ -83,8 +79,16 @@ public class RobotContainer {
 
       default:
 
+      case PrimeJr: // AKA Valence
+        intake = new Intake();
+        climb = new Climb();
+        spindexer = new Spindexer();
+
       case WaffleHouse:
-      
+        turret = new Turret();
+        shooter = new Shooter();
+        hood = new Hood();
+
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -94,8 +98,6 @@ public class RobotContainer {
       case Vivace:
 
       case Phil: // AKA "IHOP"
-
-      case PrimeJr:
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
@@ -132,7 +134,6 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    //SmartDashboard.putData("Aim at thingy", new AimAtPose(drive, turret, new Pose2d(FieldConstants.field.getTagPose(26).get().getTranslation().toTranslation2d(), Rotation2d.kZero)));
   }
 
   /**
