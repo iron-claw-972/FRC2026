@@ -31,7 +31,8 @@ import frc.robot.constants.IdConstants;
 
 public class Intake extends SubsystemBase implements IntakeIO{
     private TalonFX flyWheelMotor = new TalonFX(IdConstants.INTAKE_FLYWHEEL_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-    private TalonFX baseMotor = new TalonFX(IdConstants.INTAKE_BASE_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX baseMotorLeft = new TalonFX(IdConstants.INTAKE_BASE_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX baseMotorRight = new TalonFX(IdConstants.INTAKE_BASE_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     double basePower;
     double flyWheelPower;
@@ -59,7 +60,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     public Intake() {
         updateInputs();
-        encoderSim = baseMotor.getSimState();
+        encoderSim = baseMotorLeft.getSimState();
         
         intakeSim = new SingleJointedArmSim(
             baseIntakeMotorSim,
@@ -71,12 +72,14 @@ public class Intake extends SubsystemBase implements IntakeIO{
             Units.degreesToRadians(0),
             Units.degreesToRadians(360),
             true,
-            Units.degreesToRadians(IntakeConstants.START_ANGLE)
+            Units.degreesToRadians(IntakeConstants.STOW_ANGLE)
         );
 
         double absoluteAngleDegrees =  getAbsoluteEncoderAngle() - IntakeConstants.ABSOLUTE_OFFSET_ANGLE;
-        baseMotor.setPosition(Units.degreesToRotations(absoluteAngleDegrees * IntakeConstants.PIVOT_GEAR_RATIO));
-        baseMotor.setNeutralMode(NeutralModeValue.Coast);
+        baseMotorLeft.setPosition(Units.degreesToRotations(absoluteAngleDegrees * IntakeConstants.PIVOT_GEAR_RATIO));
+        baseMotorLeft.setNeutralMode(NeutralModeValue.Coast);
+        baseMotorRight.setPosition(Units.degreesToRotations(absoluteAngleDegrees * IntakeConstants.PIVOT_GEAR_RATIO));
+        baseMotorRight.setNeutralMode(NeutralModeValue.Coast);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kS = 0.1; // Static friction compensation (should be >0 if friction exists)
@@ -93,14 +96,19 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         
-        baseMotor.getConfigurator().apply(config);
+        baseMotorLeft.getConfigurator().apply(config);
+
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+        baseMotorRight.getConfigurator().apply(config);
 
          CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
 
         limitConfig.StatorCurrentLimit = 30; // 120
         limitConfig.StatorCurrentLimitEnable = true;
 
-        baseMotor.getConfigurator().apply(limitConfig);
+        baseMotorLeft.getConfigurator().apply(limitConfig);
+        baseMotorRight.getConfigurator().apply(limitConfig);
 
         flyWheelMotor.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
@@ -115,7 +123,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     public void setSetpoint(double setpoint) {
         double clampedSetpoint = MathUtil.clamp(setpoint, 90.0, 180.0);
-        baseMotor.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
+        baseMotorLeft.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
+        baseMotorRight.setControl(voltageRequest.withPosition(Units.degreesToRotations(clampedSetpoint) * IntakeConstants.PIVOT_GEAR_RATIO).withFeedForward(feedforward.calculate(Units.degreesToRadians(getAngle()), 0)));
     }
 
     @AutoLogOutput
@@ -133,7 +142,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // if(RobotBase.isSimulation()){
         //     return position;
         // }
-        return inputs.measuredAngle;
+        return inputs.measuredAngleLeft;
     }
 
     public double getFlyWheelVelocity() {
@@ -154,12 +163,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public double getAppliedVoltage() {
-        return baseMotor.getMotorVoltage().getValueAsDouble();
+        return baseMotorLeft.getMotorVoltage().getValueAsDouble();
     }
 
     @Override
     public void simulationPeriodic() {
-        double voltsMotor = baseMotor.getMotorVoltage().getValueAsDouble();
+        double voltsMotor = baseMotorLeft.getMotorVoltage().getValueAsDouble();
         intakeSim.setInputVoltage(voltsMotor);
 
         intakeSim.update(Constants.LOOP_TIME);
@@ -194,8 +203,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     @Override
     public void updateInputs() {
-        inputs.measuredAngle = Units.rotationsToDegrees(baseMotor.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
-        inputs.currentAmps = baseMotor.getStatorCurrent().getValueAsDouble();
+        inputs.measuredAngleLeft = Units.rotationsToDegrees(baseMotorLeft.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
+        inputs.measuredAngleRight = Units.rotationsToDegrees(baseMotorLeft.getPosition().getValueAsDouble()/ IntakeConstants.PIVOT_GEAR_RATIO);
+        inputs.currentAmps = baseMotorLeft.getStatorCurrent().getValueAsDouble();
         inputs.flyWheelVelocity = Units.rotationsPerMinuteToRadiansPerSecond(flyWheelMotor.getVelocity().getValueAsDouble() * 60);
 
         Logger.processInputs("Intake", inputs);

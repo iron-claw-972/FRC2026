@@ -38,7 +38,8 @@ public class IdConstants {
     public static final int SPINDEXER_ID = 12;
 
     // Intake
-    public static final int INTAKE_BASE_ID = 13;
-    public static final int INTAKE_FLYWHEEL_ID = 14;
+    public static final int INTAKE_BASE_LEFT_ID = 13;
+    public static final int INTAKE_BASE_RIGHT_ID = 14;
+    public static final int INTAKE_FLYWHEEL_ID = 15;
     public static final int INTAKE_ENCODER_ID = 2;
 }
