@@ -17,6 +17,7 @@ public class ShooterConstants {
     // for bang bang
     public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 10; // velocity (rotations per second)
 
+    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 40; // TUNE
 }
 // 8 velcocity is too little
 // 16 is too much

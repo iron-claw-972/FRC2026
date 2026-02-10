@@ -51,7 +51,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
-
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private double lastFrameVelocity = 0.0;
