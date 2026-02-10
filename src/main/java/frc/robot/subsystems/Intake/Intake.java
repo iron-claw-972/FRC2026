@@ -39,9 +39,9 @@ public class Intake extends SubsystemBase {
     private TalonFX leftMotor; //invert this one
     private double maxVelocity;
     private double maxAcceleration;
-    private DCMotorSim intakeSim;
-
-    private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+    private final DCMotorSim intakeSim;
+    private double distance;
+    private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
     public Intake() {
         rightMotor = new TalonFX(IntakeConstants.rightID);
@@ -70,7 +70,7 @@ public class Intake extends SubsystemBase {
         var slot0Configs = Config.Slot0;
         //find values later
         //friction, maybe?
-        slot0Configs.kP = 0;
+        slot0Configs.kP = 0.1;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0;
         slot0Configs.kV = 0;
@@ -114,7 +114,7 @@ public class Intake extends SubsystemBase {
 
         // report the position of the extension
         double percentExtended = getPosition() / IntakeConstants.kMaxRotations;
-        double distance = percentExtended/IntakeConstants.gearRatio * 1/IntakeConstants.rackPitch; // in inches
+        distance = percentExtended/IntakeConstants.gearRatio * 1/IntakeConstants.rackPitch; 
         percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
 
         // robotExtension.setLength(percentExtended * maxExtension);
@@ -152,6 +152,11 @@ public class Intake extends SubsystemBase {
         return position;
     }
 
+    public boolean atMaxExtension(){
+        return distance == IntakeConstants.maxExtension; //  TODO add tolerance for distance
+    }
+
+
     public void spin(double speed) {
         rollerMotor.set(IntakeConstants.speed);
     }
@@ -163,6 +168,7 @@ public class Intake extends SubsystemBase {
 
     public void retract(){
         setPosition(IntakeConstants.startingPoint);
+
         
     }
 
