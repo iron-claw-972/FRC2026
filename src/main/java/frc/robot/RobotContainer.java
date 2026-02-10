@@ -105,8 +105,9 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-          auto = new PathPlannerAuto("Path Name");
+          String testingAuto = "Testing Over the Bump";
+          PathPlannerAuto.getPathGroupFromAutoFile(testingAuto);
+          auto = new PathPlannerAuto(testingAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
