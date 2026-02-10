@@ -79,7 +79,6 @@ public class RobotContainer {
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
@@ -89,7 +88,11 @@ public class RobotContainer {
       case PrimeJr:
 
       case Vertigo: // AKA "French Toast"
+        turret = new Turret();
+        VisionConstants.configure(turret);
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         drive = new Drivetrain(vision, new GyroIOPigeon2());
+        shooter = new Shooter();
         driver = new PS5ControllerDriverConfig(drive, shooter, turret);
         operator = new Operator(drive);
 

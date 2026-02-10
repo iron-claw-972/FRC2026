@@ -188,6 +188,9 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Shot Distance", FieldConstants.getHubTranslation().toTranslation2d().getDistance(getPose().getTranslation()));
+
+        // SmartDashboard.putNumber("Module 0", modules[0].getAngle().getDegrees());
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);

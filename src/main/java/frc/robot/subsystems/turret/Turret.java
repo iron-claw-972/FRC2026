@@ -156,9 +156,12 @@ public class Turret extends SubsystemBase implements TurretIO {
 	public Transform3d cameraLocationAtTime(double t) {
 		double turretAngle = getPositionRad();
 		Rotation3d asRot = new Rotation3d(0, 0, turretAngle);
-		return new Transform3d(TurretConstants.TURRET_TO_CENTER_OF_ROBOT.unaryMinus(), Rotation3d.kZero)
-				.plus(new Transform3d(TurretConstants.CAMERA_TO_CENTER_OF_TURRET.unaryMinus().rotateBy(asRot),
+		Transform3d transform = new Transform3d(TurretConstants.TURRET_TO_CENTER_OF_ROBOT, Rotation3d.kZero)
+				.plus(new Transform3d(TurretConstants.CAMERA_TO_CENTER_OF_TURRET.rotateBy(asRot),
 						TurretConstants.CAMERA_ROTATION.rotateBy(asRot)));
+		Logger.recordOutput("Turret Transform", transform);
+		System.out.println("oOOOoOoooooOOO " + transform);
+		return transform;
 	}
 
 	/* ---------------- Periodic ---------------- */

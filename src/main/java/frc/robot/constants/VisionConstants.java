@@ -61,12 +61,12 @@ public class VisionConstants {
 	 * If multiple cameras return different poses, they will be ignored if the
 	 * difference between them is greater than this
 	 */
-	public static final double MAX_POSE_DIFFERENCE = 0.2;
+	public static final double MAX_POSE_DIFFERENCE = 2;
 
 	/**
 	 * The maximum distance to the tag to use
 	 */
-	public static final double MAX_DISTANCE = 4;
+	public static final double MAX_DISTANCE = 40;
 
 	/** If vision should use manual calculations */
 	public static final boolean USE_MANUAL_CALCULATIONS = true;
@@ -129,7 +129,7 @@ public class VisionConstants {
 	 * <p>
 	 * Only affects calculations using PhotonVision, not manual calculations.
 	 */
-	public static final double HIGHEST_AMBIGUITY = 0.1;
+	public static final double HIGHEST_AMBIGUITY = 1;
 
 	public static final int MAX_EMPTY_TICKS = 10;
 
@@ -153,20 +153,7 @@ public class VisionConstants {
 	 */
 	public static ArrayList<Pair<String, Function<Double, Transform3d>>> APRIL_TAG_CAMERAS = //
 			new ArrayList<Pair<String, Function<Double, Transform3d>>>(
-					List.of(
-							new Pair<String, Function<Double, Transform3d>>(
-									"CameraRight",
-									(t) -> new Transform3d(
-											new Translation3d(Units.inchesToMeters(-11.5), Units.inchesToMeters(-1),
-													Units.inchesToMeters(10.5)),
-											new Rotation3d(0, Units.degreesToRadians(-29),
-													Units.degreesToRadians(190)))),
-							new Pair<String, Function<Double, Transform3d>>(
-									"CameraLeft",
-									(t) -> new Transform3d(
-											new Translation3d(Units.inchesToMeters(-9.5), Units.inchesToMeters(13.5),
-													Units.inchesToMeters(13)),
-											new Rotation3d(0, Units.degreesToRadians(-29), Math.PI)))));
+					List.of());
 
 	/**
 	 * The transformations from the robot to object detection cameras

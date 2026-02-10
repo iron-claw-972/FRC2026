@@ -452,6 +452,7 @@ public class Vision {
      */
     public ArrayList<EstimatedRobotPose> getEstimatedPose(Pose2d referencePose) {
 
+      System.out.println("WEALLLIVEINAYELLOWSUBMARINEAYELLOWSUBMARINEAYELLOWSUBMARINE:w");
       ArrayList<EstimatedRobotPose> list = new ArrayList<>();
 	  photonPoseEstimator.setRobotToCameraTransform(robotToCam.apply(Timer.getTimestamp()));
 
@@ -616,6 +617,7 @@ public class Vision {
      * @return A list of estimated poses as EstimatedRobotPoses
      */
     public ArrayList<EstimatedRobotPose> getEstimatedPose(DoubleUnaryOperator yawFunction){
+	  photonPoseEstimator.setRobotToCameraTransform(robotToCam.apply(Timer.getTimestamp()));
       ArrayList<EstimatedRobotPose> list = new ArrayList<>();
 
       // Do nothing if this camera is disabled
