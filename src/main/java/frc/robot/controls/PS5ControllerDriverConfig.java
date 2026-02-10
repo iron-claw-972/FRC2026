@@ -23,6 +23,8 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -35,16 +37,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = ()->false;
     private Shooter shooter;
     private Turret turret;
+    private Hood hood;
 
     private Pose2d alignmentPose = null;
     private Command turretAutoShoot;
     private Command simpleTurretAutoShoot;
     private TurretJoyStickAim turretJoyStickAim;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret, Hood hood) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
+        this.hood = hood;
     }
 
     public void configureControls() { 
@@ -80,32 +84,32 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         //             }));
         //driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY))).onFalse(new InstantCommand(() -> shooter.setShooter(0)));
         
-        driver.get(PS5Button.SQUARE).onTrue(
-            new InstantCommand(()->{
-                        if (simpleTurretAutoShoot != null && simpleTurretAutoShoot.isScheduled()){
-                            simpleTurretAutoShoot.cancel();
-                        } else{
-                            simpleTurretAutoShoot = new SimpleAutoShoot(turret, getDrivetrain(), shooter);
-                            CommandScheduler.getInstance().schedule(simpleTurretAutoShoot);
-                        }
-                    })
-        );
+        // driver.get(PS5Button.SQUARE).onTrue(
+        //     new InstantCommand(()->{
+        //                 if (simpleTurretAutoShoot != null && simpleTurretAutoShoot.isScheduled()){
+        //                     simpleTurretAutoShoot.cancel();
+        //                 } else{
+        //                     simpleTurretAutoShoot = new SimpleAutoShoot(turret, getDrivetrain(), shooter);
+        //                     CommandScheduler.getInstance().schedule(simpleTurretAutoShoot);
+        //                 }
+        //             })
+        // );
 
-        driver.get(PS5Button.LB).onTrue(new InstantCommand(() -> shooter.setFeeder(1))).onFalse(
-            new InstantCommand(()->{
-                shooter.setFeeder(0);
-            })
-        );
 
-        driver.get(PS5Button.CIRCLE).onTrue(
-            new InstantCommand(()->{
-                turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(180)), 0);
-            })
-        ).onFalse(
-            new InstantCommand(()->{
-                turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(-170)), 0);
-            })
-        );
+        driver.get(PS5Button.SQUARE).onTrue(new InstantCommand(() -> hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
+        driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
+        driver.get(PS5Button.LB).onTrue(new InstantCommand(() -> hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
+
+
+        // driver.get(PS5Button.CIRCLE).onTrue(
+        //     new InstantCommand(()->{
+        //         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(180)), 0);
+        //     })
+        // ).onFalse(
+        //     new InstantCommand(()->{
+        //         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(-170)), 0);
+        //     })
+        // );
 
         // driver.get(PS5Button.CROSS).onTrue(
         //     new InstantCommand(()->{

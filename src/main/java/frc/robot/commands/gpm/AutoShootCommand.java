@@ -1,11 +1,14 @@
 package frc.robot.commands.gpm;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -13,35 +16,63 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
-// import frc.robot.util.FieldZone;
+import frc.robot.util.ShooterPhysics;
+import frc.robot.util.ShooterPhysics.Constraints;
+import frc.robot.util.ShooterPhysics.TurretState;
 
-public class TurretAutoShoot extends Command {
+public class AutoShootCommand extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
+    private Hood hood;
+    private Shooter shooter;
+
+    //TODO: find maximum interpolation
+    private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
 
     private double turretSetpoint;
+    private double hoodSetpoint;
 
     private Pose2d drivepose;
 
     private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
+    private final LinearFilter hoodAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
+    
     private Rotation2d lastTurretAngle;
     private Rotation2d turretAngle;
     private double turretVelocity;
+
+    private double lastHoodAngle;
+    private double hoodAngle;
+    private double hoodVelocity;
+
+    private TurretState goalState;
+
     private final double phaseDelay = 0.03;
 
-    public TurretAutoShoot(Turret turret, Drivetrain drivetrain) {
+    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter) {
         this.turret = turret;
         this.drivetrain = drivetrain;
+        this.hood = hood;
+        this.shooter = shooter;
         drivepose  = drivetrain.getPose();
+
+        goalState = ShooterPhysics.getShotParams(
+				new Translation2d(0, 0),
+				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
+				8.0);
         
-        addRequirements(turret);
+        addRequirements(turret, hood);
     }
 
-    public void updateTurretSetpoint(Pose2d drivepose) {
-        
+    public void updateSetpoints(Pose2d drivepose) {
+
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
         Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
         double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
@@ -68,6 +99,11 @@ public class TurretAutoShoot extends Command {
 
         // Loop (20) until lookahreadTurretToTargetDistance converges
         for (int i = 0; i < 20; i++) {
+            goalState = ShooterPhysics.getShotParams(
+				new Translation2d(turretVelocityX, turretVelocityY),
+				new Translation3d(target.minus(lookaheadPose.getTranslation())),
+				8.0);
+
             timeOfFlight = ShotInterpolation.timeOfFlightMap.get(lookaheadTurretToTargetDistance);
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
@@ -86,9 +122,26 @@ public class TurretAutoShoot extends Command {
             turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         lastTurretAngle = turretAngle;
 
-        // Add 180 since drivetrain is backwards
-        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() + Math.PI);
-        turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint), -180.0, 180.0);
+        // Shortest path
+        double error = MathUtil.inputModulus(turretAngle.getDegrees() - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
+        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
+        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
+        if (potentialSetpoint > turretRange/2) {
+            potentialSetpoint -= 360;
+        } else if (potentialSetpoint < -turretRange/2) {
+            potentialSetpoint += 360;
+        }
+
+        turretSetpoint = potentialSetpoint;
+
+        // Hood stuff
+        //hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
+        // Pitch is in radians
+        hoodAngle = goalState.pitch();
+        hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
+        hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
+        lastHoodAngle = hoodAngle;
     }
 
     public void updateDrivePose(){
@@ -101,24 +154,19 @@ public class TurretAutoShoot extends Command {
     }
 
     @Override
-    public void initialize() {
-        updateDrivePose();
-        updateTurretSetpoint(drivepose);
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
-    }
-
-    @Override
     public void execute() {
         updateDrivePose();
-        updateTurretSetpoint(drivepose);
+        updateSetpoints(drivepose);
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
+        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
+        shooter.setShooter(Units.radiansToRotations(goalState.exitVel() / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)));
     }
 
     @Override
     public void end(boolean interrupted) {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
+        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
     }
 
 }
-

@@ -22,6 +22,8 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -32,6 +34,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.swerve.DriveConstants;
+import yams.units.EasyCRT;
+import yams.units.EasyCRTConfig;
+import static edu.wpi.first.units.Units.Rotations;
+
+import java.util.function.Supplier;
+
+import static edu.wpi.first.units.Units.Degrees;
 
 public class Turret extends SubsystemBase implements TurretIO{
 
@@ -43,17 +52,20 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MAX_VEL_RAD_PER_SEC = 25;
 	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
-	private static final double VERSA_RATIO = 5.0;
-	private static final double TURRET_RATIO = 140.0 / 10.0;
-	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
+	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
 
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
+    private final DutyCycleEncoder encoderLeft = new DutyCycleEncoder(1);
+    private final DutyCycleEncoder encoderRight = new DutyCycleEncoder(2);
+
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private double lastFrameVelocity = 0.0;
+
+    EasyCRT easyCRT;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -121,6 +133,22 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
+
+        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.get()), () -> Rotations.of(encoderRight.get()))
+        .withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
+        .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
+        .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
+        .withMatchTolerance(Degrees.of(2)) // Tune this
+        .withAbsoluteEncoderInversions(false, false)
+        // shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
+        // turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
+            .withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
+        
+        this.easyCRT = new EasyCRT(crt_cfg);
+        
+        this.easyCRT.getAngleOptional().ifPresent(angle -> {
+            motor.setPosition(angle.in(Rotations) * GEAR_RATIO);
+        });
 
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
@@ -272,5 +300,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
+        inputs.encoderLeftRot = encoderLeft.get();
+        inputs.encoderRightRot = encoderRight.get();
 	}
 }

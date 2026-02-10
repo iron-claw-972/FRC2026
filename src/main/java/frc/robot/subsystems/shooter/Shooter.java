@@ -24,15 +24,15 @@ import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     
-    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.RIO_CAN);
-    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.RIO_CAN);
+    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     //rotations/sec
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
 
-    public double shooterPower = 1.0;
+    public double shooterPower = 0.5;
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
@@ -76,12 +76,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
         
-        shooterMotorLeft.getConfigurator().apply(
+        shooterMotorRight.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
-        shooterMotorRight.getConfigurator().apply(
+        shooterMotorLeft.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
