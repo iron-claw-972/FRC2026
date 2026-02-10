@@ -27,6 +27,7 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -47,6 +48,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Command turretAutoShoot;
     private Command simpleTurretAutoShoot;
     private TurretJoyStickAim turretJoyStickAim;
+
+    private boolean intakeBoolean = true;
 
     public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret, Hood hood) {
         super(drive);
@@ -75,8 +78,19 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
 
+        // Intake
         if(intake != null){
-            
+            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()->{
+                if(intakeBoolean){
+                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
+                    intake.setFlyWheel();
+                    intakeBoolean = false;
+                }
+                else{
+                    intake.setSetpoint(IntakeConstants.STOW_ANGLE);
+                    intake.stopFlyWheel();
+                }
+            }));
         }
 
         // driver.get(PS5Button.LB).onTrue(
