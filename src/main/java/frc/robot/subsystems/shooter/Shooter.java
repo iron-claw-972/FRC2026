@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -44,6 +44,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private double torqueCurrentControlTolerance = 20.0;
     private double torqueCurrentDebounceTime = 0.025;
     private double atGoalStateDebounceTime = 0.2;
+
+    /*
+     * Debouncers take in certain statement. If it is false: it checks for how long (the first parameter) 
+     * If it is long enough then return True. 
+     */
     private Debouncer torqueCurrentDebouncer = new Debouncer(torqueCurrentDebounceTime, DebounceType.kFalling);
     private Debouncer atGoalStateDebouncer = new Debouncer(atGoalStateDebounceTime, DebounceType.kFalling);
     private boolean atGoal = false;
@@ -89,31 +94,31 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void periodic(){
-        // updateInputs();
-        // runVelocity(Units.rotationsToRadians(getShooterVelcoity()));
-        // SmartDashboard.putNumber("Shot Power", shooterPower);
-        // shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
+        updateInputs();
+        runVelocity(Units.rotationsToRadians(getShooterVelcoity()));
+        SmartDashboard.putNumber("Shot Power", shooterPower);
+        shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
-        // if (phase == FlywheelPhase.BANG_BANG) { // shooter target speed is in RPS
-        //     // Duty-cycle bang-bang (apply to both)
-        //     shooterMotorLeft.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // spin as fast as possible shooter target speed
-        //     shooterMotorRight.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // same here
-        // } else {
-        //     // Torque-current bang-bang
-        //     shooterMotorLeft.setControl(new VelocityTorqueCurrentFOC(shooterTargetSpeed)); // apply constant torque current
-        //     shooterMotorRight.setControl(new VelocityTorqueCurrentFOC(shooterTargetSpeed)); // again
-        // }
-
-        shooterMotorLeft.set(-shooterPower);
-        shooterMotorRight.set(-shooterPower);
+        if (phase == FlywheelPhase.BANG_BANG || phase == FlywheelPhase.START_UP) { // shooter target speed is in RPS
+            // Duty-cycle bang-bang (apply to both) 100% speeds
+            shooterMotorLeft.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // spin as fast as possible shooter target speed
+            shooterMotorRight.setControl(new VelocityDutyCycle(shooterTargetSpeed)); // same here
+        } else {
+            // Torque-current bang-bang
+            shooterMotorLeft.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
+            shooterMotorRight.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
+        }
     }
 
     /** Run closed loop at the specified velocity. */
     private void runVelocity(double velocityRadsPerSec) {
+        // if we are not in the tolerance
         boolean inTolerance =
             Math.abs(Units.rotationsToRadians(getShooterVelcoity()) - velocityRadsPerSec)
                 <= torqueCurrentControlTolerance;
-        boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance);
+        // If we are not in tolerance we calculate for how long
+        boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance); // this calculates if the logic has been occuring long enough
+        
         atGoal = atGoalStateDebouncer.calculate(inTolerance);
 
         if (!torqueCurrentControl && lastTorqueCurrentControl) {
@@ -123,8 +128,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         phase =
             torqueCurrentControl
-                ? FlywheelPhase.BANG_BANG
-                : FlywheelPhase.CONSTANT_TORQUE;
+                ? FlywheelPhase.CONSTANT_TORQUE
+                : FlywheelPhase.BANG_BANG;
         shooterTargetSpeed = Units.radiansToRotations(velocityRadsPerSec);
         Logger.recordOutput("Shooter/Setpoint", velocityRadsPerSec);
     }
