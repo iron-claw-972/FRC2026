@@ -73,7 +73,7 @@ public class Climb extends SubsystemBase {
 
         SmartDashboard.putData("PID", pid);
         SmartDashboard.putData("Climb Display", simulationMechanism);
-         SmartDashboard.putData("EXTEND", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("EXTEND", new InstantCommand(() -> extend()));
         SmartDashboard.putData("CLIMB", new InstantCommand(() -> climb()));
     }
 
