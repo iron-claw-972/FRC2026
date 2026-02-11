@@ -26,13 +26,13 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-
+    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
     //rotations/sec
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
 
-    public double shooterPower = 0.5;
+    public double feederPower;
     
     //Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
@@ -89,6 +89,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // set start up for phase initially:
         phase = FlywheelPhase.START_UP;
 
+        feederPower = 1.0;
+
         SmartDashboard.putData("Turn on shooter", new InstantCommand(() -> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
         SmartDashboard.putData("Turn ALL off", new InstantCommand(() -> deactivateShooterAndFeeder()));
         SmartDashboard.putData("Turn off Shooter", new InstantCommand(() -> setShooter(0)));
@@ -97,8 +99,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     public void periodic(){
         updateInputs();
         runVelocity(Units.rotationsToRadians(getShooterVelcoity()));
-        SmartDashboard.putNumber("Shot Power", shooterPower);
-        shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
         if (phase == FlywheelPhase.BANG_BANG || phase == FlywheelPhase.START_UP) { // shooter target speed is in RPS
             // Duty-cycle bang-bang (apply to both) 100% speeds
@@ -109,6 +109,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             shooterMotorLeft.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
             shooterMotorRight.setControl(new TorqueCurrentFOC(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
         }
+        feederMotor.set(feederPower);
     }
 
     /** Run closed loop at the specified velocity. */
@@ -146,8 +147,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         System.out.println("Shooter is working");
     }
 
-    public void setShooterPower(double power){
-        this.shooterPower = power;
+    public void setFeederPower(double power) {
+        this.feederPower = power;
     }
 
     public double getShooterVelcoity() {
