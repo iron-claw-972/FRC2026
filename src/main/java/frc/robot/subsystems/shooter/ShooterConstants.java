@@ -15,9 +15,9 @@ public class ShooterConstants {
     public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
 
     // for bang bang
-    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 10; // velocity (rotations per second)
+    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 10; // this is how far we should drop to say a ball is detected
 
-    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 40; // TUNE
+    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 40; // TUNE (this is the target)
 }
 // 8 velcocity is too little
 // 16 is too much
