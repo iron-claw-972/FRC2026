@@ -96,6 +96,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     })
         );
 
+        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
+            new InstantCommand(() -> {
+                spindexer.accelerateSpindexer();
+            })
+        );
+        driver.get(PS5Button.LEFT_TRIGGER).onTrue(
+            new InstantCommand(() -> {
+                spindexer.deccelerateSpindexer();
+            })
+        );
     }
 
     @Override
