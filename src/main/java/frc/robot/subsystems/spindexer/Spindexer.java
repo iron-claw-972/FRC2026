@@ -31,18 +31,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
         power = 1.0;
     }
 
-    public void accelerateSpindexer(){
-        if (power <= 0.998) {
-            power += 0.002; // not sure
-        }
-    }
-
-    public void deccelerateSpindexer(){
-        if (power >= 0.002) {
-            power -= 0.002; // not sure
-        }
-    }
-
     public void stopSpindexer(){
         power = 0.0;
     }

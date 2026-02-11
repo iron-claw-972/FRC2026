@@ -85,7 +85,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
         }
 
-        driver.get(PS5Button.SQUARE).onTrue(
+        // Auto shoot
+        if(turret != null && hood != null){
+            driver.get(PS5Button.SQUARE).onTrue(
             new InstantCommand(()->{
                         if (autoShoot != null && autoShoot.isScheduled()){
                             autoShoot.cancel();
@@ -95,17 +97,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                         }
                     })
         );
+        }
 
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(
-            new InstantCommand(() -> {
-                spindexer.accelerateSpindexer();
-            })
-        );
-        driver.get(PS5Button.LEFT_TRIGGER).onTrue(
-            new InstantCommand(() -> {
-                spindexer.deccelerateSpindexer();
-            })
-        );
     }
 
     @Override
