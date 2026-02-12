@@ -11,17 +11,28 @@ public class IntakeConstants {
 
     //Motor speed
     public static final double speed = 0.2;
-    public static final double gearRatio = 3;
+    /**
+     * 12 tooth pinion driving 36 tooth driven gear
+     */
+    public static final double gearRatio = 36.0/12.0;
+    /**
+     * radius of the rack gear which is a 10 tooth pinion
+     */
     public static final double radius = 0.5;
-
-     public static final double statorLimitAmps = 50.0;
-    public static final double supplyLimitAmps = 40.0;
 
     // Intake positions
 
-    public static final double maxExtension = 14.856; // in inches: convert to rotations later
+    /**
+     * max extension in inches
+     */
+    public static final double maxExtension = 14.856; 
+    /**
+     * starting point in inches
+     */
     public static final double startingPoint = 0;
-
+    /**
+     * rack pitch in teeth per inch
+     */
     public static final double rackPitch = 10;
     // for simulation
     public static final double kMaxRotations = 37.5;

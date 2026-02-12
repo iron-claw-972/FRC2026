@@ -6,12 +6,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.fasterxml.jackson.databind.ser.std.InetAddressSerializer;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -23,9 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IntakeConstants;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.Num;
-import edu.wpi.first.math.system.LinearSystem;
-import org.ejml.simple.SimpleMatrix;
+import edu.wpi.first.math.util.Units;
 
 public class Intake extends SubsystemBase {
     private final Mechanism2d mechanism;
@@ -46,7 +39,9 @@ public class Intake extends SubsystemBase {
     public Intake() {
         rightMotor = new TalonFX(IntakeConstants.rightID);
         leftMotor = new TalonFX(IntakeConstants.leftID);
+
         rollerMotor = new TalonFX(IntakeConstants.rollerID); 
+
         DCMotor dcmotor = DCMotor.getKrakenX44(2);
      
         intakeSim = new DCMotorSim(
@@ -59,39 +54,44 @@ public class Intake extends SubsystemBase {
 );
         rightMotor.getSimState().setSupplyVoltage(12.0);
 
+        // get the maximum free speed
+        double mechFreeSpeed = Units.radiansToRotations(dcmotor.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
 
-        double mechFreeSpeed = 125.0/ IntakeConstants.gearRatio;
+        // this is confusing
         maxVelocity = 0.5 * mechFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
 
         // right motor configs
-        TalonFXConfiguration Config = new TalonFXConfiguration();
-        var slot0Configs = Config.Slot0;
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        var slot0Configs = config.Slot0;
         //find values later
         //friction, maybe?
-        slot0Configs.kP = 0.1;
+        slot0Configs.kP = 5;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0;
         slot0Configs.kV = 0;
         slot0Configs.kA = 0;
 
 
-        var currentLimits = Config.CurrentLimits;
+        var currentLimits = config.CurrentLimits;
         currentLimits.StatorCurrentLimitEnable = true;
-        currentLimits.StatorCurrentLimit = IntakeConstants.statorLimitAmps;
+        // set to a low current for testing
+        currentLimits.StatorCurrentLimit = 3.0;
         currentLimits.SupplyCurrentLimitEnable = true;
-        currentLimits.SupplyCurrentLimit = IntakeConstants.supplyLimitAmps;
+        // set to a low current for testing
+        currentLimits.SupplyCurrentLimit = 3.0;
 
-        var motionMagicConfigs = Config.MotionMagic;
+        var motionMagicConfigs = config.MotionMagic;
 
         motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radius/Math.PI/2;
         motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radius/Math.PI/2;
+
         rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-        rightMotor.getConfigurator().apply(Config);
+        rightMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-        leftMotor.getConfigurator().apply(Config);
+        leftMotor.getConfigurator().apply(config);
 
         //Follower follower = new Follower(rightMotor.getDeviceID(), true);
         leftMotor.setControl(new Follower(rightMotor.getDeviceID(), MotorAlignmentValue.Opposed));
@@ -110,15 +110,10 @@ public class Intake extends SubsystemBase {
     }
 
     public void periodic() {
-        SmartDashboard.putNumber("Intake Position:", getPosition());
-
-        // report the position of the extension
-        double percentExtended = getPosition() / IntakeConstants.kMaxRotations;
-        distance = percentExtended/IntakeConstants.gearRatio * 1/IntakeConstants.rackPitch; 
-        percentExtended = Math.max(0.0, Math.min(1.0, percentExtended));
-
-        // robotExtension.setLength(percentExtended * maxExtension);
-
+        // Report position to SmartDashboard
+        double inchExtension = getPosition();
+        SmartDashboard.putNumber("Intake Position:", inchExtension);
+        robotExtension.setLength(inchExtension);
     }
 
     public void simulationPeriodic(){
@@ -134,22 +129,27 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * in rotations
+     * in inches
      * @param setpoint
      */
     public void setPosition(double setpoint) {
-        rightMotor.setControl(voltageRequest.withPosition(setpoint));
-
-        // set the position quickly (should be in simultation and move slowly)
-        robotExtension.setLength(12.0 * setpoint/IntakeConstants.kMaxRotations);
+        double teethRackPinion = 10;
+        // setpoint is in inches, need to convert to rotations
+        double teethRackDistance = setpoint / (IntakeConstants.rackPitch * Math.PI);
+        double rotationsRackPinion = teethRackDistance / teethRackPinion;
+        double motorRotations = rotationsRackPinion * IntakeConstants.gearRatio;
+        rightMotor.setControl(voltageRequest.withPosition(motorRotations));
     }
 
     /**
      * gets motor position in inches
      */
     public double getPosition(){
-        double position = rightMotor.getPosition().getValueAsDouble();
-        return position;
+        // TODO: IDK if this is correct, so check that it's correct!!
+        double motorRotations = rightMotor.getPosition().getValueAsDouble();
+        double teethRackDistance = motorRotations / (IntakeConstants.rackPitch * Math.PI);
+        double positionInches = teethRackDistance/10;
+        return positionInches;
     }
 
     public boolean atMaxExtension(){
