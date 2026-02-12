@@ -96,7 +96,7 @@ public class AutoShootCommand extends Command {
 
     public void updateSetpoints(Pose2d drivepose) {
 
-        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d(); // Put this on the top so we can change it
         Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
         double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
         
@@ -122,9 +122,10 @@ public class AutoShootCommand extends Command {
 
         // Loop (20) until lookahreadTurretToTargetDistance converges
         for (int i = 0; i < 20; i++) {
+            Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
+            Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
             goalState = ShooterPhysics.getShotParams(
-				new Translation2d(turretVelocityX, turretVelocityY),
-				new Translation3d(target.minus(lookaheadPose.getTranslation())),
+				target3d.minus(lookahead3d),
 				8.0);
 
             timeOfFlight = ShotInterpolation.timeOfFlightMap.get(lookaheadTurretToTargetDistance);
