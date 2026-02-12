@@ -159,12 +159,17 @@ public class AutoShootCommand extends Command {
         // Loop (20) until lookaheadPose converges
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
-            Translation3d target3d = wantedState == WantedState.SHOOTING ? 
-                new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ())
-                : new Translation3d(target);
-            goalState = ShooterPhysics.getShotParams(
+            if(wantedState == WantedState.PASSING){
+                Translation3d target3d = new Translation3d(target);
+                goalState = ShooterPhysics.getShotParams(
+                    target3d.minus(lookahead3d),
+                    16.0); // TODO: Find this super high height -- should be just the maximum
+            } else{
+                Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
+                goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
 				8.0);
+            }
 
             timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
