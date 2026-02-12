@@ -48,7 +48,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	/* ---------------- Constants ---------------- */
 
-	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-90);
+	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-90); // Change this later to the actual values
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(90);
 
 	private static final double MAX_VEL_RAD_PER_SEC = 25;
@@ -232,56 +232,31 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		double targetVelocity;
 
-		// if(Math.abs(setpoint.position * GEAR_RATIO - Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) > Math.PI/2){
-		// 	// in rad/sec
-		// 	targetVelocity = longVelocityPID.calculate(
-		// 			motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-		// 			setpoint.position * GEAR_RATIO);
+		double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
+
+		targetVelocity = positionPID.calculate(
+				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
+				motorSetpointPosition);
 			
-		// 	targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
 
-		// 	double voltage = feedForward.calculate(targetVelocity);
-		// 	motor.setVoltage(voltage);
-		// } else{
-			// in rad/sec
-			//double robotRotAcceleration = (Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) - lastFrameVelocity) / Constants.LOOP_TIME;
-			double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
+		double voltage = feedForward.calculate(targetVelocity);
 
-			targetVelocity = positionPID.calculate(
-					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-					motorSetpointPosition);
-			
-			targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
+		voltage += velocityCorrectionVoltage;
 
-			double voltage = feedForward.calculate(targetVelocity);
+		motor.setVoltage(voltage);
 
-			double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-			voltage += velocityCorrectionVoltage;
-
-			motor.setVoltage(voltage);
-		// }
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
-		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
-
-		// --- Position + velocity feedforward (MA-style) ---
-		// motor.setControl(request);
-        // motor.clearStickyFaults();
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-        SmartDashboard.putData(positionPID);
-		SmartDashboard.putData(velocityPID);
-		SmartDashboard.putNumber("Turret GoalDeg",
-				Units.radiansToDegrees(best));
 		SmartDashboard.putNumber("Turret SetpointDeg",
 				Units.radiansToDegrees(setpoint.position));
-		SmartDashboard.putNumber("Turret Raw Setpoint", Units.radiansToDegrees(best));
-		SmartDashboard.putNumber("Turret motorPosRot",
-				Units.radiansToDegrees(motorPosRot));
 		SmartDashboard.putNumber("Turret motorVelRotPerSec",
 				Units.radiansToDegrees(motorVelRotPerSec));
         SmartDashboard.putNumber("Turret targetVelocity",
