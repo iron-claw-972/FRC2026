@@ -120,7 +120,7 @@ public class AutoShootCommand extends Command {
         Pose2d lookaheadPose = turretPosition;
         //double lookaheadTurretToTargetDistance = turretToTargetDistance;
 
-        // Loop (20) until lookahreadTurretToTargetDistance converges
+        // Loop (20) until lookaheadPose converges
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
@@ -159,8 +159,6 @@ public class AutoShootCommand extends Command {
 
         turretSetpoint = potentialSetpoint;
 
-        /** Hood Stuff!! */
-        //hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
         // Pitch is in radians
         hoodAngle = goalState.pitch();
         hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
