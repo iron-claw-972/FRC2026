@@ -191,6 +191,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 	}
 
+	public boolean atSetpoint(){
+		return Math.abs(setpoint.position - getPositionRad()) < Units.degreesToRadians(3.0); // Tolerance of 3 degrees
+	}
+
 	/* ---------------- Periodic ---------------- */
 
 	@Override
@@ -272,22 +276,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
-
-        SmartDashboard.putData(positionPID);
-		SmartDashboard.putData(velocityPID);
-		SmartDashboard.putNumber("Turret GoalDeg",
-				Units.radiansToDegrees(best));
-		SmartDashboard.putNumber("Turret SetpointDeg",
-				Units.radiansToDegrees(setpoint.position));
-		SmartDashboard.putNumber("Turret Raw Setpoint", Units.radiansToDegrees(best));
-		SmartDashboard.putNumber("Turret motorPosRot",
-				Units.radiansToDegrees(motorPosRot));
-		SmartDashboard.putNumber("Turret motorVelRotPerSec",
-				Units.radiansToDegrees(motorVelRotPerSec));
-        SmartDashboard.putNumber("Turret targetVelocity",
-				Units.radiansToDegrees(targetVelocity));
-		SmartDashboard.putNumber("Turret Position Deg",
-				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 
 		updateInputs();
 		Logger.processInputs("Turret", inputs);

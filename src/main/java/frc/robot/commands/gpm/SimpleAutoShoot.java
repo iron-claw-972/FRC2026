@@ -20,7 +20,6 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
 import frc.robot.util.Vision.TurretVision;
 
@@ -161,10 +160,6 @@ public class SimpleAutoShoot extends Command {
         } else {
             return false;
         }
-    }
-
-    public FieldZone getZone(Translation2d drivepose) {
-        return FieldConstants.getZone(drivepose);
     }
 }
 

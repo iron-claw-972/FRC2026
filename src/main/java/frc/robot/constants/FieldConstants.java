@@ -12,10 +12,17 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
-import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
 
 public class FieldConstants {
+
+  public enum FieldZone {
+    ALLIANCE,
+    NEUTRAL,
+    OPPOSITION,
+    TRENCH_BUMP
+  }
+  
   /** Width of the field [meters] */
   public static final double FIELD_LENGTH = Units.inchesToMeters(57*12 + 6+7.0/8.0);
   /** Height of the field [meters] */

@@ -112,6 +112,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         return Math.abs(getShooterVelcoity() - targetSpeedMPS) < 0.1; // Tolerance of 0.1 mps
     }
 
+    public double getTargetVelocityMPS(){
+        return targetSpeedMPS;
+    }
+
     public void updateInputs() {
         inputs.leftShooterVelocity = Units.rotationsToRadians(motorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.rightShooterVelocity =Units.rotationsToRadians(motorRight.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;

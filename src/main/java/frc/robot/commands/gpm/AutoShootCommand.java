@@ -52,10 +52,6 @@ public class AutoShootCommand extends Command {
     private WantedState wantedState = WantedState.IDLE;
     private CurrentState currentState = CurrentState.IDLE;
 
-    private void updateStates(){
-
-    }
-
     //TODO: find maximum interpolation
     private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
 
@@ -94,6 +90,33 @@ public class AutoShootCommand extends Command {
         addRequirements(turret, hood);
     }
 
+    private void updateStates(){
+        // if shooter is not trying to run -- idle
+        if(shooter.getTargetVelocityMPS() == 0.0){
+            currentState = CurrentState.IDLE;
+            return;
+        }
+        // if shooter velocity not ready yet -- starting up
+        if(!shooter.atTargetVelocity()){
+            currentState = CurrentState.STARTING_UP;
+            return;
+        }
+        // if turret is not at setpoint -- turning around
+        if(turret.atSetpoint()){
+            currentState = CurrentState.TURNING_AROUND;
+            return;
+        }
+        // if in alliance zone -- shooting
+        if(FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.ALLIANCE){
+            currentState = CurrentState.SHOOTING;
+        }
+        // if not in alliance zone -- passing
+        if(FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.NEUTRAL
+            || FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.OPPOSITION){
+            currentState = CurrentState.PASSING;
+        }
+    }
+
     public void updateSetpoints(Pose2d drivepose) {
 
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d(); // Put this on the top so we can change it
@@ -120,7 +143,7 @@ public class AutoShootCommand extends Command {
         Pose2d lookaheadPose = turretPosition;
         //double lookaheadTurretToTargetDistance = turretToTargetDistance;
 
-        // Loop (20) until lookahreadTurretToTargetDistance converges
+        // Loop (20) until lookaheadPose converges
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
@@ -128,7 +151,7 @@ public class AutoShootCommand extends Command {
 				target3d.minus(lookahead3d),
 				8.0);
 
-            timeOfFlight = goalState.timeOfFlight(); // TODO: Change this to get it from shooter physics
+            timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
