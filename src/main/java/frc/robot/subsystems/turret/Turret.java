@@ -136,8 +136,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
 
-        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.getPosition().getValueAsDouble()), () -> Rotations.of(encoderRight.getPosition().getValueAsDouble()))
-        .withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
+        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.getAbsolutePosition().getValueAsDouble()), () -> Rotations.of(encoderRight.getAbsolutePosition().getValueAsDouble()))
+        //.withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
+		.withCommonDriveGear(1.0, 140, 15, 22)
         .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
         .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
         .withMatchTolerance(Degrees.of(3)) // Tune this
@@ -291,7 +292,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = encoderLeft.getPosition().getValueAsDouble();
-        inputs.encoderRightRot = encoderRight.getPosition().getValueAsDouble();
+        inputs.encoderLeftRot = encoderLeft.getAbsolutePosition().getValueAsDouble();
+        inputs.encoderRightRot = encoderRight.getAbsolutePosition().getValueAsDouble();
 	}
 }
