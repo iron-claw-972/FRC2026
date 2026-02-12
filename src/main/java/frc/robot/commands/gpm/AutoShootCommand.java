@@ -79,24 +79,25 @@ public class AutoShootCommand extends Command {
 
     private final double phaseDelay = 0.03;
 
+    private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+
     public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.hood = hood;
         this.shooter = shooter;
         this.spindexer = spindexer;
-        drivepose  = drivetrain.getPose();
+        //drivepose  = drivetrain.getPose();
+        drivepose  = drivetrain.getPose().rotateBy(new Rotation2d(Math.PI)); // TODO: Revert when robot isn't backwards 
 
         goalState = ShooterPhysics.getShotParams(
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
-				8.0);
+				8.0); // Random initial goalState to prevent it being null
         
         addRequirements(turret, hood);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
-
-        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d(); // Put this on the top so we can change it
         Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
         double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
         
@@ -115,12 +116,16 @@ public class AutoShootCommand extends Command {
                     * (TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX() * Math.cos(drivepose.getRotation().getRadians())
                         - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY() * Math.sin(drivepose.getRotation().getRadians()));
 
-        // Account for imparted velocity by robot (turret) to offset
         double timeOfFlight;
         Pose2d lookaheadPose = turretPosition;
         //double lookaheadTurretToTargetDistance = turretToTargetDistance;
 
-        // Loop (20) until lookaheadPose converges
+        /*
+         * Loop (20) until lookaheadPose converges BECAUSE -->
+         * If you're 8m away (t = 1.0s) and moving at 2m/s towards target, you calculate for 6m (t = 0.8s)
+         * At 6m, we run assuming t = 0.8 but then the 6m isn't correct since it was derived using t = 1.0s
+         * So we make a bunch of guesses until it converges
+         */
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
@@ -128,7 +133,7 @@ public class AutoShootCommand extends Command {
 				target3d.minus(lookahead3d),
 				8.0);
 
-            timeOfFlight = goalState.timeOfFlight(); // TODO: Change this to get it from shooter physics
+            timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
@@ -137,6 +142,7 @@ public class AutoShootCommand extends Command {
                     turretPosition.getRotation());
             //lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
         }
+
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
         if (lastTurretAngle == null) {
             lastTurretAngle = turretAngle;
