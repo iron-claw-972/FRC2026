@@ -35,6 +35,27 @@ public class AutoShootCommand extends Command {
     private Shooter shooter;
     private Spindexer spindexer;
 
+    private enum WantedState {
+        IDLE,
+        SHOOTING,
+        PASSING
+    }
+
+    private enum CurrentState {
+        IDLE,
+        STARTING_UP,
+        TURNING_AROUND,
+        SHOOTING,
+        PASSING
+    }
+
+    private WantedState wantedState = WantedState.IDLE;
+    private CurrentState currentState = CurrentState.IDLE;
+
+    private void updateStates(){
+
+    }
+
     //TODO: find maximum interpolation
     private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
 
@@ -162,7 +183,7 @@ public class AutoShootCommand extends Command {
         updateSetpoints(drivepose);
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        shooter.setShooter(Units.radiansToRotations(goalState.exitVel() / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)));
+        shooter.setShooter(goalState.exitVel());
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
