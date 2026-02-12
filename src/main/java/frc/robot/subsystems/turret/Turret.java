@@ -51,7 +51,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-90); // Change this later to the actual values
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(90);
 
-	private static final double MAX_VEL_RAD_PER_SEC = 25;
+	//private static final double MAX_VEL_RAD_PER_SEC = 25;
+	private static final double MAX_VEL_RAD_PER_SEC = 3.0; // Starting super duper slow for now
 	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
 	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
@@ -238,7 +239,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
 				motorSetpointPosition);
 			
-		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
+		//targetVelocity += Units.rotationsToRadians(motorVelRotPerSec); // TODO: Change this back after full rotation
+		targetVelocity += Math.abs(setpoint.position) != Math.PI/2 ? Units.rotationsToRadians(motorVelRotPerSec) : 0;
 
 		double voltage = feedForward.calculate(targetVelocity);
 
