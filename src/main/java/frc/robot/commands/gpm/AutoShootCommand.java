@@ -223,8 +223,8 @@ public class AutoShootCommand extends Command {
     @Override
     public void execute() {
         updateDrivePose();
-        target = (wantedState == WantedState.SHOOTING) 
-                ? FieldConstants.getHubTranslation().toTranslation2d() 
+        target = (wantedState == WantedState.SHOOTING) ? 
+                FieldConstants.getHubTranslation().toTranslation2d() 
                 : FieldConstants.getOppositionTranslation(true).toTranslation2d();
 
         updateWantedState();
