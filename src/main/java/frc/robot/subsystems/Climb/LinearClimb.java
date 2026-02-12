@@ -23,7 +23,7 @@ public class LinearClimb {
 
     private double rotationalSetpoint = 0;
 
-    private double kP = 0.1;
+    private double kP = 0.5;
     private double kI = 0.0;
     private double kD = 0.0;  
 
@@ -64,6 +64,8 @@ public class LinearClimb {
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
         SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
+
+        motor.setPosition((ClimbConstants.MAX_HEIGHT/(2 * Math.PI * ClimbConstants.RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
 
     public void setSetpoint(double setpoint) {

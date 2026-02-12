@@ -20,5 +20,5 @@ public class IdConstants {
     public static final int CANDLE_ID = 1;
 
     // Climb
-    public static final int CLIMB_MOTOR_ID = 1; // change left and right  IDs later
+    public static final int CLIMB_MOTOR_ID = 7; // change left and right  IDs later
 }

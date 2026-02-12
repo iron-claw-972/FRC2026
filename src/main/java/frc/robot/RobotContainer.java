@@ -24,6 +24,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -48,6 +49,7 @@ public class RobotContainer {
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LinearClimb linearClimb = null;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -74,35 +76,37 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
+        linearClimb = new LinearClimb();
+        break;
 
       case Phil: // AKA "IHOP"
 
       case PrimeJr:
 
       case Vertigo: // AKA "French Toast"
-        drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
-        operator = new Operator(drive);
+        // drive = new Drivetrain(vision, new GyroIOPigeon2());
+        // driver = new PS5ControllerDriverConfig(drive);
+        // operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
-        DetectedObject.setDrive(drive);
+        // DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
 
-        driver.configureControls();
-        operator.configureControls();
+        // driver.configureControls();
+        // operator.configureControls();
         
-        initializeAutoBuilder();
-        registerCommands();
-        PathGroupLoader.loadPathGroups();
-        // Load the auto command
-        try {
-          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-          auto = new PathPlannerAuto("Path Name");
-        } catch (IOException | ParseException e) {
-          e.printStackTrace();
-        }
-        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        // initializeAutoBuilder();
+        // registerCommands();
+        // PathGroupLoader.loadPathGroups();
+        // // Load the auto command
+        // try {
+        //   PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+        //   auto = new PathPlannerAuto("Path Name");
+        // } catch (IOException | ParseException e) {
+        //   e.printStackTrace();
+        // }
+        // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
       }
 
