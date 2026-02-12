@@ -88,7 +88,6 @@ public class AutoShootCommand extends Command {
         drivepose  = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
-				new Translation2d(0, 0),
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0);
         

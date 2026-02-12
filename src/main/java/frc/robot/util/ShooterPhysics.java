@@ -42,6 +42,10 @@ public class ShooterPhysics {
 		return cvtShot(exitVel, height);
 	}
 
+	public static TurretState getShotParams(Translation3d robotToTarget, double height) {
+		return getShotParams(new Translation2d(0, 0), robotToTarget, height);
+	}
+
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			Constraints constraints) {
 		// establish a lower bound
