@@ -159,7 +159,9 @@ public class AutoShootCommand extends Command {
         // Loop (20) until lookaheadPose converges
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
-            Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
+            Translation3d target3d = wantedState == WantedState.SHOOTING ? 
+                new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ())
+                : new Translation3d(target);
             goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
 				8.0);
@@ -219,10 +221,10 @@ public class AutoShootCommand extends Command {
         target = (wantedState == WantedState.SHOOTING) 
                 ? FieldConstants.getHubTranslation().toTranslation2d() 
                 : FieldConstants.getOppositionTranslation(true).toTranslation2d();
-        
-        updateSetpoints(drivepose);
+
         updateWantedState();
         updateCurrentState();
+        updateSetpoints(drivepose);
 
         if (wantedState == WantedState.IDLE) {
             turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
