@@ -49,7 +49,7 @@ public class AutoShootCommand extends Command {
         PASSING
     }
 
-    private WantedState wantedState = WantedState.IDLE;
+    private WantedState wantedState = WantedState.SHOOTING;
     private CurrentState currentState = CurrentState.IDLE;
 
     //TODO: find maximum interpolation
@@ -71,9 +71,13 @@ public class AutoShootCommand extends Command {
     private double hoodAngle;
     private double hoodVelocity;
 
+    private double targetShooterVelocityMPS;
+
     private TurretState goalState;
 
     private final double phaseDelay = 0.03;
+
+    private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d(); 
 
     public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -90,7 +94,7 @@ public class AutoShootCommand extends Command {
         addRequirements(turret, hood);
     }
 
-    private void updateStates(){
+    private void updateCurrentState(){
         // if shooter is not trying to run -- idle
         if(shooter.getTargetVelocityMPS() == 0.0){
             currentState = CurrentState.IDLE;
@@ -117,9 +121,18 @@ public class AutoShootCommand extends Command {
         }
     }
 
+    private void updateWantedState() {
+        if(FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.ALLIANCE){
+            wantedState = WantedState.SHOOTING;
+        }
+        if(FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.NEUTRAL
+            || FieldConstants.getZone(drivepose.getTranslation()) == FieldConstants.FieldZone.OPPOSITION){
+            wantedState = WantedState.PASSING;
+        }
+    }
+
     public void updateSetpoints(Pose2d drivepose) {
 
-        Translation2d target = FieldConstants.getHubTranslation().toTranslation2d(); // Put this on the top so we can change it
         Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
         double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
         
@@ -182,13 +195,13 @@ public class AutoShootCommand extends Command {
 
         turretSetpoint = potentialSetpoint;
 
-        /** Hood Stuff!! */
-        //hoodAngle = ShotInterpolation.hoodAngleMap.get(lookaheadTurretToTargetDistance);
         // Pitch is in radians
         hoodAngle = goalState.pitch();
         hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
+
+        targetShooterVelocityMPS = goalState.exitVel();
     }
 
     public void updateDrivePose(){
@@ -203,14 +216,31 @@ public class AutoShootCommand extends Command {
     @Override
     public void execute() {
         updateDrivePose();
+        target = (wantedState == WantedState.SHOOTING) 
+                ? FieldConstants.getHubTranslation().toTranslation2d() 
+                : FieldConstants.getOppositionTranslation(true).toTranslation2d();
+        
         updateSetpoints(drivepose);
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
-        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        shooter.setShooter(goalState.exitVel());
+        updateWantedState();
+        updateCurrentState();
 
-        /** Spindexer Stuff!! */
-        if(spindexer != null){
-            spindexer.maxSpindexer();
+        if (wantedState == WantedState.IDLE) {
+            turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            shooter.setShooter(0.0);
+            spindexer.stopSpindexer();
+        } else {
+            // SHOOTING and PASSING
+            turret.setFieldRelativeTarget(Rotation2d.fromRadians(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
+            hood.setFieldRelativeTarget(Rotation2d.fromRadians(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
+            shooter.setShooter(targetShooterVelocityMPS);
+
+            boolean shouldFeed = !(currentState == CurrentState.STARTING_UP) || !(currentState == CurrentState.TURNING_AROUND);
+            if (shouldFeed) {
+                spindexer.maxSpindexer();
+            } else {
+                spindexer.stopSpindexer();
+            }
         }
     }
 
@@ -219,9 +249,8 @@ public class AutoShootCommand extends Command {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
-        if(spindexer != null){
-            spindexer.stopSpindexer();
-        }
+        spindexer.stopSpindexer();
+        shooter.setShooter(0.0);
     }
 
 }
