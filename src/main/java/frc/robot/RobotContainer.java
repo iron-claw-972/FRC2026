@@ -52,9 +52,8 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
-  // Auto
+  // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-  private Command autoSelected;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -66,7 +65,7 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    chooserInit();
+    autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -130,14 +129,6 @@ public class RobotContainer {
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
   }
 
-  public void chooserInit(){
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
-    SmartDashboard.putData("Auto chooser", autoChooser);
-  }
-
   /**
    * Sets whether the drivetrain uses vision toupdate odometry
    */
@@ -193,14 +184,29 @@ public class RobotContainer {
 
 // Autos 
 
+  /**
+   * Initialize the SendableChooser on the SmartDashbboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
 
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
+  }
 
   /**
    * Gets the auto command from SmartDashboard
    * @return
    */
-  public Command getAutoCommand(){
-    autoSelected = autoChooser.getSelected();
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
     return autoSelected;
   }
 
