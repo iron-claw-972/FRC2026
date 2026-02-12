@@ -58,7 +58,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
 
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
-	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
     private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
