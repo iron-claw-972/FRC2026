@@ -242,7 +242,7 @@ public class AutoShootCommand extends Command {
             hood.setFieldRelativeTarget(Rotation2d.fromRadians(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
             shooter.setShooter(targetShooterVelocityMPS);
 
-            boolean shouldFeed = !(currentState == CurrentState.STARTING_UP) || !(currentState == CurrentState.TURNING_AROUND);
+            boolean shouldFeed = !(currentState == CurrentState.STARTING_UP) && !(currentState == CurrentState.TURNING_AROUND);
             if (shouldFeed) {
                 spindexer.maxSpindexer();
             } else {
