@@ -9,7 +9,6 @@ import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -271,7 +270,6 @@ class ShooterPhysicsTest {
 		}
 	}
 
-	@Disabled
 	@Test
 	public void simulatedConstraintsTest() {
 		Random rng = new Random(6328);
@@ -294,10 +292,12 @@ class ShooterPhysicsTest {
 
 				// check going down breaks a constraint; we've found the minimum
 				var lower = ShooterPhysics.withAngle(initVel, robotToTarget, state.get().pitch() - .1);
-				assertTrue(lower.isEmpty());
+				assertTrue(lower.isEmpty() || !lower.get().satisfies(constraints));
 				// check going up is okay
-				var higher = ShooterPhysics.withAngle(initVel, robotToTarget, state.get().pitch() + .1);
-				assertTrue(higher.isPresent());
+				if (state.get().pitch() + 0.1 < constraints.maxPitch()) {
+					var higher = ShooterPhysics.withAngle(initVel, robotToTarget, state.get().pitch() + .1);
+					assertTrue(higher.isPresent());
+				}
 			}
 		}
 	}

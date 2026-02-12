@@ -192,13 +192,14 @@ public class ShooterPhysics {
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
 		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:"
-		// 		+ tolerance);
+		// + tolerance);
 		// trying to calculate a shot for height=0 returns NaN
 		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
 		TurretState first = cvtShot(getRequiredExitVelocity(initialVelocity, target, effectiveMinHeight),
 				effectiveMinHeight);
-		// if the minimum velocity is below our minimum height, that's the closest we can get
+		// if the minimum velocity is below our minimum height, that's the closest we
+		// can get
 		if (getVelocityDiff(first, initialVelocity, target) >= 0)
 			return first;
 
@@ -257,8 +258,11 @@ public class ShooterPhysics {
 		// if a shot requires going up a kilometer, it's probably not doable
 		TurretState second = cvtShot(getRequiredExitVelocity(initialVelocity, target, 1000.), 1000.);
 
-		if (first.pitch() > pitch + tolerance)
-			return Optional.empty();
+		if (first.pitch() > pitch)
+			if (first.pitch() <= pitch + tolerance)
+				return Optional.of(first);
+			else
+				return Optional.empty();
 		else if (second.pitch() < pitch)
 			return Optional.of(second); // it's close enough
 
@@ -279,7 +283,8 @@ public class ShooterPhysics {
 					return Optional.of(guess);
 				// we've narrowed the range but haven't found a valid angle
 				// should be covered by the checks before the loop
-				assert false;
+				throw new RuntimeException(
+						"Solving for angle resulted in an empty range " + range + " (pitch: " + pitch + ").");
 			}
 
 			if (guess.pitch() > pitch)
