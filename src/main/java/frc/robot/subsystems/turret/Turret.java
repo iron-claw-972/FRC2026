@@ -67,7 +67,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private double lastFrameVelocity = 0.0;
 
-    EasyCRT easyCRT;
+    private EasyCRT easyCRT;
 
 	/* ---------------- Hardware ---------------- */
 
