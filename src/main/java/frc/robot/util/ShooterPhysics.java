@@ -178,6 +178,12 @@ public class ShooterPhysics {
 		return new Translation3d(xExitVel, yExitVel, zExitVel);
 	}
 
+	private static double getVelocityDiff(TurretState shot, Translation2d initialVelocity, Translation3d target) {
+		return (cvtShot(getRequiredExitVelocity(initialVelocity, target, shot.height() + .01), shot.height() + .01)
+				.exitVel()
+				- shot.exitVel()) / .01;
+	}
+
 	// call with default tolerance
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
 		return withMinimumSpeed(initialVelocity, target, 0.001);
@@ -185,53 +191,48 @@ public class ShooterPhysics {
 
 	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
-		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:" + tolerance);
+		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:"
+		// 		+ tolerance);
 		// trying to calculate a shot for height=0 returns NaN
-		double effectiveMinHeight = Math.max(target.getZ(), 0.001);
+		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
-		// guess a peak height
-		double guess = effectiveMinHeight + 5;
-		double lastDerivative = Double.NaN;
-		double lastGuess = Double.NaN;
+		TurretState first = cvtShot(getRequiredExitVelocity(initialVelocity, target, effectiveMinHeight),
+				effectiveMinHeight);
+		// if the minimum velocity is below our minimum height, that's the closest we can get
+		if (getVelocityDiff(first, initialVelocity, target) >= 0)
+			return first;
+
+		// if a shot requires going up a kilometer, it's probably not doable
+		TurretState second = cvtShot(getRequiredExitVelocity(initialVelocity, target, 1000.), 1000.);
+		// just return something
+		if (getVelocityDiff(second, initialVelocity, target) < 0)
+			return second;
+
 		int maxIters = 50;
+		var range = new Pair<TurretState, TurretState>(first, second);
 		while (maxIters >= 0) {
 			maxIters--;
+			assert range.getSecond().height() > range.getFirst().height();
 
-			// this will throw an exception, so avoid it
-			// we still might have just overshot, so keep checking
-			if (guess < effectiveMinHeight)
-				guess = effectiveMinHeight;
+			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
+			TurretState guess = cvtShot(getRequiredExitVelocity(initialVelocity, target, guessHeight), guessHeight);
+			double diff = getVelocityDiff(guess, initialVelocity, target);
 
-			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
-			Translation3d guessVelocityMore = getRequiredExitVelocity(initialVelocity, target, guess + 0.1);
+			// System.out.println("diff:" + diff + "\t\t" + range);
 
-			double derivative = (guessVelocityMore.getNorm() - guessVelocity.getNorm()) / 0.1;
+			if (Math.abs(range.getSecond().exitVel() - range.getFirst().exitVel()) <= tolerance)
+				return guess;
 
-			// we've already hit minimum height and are trying to go lower
-			if (guess <= effectiveMinHeight && derivative > 0)
-				return cvtShot(guessVelocity, guess);
-
-			if (Math.abs(derivative) <= tolerance)
-				return cvtShot(guessVelocity, guess);
-
-			double secondDerivative;
-			if (Double.isNaN(lastDerivative) || Double.isNaN(lastGuess))
-				secondDerivative = 0;
+			if (diff > 0)
+				range = new Pair<TurretState, TurretState>(range.getFirst(), guess);
 			else
-				secondDerivative = (lastDerivative - derivative) / (lastGuess - guess);
-
-			assert Double.isFinite(secondDerivative);
-			lastGuess = guess;
-			lastDerivative = derivative;
-
-			// System.out.println(guess + "\t\t" + "\t\t" + derivative + "\t\t" + secondDerivative);
-			if (secondDerivative == 0)
-				guess -= derivative * 2;
-			else
-				guess -= derivative / Math.abs(secondDerivative);
+				range = new Pair<TurretState, TurretState>(guess, range.getSecond());
 		}
 
-		throw new RuntimeException("Failed to compute a trajectory for a minimum speed.");
+		throw new RuntimeException(
+				"Solving for minumum velocity did not converge (velocity: " + initialVelocity + ", target: "
+						+ target + ", tolerance: " + tolerance + ").");
+
 	}
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
