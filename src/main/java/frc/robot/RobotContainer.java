@@ -7,14 +7,17 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -49,12 +52,22 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
+  // Auto
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private Command autoSelected;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    // display the current robot id on smartdashboard
+    SmartDashboard.putString("RobotID", robotId.toString());
+
+    // Filling the SendableChooser on SmartDashboard
+    chooserInit();
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -117,6 +130,14 @@ public class RobotContainer {
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
   }
 
+  public void chooserInit(){
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+    SmartDashboard.putData("Auto chooser", autoChooser);
+  }
+
   /**
    * Sets whether the drivetrain uses vision toupdate odometry
    */
@@ -144,7 +165,6 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -171,8 +191,17 @@ public class RobotContainer {
     }
   }
 
+// Autos 
+
+
+
+  /**
+   * Gets the auto command from SmartDashboard
+   * @return
+   */
   public Command getAutoCommand(){
-    return auto;
+    autoSelected = autoChooser.getSelected();
+    return autoSelected;
   }
 
   public void logComponents(){

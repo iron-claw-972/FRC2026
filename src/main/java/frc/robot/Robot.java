@@ -18,6 +18,7 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.Constants;
@@ -39,6 +40,9 @@ public class Robot extends LoggedRobot {
         CanBridge.runTCP();
         PortForwarder.add(5800,"10.9.72.12",5800);
         PortForwarder.add(1182,"10.9.72.12",1182);
+
+        // Adding auto options on to SendableChooser on SmartDashboard
+       
 
         // Set up data receivers & replay source
         switch (Constants.CURRENT_MODE) {
@@ -75,10 +79,12 @@ public class Robot extends LoggedRobot {
         //     changes networktables.json, networktables.json.bck (both Untracked)
         //   Uncomment the next line, set the desired RobotId, deploy, and then comment the line out
         //  RobotId.setRobotId(RobotId.SwerveCompetition);
-        DriveConstants.update(RobotId.getRobotId());
+        
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
+
+        DriveConstants.update(robotId);
 
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
