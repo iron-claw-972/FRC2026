@@ -89,6 +89,7 @@ public class Hood extends SubsystemBase implements HoodIO{
     @Override
     public void periodic() {
 		updateInputs();
+
         State goalState = new State(
 				MathUtil.clamp(goalAngle.getRadians(), MIN_ANGLE_RAD, MAX_ANGLE_RAD),
 				goalVelocityRadPerSec);

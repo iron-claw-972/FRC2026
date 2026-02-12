@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -46,8 +48,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	/* ---------------- Constants ---------------- */
 
-	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
-	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
+	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-90);
+	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(90);
 
 	private static final double MAX_VEL_RAD_PER_SEC = 25;
 	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
@@ -58,8 +60,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
-    private final DutyCycleEncoder encoderLeft = new DutyCycleEncoder(1);
-    private final DutyCycleEncoder encoderRight = new DutyCycleEncoder(2);
+    private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private final CANcoder encoderRight = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
@@ -69,7 +71,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	/* ---------------- Hardware ---------------- */
 
-	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.RIO_CAN);
+	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -134,21 +136,25 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
 
-        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.get()), () -> Rotations.of(encoderRight.get()))
+        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.getPosition().getValueAsDouble()), () -> Rotations.of(encoderRight.getPosition().getValueAsDouble()))
         .withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
         .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
         .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
-        .withMatchTolerance(Degrees.of(2)) // Tune this
-        .withAbsoluteEncoderInversions(false, false)
+        .withMatchTolerance(Degrees.of(3)) // Tune this
+        .withAbsoluteEncoderInversions(false, false);
         // shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
         // turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
-            .withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
+            //.withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
         
         this.easyCRT = new EasyCRT(crt_cfg);
         
         this.easyCRT.getAngleOptional().ifPresent(angle -> {
             motor.setPosition(angle.in(Rotations) * GEAR_RATIO);
         });
+
+		//motor.setPosition(motor.getPosition().getValueAsDouble() - Units.degreesToRotations(50.6) * GEAR_RATIO);
+
+		motor.setPosition(0.0); // Delete this when easy crt is working
 
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
@@ -164,6 +170,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		}
 
 		SmartDashboard.putData("Turret Mech", mech);
+
+		SmartDashboard.putData("Turret to 90", new InstantCommand(()-> setFieldRelativeTarget(new Rotation2d(Math.PI/2), 0.0)));
+		SmartDashboard.putData("Turret to -90", new InstantCommand(()-> setFieldRelativeTarget(new Rotation2d(-Math.PI/2), 0.0)));
+
 	}
 
 	/* ---------------- Public API ---------------- */
@@ -185,7 +195,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void periodic() {
-		updateInputs();
 		
 		double robotRelativeGoal = goalAngle.getRadians();
 
@@ -279,6 +288,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 				Units.radiansToDegrees(targetVelocity));
 		SmartDashboard.putNumber("Turret Position Deg",
 				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
+
+		updateInputs();
+		Logger.processInputs("Turret", inputs);
+
+		// SmartDashboard.putNumber("Encoder Left", encoderLeft.get());
+		// SmartDashboard.putNumber("Encoder Right", encoderRight.get());
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -300,7 +315,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = encoderLeft.get();
-        inputs.encoderRightRot = encoderRight.get();
+        inputs.encoderLeftRot = encoderLeft.getPosition().getValueAsDouble();
+        inputs.encoderRightRot = encoderRight.getPosition().getValueAsDouble();
 	}
 }

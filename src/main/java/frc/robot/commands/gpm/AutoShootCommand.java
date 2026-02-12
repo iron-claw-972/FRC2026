@@ -166,7 +166,7 @@ public class AutoShootCommand extends Command {
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
-            spindexer.turnOnSpindexer();
+            spindexer.maxSpindexer();
         }
     }
 
