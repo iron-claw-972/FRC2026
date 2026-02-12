@@ -118,7 +118,7 @@ public class AutoShootCommand extends Command {
         // Account for imparted velocity by robot (turret) to offset
         double timeOfFlight;
         Pose2d lookaheadPose = turretPosition;
-        double lookaheadTurretToTargetDistance = turretToTargetDistance;
+        //double lookaheadTurretToTargetDistance = turretToTargetDistance;
 
         // Loop (20) until lookahreadTurretToTargetDistance converges
         for (int i = 0; i < 20; i++) {
@@ -128,14 +128,14 @@ public class AutoShootCommand extends Command {
 				target3d.minus(lookahead3d),
 				8.0);
 
-            timeOfFlight = ShotInterpolation.timeOfFlightMap.get(lookaheadTurretToTargetDistance);
+            timeOfFlight = goalState.timeOfFlight(); // TODO: Change this to get it from shooter physics
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
                 new Pose2d(
                     turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
                     turretPosition.getRotation());
-            lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
+            //lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
         }
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
         if (lastTurretAngle == null) {

@@ -12,7 +12,7 @@ import frc.robot.constants.Constants;
 public class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// exit velocity speed in m/s
-	public record TurretState(Rotation2d yaw, double pitch, double exitVel, double height) {
+	public record TurretState(Rotation2d yaw, double pitch, double exitVel, double height, double timeOfFlight) {
 		public boolean satisfies(Constraints constraints) {
 			if (height < constraints.height())
 				return false;
@@ -38,8 +38,10 @@ public class ShooterPhysics {
 	 */
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			double height) {
+		double zExitVel = Math.sqrt(2 * height * Constants.GRAVITY_ACCELERATION);
+		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
 		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
-		return cvtShot(exitVel, height);
+		return cvtShot(exitVel, height, t);
 	}
 
 	public static TurretState getShotParams(Translation3d robotToTarget, double height) {
@@ -54,8 +56,9 @@ public class ShooterPhysics {
 		if (withMinPitch.isPresent()) {
 			minHeight = Math.min(minHeight, withMinPitch.get().height());
 		}
-		TurretState withMinHeight = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, minHeight),
-				minHeight);
+		Translation3d minVel = getRequiredExitVelocity(robotVelocity, robotToTarget, minHeight);
+		double minT = (-minVel.getZ() - Math.sqrt(Math.pow(minVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
+		TurretState withMinHeight = cvtShot(minVel, minHeight, minT);
 		if (withMinHeight.satisfies(constraints))
 			return Optional.of(withMinHeight);
 
@@ -97,7 +100,9 @@ public class ShooterPhysics {
 		// use a 5cm tolerance
 		while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) < .05) {
 			double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
-			TurretState guess = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight), avgHeight);
+			Translation3d guessVel = getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight);
+			double guessT = (-guessVel.getZ() - Math.sqrt(Math.pow(guessVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
+			TurretState guess = cvtShot(guessVel, avgHeight, guessT);
 			if (guess.satisfies(constraints)) {
 				if (guess.height() < lastValid.height()) lastValid = guess;
 				newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
@@ -109,7 +114,7 @@ public class ShooterPhysics {
 		return Optional.of(lastValid);
 	}
 
-	public static TurretState cvtShot(Translation3d velocity, double height) {
+	public static TurretState cvtShot(Translation3d velocity, double height, double timeOfFlight) {
 		Translation2d onGround = velocity.toTranslation2d();
 		Rotation2d yaw = onGround.getAngle();
 		double magnitude2d = onGround.getNorm();
@@ -118,7 +123,7 @@ public class ShooterPhysics {
 		pitch %= Math.PI * 2;
 		double speed = velocity.getDistance(Translation3d.kZero);
 
-		return new TurretState(yaw, pitch, speed, height);
+		return new TurretState(yaw, pitch, speed, height, timeOfFlight);
 	}
 
 	/**
@@ -206,6 +211,7 @@ public class ShooterPhysics {
 				guess = target.getZ();
 
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
+			double guessT = (-guessVelocity.getZ() - Math.sqrt(Math.pow(guessVelocity.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ())) / -Constants.GRAVITY_ACCELERATION;
 			double guessSpeed = guessVelocity.getNorm();
 			double difference = minSpeed - guessSpeed;
 
@@ -214,7 +220,7 @@ public class ShooterPhysics {
 				throw new RuntimeException("Incorrect minimum speed calculation in ShooterPhysics.java");
 
 			if (Math.abs(difference) <= tolerance)
-				return cvtShot(guessVelocity, guess);
+    			return cvtShot(guessVelocity, guess, guessT);
 
 			guess += difference * 1.7; // experimentally determined value
 		}
@@ -242,7 +248,8 @@ public class ShooterPhysics {
 				guess = target.getZ();
 
 			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
-			TurretState polar = cvtShot(guessVelocity, guess);
+			double guessT = (-guessVelocity.getZ() - Math.sqrt(Math.pow(guessVelocity.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ())) / -Constants.GRAVITY_ACCELERATION;
+			TurretState polar = cvtShot(guessVelocity, guess, guessT);
 			double difference = pitch - polar.pitch();
 
 			// we've already hit minimum height and are trying to go lower
