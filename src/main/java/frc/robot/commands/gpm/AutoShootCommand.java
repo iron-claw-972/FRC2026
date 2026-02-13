@@ -94,7 +94,7 @@ public class AutoShootCommand extends Command {
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
-        addRequirements(turret, hood);
+        addRequirements(turret, hood, shooter);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
