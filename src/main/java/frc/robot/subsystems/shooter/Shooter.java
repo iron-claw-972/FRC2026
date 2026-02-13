@@ -57,8 +57,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         motorLeft.getConfigurator().apply(config);
         motorRight.getConfigurator().apply(config);
-        
-        motorRight.setControl(new Follower(motorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
 
         motorRight.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
@@ -67,6 +65,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         motorLeft.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
+
+        motorRight.setControl(new Follower(motorLeft.getDeviceID(), MotorAlignmentValue.Opposed));
 
         SmartDashboard.putData("Turn on shooter", new InstantCommand(() -> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
         SmartDashboard.putData("Turn off Shooter", new InstantCommand(() -> setShooter(0)));
