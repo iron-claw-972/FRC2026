@@ -91,20 +91,6 @@ public class SimpleAutoShoot extends Command {
         // System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
-    public void adjustWithTurretCam() {
-        if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
-            // Adjust turret setpoint based on vision input
-            if(Robot.getAlliance() == Alliance.Blue){
-                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(26).get());
-            }
-            else{
-                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(10).get());
-            }
-            double error = yawToTagCamera - yawToTag;
-            adjustedSetpoint = turretSetpoint + error;
-        }
-    }
-
     public void updateYawToTag(){
         // Calculate the yaw offset to the tag
         double D_y = FieldConstants.getHubTranslation().getY() - drivetrain.getPose().getY();
