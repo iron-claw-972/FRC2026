@@ -138,10 +138,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 
         EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.getAbsolutePosition().getValueAsDouble()), () -> Rotations.of(encoderRight.getAbsolutePosition().getValueAsDouble()))
         //.withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
-		.withCommonDriveGear(1.0, 140, 15, 22)
+		.withCommonDriveGear(1.0, 140, 15, 22) // 1:1 from 140t to 15t (left) to 22t (right)
         .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
         .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
-        .withMatchTolerance(Degrees.of(3)) // Tune this
+        .withMatchTolerance(Degrees.of(3)) // Tolerance of 3 degrees
         .withAbsoluteEncoderInversions(false, false);
         // shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
         // turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
