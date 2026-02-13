@@ -45,7 +45,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private FlywheelPhase phase;
 
     private double torqueCurrentDebounceTime = 0.5;
-    private double atGoalStateDebounceTime = 0.5;
 
     VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
     TorqueCurrentFOC torqueCurrentFOC = new TorqueCurrentFOC(0);
@@ -55,8 +54,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
      * If it is long enough then return True. 
      */
     private Debouncer torqueCurrentDebouncer = new Debouncer(torqueCurrentDebounceTime, DebounceType.kFalling);
-    private Debouncer atGoalStateDebouncer = new Debouncer(atGoalStateDebounceTime, DebounceType.kFalling);
-    private boolean atGoal = false;
+
     @AutoLogOutput private long launchCount = 0;
     private boolean lastTorqueCurrentControl = false;
 
@@ -64,19 +62,19 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         BANG_BANG,
         CONSTANT_TORQUE,
         START_UP
-    }    
+    }
 
     public Shooter(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 676767.0; //tune p value
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0;
-        config.Slot0.kV = 0.12; //Maximum rps = 100 --> 12V/100rps
+        config.Slot0.kP = ShooterConstants.kP; //tune p value
+        config.Slot0.kI = ShooterConstants.kI;
+        config.Slot0.kD = ShooterConstants.kD;
+        config.Slot0.kV = ShooterConstants.kV; //Maximum rps = 100 --> 12V/100rps
         
-        config.TorqueCurrent.PeakForwardTorqueCurrent = 40; // this is the constant torque velocity
-        config.TorqueCurrent.PeakReverseTorqueCurrent = 0; // we are making this a BANG BANG controller for talon fx
-        config.MotorOutput.PeakForwardDutyCycle = 1.0;
-        config.MotorOutput.PeakReverseDutyCycle = 0.0;
+        config.TorqueCurrent.PeakReverseTorqueCurrent = ShooterConstants.SHOOTER_MAX_TORQUE_CURRENT; // we are making this a BANG BANG controller for talon fx
+        config.MotorOutput.PeakForwardDutyCycle = ShooterConstants.MOTOR_BANG_BANG_MAX; // bang bang up
+        // tune this 
+        config.MotorOutput.PeakReverseDutyCycle = ShooterConstants.MOTOR_BANG_BANG_MIN; // bang bang down
 
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
@@ -130,12 +128,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         System.out.println(math);
         boolean inTolerance =
             math
-                <= ShooterConstants.TORQUE_CURRENT_CONTROL_TOLERANCE;
+                <= Units.rotationsToRadians(ShooterConstants.MOTOR_VELOCITY_TOLERANCE);
         // If we are not in tolerance we calculate for how long
         boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance); // this calculates if the logic has been occuring long enough
         
-        atGoal = atGoalStateDebouncer.calculate(inTolerance);
-
         if (!torqueCurrentControl && lastTorqueCurrentControl) {
             launchCount++;
         }
@@ -143,8 +139,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         phase =
             torqueCurrentControl
-                ? FlywheelPhase.BANG_BANG
-                : FlywheelPhase.CONSTANT_TORQUE;
+                ? FlywheelPhase.CONSTANT_TORQUE
+                : FlywheelPhase.BANG_BANG;
         shooterTargetSpeed = Units.radiansToRotations(velocityRadsPerSec);
         Logger.recordOutput("Shooter/Setpoint", velocityRadsPerSec);
     }

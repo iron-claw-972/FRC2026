@@ -15,7 +15,14 @@ public class ShooterConstants {
     public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
 
     // for bang bang
-    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 50; // velocity (rotations per second)
-
+    // public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 50; // velocity (rotations per second)
+    public static final double MOTOR_VELOCITY_TOLERANCE = 3; // velocity (rotations per second)
     public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 150; // TUNE
+    public static final double MOTOR_BANG_BANG_MAX = 1.0;
+    public static final double MOTOR_BANG_BANG_MIN = 0.0;
+    public static final double kP = 676767676.0;
+    public static final double kD = 0.02;
+    public static final double kI = 0.0;
+    public static final double kV = 0.12;
+    public static final double SHOOTER_MAX_TORQUE_CURRENT = TORQUE_CURRENT_CONTROL_GOAL_AMP + 10.0;
 }
