@@ -100,6 +100,11 @@ public class FieldConstants {
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
     double y = drivepose.getY();
+    if((x > FieldConstants.BlueAllianceLine && x < FieldConstants.BlueAllianceLine + Units.inchesToMeters(50.0))
+      || x < FieldConstants.RedAllianceLine && x < FieldConstants.RedAllianceLine - Units.inchesToMeters(50.0)
+    ){
+      return FieldZone.TRENCH_BUMP;
+    }
     if(x < FieldConstants.RedAllianceLine) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
