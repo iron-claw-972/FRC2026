@@ -24,6 +24,14 @@ public class ShooterPhysics {
 		}
 	};
 
+	/**
+	 * Specifies the constraints of the shot.
+	 *
+	 * @param height The minimum apex height of the shot.
+	 * @param maxVel The maximum exit velocity of the shooter
+	 * @param minPitch The minimum pitch covered by the hood
+	 * @param maxPitch The maximum pitch covered by the hood
+	 */
 	public record Constraints(double height, double maxVel, double minPitch, double maxPitch) {
 	};
 
@@ -33,19 +41,31 @@ public class ShooterPhysics {
 	 * @param robotVelocity The x and y velocity of the robot, field relative.
 	 * @param robotToTarget The robot to target transform. Angles are field
 	 *                      relative, positions are with the robot as the origin.
-	 * @param height        The peak height the trajectory should reach.
+	 * @param peakHeight        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
-			double height) {
-		double zExitVel = Math.sqrt(2 * height * Constants.GRAVITY_ACCELERATION);
+			double peakHeight) {
+		double zExitVel = Math.sqrt(2 * peakHeight * Constants.GRAVITY_ACCELERATION);
 		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
-		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
-		return cvtShot(exitVel, height, t);
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
+		return cvtShot(exitVel, peakHeight, t);
 	}
 
-	public static TurretState getShotParams(Translation3d robotToTarget, double height) {
-		return getShotParams(new Translation2d(0, 0), robotToTarget, height);
+	/**
+	 * Calculates shot parameters for stationary shooting using Physics™.
+	 *
+	 * @param robotToTarget The robot to target transform. Angles are field
+	 *                      relative, positions are with the robot as the origin.
+	 * @param peakHeight        The peak height the trajectory should reach.
+	 * @return A TurretState that represents the shot the robot should take.
+	 */
+	public static TurretState getShotParams(Translation3d robotToTarget, double peakHeight) {
+		return getShotParams(new Translation2d(0, 0), robotToTarget, peakHeight);
+	}
+	
+	public static Optional<TurretState> getConstrainedParams(Translation3d robotToTarget, Constraints constraints){
+		return getConstrainedParams(new Translation2d(0, 0), robotToTarget, constraints);
 	}
 
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
