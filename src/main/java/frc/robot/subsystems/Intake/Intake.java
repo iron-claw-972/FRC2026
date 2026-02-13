@@ -133,11 +133,7 @@ public class Intake extends SubsystemBase {
      * @param setpoint
      */
     public void setPosition(double setpoint) {
-        double teethRackPinion = 10;
-        // setpoint is in inches, need to convert to rotations
-        double teethRackDistance = setpoint / (IntakeConstants.rackPitch * Math.PI);
-        double rotationsRackPinion = teethRackDistance / teethRackPinion;
-        double motorRotations = rotationsRackPinion * IntakeConstants.gearRatio;
+        double motorRotations =inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
     }
 
@@ -147,10 +143,36 @@ public class Intake extends SubsystemBase {
     public double getPosition(){
         // TODO: IDK if this is correct, so check that it's correct!!
         double motorRotations = rightMotor.getPosition().getValueAsDouble();
-        double teethRackDistance = motorRotations / (IntakeConstants.rackPitch * Math.PI);
+        return rotationsToInches(motorRotations);
+
+    }
+
+    /**
+     * convert rotations to inches
+     * @param rotations
+     * @return
+     */
+    public double rotationsToInches(double rotations){
+        double teethRackDistance = rotations / (IntakeConstants.rackPitch * Math.PI);
         double positionInches = teethRackDistance/10;
         return positionInches;
     }
+
+    /**
+     * convert inches to rotations
+     * @param inches
+     * @return
+     */
+    public double inchesToRotations(double inches){
+        double teethRackPinion = 10;
+        // setpoint is in inches, need to convert to rotations
+        double teethRackDistance = inches / (IntakeConstants.rackPitch * Math.PI);
+        double rotationsRackPinion = teethRackDistance / teethRackPinion;
+        double motorRotations = rotationsRackPinion * IntakeConstants.gearRatio;
+        return motorRotations;
+    }
+
+
 
     public boolean atMaxExtension(){
         return distance == IntakeConstants.maxExtension; //  TODO add tolerance for distance
@@ -170,6 +192,12 @@ public class Intake extends SubsystemBase {
         setPosition(IntakeConstants.startingPoint);
 
         
+    }
+
+    public void close() {
+        leftMotor.close();
+        rightMotor.close();
+        rollerMotor.close();
     }
 
 }
