@@ -159,6 +159,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	@Override
 	public void periodic() {
 		updateInputs();
+		Logger.processInputs("Turret", inputs);
 		
 		double robotRelativeGoal = goalAngle.getRadians();
 

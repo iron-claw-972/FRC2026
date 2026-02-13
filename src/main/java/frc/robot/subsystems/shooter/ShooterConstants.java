@@ -3,7 +3,7 @@ package frc.robot.subsystems.shooter;
 public class ShooterConstants {
     //TODO: find these values
     public static final double FEEDER_RUN_POWER = 0.5; // meters per second??
-    public static double SHOOTER_VELOCITY = 30.0; // meters per second
+    public static final double SHOOTER_VELOCITY = 10.0; // meters per second
     public static final double SHOOTER_GEAR_RATIO = 36.0 / 24.0; // gear ratio from motors to shooter wheel
     // public static final double SHOOTER_LAUNCH_DIAMETER = 0.0762; // meters (3 inches)
     public static final double SHOOTER_LAUNCH_DIAMETER = 0.1016; // meters (4 inches) I think this is right.
@@ -15,9 +15,7 @@ public class ShooterConstants {
     public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
 
     // for bang bang
-    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 10; // velocity (rotations per second)
+    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 50; // velocity (rotations per second)
 
-    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 40; // TUNE
+    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 150; // TUNE
 }
-// 8 velcocity is too little
-// 16 is too much
