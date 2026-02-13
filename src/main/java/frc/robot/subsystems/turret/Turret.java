@@ -2,6 +2,7 @@ package frc.robot.subsystems.turret;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
@@ -123,13 +124,7 @@ public class Turret extends SubsystemBase implements TurretIO{
         motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
         motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
         motor.getConfigurator().apply(config);
-
-		motor.getConfigurator().apply(
-				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
-					{
-						MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-					}
-				});
+		motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
 		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC, feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO), goalVelocityRadPerSec))))
 
