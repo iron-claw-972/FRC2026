@@ -101,7 +101,7 @@ public class FieldConstants {
     double x = drivepose.getX();
     double y = drivepose.getY();
     if((x > FieldConstants.BlueAllianceLine && x < FieldConstants.BlueAllianceLine + Units.inchesToMeters(50.0))
-      || x < FieldConstants.RedAllianceLine && x < FieldConstants.RedAllianceLine - Units.inchesToMeters(50.0)
+      || (x < FieldConstants.RedAllianceLine && x < FieldConstants.RedAllianceLine - Units.inchesToMeters(50.0))
     ){
       return FieldZone.TRENCH_BUMP;
     }
