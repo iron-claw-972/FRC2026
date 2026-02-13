@@ -106,7 +106,7 @@ public class AutoShootCommand extends Command {
             return;
         }
         // if turret is not at setpoint -- turning around
-        if(turret.atSetpoint()){
+        if(!turret.atSetpoint()){
             currentState = CurrentState.TURNING_AROUND;
             return;
         }
