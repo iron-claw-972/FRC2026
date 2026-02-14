@@ -2,6 +2,8 @@ package frc.robot.commands.gpm;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -87,8 +90,8 @@ public class AutoShootCommand extends Command {
         this.hood = hood;
         this.shooter = shooter;
         this.spindexer = spindexer;
-        //drivepose  = drivetrain.getPose();
-        drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
+        drivepose  = drivetrain.getPose();
+        //drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
 
         goalState = ShooterPhysics.getShotParams(
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
@@ -177,7 +180,7 @@ public class AutoShootCommand extends Command {
         // Add 180 degrees to the rotation bc robot is backwards
         drivepose = new Pose2d(
             currentPose.getTranslation(), 
-            currentPose.getRotation().plus(new Rotation2d(Math.PI))
+            currentPose.getRotation()//.plus(new Rotation2d(Math.PI))
         );
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
         drivepose.exp(
@@ -191,9 +194,12 @@ public class AutoShootCommand extends Command {
     public void execute() {
         updateDrivePose();
         updateSetpoints(drivepose);
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
-        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        shooter.setShooter(goalState.exitVel());
+        //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
+        //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
+        //shooter.setShooter(goalState.exitVel());
+
+        SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
+        SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
 
         /** Spindexer Stuff!! */
         if(spindexer != null){

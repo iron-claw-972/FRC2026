@@ -161,9 +161,9 @@ public class VisionConstants {
                 new Pair<String, Transform3d>(
                         "CameraLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-9.5), Units.inchesToMeters(13.5),
-                                        Units.inchesToMeters(13)),
-                                new Rotation3d(0, Units.degreesToRadians(-29), Math.PI)))));
+                                new Translation3d(Units.inchesToMeters(12.0), Units.inchesToMeters(11.0),
+                                        Units.inchesToMeters(13.5)),
+                                new Rotation3d(0, Units.degreesToRadians(-26), Units.degreesToRadians(-30))))));
 
     /**
      * The transformations from the robot to object detection cameras
