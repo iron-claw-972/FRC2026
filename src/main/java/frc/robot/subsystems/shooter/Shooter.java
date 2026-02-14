@@ -69,24 +69,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     @Override
     public void periodic(){
-        shooterMotorRight.set(1.0);
-        shooterMotorLeft.set(1.0);
         updateInputs();
 
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
-        //shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        //shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));          
-    }
-
-    public void deactivateShooterAndFeeder() {
-        setFeeder(0);
-        setShooter(0);
-    }
-
-    public void setFeeder(double power){
-        // System.out.println("VELOCITY: " + getShooterVelcoity()); 
-        feederPower = power;
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));          
     }
 
     public void setShooter(double linearVelocityMps) {
