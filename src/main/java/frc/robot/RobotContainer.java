@@ -7,6 +7,7 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AimAtPose;
+import frc.robot.commands.gpm.SimpleAutoShoot;
+import frc.robot.commands.gpm.TurretAutoShoot;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -154,7 +157,7 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-
+    NamedCommands.registerCommand("Auto shoot", new SimpleAutoShoot(turret, drive, shooter));
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
