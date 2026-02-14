@@ -88,7 +88,7 @@ public class AutoShootCommand extends Command {
         this.shooter = shooter;
         this.spindexer = spindexer;
         //drivepose  = drivetrain.getPose();
-        drivepose  = drivetrain.getPose().rotateBy(new Rotation2d(Math.PI)); // TODO: Revert when robot isn't backwards 
+        drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
 
         goalState = ShooterPhysics.getShotParams(
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
@@ -173,8 +173,14 @@ public class AutoShootCommand extends Command {
     }
 
     public void updateDrivePose(){
+        Pose2d currentPose = drivetrain.getPose();
+        // Add 180 degrees to the rotation bc robot is backwards
+        drivepose = new Pose2d(
+            currentPose.getTranslation(), 
+            currentPose.getRotation().plus(new Rotation2d(Math.PI))
+        );
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
-        drivepose = drivetrain.getPose().exp(
+        drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,
