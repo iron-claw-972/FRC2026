@@ -91,6 +91,17 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     })
         );
 
+        driver.get(PS5Button.TRIANGLE).onTrue(
+            new InstantCommand(()->{
+                        if (turretAutoShoot != null && turretAutoShoot.isScheduled()){
+                            turretAutoShoot.cancel();
+                        } else{
+                            turretAutoShoot = new TurretAutoShoot(turret, getDrivetrain());
+                            CommandScheduler.getInstance().schedule(turretAutoShoot);
+                        }
+                    })
+        );
+
         driver.get(PS5Button.LB).onTrue(new InstantCommand(() -> shooter.setFeeder(1))).onFalse(
             new InstantCommand(()->{
                 shooter.setFeeder(0);

@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,9 +46,10 @@ public class TurretAutoShoot extends Command {
     public void updateTurretSetpoint(Pose2d drivepose) {
         
         Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
-        Pose2d turretPosition = drivepose.transformBy(new Transform2d((TurretConstants.DISTANCE_FROM_ROBOT_CENTER), new Rotation2d()));
-        double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
-        
+        Pose2d turretPosition = drivepose;//.transformBy(new Transform2d((TurretConstants.DISTANCE_FROM_ROBOT_CENTER), new Rotation2d()));
+        //double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
+        Logger.recordOutput("brrr", turretPosition);
+
         // If the robot is moving, adjust the target position based on velocity
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
         ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
@@ -69,7 +72,7 @@ public class TurretAutoShoot extends Command {
 
         // Loop (20) until lookahreadTurretToTargetDistance converges
         //for (int i = 0; i < 20; i++) {
-            timeOfFlight = 1.0;
+            timeOfFlight = 0.0;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
@@ -78,7 +81,10 @@ public class TurretAutoShoot extends Command {
                     turretPosition.getRotation());
             //lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
         //}
-        turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
+        turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();//.minus(new Rotation2d(Math.PI/4));
+        Logger.recordOutput("lookahead pose", lookaheadPose);
+        Logger.recordOutput("target pose", target);
+        System.out.println(turretAngle);
         if (lastTurretAngle == null) {
             lastTurretAngle = turretAngle;
         }
@@ -87,25 +93,25 @@ public class TurretAutoShoot extends Command {
             turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         lastTurretAngle = turretAngle;
 
-        // Add 180 since drivetrain is backwards
-        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() + Math.PI);
+        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
         turretSetpoint = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint), -180.0, 180.0);
     }
 
     public void updateDrivePose(){
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
-        drivepose = drivetrain.getPose().exp(
-            new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay,
-                robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay));
+        drivepose = drivetrain.getPose().rotateBy(new Rotation2d(Math.PI));
+        // .exp(
+        //     new Twist2d(
+        //         robotRelVel.vxMetersPerSecond * phaseDelay,
+        //         robotRelVel.vyMetersPerSecond * phaseDelay,
+        //         robotRelVel.omegaRadiansPerSecond * phaseDelay));
     }
 
     @Override
     public void execute() {
         updateDrivePose();
         updateTurretSetpoint(drivepose);
-        //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         System.out.println("Turret Setpoint: " + turretSetpoint);
         //System.out.println("Turret goal velocity" + (turretVelocity - drivetrain.getAngularRate(2)));
     }

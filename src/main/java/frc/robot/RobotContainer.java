@@ -86,7 +86,7 @@ public class RobotContainer {
       case Vertigo:
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         turret = new Turret();
-        shooter = new Shooter();
+        //shooter = new Shooter();
 
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret);

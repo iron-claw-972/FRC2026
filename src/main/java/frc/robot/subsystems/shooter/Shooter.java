@@ -102,7 +102,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void periodic() {
-        runVelocity(Units.rotationsToRadians(shooterTargetSpeed));
+        //runVelocity(Units.rotationsToRadians(shooterTargetSpeed));
         SmartDashboard.putNumber("Shot Power", shooterPower);
         shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
 
