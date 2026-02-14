@@ -38,7 +38,7 @@ public class TurretAutoShoot extends Command {
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain) {
         this.turret = turret;
         this.drivetrain = drivetrain;
-        drivepose  = drivetrain.getPose().rotateBy(new Rotation2d(Math.PI));
+        drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
         
         addRequirements(turret);
     }
@@ -98,13 +98,18 @@ public class TurretAutoShoot extends Command {
     }
 
     public void updateDrivePose(){
+        Pose2d currentPose = drivetrain.getPose();
+        // Add 180 degrees to the rotation bc robot is backwards
+        drivepose = new Pose2d(
+            currentPose.getTranslation(), 
+            currentPose.getRotation().plus(new Rotation2d(Math.PI))
+        );
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
-        drivepose = drivetrain.getPose().rotateBy(new Rotation2d(Math.PI));
-        // .exp(
-        //     new Twist2d(
-        //         robotRelVel.vxMetersPerSecond * phaseDelay,
-        //         robotRelVel.vyMetersPerSecond * phaseDelay,
-        //         robotRelVel.omegaRadiansPerSecond * phaseDelay));
+        drivepose.exp(
+            new Twist2d(
+                robotRelVel.vxMetersPerSecond * phaseDelay,
+                robotRelVel.vyMetersPerSecond * phaseDelay,
+                robotRelVel.omegaRadiansPerSecond * phaseDelay));
     }
 
     @Override
