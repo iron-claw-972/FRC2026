@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Shooter;
+package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -19,6 +19,7 @@ import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -62,16 +63,20 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
+
+        SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(20.0)));
     }
 
     @Override
     public void periodic(){
+        shooterMotorRight.set(1.0);
+        shooterMotorLeft.set(1.0);
         updateInputs();
 
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));          
+        //shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
+        //shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));          
     }
 
     public void deactivateShooterAndFeeder() {

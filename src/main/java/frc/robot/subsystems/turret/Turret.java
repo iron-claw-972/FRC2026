@@ -162,6 +162,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
 		motor.setPosition(motorRotations);
 
+		motor.setPosition(0.0); //TODO: remove after hardcrt works
+
 		SmartDashboard.putData("Turret Mech", mech);
 
 		SmartDashboard.putData("Turret to 90", new InstantCommand(()-> setFieldRelativeTarget(new Rotation2d(Math.PI/2), 0.0)));
@@ -244,18 +246,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
+		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(setpoint.position));
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
-
-		SmartDashboard.putNumber("Turret SetpointDeg",
-				Units.radiansToDegrees(setpoint.position));
-		SmartDashboard.putNumber("Turret motorVelRotPerSec",
-				Units.radiansToDegrees(motorVelRotPerSec));
-        SmartDashboard.putNumber("Turret targetVelocity",
-				Units.radiansToDegrees(targetVelocity));
-		SmartDashboard.putNumber("Turret Position Deg",
-				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 
 		updateInputs();
 		Logger.processInputs("Turret", inputs);

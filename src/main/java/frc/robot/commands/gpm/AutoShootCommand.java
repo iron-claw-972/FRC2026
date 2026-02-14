@@ -181,7 +181,7 @@ public class AutoShootCommand extends Command {
         lastHoodAngle = hoodAngle;
 
         if (Math.abs(lastTurretAngle.getDegrees() - turretSetpoint) > 90) {
-            velocityAdjustment = -drivetrain.getAngularRate(2) * 1.4;
+            velocityAdjustment = -drivetrain.getAngularRate(2) * 1.0;
         }
     }
 
@@ -207,7 +207,7 @@ public class AutoShootCommand extends Command {
 
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        //shooter.setShooter(goalState.exitVel());
+        shooter.setShooter(goalState.exitVel());
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
@@ -224,7 +224,7 @@ public class AutoShootCommand extends Command {
     public void end(boolean interrupted) {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
-        //shooter.setShooter(0.0);
+        shooter.setShooter(0.0);
         //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
         if(spindexer != null){
             spindexer.stopSpindexer();
