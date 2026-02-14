@@ -57,6 +57,7 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    SmartDashboard.putString("Robot ID", robotId.toString());
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:

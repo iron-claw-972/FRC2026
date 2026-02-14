@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Climb;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -23,7 +24,7 @@ public class LinearClimb {
 
     private double rotationalSetpoint = 0;
 
-    private double kP = 0.5;
+    private double kP = 1.5;
     private double kI = 0.0;
     private double kD = 0.0;  
 
@@ -36,21 +37,29 @@ public class LinearClimb {
 
     private MotionMagicVoltage voltageRequest = new MotionMagicVoltage(Units.degreesToRotations(0) * gearRatio); // gear ratio
 
+
     // ElevatorFeedforward feedforward = new ElevatorFeedforward(0, (((DriveConstants.ROBOT_MASS * Constants.GRAVITY_ACCELERATION * ClimbConstants.RADIUS) / gearRatio) / motorConstant.KtNMPerAmp) * motorConstant.rOhms, 0, 0);
-    ElevatorFeedforward feedforward = new ElevatorFeedforward(0, SpringResistance, 0, 0);
+    // ElevatorFeedforward feedforward = new ElevatorFeedforward(0, SpringResistance, 0, 0);
 
     public LinearClimb() {
-        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID, Constants.RIO_CAN);
+        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID);//, Constants.RIO_CAN);
 
         motor.setPosition(Units.degreesToRotations(0) * gearRatio); // gear ratio
         motor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
 
+        config.CurrentLimits = new CurrentLimitsConfigs();
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 10.0;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 10.0;
+
         config.Slot0.kS = 0.0; // Static friction compensation (should be >0 if friction exists)
         config.Slot0.kG = 0.0; // Gravity compensation
-        config.Slot0.kV = 0.0; // Velocity gain: 1 rps -> 0.12V
-        config.Slot0.kA = 0.0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
+        config.Slot0.kV = 0.5; // Velocity gain: 1 rps -> 0.12V
+        config.Slot0.kA = 10.0; // Acceleration gain: 1 rps² -> 0V (should be tuned if acceleration matters)
         
         config.Slot0.kP = kP; // If position error is 1 rotation, apply 10V
         config.Slot0.kI = kI; // Integral term (usually left at 0 for MotionMagic)
@@ -74,7 +83,8 @@ public class LinearClimb {
 
         rotationalSetpoint = (setpoint / (2 * Math.PI * ClimbConstants.RADIUS)) * gearRatio;
 
-        motor.setControl(voltageRequest.withPosition(rotationalSetpoint).withFeedForward(feedforward.calculate(0)));
+        // motor.setControl(voltageRequest.withPosition(rotationalSetpoint).withFeedForward(feedforward.calculate(0)));
+        motor.setControl(voltageRequest.withPosition(rotationalSetpoint));
     }
 
     public boolean atSetPoint(){
@@ -86,12 +96,12 @@ public class LinearClimb {
     }
 
     public void goUp() {
-        feedforward.setKg(SpringResistance);
+        // feedforward.setKg(SpringResistance);
         setSetpoint(ClimbConstants.MAX_HEIGHT);
     }
 
     public void goDown() {
-        feedforward.setKg(RobotResistance  - SpringResistance);
+        // feedforward.setKg(RobotResistance  - SpringResistance);
         setSetpoint(ClimbConstants.MIN_HEIGHT);
     }
 
