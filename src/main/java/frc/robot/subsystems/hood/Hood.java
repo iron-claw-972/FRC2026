@@ -122,6 +122,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 		SmartDashboard.putData("Hood PID", positionPID);
 
 		SmartDashboard.putNumber("Turret Position Deg", Units.radiansToDegrees(getPositionRad()) / GEAR_RATIO);
+		Logger.processInputs("Hood", inputs);
 	}
 
     @Override

@@ -155,8 +155,12 @@ public class AutoShootCommand extends Command {
             turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         lastTurretAngle = turretAngle;
 
+        Logger.recordOutput("Lookahead Pose", lookaheadPose);
+
+        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
+
         // Shortest path
-        double error = MathUtil.inputModulus(turretAngle.getDegrees() - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
+        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
         // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
         double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
@@ -200,6 +204,7 @@ public class AutoShootCommand extends Command {
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
+        System.out.println("COMMAND IS WORKINNGGG");
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
