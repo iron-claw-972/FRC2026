@@ -12,7 +12,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
     TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID);
 
     private double power = 0.0;
-
+    public int ballCount = 0;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
     public Spindexer(){
@@ -23,8 +23,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
     public void periodic() {
         power = SmartDashboard.getNumber("Spindexer Power", power);
         SmartDashboard.putNumber("Spindexer Power", power);
-
         motor.set(power);
+        if (inputs.spindexerVelocity < SpindexerConstants.spindexerVelocityWithBall) {
+            ballCount++;
+        }
     }
 
     public void maxSpindexer(){
