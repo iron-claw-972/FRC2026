@@ -86,8 +86,8 @@ public class RobotContainer {
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
-        shooter = new Shooter();
-        hood = new Hood();
+        //shooter = new Shooter();
+        //hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 

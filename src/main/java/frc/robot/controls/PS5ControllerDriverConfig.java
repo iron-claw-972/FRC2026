@@ -14,6 +14,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
@@ -86,7 +87,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Auto shoot
-        if(turret != null && hood != null){
+        if(turret != null){
             driver.get(PS5Button.SQUARE).onTrue(
             new InstantCommand(()->{
                         if (autoShoot != null && autoShoot.isScheduled()){
@@ -96,8 +97,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                             CommandScheduler.getInstance().schedule(autoShoot);
                         }
                     })
-        );
+            );
         }
+
 
     }
 

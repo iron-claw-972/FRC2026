@@ -48,7 +48,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public Shooter(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0.15; 
+        config.Slot0.kP = 2.0; 
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.03;
         config.Slot0.kV = 0.20; 
@@ -114,7 +114,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public void updateInputs() {
         inputs.leftShooterVelocity = Units.rotationsToRadians(motorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
-        inputs.rightShooterVelocity =Units.rotationsToRadians(motorRight.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
+        inputs.rightShooterVelocity = Units.rotationsToRadians(motorRight.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.leftShooterCurrent = motorLeft.getStatorCurrent().getValueAsDouble();
         inputs.rightShooterCurrent = motorRight.getStatorCurrent().getValueAsDouble();
     }

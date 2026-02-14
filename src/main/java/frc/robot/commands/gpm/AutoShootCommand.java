@@ -97,7 +97,7 @@ public class AutoShootCommand extends Command {
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
-        addRequirements(turret, hood, shooter);
+        addRequirements(turret);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
@@ -134,7 +134,7 @@ public class AutoShootCommand extends Command {
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ()); // Add if statement so that it's only when it's shooting
             goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
-				8.0);
+				2.0);
 
             timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
@@ -198,12 +198,13 @@ public class AutoShootCommand extends Command {
     public void execute() {
         updateDrivePose();
         updateSetpoints(drivepose);
-        //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         //shooter.setShooter(goalState.exitVel());
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
+        SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
         System.out.println("COMMAND IS WORKINNGGG");
 
         /** Spindexer Stuff!! */
@@ -216,7 +217,8 @@ public class AutoShootCommand extends Command {
     public void end(boolean interrupted) {
         // Set the turret to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
-        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
+        //shooter.setShooter(0.0);
+        //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
         if(spindexer != null){
             spindexer.stopSpindexer();
         }
