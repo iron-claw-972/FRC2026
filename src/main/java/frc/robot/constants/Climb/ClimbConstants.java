@@ -8,4 +8,8 @@ public class ClimbConstants {
     public final static double MAX_ACCELERATION = 0.3;
     public final static double RADIUS = 0.3;
     public final static double CLIMB_HEIGHT = 4;
+    public final static double STRONG_CURRENT = 5.0;
+    public final static double WEAK_CURRENT = 4.0;
+    public final static double OFFSET = 100.0;
+    public final static double CLIMB_OFFSET = 45.0;
 }

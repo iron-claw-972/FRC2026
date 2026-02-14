@@ -26,6 +26,10 @@ import frc.robot.constants.swerve.DriveConstants;
 public class LinearClimb extends SubsystemBase{
     private TalonFX motor;
     private boolean calibrating = false;
+    double counter = 0;
+    double downPosition = ClimbConstants.OFFSET;
+    double upPosition = 0;
+    double climbPosition = ClimbConstants.CLIMB_OFFSET;
 
     private static PIDController pid = new PIDController(0.1, 0, 0);
     
@@ -43,6 +47,7 @@ public class LinearClimb extends SubsystemBase{
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
         SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
         SmartDashboard.putData("Hardstop Calibrate", new InstantCommand(() -> hardstopCalibration()));
+        SmartDashboard.putData("Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
         SmartDashboard.putNumber("Position", getPosition());
 
         motor.setPosition(0);
@@ -65,15 +70,15 @@ public class LinearClimb extends SubsystemBase{
     }
 
     public void goUp() {
-        setSetpoint(0);
+        setSetpoint(upPosition);
     }
 
     public void goDown() {
-        setSetpoint(0);
+        setSetpoint(downPosition);
     }
 
     public void climb() {
-        setSetpoint(ClimbConstants.CLIMB_HEIGHT);
+        setSetpoint(climbPosition);
     }
 
     public void periodic() {
@@ -83,9 +88,12 @@ public class LinearClimb extends SubsystemBase{
             motor.set(power);
             SmartDashboard.putNumber("Position", getPosition());
         }else{
+            if(counter > 250){
+                stopCalibrating();
+            }
             motor.set(0.15);
+            counter += 1;
         }
-        
     }
     public void setCurrentLimits(double limit){
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -101,6 +109,17 @@ public class LinearClimb extends SubsystemBase{
         motor.getConfigurator().apply(config);
     }
     public void hardstopCalibration(){
-        calibrating = !calibrating;
+        calibrating = true;
+        counter = 0;
+        setCurrentLimits(ClimbConstants.WEAK_CURRENT);
+    }
+    public void stopCalibrating(){
+        downPosition = motor.getPosition().getValueAsDouble();
+        upPosition = downPosition - ClimbConstants.OFFSET;
+        climbPosition = upPosition + ClimbConstants.CLIMB_OFFSET;
+        setSetpoint(downPosition);
+        calibrating = false;
+        counter = 0;
+        setCurrentLimits(ClimbConstants.STRONG_CURRENT);
     }
 }
