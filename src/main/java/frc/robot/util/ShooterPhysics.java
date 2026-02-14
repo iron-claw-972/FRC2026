@@ -24,6 +24,20 @@ public class ShooterPhysics {
 	};
 
 	public record Constraints(double height, double maxVel, double minPitch, double maxPitch) {
+		// performs some sanity checks
+		public boolean check() {
+			if (height <= 0)
+				return false;
+			if (maxVel <= 0)
+				return false;
+			if (minPitch <= 0)
+				return false;
+			if (maxPitch >= Math.PI / 2)
+				return false;
+			if (minPitch >= maxPitch)
+				return false;
+			return true;
+		}
 	};
 
 	/**
@@ -43,6 +57,9 @@ public class ShooterPhysics {
 
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			Constraints constraints) {
+		if (!constraints.check())
+			throw new IllegalArgumentException("Provided constraints are invalid (" + constraints + ").");
+
 		// establish a lower bound
 		double minHeight = Math.max(Math.max(robotToTarget.getZ(), constraints.height()), 0.01);
 		Optional<TurretState> withMinPitch = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
@@ -85,7 +102,11 @@ public class ShooterPhysics {
 
 		} else {
 			// the minimum speed is within the ok range
-			assert withMinSpeed.satisfies(constraints);
+			if (!withMinSpeed.satisfies(constraints)) {
+				throw new RuntimeException(
+						"Impossible state: " + withMinSpeed + " does not satisfy " + constraints + ".");
+			}
+
 			newRange = new Pair<TurretState, TurretState>(withMinSpeed, withMinHeight);
 		}
 
@@ -238,7 +259,7 @@ public class ShooterPhysics {
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch) {
-		return withAngle(initialVelocity, target, pitch, .01);
+		return withAngle(initialVelocity, target, pitch, 0.001);
 	}
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,

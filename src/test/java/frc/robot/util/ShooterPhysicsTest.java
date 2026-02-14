@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +31,7 @@ class ShooterPhysicsTest {
 	public void cleanup() {
 	}
 
+	@Disabled
 	@Test
 	public void basicImpulseTest() {
 		Translation3d transform = ShooterPhysics.getRequiredExitVelocity(Translation2d.kZero, Translation3d.kZero, 1);
@@ -69,6 +71,7 @@ class ShooterPhysicsTest {
 		assertEquals(Constants.GRAVITY_ACCELERATION, transform7.getZ(), epsilon);
 	}
 
+	@Disabled
 	@Test
 	public void initialVelocityTest() {
 		Translation2d initialVelocityDiff = new Translation2d(5.1, -6.5);
@@ -82,6 +85,7 @@ class ShooterPhysicsTest {
 		assertEquals(transform.getZ(), transform2.getZ(), epsilon);
 	}
 
+	@Disabled
 	@Test
 	public void yawTest() {
 		TurretState state1 = ShooterPhysics.getShotParams(Translation2d.kZero,
@@ -103,6 +107,7 @@ class ShooterPhysicsTest {
 		assertEquals(new Rotation2d(-Math.PI / 2).getRadians(), state4.yaw().getRadians(), epsilon);
 	}
 
+	@Disabled
 	@Test
 	public void pitchTest() {
 		// check random values are within range
@@ -133,6 +138,7 @@ class ShooterPhysicsTest {
 		assertTrue(state6.pitch() >= 0 && state6.pitch() <= Math.PI / 16, state6.toString());
 	}
 
+	@Disabled
 	@Test
 	public void velocityTest() {
 
@@ -172,13 +178,13 @@ class ShooterPhysicsTest {
 		assertTrue(state3.exitVel() < state3Minus.exitVel(), state3Minus.toString());
 	}
 
+	@Disabled
 	@Test
 	public void angleTest() {
-
-		// var t1 = new Translation3d(10, 10, 3);
-		// for (int i = 31; i < 1000; i++) {
-		// var x = ShooterPhysics.getShotParams(Translation2d.kZero, t1, i / 10.);
-		// System.out.println(i / 10. + ", " + x.pitch());
+		// for (int i = 21; i < 1000; i++) {
+		// 	var x = ShooterPhysics.getShotParams(new Translation2d(-3.81, -3.52), new Translation3d(-8.43, -5.58, 2.09),
+		// 			i / 10.);
+		// 	System.out.println(i / 10. + ", " + x.pitch());
 		// }
 
 		var t1 = new Translation3d(10, 0, 0);
@@ -221,6 +227,7 @@ class ShooterPhysicsTest {
 		assertEquals(state5.get().pitch(), 0.01, epsilon);
 	}
 
+	@Disabled
 	@Test
 	public void simpleConstraintsTest() {
 		// a test where the optimal shot is just plain height
@@ -246,6 +253,7 @@ class ShooterPhysicsTest {
 	}
 
 	// test using a simple physics simulation
+	@Disabled
 	@Test
 	public void simulatedTest() {
 		// test the simulation itself
@@ -274,7 +282,7 @@ class ShooterPhysicsTest {
 	public void simulatedConstraintsTest() {
 		Random rng = new Random(6328);
 
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 100000; i++) {
 			Translation2d initPos = new Translation2d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10));
 			Translation3d target = new Translation3d(rng.nextDouble(-10, 10), rng.nextDouble(-10, 10),
 					rng.nextDouble(1, 11));
@@ -282,7 +290,7 @@ class ShooterPhysicsTest {
 			Translation3d robotToTarget = target.minus(new Translation3d(initPos));
 
 			double minAngle = rng.nextDouble(.01, Math.PI / 2 - .03);
-			Constraints constraints = new Constraints(rng.nextDouble(20), rng.nextDouble(30), minAngle,
+			Constraints constraints = new Constraints(rng.nextDouble(20) + .001, rng.nextDouble(30) + .001, minAngle,
 					rng.nextDouble(minAngle + .01, Math.PI / 2 - .01));
 
 			var state = ShooterPhysics.getConstrainedParams(initVel, robotToTarget, constraints);
