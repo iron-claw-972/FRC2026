@@ -84,6 +84,8 @@ public class AutoShootCommand extends Command {
 
     private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
 
+    private double velocityAdjustment = 0;
+
     public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
@@ -177,6 +179,10 @@ public class AutoShootCommand extends Command {
         hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
+
+        if (Math.abs(lastTurretAngle.getDegrees() - turretSetpoint) > 90) {
+            velocityAdjustment = -drivetrain.getAngularRate(2) * 1.4;
+        }
     }
 
     public void updateDrivePose(){
@@ -198,6 +204,7 @@ public class AutoShootCommand extends Command {
     public void execute() {
         updateDrivePose();
         updateSetpoints(drivepose);
+
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         //shooter.setShooter(goalState.exitVel());
