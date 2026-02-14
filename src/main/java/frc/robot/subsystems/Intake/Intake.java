@@ -141,7 +141,6 @@ public class Intake extends SubsystemBase {
      * gets motor position in inches
      */
     public double getPosition(){
-        // TODO: IDK if this is correct, so check that it's correct!!
         double motorRotations = rightMotor.getPosition().getValueAsDouble();
         return rotationsToInches(motorRotations);
 
@@ -152,10 +151,11 @@ public class Intake extends SubsystemBase {
      * @param rotations
      * @return
      */
-    public double rotationsToInches(double rotations){
-        double teethRackDistance = rotations / (IntakeConstants.rackPitch * Math.PI);
-        double positionInches = teethRackDistance/10;
-        return positionInches;
+    public double rotationsToInches(double motorRotations){
+        double circ = 2 * Math.PI * 0.5;
+        double pinionRotations = motorRotations / IntakeConstants.gearRatio;
+        double inches = pinionRotations * circ;
+        return inches; 
     }
 
     /**
@@ -164,15 +164,11 @@ public class Intake extends SubsystemBase {
      * @return
      */
     public double inchesToRotations(double inches){
-        double teethRackPinion = 10;
-        // setpoint is in inches, need to convert to rotations
-        double teethRackDistance = inches / (IntakeConstants.rackPitch * Math.PI);
-        double rotationsRackPinion = teethRackDistance / teethRackPinion;
-        double motorRotations = rotationsRackPinion * IntakeConstants.gearRatio;
+        double circ = 2 * Math.PI * 0.5;
+        double pinionRotations = inches / circ;
+        double motorRotations = pinionRotations * IntakeConstants.gearRatio;
         return motorRotations;
     }
-
-
 
     public boolean atMaxExtension(){
         return distance == IntakeConstants.maxExtension; //  TODO add tolerance for distance

@@ -16,7 +16,9 @@ public class IntakeTest {
     @Test
     public void conversionTest() {
         System.out.println("rotations to inches: "  + intake.rotationsToInches(3.0));
-        assertEquals(3.14159, intake.rotationsToInches(3.0), 0.0001);
+        assertEquals(Math.PI, intake.rotationsToInches(3.0), 0.0001);
+
+        System.out.println("2: inches to rotations: "  + intake.inchesToRotations(Math.PI));
         
         assertEquals(3.0, intake.inchesToRotations(3.14159), 0.0001);
 
