@@ -121,10 +121,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Auto shoot",
+      "name": "Start: shoot before bump",
       "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 1.115860517435307,
-      "command": null
+      "endWaypointRelativePos": 1.0798650168728918,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Auto shoot"
+        }
+      }
     }
   ],
   "globalConstraints": {
