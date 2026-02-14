@@ -28,7 +28,7 @@ public class LinearClimb extends SubsystemBase{
 
     private double rotationalSetpoint = 0;
 
-    private static PIDController pid = new PIDController(0.5, 0, 0);
+    private static PIDController pid = new PIDController(0.1, 0, 0);
 
     private double kP = 1.0;
     private double kI = 0.0;
@@ -115,7 +115,7 @@ public class LinearClimb extends SubsystemBase{
 
     public void goUp() {
         // feedforward.setKg(SpringResistance);
-        setSetpoint(ClimbConstants.MAX_HEIGHT);
+        setSetpoint(1);
     }
 
     public void goDown() {
