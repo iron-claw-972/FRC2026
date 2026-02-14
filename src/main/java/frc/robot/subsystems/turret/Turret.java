@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.swerve.DriveConstants;
+import frc.robot.util.ChineseRemainderTheorem;
 import yams.units.EasyCRT;
 import yams.units.EasyCRTConfig;
 import static edu.wpi.first.units.Units.Rotations;
@@ -67,8 +68,6 @@ public class Turret extends SubsystemBase implements TurretIO{
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private double lastFrameVelocity = 0.0;
-
-    private EasyCRT easyCRT;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -108,7 +107,6 @@ public class Turret extends SubsystemBase implements TurretIO{
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
-
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
@@ -131,27 +129,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
 
-        EasyCRTConfig crt_cfg = new EasyCRTConfig(() -> Rotations.of(encoderLeft.getAbsolutePosition().getValueAsDouble()), () -> Rotations.of(encoderRight.getAbsolutePosition().getValueAsDouble()))
-        //.withEncoderRatios(TurretConstants.LEFT_ENCODER_RATIO, TurretConstants.RIGHT_ENCODER_RATIO)
-		.withCommonDriveGear(1.0, 140, 15, 22) // 1:1 from 140t to 15t (left) to 22t (right)
-        .withAbsoluteEncoderOffsets(Degrees.of(TurretConstants.LEFT_ENCODER_OFFSET), Degrees.of(TurretConstants.RIGHT_ENCODER_OFFSET))
-        .withMechanismRange(Degrees.of(TurretConstants.MIN_ANGLE), Degrees.of(TurretConstants.MAX_ANGLE))
-        .withMatchTolerance(Degrees.of(3)) // Tolerance of 3 degrees
-        .withAbsoluteEncoderInversions(false, false);
-        // shared drive gear / pinion (the tan gear/tiny first gear on motor shaft)
-        // turret ring / shared drive pulley (big turret gear / first black belt gear weird thingy?)
-            //.withCrtGearRecommendationInputs(10, 140.0/22.0);  // prob need to fix
-        
-        this.easyCRT = new EasyCRT(crt_cfg);
-        
-        this.easyCRT.getAngleOptional().ifPresent(angle -> {
-            motor.setPosition(angle.in(Rotations) * GEAR_RATIO);
-        });
-
-		//motor.setPosition(motor.getPosition().getValueAsDouble() - Units.degreesToRotations(50.6) * GEAR_RATIO);
-
-		motor.setPosition(0.0); // Delete this when easy crt is working
-
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
 			turretSim = new SingleJointedArmSim(
@@ -165,11 +142,29 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
+		double leftAbs = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET);
+		double rightAbs = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
+
+		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
+				% TurretConstants.LEFT_ENCODER_TEETH;
+
+		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
+				% TurretConstants.RIGHT_ENCODER_TEETH;
+
+		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
+
+		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
+        * TurretConstants.RIGHT_ENCODER_TEETH;
+
+		double turretRotations = turretIndex / (double) totalTeeth;
+
+		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
+		motor.setPosition(motorRotations);
+
 		SmartDashboard.putData("Turret Mech", mech);
 
 		SmartDashboard.putData("Turret to 90", new InstantCommand(()-> setFieldRelativeTarget(new Rotation2d(Math.PI/2), 0.0)));
 		SmartDashboard.putData("Turret to -90", new InstantCommand(()-> setFieldRelativeTarget(new Rotation2d(-Math.PI/2), 0.0)));
-
 	}
 
 	/* ---------------- Public API ---------------- */
@@ -289,5 +284,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
         inputs.encoderLeftRot = encoderLeft.getAbsolutePosition().getValueAsDouble();
         inputs.encoderRightRot = encoderRight.getAbsolutePosition().getValueAsDouble();
+	}
+
+	private double wrapUnit(double value) {
+		value %= 1.0;
+		if (value < 0) value += 1.0;
+		return value;
 	}
 }

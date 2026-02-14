@@ -7,9 +7,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import frc.robot.util.Remainders.Encoder;
+import frc.robot.util.ChineseRemainderTheorum.Encoder;
 
-public class RemainderTest {
+public class ChineseRemainderTheorumTest {
 
 	@BeforeEach
 	public void prepare() {
@@ -25,7 +25,7 @@ public class RemainderTest {
 
 		Encoder a = new Encoder(5000 % 123, 123);
 		Encoder b = new Encoder(5000 % 321, 321);
-		double val = Remainders.compute(a, b, tolerance);
+		double val = ChineseRemainderTheorum.compute(a, b, tolerance);
 		assertEquals(5000, val, tolerance);
 	}
 }
