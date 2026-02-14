@@ -70,7 +70,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 					}
 				});
 
-        setpoint = new State(getPositionRad(), 0.0);
+        setpoint = new State(getPositionRad() / GEAR_RATIO, 0.0);
 
 		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
 		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
