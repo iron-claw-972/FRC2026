@@ -25,6 +25,7 @@ import frc.robot.constants.swerve.DriveConstants;
 
 public class LinearClimb extends SubsystemBase{
     private TalonFX motor;
+    private boolean calibrating = false;
 
     private static PIDController pid = new PIDController(0.1, 0, 0);
     
@@ -36,20 +37,12 @@ public class LinearClimb extends SubsystemBase{
 
         motor.setNeutralMode(NeutralModeValue.Brake);
 
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        setCurrentLimits(5.0);
 
-        config.CurrentLimits = new CurrentLimitsConfigs();
-
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 5.0;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 5.0;
-
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        motor.getConfigurator().apply(config);
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
         SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
+        SmartDashboard.putData("Hardstop Calibrate", new InstantCommand(() -> hardstopCalibration()));
         SmartDashboard.putNumber("Position", getPosition());
 
         motor.setPosition(0);
@@ -72,11 +65,11 @@ public class LinearClimb extends SubsystemBase{
     }
 
     public void goUp() {
-        setSetpoint(45);
+        setSetpoint(0);
     }
 
     public void goDown() {
-        setSetpoint(ClimbConstants.MIN_HEIGHT);
+        setSetpoint(0);
     }
 
     public void climb() {
@@ -84,9 +77,30 @@ public class LinearClimb extends SubsystemBase{
     }
 
     public void periodic() {
-        double power = pid.calculate(motor.getPosition().getValueAsDouble());
-        power = MathUtil.clamp(power, -0.2, 0.2);
-        motor.set(power);
-        SmartDashboard.putNumber("Position", getPosition());
+        if(calibrating == false){
+            double power = pid.calculate(motor.getPosition().getValueAsDouble());
+            power = MathUtil.clamp(power, -0.2, 0.2);
+            motor.set(power);
+            SmartDashboard.putNumber("Position", getPosition());
+        }else{
+            motor.set(0.15);
+        }
+        
+    }
+    public void setCurrentLimits(double limit){
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.CurrentLimits = new CurrentLimitsConfigs();
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = limit;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = limit;
+
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        motor.getConfigurator().apply(config);
+    }
+    public void hardstopCalibration(){
+        calibrating = !calibrating;
     }
 }
