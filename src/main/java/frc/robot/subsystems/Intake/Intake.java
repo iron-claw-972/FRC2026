@@ -70,8 +70,32 @@ public class Intake extends SubsystemBase {
         maxAcceleration = maxVelocity / 0.25;
 
         // Configure the motors
+        // Build the configuration for the roller
+        TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
-        // Build the configuration
+        // config the current limits (low value for testing)
+        rollerConfig.CurrentLimits
+        .withStatorCurrentLimit(3.0)
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(3.0)
+        .withSupplyCurrentLimitEnable(true);
+
+        // config Slot 0 PID params
+        var slot0Configs = rollerConfig.Slot0;
+        // TODO: set PID parameters
+        slot0Configs.kP = 5.0;
+        slot0Configs.kI = 0.0;
+        slot0Configs.kD = 0.0;
+        slot0Configs.kV = 0.0;
+        slot0Configs.kA = 0.0;
+
+        // set the brake mode
+        rollerConfig.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+
+        // apply the configuration to the right motor (master)
+        rollerMotor.getConfigurator().apply(rollerConfig);
+
+        // Build the configuration for the left and right Motor
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         // config the current limits (low value for testing)
@@ -82,13 +106,13 @@ public class Intake extends SubsystemBase {
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
-        var slot0Configs = config.Slot0;
+        var rollerSlot0Configs = config.Slot0;
         // TODO: set PID parameters
-        slot0Configs.kP = 5.0;
-        slot0Configs.kI = 0.0;
-        slot0Configs.kD = 0.0;
-        slot0Configs.kV = 0.0;
-        slot0Configs.kA = 0.0;
+        rollerSlot0Configs.kP = 5.0;
+        rollerSlot0Configs.kI = 0.0;
+        rollerSlot0Configs.kD = 0.0;
+        rollerSlot0Configs.kV = 0.0;
+        rollerSlot0Configs.kA = 0.0;
 
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
