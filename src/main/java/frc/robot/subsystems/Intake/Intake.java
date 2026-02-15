@@ -74,10 +74,11 @@ public class Intake extends SubsystemBase {
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
         // config the current limits (low value for testing)
+        // add constant for currentLimits
         rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(3.0)
+        .withStatorCurrentLimit(40.0)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(3.0)
+        .withSupplyCurrentLimit(40.0)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -100,9 +101,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         config.CurrentLimits
-        .withStatorCurrentLimit(3.0)
+        .withStatorCurrentLimit(10.0)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(3.0)
+        .withSupplyCurrentLimit(10.0)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -147,6 +148,11 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
         SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
         SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
+        SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.5), this));
+        SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.5), this));
+        SmartDashboard.putData("Roller Stop", new InstantCommand(() -> this.spin(0.0), this));
+        SmartDashboard.putData("Zero Motors", new InstantCommand(this::zeroMotors));
+
 
         if (RobotBase.isSimulation()) {
             // build the simulation resources
@@ -190,6 +196,7 @@ public class Intake extends SubsystemBase {
         // this returns rotations per second.
         double velocity = rollerMotor.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Roller Velocity", velocity);
+
     }
 
     public void simulationPeriodic(){
@@ -276,6 +283,7 @@ public class Intake extends SubsystemBase {
      */
     public void spin(double speed) {
         rollerMotor.set(speed);
+        System.out.println(speed);
     }
 
     /**
@@ -300,6 +308,12 @@ public class Intake extends SubsystemBase {
     /** Retract the intake to its starting position. */
     public void retract(){
         setPosition(IntakeConstants.startingPoint);
+
+    }
+
+    public void zeroMotors() {
+        rightMotor.setPosition(0.0);
+        leftMotor.setPosition(0.0);
     }
 
     /**
