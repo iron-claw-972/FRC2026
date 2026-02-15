@@ -98,17 +98,19 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
-		motor.setNeutralMode(NeutralModeValue.Coast);
-
-		motor.getConfigurator().apply(
-				new Slot0Configs()
-						.withKP(kP)
-						.withKD(kD));
+		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
-        motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
+    
+		config.Slot0.kP = 2.0; 
+		config.Slot0.kS = 0.1; // Static friction compensation
+		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
+		config.Slot0.kD = 0.1; // The "Braking" term to stop overshoot
+
+		var mm = config.MotionMagic;
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(40.0) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed -- maybe 10-20x the acceleration
         motor.getConfigurator().apply(config);
 
 		motor.getConfigurator().apply(
@@ -180,56 +182,21 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
-		// --- Profile in MECHANISM SPACE ---
-		State goalState = new State(
-				MathUtil.clamp(best, MIN_ANGLE_RAD, MAX_ANGLE_RAD),
-				goalVelocityRadPerSec);
+		// Tells the Kraken to get to this position using 1000Hz profile
+		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
+		
+		// Add the feedforward for the target velocity (SOTM) here as well
+		double feedforwardVoltage = feedForward.calculate(goalVelocityRadPerSec * GEAR_RATIO);
+		
+		motor.setControl(mmVoltageRequest
+			.withPosition(motorGoalRotations)
+			.withFeedForward(feedforwardVoltage));
 
-		setpoint = profile.calculate(
-				Constants.LOOP_TIME,
-				setpoint,
-				goalState);
-
-		// --- Convert to MOTOR SPACE ---
-		double motorPosRot = Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
-
-		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
-
-		double targetVelocity;
-
-		// if(Math.abs(setpoint.position * GEAR_RATIO - Units.rotationsToRadians(motor.getPosition().getValueAsDouble())) > Math.PI/2){
-		// 	// in rad/sec
-		// 	targetVelocity = longVelocityPID.calculate(
-		// 			motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-		// 			setpoint.position * GEAR_RATIO);
-			
-		// 	targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
-
-		// 	double voltage = feedForward.calculate(targetVelocity);
-		// 	motor.setVoltage(voltage);
-		// } else{
-			// in rad/sec
-			//double robotRotAcceleration = (Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) - lastFrameVelocity) / Constants.LOOP_TIME;
-			double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
-
-			targetVelocity = positionPID.calculate(
-					motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-					motorSetpointPosition);
-			
-			targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
-
-			double voltage = feedForward.calculate(targetVelocity);
-
-			double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-			voltage += velocityCorrectionVoltage;
-
-			motor.setVoltage(voltage);
-		// }
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
 		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
+		//Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
 
 		// --- Position + velocity feedforward (MA-style) ---
 		// motor.setControl(request);
@@ -238,21 +205,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-        SmartDashboard.putData(positionPID);
-		SmartDashboard.putData(velocityPID);
-		SmartDashboard.putNumber("Turret GoalDeg",
-				Units.radiansToDegrees(best));
-		SmartDashboard.putNumber("Turret SetpointDeg",
-				Units.radiansToDegrees(setpoint.position));
-		SmartDashboard.putNumber("Turret Raw Setpoint", Units.radiansToDegrees(best));
-		SmartDashboard.putNumber("Turret motorPosRot",
-				Units.radiansToDegrees(motorPosRot));
-		SmartDashboard.putNumber("Turret motorVelRotPerSec",
-				Units.radiansToDegrees(motorVelRotPerSec));
-        SmartDashboard.putNumber("Turret targetVelocity",
-				Units.radiansToDegrees(targetVelocity));
-		SmartDashboard.putNumber("Turret Position Deg",
-				Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO);
 	}
 
 	/* ---------------- Simulation ---------------- */

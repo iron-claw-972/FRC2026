@@ -142,7 +142,7 @@ public class SimpleAutoShoot extends Command {
         Logger.recordOutput("Spinny accel", drivetrain.getAngularRate(2));
         Logger.recordOutput("Original Turret Setpoint", turretSetpoint);
         
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2) - velocityAdjustment);
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
         // turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), (-drivetrain.getAngularRate(2)) + turretAcceleration * 0.3);
         //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
 
