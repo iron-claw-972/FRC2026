@@ -1,14 +1,17 @@
 package frc.robot.subsystems.Intake;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -16,86 +19,84 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IntakeConstants;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
 
 public class Intake extends SubsystemBase {
+    // Mechanism Display...
     private final Mechanism2d mechanism;
     private final MechanismLigament2d robotExtension;
+    @SuppressWarnings("unused")
     private final MechanismLigament2d robotFrame; 
     private final MechanismLigament2d robotHeight; 
     private final MechanismLigament2d robotPos;
 
-    private TalonFX rollerMotor; 
-    private TalonFX rightMotor; //leader
-    private TalonFX leftMotor; //invert this one
+    // create the motors
+    /** Motor to move the roller */
+    private TalonFX rollerMotor = new TalonFX(IntakeConstants.rollerID, Constants.CANIVORE_SUB);
+    /** Right motor (master) */
+    private TalonFX rightMotor = new TalonFX(IntakeConstants.rightID, Constants.CANIVORE_SUB);
+    /** Left motor (slave) */
+    private TalonFX leftMotor = new TalonFX(IntakeConstants.leftID, Constants.CANIVORE_SUB);
+
+    /** Motor characteristics for the extending pair of Kraken X44 motors (aka gearbox) */
+    private final DCMotor dcMotor = DCMotor.getKrakenX44(2);
+
     private double maxVelocity;
     private double maxAcceleration;
-    private final DCMotorSim intakeSim;
+    private ElevatorSim intakeSim;
     private double distance;
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
     public Intake() {
-        rightMotor = new TalonFX(IntakeConstants.rightID);
-        leftMotor = new TalonFX(IntakeConstants.leftID);
-
-        rollerMotor = new TalonFX(IntakeConstants.rollerID); 
-
-        DCMotor dcmotor = DCMotor.getKrakenX44(2);
      
-        intakeSim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-            DCMotor.getKrakenX44(2),      // motor model
-        0.001,                        // MOI (kg·m²) – tune later
-            IntakeConstants.gearRatio
-         ),
-        DCMotor.getKrakenX44(2)
-);
-        rightMotor.getSimState().setSupplyVoltage(12.0);
-
         // get the maximum free speed
-        double mechFreeSpeed = Units.radiansToRotations(dcmotor.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
+        double mechFreeSpeed = Units.radiansToRotations(dcMotor.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
 
         // this is confusing
         maxVelocity = 0.5 * mechFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
+        // Configure the motors
 
-        // right motor configs
+        // Build the configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
+
+        // config the current limits (low value for testing)
+        config.CurrentLimits
+        .withStatorCurrentLimit(3.0)
+        .withStatorCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(3.0)
+        .withSupplyCurrentLimitEnable(true);
+
+        // config Slot 0 PID params
         var slot0Configs = config.Slot0;
-        //find values later
-        //friction, maybe?
+        // TODO: set PID parameters
         slot0Configs.kP = 5;
         slot0Configs.kI = 0;
         slot0Configs.kD = 0;
         slot0Configs.kV = 0;
         slot0Configs.kA = 0;
 
-
-        var currentLimits = config.CurrentLimits;
-        currentLimits.StatorCurrentLimitEnable = true;
-        // set to a low current for testing
-        currentLimits.StatorCurrentLimit = 3.0;
-        currentLimits.SupplyCurrentLimitEnable = true;
-        // set to a low current for testing
-        currentLimits.SupplyCurrentLimit = 3.0;
-
-        var motionMagicConfigs = config.MotionMagic;
+        // configure MotionMagic
+        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
         motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radius/Math.PI/2;
         motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radius/Math.PI/2;
 
-        rightMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+        // set the brake mode
+        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
+
+        // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
 
-        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+        // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
-        //Follower follower = new Follower(rightMotor.getDeviceID(), true);
+        // make the left motor follow but oppose the right motor
         leftMotor.setControl(new Follower(rightMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
+        // Build the mechanism for display
         mechanism = new Mechanism2d(80, 80);
         MechanismRoot2d root = mechanism.getRoot("Root", 0, 1);
         robotPos = root.append(new MechanismLigament2d("robotPos", 40, 0.0, 1, new Color8Bit(0, 0, 0)));
@@ -107,6 +108,30 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Extension Mechanism", mechanism);
         SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
         SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
+        SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
+        SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
+
+        if (RobotBase.isSimulation()) {
+            // build the simulation resources
+
+            // the supply voltage should change with load....
+            rightMotor.getSimState().setSupplyVoltage(12.0);
+
+            double carriageMassKg = 3.0;
+            double drumRadiusMeters = Units.inchesToMeters(1.0);
+            double minHeightMeters = Units.inchesToMeters(0.0);
+            double maxHeightMeters = Units.inchesToMeters(IntakeConstants.maxExtension);
+            double startingHeightMeters = Units.inchesToMeters(0.0);
+            intakeSim = new ElevatorSim(
+                dcMotor,
+                IntakeConstants.gearRatio,
+                carriageMassKg, 
+                drumRadiusMeters, 
+                minHeightMeters, 
+                maxHeightMeters, 
+                false, 
+                startingHeightMeters);
+        }
     }
 
     public void periodic() {
@@ -118,14 +143,25 @@ public class Intake extends SubsystemBase {
 
     public void simulationPeriodic(){
         // simulate the motor activity
+
+        // get the applied motor voltage
         double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
+
+        // tell the simulator that voltage
         intakeSim.setInputVoltage(voltage);
+        // run the siimulation
         intakeSim.update(0.02);
-        // rackPitch in teeth/inch
-        double mechanicalRotation = intakeSim.getAngularPositionRotations();
-        double motorRotation = mechanicalRotation * IntakeConstants.gearRatio; 
-        //convert motor rotation to distance
-    
+
+        // get the simulation result
+        double metersExtend = intakeSim.getPositionMeters();
+        double inchesExtend = Units.metersToInches(metersExtend);
+        double motorRotations = inchesToRotations(inchesExtend);
+
+        // set the motor to that position
+        rightMotor.getSimState().setRawRotorPosition(motorRotations);
+
+        // update the display
+        robotExtension.setLength(inchesExtend);
     }
 
     /**
@@ -176,7 +212,15 @@ public class Intake extends SubsystemBase {
 
 
     public void spin(double speed) {
-        rollerMotor.set(IntakeConstants.speed);
+        rollerMotor.set(speed);
+    }
+
+    public void spinStart() {
+        spin(IntakeConstants.speed);
+    }
+
+    public void spinStop() {
+        spin(0.0);
     }
 
     public void extend() {
@@ -186,8 +230,6 @@ public class Intake extends SubsystemBase {
 
     public void retract(){
         setPosition(IntakeConstants.startingPoint);
-
-        
     }
 
     public void close() {

@@ -1,7 +1,5 @@
 package frc.robot.constants;
 
-import edu.wpi.first.math.util.Units;
-
 public class IntakeConstants {
 
     // Motors (set actual ids)
@@ -25,7 +23,7 @@ public class IntakeConstants {
     /**
      * max extension in inches
      */
-    public static final double maxExtension = 14.856; 
+    public static final double maxExtension = 3.0; // 14.856; 
     /**
      * starting point in inches
      */

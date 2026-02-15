@@ -83,8 +83,6 @@ public class RobotContainer {
       default:
 
       case WaffleHouse:
-        intake = new Intake();
-
       
       case SwerveCompetition: // AKA "Vantage"
 
@@ -97,6 +95,7 @@ public class RobotContainer {
       case Phil: // AKA "IHOP"
 
       case PrimeJr:
+        intake = new Intake();
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
