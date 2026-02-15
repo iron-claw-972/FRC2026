@@ -13,8 +13,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -49,12 +51,21 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
+  // Auto Command selection
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    // display the current robot id on smartdashboard
+    SmartDashboard.putString("RobotID", robotId.toString());
+
+    // Filling the SendableChooser on SmartDashboard
+    autoChooserInit();
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -144,7 +155,6 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -171,8 +181,32 @@ public class RobotContainer {
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+// Autos 
+
+  /**
+   * Initialize the SendableChooser on the SmartDashbboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
+  }
+
+  /**
+   * Gets the auto command from SmartDashboard
+   * @return
+   */
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
+    return autoSelected;
   }
 
   public void logComponents(){
