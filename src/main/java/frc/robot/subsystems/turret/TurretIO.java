@@ -10,6 +10,7 @@ public interface TurretIO {
         public double motorCurrent = 0;
         public double encoderLeftRot = 0;
         public double encoderRightRot = 0;
+        public double motorVoltage = 0;
     }
 
     public void updateInputs();

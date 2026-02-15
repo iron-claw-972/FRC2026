@@ -7,6 +7,8 @@ public class ShotInterpolation {
     public static final InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
     public static final InterpolatingDoubleTreeMap shooterPowerMap = new InterpolatingDoubleTreeMap();
     public static final InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
+    
+    public static final InterpolatingDoubleTreeMap exitVelocityMap = new InterpolatingDoubleTreeMap();
 
     static{
         timeOfFlightMap.put(0.0, 0.67);
@@ -17,5 +19,8 @@ public class ShotInterpolation {
 
         hoodAngleMap.put(0.0, Units.degreesToRadians(90));
         hoodAngleMap.put(1.0, Units.degreesToRadians(90));
+
+        exitVelocityMap.put(1.0, 2.0);
+        exitVelocityMap.put(2.0, 4.0);
     }
 }

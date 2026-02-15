@@ -207,7 +207,7 @@ public class AutoShootCommand extends Command {
 
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
         //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        shooter.setShooter(goalState.exitVel());
+        //shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);

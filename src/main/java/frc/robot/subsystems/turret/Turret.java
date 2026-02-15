@@ -56,12 +56,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MAX_VEL_RAD_PER_SEC = 15;
 	//private static final double MAX_VEL_RAD_PER_SEC = 3.0; // Starting super duper slow for now
 	// private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
-	private static final double MAX_ACCEL_RAD_PER_SEC2 = 60.0;
+	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
 	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
 
-	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
-	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
+	private static final PIDController positionPID = new PIDController(15.0, 0, 0.0);
+	// private static final PIDController positionPID = new PIDController(15, 0, 0.25);
+	private static final PIDController velocityPID = new PIDController(0.2, 0.0, 0.0);
 
     private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
     private final CANcoder encoderRight = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
@@ -105,7 +106,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
     // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
+    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, (1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt) * 0.8, 0);
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 	/* ---------------- Constructor ---------------- */
@@ -113,10 +114,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	public Turret() {
 		motor.setNeutralMode(NeutralModeValue.Coast);
 
-		motor.getConfigurator().apply(
-				new Slot0Configs()
-						.withKP(kP)
-						.withKD(kD));
+		// motor.getConfigurator().apply(
+		// 		new Slot0Configs()
+		// 				.withKP(kP)
+		// 				.withKD(kD));
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		var motionMagicConfigs = config.MotionMagic;
@@ -228,17 +229,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
 
-		targetVelocity = positionPID.calculate(
+		targetVelocity =
+		positionPID.calculate(
 				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
 				motorSetpointPosition);
 			
-		//targetVelocity += Units.rotationsToRadians(motorVelRotPerSec); // TODO: Change this back after full rotation
-		targetVelocity += Math.abs(setpoint.position) != Math.PI/2 ? Units.rotationsToRadians(motorVelRotPerSec) : 0;
+		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec) * 1.0;
 
 		double voltage = feedForward.calculate(targetVelocity);
 
-		double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-		voltage += velocityCorrectionVoltage;
+		// double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
+		// voltage += velocityCorrectionVoltage;
 
 		motor.setVoltage(voltage);
 
@@ -279,6 +280,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
         inputs.encoderLeftRot = encoderLeft.getAbsolutePosition().getValueAsDouble();
         inputs.encoderRightRot = encoderRight.getAbsolutePosition().getValueAsDouble();
+		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 	}
 
 	private double wrapUnit(double value) {

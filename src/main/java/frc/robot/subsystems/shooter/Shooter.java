@@ -48,10 +48,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0.1; //tune p value
+        config.Slot0.kP = 0.15; //tune p value
         config.Slot0.kI = 0;
-        config.Slot0.kD = 0;
-        config.Slot0.kV = 0.12; //Maximum rps = 100 --> 12V/100rps
+        config.Slot0.kD = 0.0;
+        config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
         
@@ -64,7 +64,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
-        SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(20.0)));
+        SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
     }
 
     @Override
@@ -73,8 +73,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(shooterTargetSpeed * powerModifier));          
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2))));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2))));   
+        
+        Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
     }
 
     public void setShooter(double linearVelocityMps) {
@@ -88,8 +90,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     @Override
     public void updateInputs(){
-        inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble());
-        inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble());
+        inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
+        inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         Logger.processInputs("Shooter", inputs);
     }
 
