@@ -11,7 +11,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -50,7 +49,13 @@ public class Intake extends SubsystemBase {
     private double maxVelocity;
     private double maxAcceleration;
 
+    // Use FlywheelSim for the roller
     private FlywheelSim rollerSim;
+    // for the moment of inertial, guess .5 kg at a radius of 20 mm
+    private double moiRoller = 0.5 * 0.020 * 0.20;
+    private double gearingRoller = 2.0;
+
+    // Use ElevatorSim for the extender
     private ElevatorSim intakeSim;
 
     private double distance;
@@ -142,10 +147,8 @@ public class Intake extends SubsystemBase {
                 startingHeightMeters);
 
             // Roller
-            double moi = 0.25;
-            double gearing = 2.0;
             rollerSim = new FlywheelSim(
-                LinearSystemId.createFlywheelSystem(dcMotorRoller, moi, gearing),
+                LinearSystemId.createFlywheelSystem(dcMotorRoller, moiRoller, gearingRoller),
                 dcMotorRoller);
         }
     }
@@ -187,8 +190,11 @@ public class Intake extends SubsystemBase {
         voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
         rollerSim.setInputVoltage(voltage);
         rollerSim.update(0.020);
-        // FIXME: get the simulated velocity
-        double velocity = 51.9; // rollerSim.getAngularVelocity();
+        // the X44 has a top speed of 7530 RPM = 125 RPS
+        // If the drive is 0.2, then ultimate speed should be 125 RPS * 0.2 = 25 RPS
+        // result is 26 RPS.
+        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * gearingRoller;
+
         rollerMotor.getSimState().setRotorVelocity(velocity);
     }
 
