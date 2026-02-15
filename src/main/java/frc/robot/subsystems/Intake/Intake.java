@@ -9,9 +9,12 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.VelocityUnit;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -39,19 +42,24 @@ public class Intake extends SubsystemBase {
     /** Left motor (slave) */
     private TalonFX leftMotor = new TalonFX(IntakeConstants.leftID, Constants.CANIVORE_SUB);
 
+    /** Motor characteristics for the roller motor, a Kraken X44 (aka gearbox) */
+    private final DCMotor dcMotorRoller = DCMotor.getKrakenX44(1);
     /** Motor characteristics for the extending pair of Kraken X44 motors (aka gearbox) */
-    private final DCMotor dcMotor = DCMotor.getKrakenX44(2);
+    private final DCMotor dcMotorExtend = DCMotor.getKrakenX44(2);
 
     private double maxVelocity;
     private double maxAcceleration;
+
+    private FlywheelSim rollerSim;
     private ElevatorSim intakeSim;
+
     private double distance;
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
     public Intake() {
      
         // get the maximum free speed
-        double mechFreeSpeed = Units.radiansToRotations(dcMotor.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
+        double mechFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
 
         // this is confusing
         maxVelocity = 0.5 * mechFreeSpeed;
@@ -114,6 +122,7 @@ public class Intake extends SubsystemBase {
         if (RobotBase.isSimulation()) {
             // build the simulation resources
 
+            // Extender
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
 
@@ -123,7 +132,7 @@ public class Intake extends SubsystemBase {
             double maxHeightMeters = Units.inchesToMeters(IntakeConstants.maxExtension);
             double startingHeightMeters = Units.inchesToMeters(0.0);
             intakeSim = new ElevatorSim(
-                dcMotor,
+                dcMotorExtend,
                 IntakeConstants.gearRatio,
                 carriageMassKg, 
                 drumRadiusMeters, 
@@ -131,6 +140,13 @@ public class Intake extends SubsystemBase {
                 maxHeightMeters, 
                 false, 
                 startingHeightMeters);
+
+            // Roller
+            double moi = 0.25;
+            double gearing = 2.0;
+            rollerSim = new FlywheelSim(
+                LinearSystemId.createFlywheelSystem(dcMotorRoller, moi, gearing),
+                dcMotorRoller);
         }
     }
 
@@ -139,6 +155,10 @@ public class Intake extends SubsystemBase {
         double inchExtension = getPosition();
         SmartDashboard.putNumber("Intake Position:", inchExtension);
         robotExtension.setLength(inchExtension);
+
+        // this returns rotations per second.
+        double velocity = rollerMotor.getVelocity().getValueAsDouble();
+        SmartDashboard.putNumber("Roller Velocity", velocity);
     }
 
     public void simulationPeriodic(){
@@ -162,6 +182,14 @@ public class Intake extends SubsystemBase {
 
         // update the display
         robotExtension.setLength(inchesExtend);
+
+        // simulate roller
+        voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
+        rollerSim.setInputVoltage(voltage);
+        rollerSim.update(0.020);
+        // FIXME: get the simulated velocity
+        double velocity = 51.9; // rollerSim.getAngularVelocity();
+        rollerMotor.getSimState().setRotorVelocity(velocity);
     }
 
     /**
@@ -179,7 +207,6 @@ public class Intake extends SubsystemBase {
     public double getPosition(){
         double motorRotations = rightMotor.getPosition().getValueAsDouble();
         return rotationsToInches(motorRotations);
-
     }
 
     /**
@@ -210,7 +237,6 @@ public class Intake extends SubsystemBase {
         return distance == IntakeConstants.maxExtension; //  TODO add tolerance for distance
     }
 
-
     public void spin(double speed) {
         rollerMotor.set(speed);
     }
@@ -225,7 +251,6 @@ public class Intake extends SubsystemBase {
 
     public void extend() {
        setPosition(IntakeConstants.maxExtension);
-
     }
 
     public void retract(){
@@ -237,7 +262,6 @@ public class Intake extends SubsystemBase {
         rightMotor.close();
         rollerMotor.close();
     }
-
 }
     
 
