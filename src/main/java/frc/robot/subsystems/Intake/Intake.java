@@ -58,7 +58,6 @@ public class Intake extends SubsystemBase {
     // Use ElevatorSim for the extender
     private ElevatorSim intakeSim;
 
-    private double distance;
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
     public Intake() {
@@ -239,10 +238,6 @@ public class Intake extends SubsystemBase {
         return motorRotations;
     }
 
-    public boolean atMaxExtension(){
-        return distance == IntakeConstants.maxExtension; //  TODO add tolerance for distance
-    }
-
     public void spin(double speed) {
         rollerMotor.set(speed);
     }
@@ -269,5 +264,3 @@ public class Intake extends SubsystemBase {
         rollerMotor.close();
     }
 }
-    
-
