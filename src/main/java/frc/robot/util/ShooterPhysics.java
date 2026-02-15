@@ -6,6 +6,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.constants.Constants;
 
 public class ShooterPhysics {
@@ -23,6 +24,7 @@ public class ShooterPhysics {
 		}
 	};
 
+	// note: minPitch must be < 75°
 	public record Constraints(double height, double maxVel, double minPitch, double maxPitch) {
 		// performs some sanity checks
 		public boolean check() {
@@ -36,12 +38,17 @@ public class ShooterPhysics {
 				return false;
 			if (minPitch >= maxPitch)
 				return false;
+
+			// this causes problems and isn't likely to actually occur
+			if (minPitch > Units.degreesToRadians(75))
+				return false;
+
 			return true;
 		}
 	};
 
 	/**
-	 * Calculates shot parameters for SOTM using Physics™.
+	 * Calculates shot parameters for SOTM for a peak height using Physics™.
 	 *
 	 * @param robotVelocity The x and y velocity of the robot, field relative.
 	 * @param robotToTarget The robot to target transform. Angles are field
@@ -55,6 +62,15 @@ public class ShooterPhysics {
 		return cvtShot(exitVel, height);
 	}
 
+	/**
+	 * Calculates shot parameters for SOTM for a peak height using Physics™.
+	 *
+	 * @param robotVelocity The x and y velocity of the robot, field relative.
+	 * @param robotToTarget The robot to target transform. Angles are field
+	 *                      relative, positions are with the robot as the origin.
+	 * @param constraints   The constraints on the shooter.
+	 * @return A TurretState that represents the shot the robot should take.
+	 */
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			Constraints constraints) {
 		if (!constraints.check())
@@ -104,7 +120,7 @@ public class ShooterPhysics {
 		}
 	}
 
-	public static TurretState cvtShot(Translation3d velocity, double height) {
+	static TurretState cvtShot(Translation3d velocity, double height) {
 		Translation2d onGround = velocity.toTranslation2d();
 		Rotation2d yaw = onGround.getAngle();
 		double magnitude2d = onGround.getNorm();
@@ -117,7 +133,7 @@ public class ShooterPhysics {
 
 	/**
 	 * Actually does the SOTM math. Assumes shots are from (0, 0, 0). This is only
-	 * public so it can be unit tested, and shouldn't be called directly.
+	 * package scope so it can be unit tested, and shouldn't be called directly.
 	 *
 	 * @param robotVelocity The velocity of the robot, field relative.
 	 * @param target        The translation from the robot to the target, field
@@ -127,7 +143,7 @@ public class ShooterPhysics {
 	 *                      trajectory.
 	 * @return Velocity that should be imparted on the ball, field relative.
 	 */
-	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
+	static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
 			double peakZ) {
 		if (target.getZ() > peakZ)
 			throw new IllegalArgumentException(
@@ -175,16 +191,17 @@ public class ShooterPhysics {
 		return new Translation3d(xExitVel, yExitVel, zExitVel);
 	}
 
+	// gets the derivative of velocity with respect to height at shot
 	private static double getVelocityDiff(TurretState shot, Translation2d initialVelocity, Translation3d target) {
 		return (getShotParams(initialVelocity, target, shot.height() + .01).exitVel() - shot.exitVel()) / .01;
 	}
 
 	// call with default tolerance
-	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
+	static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
 		return withMinimumSpeed(initialVelocity, target, 0.001);
 	}
 
-	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
+	static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
 		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:"
 		// + tolerance);
@@ -230,7 +247,7 @@ public class ShooterPhysics {
 
 	}
 
-	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
+	static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch) {
 		return withAngle(initialVelocity, target, pitch, 0.001);
 	}
@@ -238,7 +255,7 @@ public class ShooterPhysics {
 	// note: this behaves badly with high angles
 	// this isn't a problem when this is called from getConstrainedParams because
 	// that will only use this method to solve for the lower bound
-	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
+	static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
 		if (pitch <= 0 || pitch >= Math.PI / 2)
 			throw new IllegalArgumentException("Pitch must be in the range 0 < pitch < pi/2 (got: " + pitch + ").");
