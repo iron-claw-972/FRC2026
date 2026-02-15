@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase {
     /** Left motor (slave) */
     private TalonFX leftMotor = new TalonFX(IntakeConstants.leftID, Constants.CANIVORE_SUB);
 
-    /** Motor characteristics for the roller motor, a Kraken X44 (aka gearbox) */
+    /** Motor characteristics for the roller motor, a single Kraken X44 (aka gearbox) */
     private final DCMotor dcMotorRoller = DCMotor.getKrakenX44(1);
     /** Motor characteristics for the extending pair of Kraken X44 motors (aka gearbox) */
     private final DCMotor dcMotorExtend = DCMotor.getKrakenX44(2);
@@ -51,7 +51,7 @@ public class Intake extends SubsystemBase {
 
     // Use FlywheelSim for the roller
     private FlywheelSim rollerSim;
-    // for the moment of inertial, guess .5 kg at a radius of 20 mm
+    // for the moment of inertial, guess the roller is .5 kg at a radius of 20 mm
     private double moiRoller = 0.5 * 0.020 * 0.20;
     private double gearingRoller = 2.0;
 
@@ -63,10 +63,10 @@ public class Intake extends SubsystemBase {
     public Intake() {
      
         // get the maximum free speed
-        double mechFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
+        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
 
         // this is confusing
-        maxVelocity = 0.5 * mechFreeSpeed;
+        maxVelocity = 0.5 * maxFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
         // Configure the motors
@@ -84,17 +84,17 @@ public class Intake extends SubsystemBase {
         // config Slot 0 PID params
         var slot0Configs = config.Slot0;
         // TODO: set PID parameters
-        slot0Configs.kP = 5;
-        slot0Configs.kI = 0;
-        slot0Configs.kD = 0;
-        slot0Configs.kV = 0;
-        slot0Configs.kA = 0;
+        slot0Configs.kP = 5.0;
+        slot0Configs.kI = 0.0;
+        slot0Configs.kD = 0.0;
+        slot0Configs.kV = 0.0;
+        slot0Configs.kA = 0.0;
 
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
-        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radius/Math.PI/2;
-        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radius/Math.PI/2;
+        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radiusRackPinion/Math.PI/2;
+        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radiusRackPinion/Math.PI/2;
 
         // set the brake mode
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
@@ -117,6 +117,7 @@ public class Intake extends SubsystemBase {
         // extensiion is initially retracted.
         robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
 
+        // add some test commands.
         SmartDashboard.putData("Extension Mechanism", mechanism);
         SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
         SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
@@ -126,14 +127,17 @@ public class Intake extends SubsystemBase {
         if (RobotBase.isSimulation()) {
             // build the simulation resources
 
-            // Extender
+            // Extender simulation
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
 
+            // mass is just a guess
             double carriageMassKg = 3.0;
+            // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
             double drumRadiusMeters = Units.inchesToMeters(1.0);
             double minHeightMeters = Units.inchesToMeters(0.0);
             double maxHeightMeters = Units.inchesToMeters(IntakeConstants.maxExtension);
+            // start retracted
             double startingHeightMeters = Units.inchesToMeters(0.0);
             intakeSim = new ElevatorSim(
                 dcMotorExtend,
@@ -145,7 +149,7 @@ public class Intake extends SubsystemBase {
                 false, 
                 startingHeightMeters);
 
-            // Roller
+            // Roller simulation
             rollerSim = new FlywheelSim(
                 LinearSystemId.createFlywheelSystem(dcMotorRoller, moiRoller, gearingRoller),
                 dcMotorRoller);
@@ -158,13 +162,14 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putNumber("Intake Position:", inchExtension);
         robotExtension.setLength(inchExtension);
 
+        // Report velocity to SmartDashbboard
         // this returns rotations per second.
         double velocity = rollerMotor.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Roller Velocity", velocity);
     }
 
     public void simulationPeriodic(){
-        // simulate the motor activity
+        // simulate the motor activities
 
         // get the applied motor voltage
         double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
@@ -189,6 +194,7 @@ public class Intake extends SubsystemBase {
         voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
         rollerSim.setInputVoltage(voltage);
         rollerSim.update(0.020);
+        // Sanity check:
         // the X44 has a top speed of 7530 RPM = 125 RPS
         // If the drive is 0.2, then ultimate speed should be 125 RPS * 0.2 = 25 RPS
         // result is 26 RPS.
@@ -198,8 +204,8 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * in inches
-     * @param setpoint
+     * Set the intake extender position
+     * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
         double motorRotations =inchesToRotations(setpoint);
@@ -207,7 +213,8 @@ public class Intake extends SubsystemBase {
     }
 
     /**
-     * gets motor position in inches
+     * Get the intake extender position
+     * @return inches
      */
     public double getPosition(){
         double motorRotations = rightMotor.getPosition().getValueAsDouble();
@@ -216,10 +223,11 @@ public class Intake extends SubsystemBase {
 
     /**
      * convert rotations to inches
-     * @param rotations
-     * @return
+     * @param rotations of the motor
+     * @return inches of rack travel
      */
-    public double rotationsToInches(double motorRotations){
+    public double rotationsToInches(double motorRotations) {
+        // circumference of the rack pinion
         double circ = 2 * Math.PI * 0.5;
         double pinionRotations = motorRotations / IntakeConstants.gearRatio;
         double inches = pinionRotations * circ;
@@ -228,8 +236,8 @@ public class Intake extends SubsystemBase {
 
     /**
      * convert inches to rotations
-     * @param inches
-     * @return
+     * @param inches of rack travel
+     * @return motor rotations
      */
     public double inchesToRotations(double inches){
         double circ = 2 * Math.PI * 0.5;
@@ -238,26 +246,42 @@ public class Intake extends SubsystemBase {
         return motorRotations;
     }
 
+    /**
+     * Set the roller speed.
+     * @param speed duty cycle in the range [-1, 1]
+     */
     public void spin(double speed) {
         rollerMotor.set(speed);
     }
 
+    /**
+     * Start the intake roller spinning.
+     */
     public void spinStart() {
         spin(IntakeConstants.speed);
     }
 
+    /**
+     * Stop the intake roller.
+     */
     public void spinStop() {
         spin(0.0);
     }
 
+    /** Extend the intake the maximum distance. */
     public void extend() {
        setPosition(IntakeConstants.maxExtension);
     }
 
+    /** Retract the intake to its starting position. */
     public void retract(){
         setPosition(IntakeConstants.startingPoint);
     }
 
+    /**
+     * Reclaim all the resources (e.g., motors and other devices).
+     * This step is necessary for multiple unit tests to work.
+     */
     public void close() {
         leftMotor.close();
         rightMotor.close();
