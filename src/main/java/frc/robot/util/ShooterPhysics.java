@@ -66,66 +66,42 @@ public class ShooterPhysics {
 		if (withMinPitch.isPresent())
 			minHeight = Math.max(minHeight, withMinPitch.get().height());
 
-		TurretState withMinHeight = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, minHeight),
-				minHeight);
+		TurretState withMinHeight = getShotParams(robotVelocity, robotToTarget, minHeight);
 		if (withMinHeight.satisfies(constraints))
 			return Optional.of(withMinHeight);
-
-		// the only reason this is empty is if the highest posible trajectory is too low
-		// to intersect the goal
-		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.maxPitch());
-		if (withMaxPitchOpt.isEmpty())
-			return Optional.empty();
-		TurretState withMaxPitch = withMaxPitchOpt.get();
-
-		// the range from withMinHeight to withMaxPitch will satisfy pitch and height
-		// constraints
-		// now we need to satisfy the speed constraint
 
 		TurretState withMinSpeed = withMinimumSpeed(robotVelocity, robotToTarget);
 		if (withMinSpeed.exitVel() > constraints.maxVel())
 			return Optional.empty();
-		// ordered such that the first element is valid and the second is not
-		Pair<TurretState, TurretState> newRange;
 
 		if (withMinSpeed.height() < withMinHeight.height()) {
 			// the minimum speed is below the lower bound, but doesn't satisfy constraints
 			return Optional.empty();
+		} else {
+			// the first element is lower than the second, the first satisfies the angle but
+			// not the velocity and the second satisfies the velocity but may or may not
+			// satisfy the angle
+			var newRange = new Pair<TurretState, TurretState>(withMinHeight, withMinSpeed);
 
-		} else if (withMinSpeed.height() > withMaxPitch.height()) {
-			// the minimum speed is above the upper bound
-			if (withMaxPitch.satisfies(constraints))
-				// keep optimizing to find the lowest height
-				newRange = new Pair<TurretState, TurretState>(withMaxPitch, withMinHeight);
+			// now we binary search the new range to find the lowest value that satisfies
+			// the velocity constraint, we know velocity is decreasing on the interval
+
+			// use a 1cm tolerance
+			while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) > .01) {
+				double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
+				TurretState guess = getShotParams(robotVelocity, robotToTarget, avgHeight);
+				if (guess.exitVel() > constraints.maxVel())
+					newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
+				else
+					newRange = new Pair<TurretState, TurretState>(newRange.getFirst(), guess);
+
+			}
+
+			if (newRange.getSecond().satisfies(constraints))
+				return Optional.of(newRange.getSecond());
 			else
 				return Optional.empty();
-
-		} else {
-			// the minimum speed is within the ok range
-			if (!withMinSpeed.satisfies(constraints)) {
-				throw new RuntimeException(
-						"Impossible state: " + withMinSpeed + " does not satisfy " + constraints + ".");
-			}
-
-			newRange = new Pair<TurretState, TurretState>(withMinSpeed, withMinHeight);
 		}
-
-		// now we binary search the new range
-		TurretState lastValid = newRange.getFirst();
-		// use a 5cm tolerance
-		while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) > .05) {
-			double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
-			TurretState guess = cvtShot(getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight), avgHeight);
-			if (guess.satisfies(constraints)) {
-				if (guess.height() < lastValid.height())
-					lastValid = guess;
-				newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
-			} else {
-				newRange = new Pair<TurretState, TurretState>(newRange.getFirst(), guess);
-			}
-		}
-
-		return Optional.of(lastValid);
 	}
 
 	public static TurretState cvtShot(Translation3d velocity, double height) {
@@ -200,9 +176,7 @@ public class ShooterPhysics {
 	}
 
 	private static double getVelocityDiff(TurretState shot, Translation2d initialVelocity, Translation3d target) {
-		return (cvtShot(getRequiredExitVelocity(initialVelocity, target, shot.height() + .01), shot.height() + .01)
-				.exitVel()
-				- shot.exitVel()) / .01;
+		return (getShotParams(initialVelocity, target, shot.height() + .01).exitVel() - shot.exitVel()) / .01;
 	}
 
 	// call with default tolerance
@@ -217,15 +191,14 @@ public class ShooterPhysics {
 		// trying to calculate a shot for height=0 returns NaN
 		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
-		TurretState first = cvtShot(getRequiredExitVelocity(initialVelocity, target, effectiveMinHeight),
-				effectiveMinHeight);
+		TurretState first = getShotParams(initialVelocity, target, effectiveMinHeight);
 		// if the minimum velocity is below our minimum height, that's the closest we
 		// can get
 		if (getVelocityDiff(first, initialVelocity, target) >= 0)
 			return first;
 
 		// if a shot requires going up a kilometer, it's probably not doable
-		TurretState second = cvtShot(getRequiredExitVelocity(initialVelocity, target, 1000.), 1000.);
+		TurretState second = getShotParams(initialVelocity, target, 1000.);
 		// just return something
 		if (getVelocityDiff(second, initialVelocity, target) < 0)
 			return second;
@@ -237,7 +210,7 @@ public class ShooterPhysics {
 			assert range.getSecond().height() > range.getFirst().height();
 
 			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
-			TurretState guess = cvtShot(getRequiredExitVelocity(initialVelocity, target, guessHeight), guessHeight);
+			TurretState guess = getShotParams(initialVelocity, target, guessHeight);
 			double diff = getVelocityDiff(guess, initialVelocity, target);
 
 			// System.out.println("diff:" + diff + "\t\t" + range);
@@ -262,6 +235,9 @@ public class ShooterPhysics {
 		return withAngle(initialVelocity, target, pitch, 0.001);
 	}
 
+	// note: this behaves badly with high angles
+	// this isn't a problem when this is called from getConstrainedParams because
+	// that will only use this method to solve for the lower bound
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
 		if (pitch <= 0 || pitch >= Math.PI / 2)
@@ -274,10 +250,8 @@ public class ShooterPhysics {
 		// trying to calculate a shot for height=0 returns NaN
 		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
-		TurretState first = cvtShot(getRequiredExitVelocity(initialVelocity, target, effectiveMinHeight),
-				effectiveMinHeight);
-		// if a shot requires going up a kilometer, it's probably not doable
-		TurretState second = cvtShot(getRequiredExitVelocity(initialVelocity, target, 1000.), 1000.);
+		TurretState first = getShotParams(initialVelocity, target, effectiveMinHeight);
+		TurretState second = getShotParams(initialVelocity, target, 1000.);
 
 		if (first.pitch() > pitch)
 			if (first.pitch() <= pitch + tolerance)
@@ -294,14 +268,17 @@ public class ShooterPhysics {
 			assert range.getSecond().height() > range.getFirst().height();
 
 			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
-			TurretState guess = cvtShot(getRequiredExitVelocity(initialVelocity, target, guessHeight), guessHeight);
+			TurretState guess = getShotParams(initialVelocity, target, guessHeight);
 
 			// System.out.println(range + "\t\tguess=" + guess);
 
 			if (range.getSecond().pitch() - range.getFirst().pitch() <= tolerance) {
 				// we've found a valid angle
-				if (Math.abs(guess.pitch() - pitch) <= tolerance)
-					return Optional.of(guess);
+				if (Math.abs(range.getFirst().pitch() - pitch) <= tolerance)
+					return Optional.of(range.getFirst());
+				if (Math.abs(range.getSecond().pitch() - pitch) <= tolerance)
+					return Optional.of(range.getSecond());
+
 				// we've narrowed the range but haven't found a valid angle
 				// should be covered by the checks before the loop
 				throw new RuntimeException(

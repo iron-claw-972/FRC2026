@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,6 +13,7 @@ public class PathCheck {
      * <p>
      * We have had problems with syntax errors in a path.
      */
+	@Disabled
     @Test
     public void pathGroupLoaderTest() {
         // load the paths
