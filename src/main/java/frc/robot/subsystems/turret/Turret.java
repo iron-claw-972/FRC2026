@@ -49,7 +49,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
-	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.2
+	, 0.02);
 
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
@@ -196,23 +197,23 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double errorRad = best - currentPositionRad;
 		double absError = Math.abs(errorRad);
 
-		// if(Math.abs(best - lastGoalRad) < Math.PI/2){
-		// 	best = setpointFilter.calculate(best);
-		// }
+		if(Math.abs(best - lastGoalRad) < Math.PI/2){
+			best = setpointFilter.calculate(best);
+		}
 
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
-		if (isInDeadband) {
-			if (absError > START_THRESHOLD_RAD) {
-				isInDeadband = false;
-				lastGoalRad = best;
-			}
-		} else {
-			lastGoalRad = best;
-			if (absError < STOP_THRESHOLD_RAD) {
-				isInDeadband = true;
-			}
-		}
+		// if (isInDeadband) {
+		// 	if (absError > START_THRESHOLD_RAD) {
+		// 		isInDeadband = false;
+		// 		lastGoalRad = best;
+		// 	}
+		// } else {
+		// 	lastGoalRad = best;
+		// 	if (absError < STOP_THRESHOLD_RAD) {
+		// 		isInDeadband = true;
+		// 	}
+		// }
 
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
 		
