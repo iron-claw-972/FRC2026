@@ -1,29 +1,20 @@
 package frc.robot.subsystems.Climb;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.Climb.ClimbConstants;
-import frc.robot.constants.swerve.DriveConstants;
 
-public class LinearClimb extends SubsystemBase{
+public class LinearClimb extends SubsystemBase {
     private TalonFX motor;
     private boolean calibrating = false;
     double counter = 0;
@@ -32,11 +23,11 @@ public class LinearClimb extends SubsystemBase{
     double climbPosition = ClimbConstants.CLIMB_OFFSET;
 
     private static PIDController pid = new PIDController(0.1, 0, 0);
-    
+
     private double gearRatio = ClimbConstants.CLIMB_GEAR_RATIO;
 
     public LinearClimb() {
-        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID);//, Constants.RIO_CAN);
+        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID);// , Constants.RIO_CAN);
         pid.setTolerance(0.2);
 
         motor.setNeutralMode(NeutralModeValue.Brake);
@@ -54,14 +45,15 @@ public class LinearClimb extends SubsystemBase{
     }
 
     /**
-    * set the setpoint for the pid
-    * @param setpoint in rotations
-    */
+     * set the setpoint for the pid
+     * 
+     * @param setpoint in rotations
+     */
     public void setSetpoint(double setpoint) {
         pid.setSetpoint(setpoint);
     }
 
-    public boolean atSetPoint(){
+    public boolean atSetPoint() {
         return pid.atSetpoint();
     }
 
@@ -82,12 +74,12 @@ public class LinearClimb extends SubsystemBase{
     }
 
     public void periodic() {
-        if(calibrating == false){
+        if (calibrating == false) {
             double power = pid.calculate(motor.getPosition().getValueAsDouble());
             power = MathUtil.clamp(power, -0.2, 0.2);
             motor.set(power);
-        }else{
-            if(counter > 250){
+        } else {
+            if (counter > 250) {
                 stopCalibrating();
             }
             motor.set(0.15);
@@ -95,7 +87,8 @@ public class LinearClimb extends SubsystemBase{
         }
         SmartDashboard.putNumber("Position", getPosition());
     }
-    public void setCurrentLimits(double limit){
+
+    public void setCurrentLimits(double limit) {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.CurrentLimits = new CurrentLimitsConfigs();
@@ -108,12 +101,14 @@ public class LinearClimb extends SubsystemBase{
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         motor.getConfigurator().apply(config);
     }
-    public void hardstopCalibration(){
+
+    public void hardstopCalibration() {
         calibrating = true;
         counter = 0;
         setCurrentLimits(ClimbConstants.WEAK_CURRENT);
     }
-    public void stopCalibrating(){
+
+    public void stopCalibrating() {
         downPosition = motor.getPosition().getValueAsDouble() - 1.0;
         upPosition = downPosition - ClimbConstants.OFFSET;
         climbPosition = upPosition + ClimbConstants.CLIMB_OFFSET;
