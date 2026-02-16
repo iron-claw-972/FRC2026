@@ -115,7 +115,7 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-
+project.compileJava.dependsOn(createVersionFile)
 gversion {
     srcDir = file("src/main/java")
     classPackage = "frc.robot.util"
