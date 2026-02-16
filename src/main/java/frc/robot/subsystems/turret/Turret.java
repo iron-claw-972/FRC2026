@@ -80,6 +80,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
+	private State setpoint = new State();
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
