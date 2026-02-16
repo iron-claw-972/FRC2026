@@ -5,8 +5,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -18,8 +16,11 @@ import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
 import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 import au.grapplerobotics.interfaces.LaserCanInterface.TimingBudget;
+<<<<<<< HEAD
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+=======
+>>>>>>> parent of ae21e1f7 (Merge branch 'arnavs-mega-velocityvoltage-turret' into beta-bot)
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +36,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
+    private double feederPower = 0;
 
 
     public boolean shooterAtMaxSpeed = false;
@@ -45,29 +47,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
     double powerModifier;
-
-    // for tracking current phase: used to adjust the setting
-    private FlywheelPhase phase;
-
-    private double torqueCurrentDebounceTime = 0.5;
-
-    VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
-    TorqueCurrentFOC torqueCurrentFOC = new TorqueCurrentFOC(0);
-
-    /*
-     * Debouncers take in certain statement. If it is false: it checks for how long (the first parameter) 
-     * If it is long enough then return True. 
-     */
-    private Debouncer torqueCurrentDebouncer = new Debouncer(torqueCurrentDebounceTime, DebounceType.kFalling);
-
-    @AutoLogOutput private long launchCount = 0;
-    private boolean lastTorqueCurrentControl = false;
-
-    public enum FlywheelPhase {
-        BANG_BANG,
-        CONSTANT_TORQUE,
-        START_UP
-    }
 
     public Shooter(){
 
@@ -81,12 +60,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
         
-        shooterMotorRight.getConfigurator().apply(
+        shooterMotorLeft.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
-        shooterMotorLeft.getConfigurator().apply(
+        shooterMotorRight.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 

@@ -7,7 +7,6 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -117,9 +116,8 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String testingAuto = "Testing Over the Bump";
-          PathPlannerAuto.getPathGroupFromAutoFile(testingAuto);
-          auto = new PathPlannerAuto(testingAuto);
+          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+          auto = new PathPlannerAuto("Path Name");
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
@@ -165,6 +163,10 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of ae21e1f7 (Merge branch 'arnavs-mega-velocityvoltage-turret' into beta-bot)
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
