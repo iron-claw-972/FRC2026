@@ -1,19 +1,13 @@
 package frc.robot.constants;
 
-import java.lang.reflect.Field;
-
-import org.opencv.dnn.Net;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
 import frc.robot.util.FieldZone;
-import frc.robot.util.ShootingTarget;
 
 public class FieldConstants {
   /** Width of the field [meters] */

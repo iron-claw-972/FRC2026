@@ -8,7 +8,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.util.Units;
 
-@SuppressWarnings("removal")
 public class TurretVision {
 
     private final PhotonCamera camera;

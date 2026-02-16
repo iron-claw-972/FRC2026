@@ -2,7 +2,6 @@ package frc.robot.subsystems.hood;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 
 public class HoodConstants {
     public static final double HOOD_GEAR_RATIO = 64;
