@@ -86,7 +86,6 @@ public class LinearClimb extends SubsystemBase{
             double power = pid.calculate(motor.getPosition().getValueAsDouble());
             power = MathUtil.clamp(power, -0.2, 0.2);
             motor.set(power);
-            SmartDashboard.putNumber("Position", getPosition());
         }else{
             if(counter > 250){
                 stopCalibrating();
@@ -94,6 +93,7 @@ public class LinearClimb extends SubsystemBase{
             motor.set(0.15);
             counter += 1;
         }
+        SmartDashboard.putNumber("Position", getPosition());
     }
     public void setCurrentLimits(double limit){
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -114,7 +114,7 @@ public class LinearClimb extends SubsystemBase{
         setCurrentLimits(ClimbConstants.WEAK_CURRENT);
     }
     public void stopCalibrating(){
-        downPosition = motor.getPosition().getValueAsDouble();
+        downPosition = motor.getPosition().getValueAsDouble() - 1.0;
         upPosition = downPosition - ClimbConstants.OFFSET;
         climbPosition = upPosition + ClimbConstants.CLIMB_OFFSET;
         setSetpoint(downPosition);
