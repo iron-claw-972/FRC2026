@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -21,21 +22,28 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public Spindexer() {
         updateInputs();
-        
+
         // configure current limit
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
         limitConfig.StatorCurrentLimit = SpindexerConstants.currentLimit;
         limitConfig.StatorCurrentLimitEnable = true;
         motor.getConfigurator().apply(limitConfig);
+
+        SmartDashboard.putData("Max speed spindexer", new InstantCommand(() -> maxSpindexer()));
+        SmartDashboard.putData("Turn off spindexer", new InstantCommand(() -> stopSpindexer()));
+        SmartDashboard.putData("Spindexer 50%", new InstantCommand(() -> setSpindexer(0.5)));
     }
 
     @Override
     public void periodic() {
         updateInputs();
 
-        double dashboardPower = SmartDashboard.getNumber("Spindexer Power", -1.0);
-        if (dashboardPower != -1.0) {
-            power = dashboardPower;
+        // if speed was set
+        if (SmartDashboard.containsKey("Spindexer Power")) {
+            double dashboardPower = SmartDashboard.getNumber("Spindexer Power", 0.0);
+            if (dashboardPower != power) {
+                power = dashboardPower;
+            }
         }
 
         motor.set(power);
@@ -57,6 +65,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public void stopSpindexer() {
         power = 0.0;
+    }
+
+    public void setSpindexer(double power) {
+        this.power = power;
     }
 
     @Override
