@@ -5,13 +5,10 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -19,6 +16,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -53,9 +51,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-180); // Change this later to the actual values
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(180);
 
-	private static final double MAX_VEL_RAD_PER_SEC = 15;
-	//private static final double MAX_VEL_RAD_PER_SEC = 3.0; // Starting super duper slow for now
-	// private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
+	private static final double MAX_VEL_RAD_PER_SEC = 600;
 	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
 	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
@@ -66,6 +62,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
     private final CANcoder encoderRight = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
+	, 0.02);
+
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
@@ -90,6 +89,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
+	private double lastFilteredRad = 0.0;
+	private double lastRawSetpoint = 0.0;
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
@@ -99,6 +100,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private static final double kD = 0.2;
 
+	private double acclerationAdjustment = 0.0;
+
 	/* ---------------- Visualization ---------------- */
 
 	private final Mechanism2d mech = new Mechanism2d(100, 100);
@@ -106,25 +109,35 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
     // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, (1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt) * 0.8, 0);
+    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt * 2.0, 0);
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
-		motor.setNeutralMode(NeutralModeValue.Coast);
-
-		// motor.getConfigurator().apply(
-		// 		new Slot0Configs()
-		// 				.withKP(kP)
-		// 				.withKD(kD));
+		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
-        motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    
+		config.Slot0.kP = 12.0; 
+		config.Slot0.kS = 0.1; // Static friction compensation
+		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
+		config.Slot0.kD = 0.15; // The "Braking" term to stop overshoot
+
+		var mm = config.MotionMagic;
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(120.0) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicJerk = 0; //Units.radiansToRotations(400.0) * GEAR_RATIO * 1000000000 * 10000000 * 100000000 * 10000000; // Set to > 0 for "S-Curve" smoothing if needed -- maybe 10-20x the acceleration
         motor.getConfigurator().apply(config);
-		motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+
+		motor.setPosition(0.0);
+
+		// Dashboard setup for tuning
+        SmartDashboard.putNumber("Turret/kP", config.Slot0.kP);
+        SmartDashboard.putNumber("Turret/kS", config.Slot0.kS);
+        SmartDashboard.putNumber("Turret/kV", config.Slot0.kV);
+        SmartDashboard.putNumber("Turret/kD", config.Slot0.kD);
 
 		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC, feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO), goalVelocityRadPerSec))))
 
@@ -190,15 +203,24 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void periodic() {
+		updateInputs();
+		Logger.processInputs("Turret", inputs);
+
+		acclerationAdjustment = SmartDashboard.getNumber("Acc Adjust", acclerationAdjustment);
+		SmartDashboard.putNumber("Acc Adjust", acclerationAdjustment);
 		
 		double robotRelativeGoal = goalAngle.getRadians();
 
 		// --- MA-style continuous wrap selection ---
+
+		double lookAheadSeconds = 0.060; 
+    	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
+
 		double best = lastGoalRad;
 		boolean found = false;
 
 		for (int i = -2; i <= 2; i++) {
-			double candidate = robotRelativeGoal + 2.0 * Math.PI * i;
+			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
 			if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD)
 				continue;
 
@@ -210,43 +232,49 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
-		// --- Profile in MECHANISM SPACE ---
-		State goalState = new State(
-				MathUtil.clamp(best, MIN_ANGLE_RAD, MAX_ANGLE_RAD),
-				goalVelocityRadPerSec);
+		// calculate shortest angular delta
+		double delta = best - lastRawSetpoint;
+		delta = MathUtil.angleModulus(delta);
+		
+		// filter delta
+		double filteredDelta = setpointFilter.calculate(delta);
+		
+		// apply filtered range
+		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastRawSetpoint = best;
+		best = lastFilteredRad;
 
-		setpoint = profile.calculate(
-				Constants.LOOP_TIME,
-				setpoint,
-				goalState);
+		// Tells the Kraken to get to this position using 1000Hz profile
+		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
+		// if (isInDeadband) {
+		// 	if (absError > START_THRESHOLD_RAD) {
+		// 		isInDeadband = false;
+		// 		lastGoalRad = best;
+		// 	}
+		// } else {
+		// 	lastGoalRad = best;
+		// 	if (absError < STOP_THRESHOLD_RAD) {
+		// 		isInDeadband = true;
+		// 	}
+		// }
 
-		// --- Convert to MOTOR SPACE ---
-		double motorPosRot = Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
+		
+		double acceleration = (goalVelocityRadPerSec - lastFrameVelocity)/Constants.LOOP_TIME;
+		// Add the feedforward for the target velocity (SOTM) here as well
+		double feedforwardVoltage = feedForward.calculate((goalVelocityRadPerSec) * GEAR_RATIO);
+		
+		double robotTurnCompensation = goalVelocityRadPerSec * 0.185;
 
-		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
+		motor.setControl(mmVoltageRequest
+			.withPosition(motorGoalRotations)
+			.withFeedForward(robotTurnCompensation));
 
-		double targetVelocity;
-
-		double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
-
-		targetVelocity =
-		positionPID.calculate(
-				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-				motorSetpointPosition);
-			
-		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec) * 1.0;
-
-		double voltage = feedForward.calculate(targetVelocity);
-
-		// double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-		// voltage += velocityCorrectionVoltage;
-
-		motor.setVoltage(voltage);
+		Logger.recordOutput("Turret/FilteredSetpoint", Units.radiansToDegrees(best));
 
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
 		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(setpoint.position));
 
 		// --- Visualization ---
@@ -257,6 +285,15 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// SmartDashboard.putNumber("Encoder Left", encoderLeft.get());
 		// SmartDashboard.putNumber("Encoder Right", encoderRight.get());
+		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(motorGoalRotations) / GEAR_RATIO);
+		//Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
+
+		// --- Position + velocity feedforward (MA-style) ---
+		// motor.setControl(request);
+        // motor.clearStickyFaults();
+
+		// --- Visualization ---
+		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 	}
 
 	/* ---------------- Simulation ---------------- */

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
@@ -109,6 +110,7 @@ public class SimpleAutoShoot extends Command {
 
     @Override
     public void execute() {
+        SmartDashboard.putNumber("Robot X Position", drivepose.getX());
         //shooter.setShooterPower(ShotInterpolation.shooterPowerMap.get(FieldConstants.getHubTranslation().toTranslation2d().getDistance(drivetrain.getPose().getTranslation())));
         // Continuously update setpoints and adjust based on vision if available
         drivepose = drivetrain.getPose().getTranslation();
@@ -127,7 +129,7 @@ public class SimpleAutoShoot extends Command {
         Logger.recordOutput("Spinny accel", drivetrain.getAngularRate(2));
         Logger.recordOutput("Original Turret Setpoint", turretSetpoint);
         
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2) - velocityAdjustment);
+        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), -drivetrain.getAngularRate(2));
         // turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), (-drivetrain.getAngularRate(2)) + turretAcceleration * 0.3);
         //turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity);
 

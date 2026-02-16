@@ -7,6 +7,7 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -116,8 +117,9 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-          auto = new PathPlannerAuto("Path Name");
+          String testingAuto = "Testing Over the Bump";
+          PathPlannerAuto.getPathGroupFromAutoFile(testingAuto);
+          auto = new PathPlannerAuto(testingAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
@@ -163,7 +165,7 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-
+    NamedCommands.registerCommand("Auto shoot", new SimpleAutoShoot(turret, drive, shooter));
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
