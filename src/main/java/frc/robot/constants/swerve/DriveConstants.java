@@ -141,6 +141,9 @@ public class DriveConstants {
         /* Neutral Modes */
         public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
         public static final NeutralModeValue STEER_NEUTRAL_MODE = NeutralModeValue.Brake;
+
+        /* Gyro mount pose roll in deg (180.0 if placed under the robot) */
+        public static double GYRO_MOUNT_POSE_ROLL = 0.0; 
     
         /* Drive Motor PID Values */
         public static final double[] P_VALUES = {
@@ -209,9 +212,12 @@ public class DriveConstants {
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
-
+                // Gear ratios 
                 DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
                 STEER_GEAR_RATIO = 287.0 / 11.0;
+
+                // Gyro is mounted under the robot 
+                GYRO_MOUNT_POSE_ROLL = 180.0; 
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
