@@ -84,14 +84,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
 
-    // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
-
-	/* ---------------- Gains ---------------- */
-
-	private static final double kP = 15.0;
-
-	private static final double kD = 0.2;
-
 	/* ---------------- Visualization ---------------- */
 
 	private final Mechanism2d mech = new Mechanism2d(100, 100);
@@ -99,7 +91,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
     // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, (1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt) * 0.8, 0);
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 	/* ---------------- Constructor ---------------- */
