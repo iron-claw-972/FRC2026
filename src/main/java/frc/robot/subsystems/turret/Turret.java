@@ -17,6 +17,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -50,6 +51,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
+
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.1, 0.02);
 
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
@@ -112,9 +115,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
-		mm.MotionMagicAcceleration = Units.radiansToRotations(180.0) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicAcceleration = Units.radiansToRotations(120.0) * GEAR_RATIO; // Lowered for belt safety
 		mm.MotionMagicJerk = 0; //Units.radiansToRotations(400.0) * GEAR_RATIO * 1000000000 * 10000000 * 100000000 * 10000000; // Set to > 0 for "S-Curve" smoothing if needed -- maybe 10-20x the acceleration
         motor.getConfigurator().apply(config);
+
+		motor.setPosition(0.0);
 
 		// Dashboard setup for tuning
         SmartDashboard.putNumber("Turret/kP", config.Slot0.kP);
@@ -160,26 +165,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	/* ---------------- Periodic ---------------- */
 
-	/** Updates motor gains if SmartDashboard values change */
-    // private void updateTuningGains() {
-    //     double p = SmartDashboard.getNumber("Turret/kP", 0);
-    //     double s = SmartDashboard.getNumber("Turret/kS", 0);
-    //     double v = SmartDashboard.getNumber("Turret/kV", 0);
-    //     double d = SmartDashboard.getNumber("Turret/kD", 0);
-
-    //     // Only update if something changed to save CAN bus traffic
-    //     if (p != motor.getConfigurator().getConfig(new Slot0Configs()).kP ||
-    //         s != motor.getConfigurator().getConfig(new Slot0Configs()).kS) {
-            
-    //         Slot0Configs slot0 = new Slot0Configs();
-    //         slot0.kP = p;
-    //         slot0.kS = s;
-    //         slot0.kV = v;
-    //         slot0.kD = d;
-    //         motor.getConfigurator().apply(slot0);
-    //     }
-    // }
-
 	@Override
 	public void periodic() {
 		updateInputs();
@@ -192,7 +177,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// --- MA-style continuous wrap selection ---
 
-		double lookAheadSeconds = 0.040; 
+		double lookAheadSeconds = 0.060; 
     	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
 
 		double best = lastGoalRad;
@@ -211,6 +196,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
+		// if(Math.abs(best - lastGoalRad) < Math.PI/2){
+		// 	best = setpointFilter.calculate(best);
+		// }
+
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
 
@@ -220,7 +209,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// Add the feedforward for the target velocity (SOTM) here as well
 		double feedforwardVoltage = feedForward.calculate((goalVelocityRadPerSec) * GEAR_RATIO);
 		
-		double robotTurnCompensation = goalVelocityRadPerSec * 0.165;
+		double robotTurnCompensation = goalVelocityRadPerSec * 0.185;
 
 		motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
