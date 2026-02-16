@@ -10,7 +10,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.subsystems.spindexer.SpindexerIO;
 
-public class Spindexer extends SubsystemBase implements SpindexerIO{
+public class Spindexer extends SubsystemBase implements SpindexerIO {
     private TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
     private double power = 0.0;
@@ -18,21 +18,25 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
     private boolean wasSpindexerSlow = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
-    public Spindexer(){
+    public Spindexer() {
         updateInputs();
     }
 
     @Override
     public void periodic() {
         updateInputs();
-        
+
         double dashboardPower = SmartDashboard.getNumber("Spindexer Power", -1.0);
         if (dashboardPower != -1.0) {
             power = dashboardPower;
         }
-        
+
         motor.set(power);
-        
+
+        SmartDashboard.putNumber("Spindexer Power", power);
+        SmartDashboard.putNumber("Spindexer Velocity", inputs.spindexerVelocity);
+        SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
+
         boolean isSpindexerSlow = inputs.spindexerVelocity < SpindexerConstants.spindexerVelocityWithBall;
         if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
             ballCount++;
@@ -40,11 +44,11 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
         wasSpindexerSlow = isSpindexerSlow;
     }
 
-    public void maxSpindexer(){
+    public void maxSpindexer() {
         power = SpindexerConstants.spindexerMaxPower;
     }
 
-    public void stopSpindexer(){
+    public void stopSpindexer() {
         power = 0.0;
     }
 
