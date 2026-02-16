@@ -26,7 +26,7 @@ public class IntakeTest {
         assertEquals(Math.PI, intake.rotationsToInches(3.0), 0.0001);
 
         // traveling pi inches should take 3 motor turns
-        assertEquals(3.0, intake.inchesToRotations(3.14159), 0.0001);
+        assertEquals(3.0, intake.inchesToRotations(Math.PI), 0.0001);
 
         // the methods should be inverses of each other
         assertEquals(15.0, intake.rotationsToInches(intake.inchesToRotations(15.0)), 0.0001);
