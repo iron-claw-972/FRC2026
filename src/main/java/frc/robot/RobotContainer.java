@@ -29,7 +29,6 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
-import frc.robot.subsystems.indexer.Spindexer;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -48,7 +47,7 @@ public class RobotContainer {
   private Drivetrain drive = null;
   private Vision vision = null;
   private Command auto = new DoNothing();
-  private Spindexer spindexer = null;
+
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -101,7 +100,7 @@ public class RobotContainer {
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
         // added indexer here for now
-        spindexer = new Spindexer();
+        
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
