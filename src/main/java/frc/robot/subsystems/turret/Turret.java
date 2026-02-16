@@ -46,7 +46,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
-	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.2
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
 	, 0.02);
 
 
