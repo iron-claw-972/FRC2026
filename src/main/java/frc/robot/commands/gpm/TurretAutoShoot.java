@@ -27,7 +27,7 @@ public class TurretAutoShoot extends Command {
 
     private double turretSetpoint;
 
-    private Pose2d drivepose;
+    private Pose2d drivepose = new Pose2d();
 
     private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     private Rotation2d lastTurretAngle;
@@ -38,7 +38,6 @@ public class TurretAutoShoot extends Command {
     public TurretAutoShoot(Turret turret, Drivetrain drivetrain) {
         this.turret = turret;
         this.drivetrain = drivetrain;
-        drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
         
         addRequirements(turret);
     }
