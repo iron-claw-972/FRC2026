@@ -15,24 +15,29 @@ import frc.robot.constants.IdConstants;
 import frc.robot.constants.Climb.ClimbConstants;
 
 public class LinearClimb extends SubsystemBase {
-    private TalonFX motor;
+    private final TalonFX motor;
     private boolean calibrating = false;
-    double counter = 0;
-    double downPosition = ClimbConstants.OFFSET;
-    double upPosition = 0;
-    double climbPosition = ClimbConstants.CLIMB_OFFSET;
+    private double counter = 0;
+    private double downPosition = ClimbConstants.OFFSET;
+    private double upPosition = 0;
+    private double climbPosition = ClimbConstants.CLIMB_OFFSET;
 
-    private static PIDController pid = new PIDController(0.1, 0, 0);
-
-    private double gearRatio = ClimbConstants.CLIMB_GEAR_RATIO;
+    private final PIDController pid = new PIDController(
+            ClimbConstants.PID_P,
+            ClimbConstants.PID_I,
+            ClimbConstants.PID_D);
 
     public LinearClimb() {
-        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID);// , Constants.RIO_CAN);
-        pid.setTolerance(0.2);
+        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID);
+        pid.setTolerance(ClimbConstants.PID_TOLERANCE);
 
         motor.setNeutralMode(NeutralModeValue.Brake);
 
-        setCurrentLimits(5.0);
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        motor.getConfigurator().apply(config);
+
+        setCurrentLimits(ClimbConstants.DEFAULT_CURRENT_LIMIT);
 
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
@@ -73,16 +78,17 @@ public class LinearClimb extends SubsystemBase {
         setSetpoint(climbPosition);
     }
 
+    @Override
     public void periodic() {
-        if (calibrating == false) {
+        if (!calibrating) {
             double power = pid.calculate(motor.getPosition().getValueAsDouble());
-            power = MathUtil.clamp(power, -0.2, 0.2);
+            power = MathUtil.clamp(power, ClimbConstants.MIN_POWER, ClimbConstants.MAX_POWER);
             motor.set(power);
         } else {
-            if (counter > 250) {
+            if (counter > ClimbConstants.CALIBRATION_COUNTER_LIMIT) {
                 stopCalibrating();
             }
-            motor.set(0.15);
+            motor.set(ClimbConstants.CALIBRATION_POWER);
             counter += 1;
         }
         SmartDashboard.putNumber("Position", getPosition());
@@ -98,7 +104,6 @@ public class LinearClimb extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = limit;
 
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         motor.getConfigurator().apply(config);
     }
 
@@ -109,7 +114,7 @@ public class LinearClimb extends SubsystemBase {
     }
 
     public void stopCalibrating() {
-        downPosition = motor.getPosition().getValueAsDouble() - 1.0;
+        downPosition = motor.getPosition().getValueAsDouble() - ClimbConstants.CALIBRATION_POSITION_OFFSET;
         upPosition = downPosition - ClimbConstants.OFFSET;
         climbPosition = upPosition + ClimbConstants.CLIMB_OFFSET;
         setSetpoint(downPosition);
