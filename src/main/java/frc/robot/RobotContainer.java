@@ -87,7 +87,7 @@ public class RobotContainer {
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
         shooter = new Shooter();
-        //hood = new Hood();
+        // hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -106,11 +106,11 @@ public class RobotContainer {
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -123,10 +123,12 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putString("RobotId", RobotId.getRobotId().name());
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
@@ -143,7 +145,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -181,28 +182,25 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
+  public Command getAutoCommand() {
     return auto;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-
