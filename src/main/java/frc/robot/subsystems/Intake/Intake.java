@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
@@ -36,11 +37,11 @@ public class Intake extends SubsystemBase {
 
     // create the motors
     /** Motor to move the roller */
-    private TalonFX rollerMotor = new TalonFX(IntakeConstants.rollerID, Constants.CANIVORE_SUB);
+    private TalonFX rollerMotor = new TalonFX(IdConstants.RIGHT_MOTOR_ID, Constants.CANIVORE_SUB);
     /** Right motor (master) */
-    private TalonFX rightMotor = new TalonFX(IntakeConstants.rightID, Constants.CANIVORE_SUB);
+    private TalonFX rightMotor = new TalonFX(IdConstants.LEFT_MOTOR_ID, Constants.CANIVORE_SUB);
     /** Left motor (slave) */
-    private TalonFX leftMotor = new TalonFX(IntakeConstants.leftID, Constants.CANIVORE_SUB);
+    private TalonFX leftMotor = new TalonFX(IdConstants.ROLLER_MOTOR_ID, Constants.CANIVORE_SUB);
 
     /** Motor characteristics for the roller motor, a single Kraken X44 (aka gearbox) */
     private final DCMotor dcMotorRoller = DCMotor.getKrakenX44(1);
@@ -52,9 +53,6 @@ public class Intake extends SubsystemBase {
 
     // Use FlywheelSim for the roller
     private FlywheelSim rollerSim;
-    // for the moment of inertial, guess the roller is .5 kg at a radius of 20 mm
-    private double moiRoller = 0.5 * 0.020 * 0.20;
-    private double gearingRoller = 2.0;
 
     // Use ElevatorSim for the extender
     private ElevatorSim intakeSim;
@@ -64,9 +62,10 @@ public class Intake extends SubsystemBase {
     public Intake() {
      
         // get the maximum free speed
-        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.gearRatio;
+        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
 
-        // this is confusing
+        // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
+        // safety margin, limits velocity to half free speed
         maxVelocity = 0.5 * maxFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
@@ -76,9 +75,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.extendCurrentLimits)
+        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.extendCurrentLimits)
+        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -101,9 +100,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         config.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.rCurrentLimits)
+        .withStatorCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.rCurrentLimits)
+        .withSupplyCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -118,15 +117,15 @@ public class Intake extends SubsystemBase {
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
-        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.gearRatio * maxVelocity/IntakeConstants.radiusRackPinion/Math.PI/2;
-        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.gearRatio * maxAcceleration/IntakeConstants.radiusRackPinion/Math.PI/2;
+        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
+        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
 
         // set the brake mode
         config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
 
         // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
-        
+
         // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
@@ -161,18 +160,16 @@ public class Intake extends SubsystemBase {
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
 
-            // mass is just a guess
-            double carriageMassKg = 3.0;
             // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
             double drumRadiusMeters = Units.inchesToMeters(1.0);
             double minHeightMeters = Units.inchesToMeters(0.0);
-            double maxHeightMeters = Units.inchesToMeters(IntakeConstants.maxExtension);
+            double maxHeightMeters = Units.inchesToMeters(IntakeConstants.MAX_EXTENSION);
             // start retracted
             double startingHeightMeters = Units.inchesToMeters(0.0);
             intakeSim = new ElevatorSim(
                 dcMotorExtend,
-                IntakeConstants.gearRatio,
-                carriageMassKg, 
+                IntakeConstants.GEAR_RATIO,
+                IntakeConstants.CARRIAGE_MASS_KG, 
                 drumRadiusMeters, 
                 minHeightMeters, 
                 maxHeightMeters, 
@@ -181,7 +178,7 @@ public class Intake extends SubsystemBase {
 
             // Roller simulation
             rollerSim = new FlywheelSim(
-                LinearSystemId.createFlywheelSystem(dcMotorRoller, moiRoller, gearingRoller),
+                LinearSystemId.createFlywheelSystem(dcMotorRoller, IntakeConstants.ROLLER_MOI_KG_M_SQ, IntakeConstants.ROLLER_GEARING),
                 dcMotorRoller);
         }
     }
@@ -229,7 +226,7 @@ public class Intake extends SubsystemBase {
         // the X44 has a top speed of 7530 RPM = 125 RPS
         // If the drive is 0.2, then ultimate speed should be 125 RPS * 0.2 = 25 RPS
         // result is 26 RPS.
-        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * gearingRoller;
+        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
 
         rollerMotor.getSimState().setRotorVelocity(velocity);
     }
@@ -261,7 +258,7 @@ public class Intake extends SubsystemBase {
     public double rotationsToInches(double motorRotations) {
         // circumference of the rack pinion
         double circ = 2 * Math.PI * 0.5;
-        double pinionRotations = motorRotations / IntakeConstants.gearRatio;
+        double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
         double inches = pinionRotations * circ;
         return inches; 
     }
@@ -274,7 +271,7 @@ public class Intake extends SubsystemBase {
     public double inchesToRotations(double inches){
         double circ = 2 * Math.PI * 0.5;
         double pinionRotations = inches / circ;
-        double motorRotations = pinionRotations * IntakeConstants.gearRatio;
+        double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
         return motorRotations;
     }
 
@@ -284,14 +281,13 @@ public class Intake extends SubsystemBase {
      */
     public void spin(double speed) {
         rollerMotor.set(speed);
-        System.out.println(speed);
     }
 
     /**
      * Start the intake roller spinning.
      */
     public void spinStart() {
-        spin(IntakeConstants.speed);
+        spin(IntakeConstants.SPEED);
     }
 
     /**
@@ -303,12 +299,12 @@ public class Intake extends SubsystemBase {
 
     /** Extend the intake the maximum distance. */
     public void extend() {
-       setPosition(IntakeConstants.maxExtension);
+       setPosition(IntakeConstants.MAX_EXTENSION);
     }
 
     /** Retract the intake to its starting position. */
     public void retract(){
-        setPosition(IntakeConstants.startingPoint);
+        setPosition(IntakeConstants.STARTING_POINT);
 
     }
 

@@ -1,32 +1,33 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.util.Units;
+
 public class IntakeConstants {
-
-    // Motors (set actual ids)
-    /** Intake extender right motor CAN ID */
-    public static final int rightID = 1;
-    /** Intake extender left motor CAN ID */
-    public static final int leftID = 2;
-    /** Intake roller motor CAN ID */
-    public static final int rollerID = 3;
-
     /** Intake roller motor speed in range [-1, 1] */
-    public static final double speed = 0.2;
+    public static final double SPEED = 0.2;
     /** 12 tooth pinion driving 36 tooth driven gear */
-    public static final double gearRatio = 36.0/12.0;
+    public static final double GEAR_RATIO = 36.0/12.0;
     /** radius (inches) of the rack gear which is a 10 tooth pinion at 10 DP */
-    public static final double radiusRackPinion = 0.5;
+    public static final double RADIUS_RACK_PINION = 0.5;
     /** roller current limits */
-    public static final double rCurrentLimits = 10.0;
+    public static final double ROLLER_CURRENT_LIMITS = 10.0;
     /**right and left motor current limits */
-    public static final double extendCurrentLimits = 40.0;
+    public static final double EXTENDER_CURRENT_LIMITS = 40.0;
 
-    // Intake positions
+    public static final double ROLLER_MOI_KG_M_SQ = 0.5 * 0.020 * 0.020; // 0.5kg roller, 20mm radius for now
+    public static final double ROLLER_GEARING = 2.0;
+    public static final double CARRIAGE_MASS_KG = 3.0;
+    public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1.0);
+
+
 
     /** max extension in inches */
-    public static final double maxExtension = 3.0; // 14.856; 
+    public static final double MAX_EXTENSION = 3.0; // 14.856; 
     /** starting point in inches */
-    public static final double startingPoint = 0;
+    public static final double STARTING_POINT = 0;
     /** rack pitch in teeth per inch of diameter (Diametral Pitch) DP = N teeth / Diameter in inches */
-    public static final double rackPitch = 10;
+    public static final double RACK_PITCH = 10;
+
+    // Simulation 
+
 }

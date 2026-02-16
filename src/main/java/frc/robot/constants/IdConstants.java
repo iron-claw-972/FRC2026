@@ -18,4 +18,11 @@ public class IdConstants {
 
     // LEDs
     public static final int CANDLE_ID = 1;
+
+    // Intake
+    // extender right and left motor CAN ID
+    public static final int RIGHT_MOTOR_ID = 1;
+    public static final int LEFT_MOTOR_ID = 2;
+    // roller motor CAN ID 
+    public static final int ROLLER_MOTOR_ID = 3;
 }
