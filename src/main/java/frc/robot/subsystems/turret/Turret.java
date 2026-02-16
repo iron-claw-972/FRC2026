@@ -102,21 +102,21 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
-		motor.setNeutralMode(NeutralModeValue.Coast);
-
-		// motor.getConfigurator().apply(
-		// 		new Slot0Configs()
-		// 				.withKP(kP)
-		// 				.withKD(kD));
+		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		var motionMagicConfigs = config.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 10 * GEAR_RATIO;
-        motionMagicConfigs.MotionMagicAcceleration = 50 * GEAR_RATIO;
-        motor.getConfigurator().apply(config);
-		motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    
+		config.Slot0.kP = 12.0; 
+		config.Slot0.kS = 0.1; // Static friction compensation
+		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
+		config.Slot0.kD = 0.15; // The "Braking" term to stop overshoot
 
-		// profile = new TrapezoidProfile(new Constraints(MAX_VEL_RAD_PER_SEC, feedForward.maxAchievableAcceleration(DCMotor.getKrakenX60(1, GEAR_RATIO), goalVelocityRadPerSec))))
+		var mm = config.MotionMagic;
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(120.0) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicJerk = 0; //Units.radiansToRotations(400.0) * GEAR_RATIO * 1000000000 * 10000000 * 100000000 * 10000000; // Set to > 0 for "S-Curve" smoothing if needed -- maybe 10-20x the acceleration
+        motor.getConfigurator().apply(config);
 
 		setpoint = new State(getPositionRad(), 0.0);
 		lastGoalRad = setpoint.position;
