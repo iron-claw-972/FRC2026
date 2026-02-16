@@ -2,14 +2,9 @@ package frc.robot.subsystems.turret;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -31,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.constants.swerve.DriveConstants;
 
 public class Turret extends SubsystemBase implements TurretIO{
 
@@ -46,6 +40,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double VERSA_RATIO = 5.0;
 	private static final double TURRET_RATIO = 140.0 / 10.0;
 	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
+
+	private static final double STOP_THRESHOLD_RAD = Units.degreesToRadians(0.5);  // stop if within 0.5 deg
+	private static final double START_THRESHOLD_RAD = Units.degreesToRadians(1.0); // move again if beyond 1.0 deg
 
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
@@ -75,6 +72,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
+	private boolean isInDeadband = false;
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
@@ -209,10 +207,23 @@ public class Turret extends SubsystemBase implements TurretIO{
 			}
 		}
 
-		lastGoalRad = best;
+		double currentPositionRad = getPositionRad();
+		double errorRad = best - currentPositionRad;
+		double absError = Math.abs(errorRad);
 
-		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
+		if (isInDeadband) {
+			if (absError > START_THRESHOLD_RAD) {
+				isInDeadband = false;
+				lastGoalRad = best;
+			}
+		} else {
+			lastGoalRad = best;
+			if (absError < STOP_THRESHOLD_RAD) {
+				isInDeadband = true;
+			}
+		}
+
+		double motorGoalRotations = Units.radiansToRotations(lastGoalRad) * GEAR_RATIO;
 
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
 		
@@ -222,9 +233,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 		
 		double robotTurnCompensation = goalVelocityRadPerSec * 0.165;
 
+		double feedforward = isInDeadband ? 0.0 : robotTurnCompensation;
+
 		motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			.withFeedForward(feedforward));
+
+		Logger.recordOutput("Turret/InDeadband", isInDeadband);
 
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
