@@ -163,10 +163,6 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-<<<<<<< HEAD
-=======
-
->>>>>>> parent of ae21e1f7 (Merge branch 'arnavs-mega-velocityvoltage-turret' into beta-bot)
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
