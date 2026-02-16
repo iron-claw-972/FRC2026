@@ -223,17 +223,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
-		// if (isInDeadband) {
-		// 	if (absError > START_THRESHOLD_RAD) {
-		// 		isInDeadband = false;
-		// 		lastGoalRad = best;
-		// 	}
-		// } else {
-		// 	lastGoalRad = best;
-		// 	if (absError < STOP_THRESHOLD_RAD) {
-		// 		isInDeadband = true;
-		// 	}
-		// }
 
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
 			
