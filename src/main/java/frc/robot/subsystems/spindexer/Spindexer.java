@@ -1,5 +1,6 @@
 package frc.robot.subsystems.spindexer;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import org.littletonrobotics.junction.Logger;
@@ -20,6 +21,12 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public Spindexer() {
         updateInputs();
+        
+        // configure current limit
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = SpindexerConstants.currentLimit;
+        limitConfig.StatorCurrentLimitEnable = true;
+        motor.getConfigurator().apply(limitConfig);
     }
 
     @Override
