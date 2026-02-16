@@ -165,7 +165,6 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-    NamedCommands.registerCommand("Auto shoot", new SimpleAutoShoot(turret, drive, shooter));
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
