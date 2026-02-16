@@ -19,6 +19,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -53,16 +54,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(-180); // Change this later to the actual values
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(180);
 
-	private static final double MAX_VEL_RAD_PER_SEC = 15;
-	//private static final double MAX_VEL_RAD_PER_SEC = 3.0; // Starting super duper slow for now
-	// private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
+	private static final double MAX_VEL_RAD_PER_SEC = 600;
 	private static final double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
 	private static final double GEAR_RATIO = TurretConstants.TURRET_GEAR_RATIO;
-
-	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
-	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
-	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
 
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
 	, 0.02);
@@ -73,8 +68,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-	private double lastFrameVelocity = 0.0;
-
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
@@ -83,13 +76,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private SingleJointedArmSim turretSim;
 
 	/* ---------------- Control ---------------- */
-
-	private final TrapezoidProfile profile = new TrapezoidProfile(
-			new TrapezoidProfile.Constraints(
-					MAX_VEL_RAD_PER_SEC,
-					MAX_ACCEL_RAD_PER_SEC2));
-
-	private State setpoint = new State();
 
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
