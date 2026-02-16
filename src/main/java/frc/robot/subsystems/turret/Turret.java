@@ -81,6 +81,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
 	private State setpoint = new State();
+	private double lastFilteredRad = 0.0;
+	private double lastRawSetpoint = 0.0;
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
@@ -234,10 +236,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// }
 
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
-		
-		// Add the feedforward for the target velocity (SOTM) here as well
-		double feedforwardVoltage = feedForward.calculate((goalVelocityRadPerSec) * GEAR_RATIO);
-		
+			
 		double robotTurnCompensation = goalVelocityRadPerSec * 0.185;
 
 		motor.setControl(mmVoltageRequest
@@ -245,7 +244,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 			.withFeedForward(robotTurnCompensation));
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
 		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(setpoint.position));
 
 		// --- Visualization ---
