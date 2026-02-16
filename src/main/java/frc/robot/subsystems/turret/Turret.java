@@ -73,6 +73,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
+	private double lastFilteredRad = 0.0;
+	private double lastRawSetpoint = 0.0;
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
@@ -191,8 +193,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
-		// always apply filter to smooth setpoint
-		best = setpointFilter.calculate(best);
+		// calculate shortest angular delta
+		double delta = best - lastRawSetpoint;
+		delta = MathUtil.angleModulus(delta);
+		
+		// filter delta
+		double filteredDelta = setpointFilter.calculate(delta);
+		
+		// apply filtered range
+		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastRawSetpoint = best;
+		best = lastFilteredRad;
 
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
