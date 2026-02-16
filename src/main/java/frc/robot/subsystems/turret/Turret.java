@@ -142,7 +142,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	}
 
 	public boolean atGoal() {
-		return Math.abs(setpoint.position - lastGoalRad) < Units.degreesToRadians(1.5);
+		return Math.abs(setpoint.position - getPositionRad()) < Units.degreesToRadians(2.0);
 	}
 
 	public double getPositionRad() {
