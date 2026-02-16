@@ -181,15 +181,21 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void periodic() {
+		updateInputs();
+		Logger.processInputs("Turret", inputs);
 		
 		double robotRelativeGoal = goalAngle.getRadians();
 
 		// --- MA-style continuous wrap selection ---
+
+		double lookAheadSeconds = 0.060; 
+    	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
+
 		double best = lastGoalRad;
 		boolean found = false;
 
 		for (int i = -2; i <= 2; i++) {
-			double candidate = robotRelativeGoal + 2.0 * Math.PI * i;
+			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
 			if (candidate < MIN_ANGLE_RAD || candidate > MAX_ANGLE_RAD)
 				continue;
 
@@ -201,40 +207,42 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
-		// --- Profile in MECHANISM SPACE ---
-		State goalState = new State(
-				MathUtil.clamp(best, MIN_ANGLE_RAD, MAX_ANGLE_RAD),
-				goalVelocityRadPerSec);
+		// calculate shortest angular delta
+		double delta = best - lastRawSetpoint;
+		delta = MathUtil.angleModulus(delta);
+		
+		// filter delta
+		double filteredDelta = setpointFilter.calculate(delta);
+		
+		// apply filtered range
+		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastRawSetpoint = best;
+		best = lastFilteredRad;
 
-		setpoint = profile.calculate(
-				Constants.LOOP_TIME,
-				setpoint,
-				goalState);
+		// Tells the Kraken to get to this position using 1000Hz profile
+		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
+		// if (isInDeadband) {
+		// 	if (absError > START_THRESHOLD_RAD) {
+		// 		isInDeadband = false;
+		// 		lastGoalRad = best;
+		// 	}
+		// } else {
+		// 	lastGoalRad = best;
+		// 	if (absError < STOP_THRESHOLD_RAD) {
+		// 		isInDeadband = true;
+		// 	}
+		// }
 
-		// --- Convert to MOTOR SPACE ---
-		double motorPosRot = Units.radiansToRotations(setpoint.position) * GEAR_RATIO;
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
+		
+		// Add the feedforward for the target velocity (SOTM) here as well
+		double feedforwardVoltage = feedForward.calculate((goalVelocityRadPerSec) * GEAR_RATIO);
+		
+		double robotTurnCompensation = goalVelocityRadPerSec * 0.185;
 
-		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
-
-		double targetVelocity;
-
-		double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
-
-		targetVelocity =
-		positionPID.calculate(
-				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-				motorSetpointPosition);
-			
-		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec) * 1.0;
-
-		double voltage = feedForward.calculate(targetVelocity);
-
-		// double velocityCorrectionVoltage = velocityPID.calculate(Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()), targetVelocity);
-		// voltage += velocityCorrectionVoltage;
-
-		motor.setVoltage(voltage);
-
-		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
+		motor.setControl(mmVoltageRequest
+			.withPosition(motorGoalRotations)
+			.withFeedForward(robotTurnCompensation));
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
