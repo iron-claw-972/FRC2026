@@ -42,9 +42,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double TURRET_RATIO = 140.0 / 10.0;
 	private static final double GEAR_RATIO = VERSA_RATIO * TURRET_RATIO;
 
-	private static final double STOP_THRESHOLD_RAD = Units.degreesToRadians(0.5);  // stop if within 0.5 deg
-	private static final double START_THRESHOLD_RAD = Units.degreesToRadians(1.0); // move again if beyond 1.0 deg
-
 	private static final PIDController positionPID = new PIDController(15, 0, 0.25);
 	//private static final PIDController longVelocityPID = new PIDController(15, 0, 1.0);
 	private static final PIDController velocityPID = new PIDController(0.0, 0.0, 0.0);
@@ -76,7 +73,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
-	private boolean isInDeadband = false;
 
     // private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0.0).withUpdateFreqHz(0);
 
@@ -193,9 +189,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 			}
 		}
 
-		double currentPositionRad = getPositionRad();
-		double errorRad = best - currentPositionRad;
-		double absError = Math.abs(errorRad);
+		lastGoalRad = best;
 
 		if(Math.abs(best - lastGoalRad) < Math.PI/2){
 			best = setpointFilter.calculate(best);
@@ -223,19 +217,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 		
 		double robotTurnCompensation = goalVelocityRadPerSec * 0.185;
 
-		double feedforward = isInDeadband ? 0.0 : robotTurnCompensation;
-
 		motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(feedforward));
+			.withFeedForward(robotTurnCompensation));
 
-		Logger.recordOutput("Turret/InDeadband", isInDeadband);
+		Logger.recordOutput("Turret/FilteredSetpoint", Units.radiansToDegrees(filteredSetpoint));
 
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
 		// var request = velocityRequest.withVelocity(Units.radiansToRotations(targetVelocity)).withEnableFOC(false);
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/setpointDeg", Units.rotationsToDegrees(motorGoalRotations) / GEAR_RATIO);
+		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(motorGoalRotations) / GEAR_RATIO);
 		//Logger.recordOutput("Turret/velocitySetpoint", targetVelocity / GEAR_RATIO);
 
 		// --- Position + velocity feedforward (MA-style) ---
