@@ -79,7 +79,7 @@ public class RobotContainer {
       default:
 
       case WaffleHouse:
-      
+
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -95,31 +95,31 @@ public class RobotContainer {
       case PrimeJr:
 
       case Vertigo: // AKA "French Toast"
-        // drive = new Drivetrain(vision, new GyroIOPigeon2());
-        // driver = new PS5ControllerDriverConfig(drive);
-        // operator = new Operator(drive);
+        drive = new Drivetrain(vision, new GyroIOPigeon2());
+        driver = new PS5ControllerDriverConfig(drive);
+        operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
-        // DetectedObject.setDrive(drive);
-        
+        DetectedObject.setDrive(drive);
+
         // SignalLogger.start();
 
-        // driver.configureControls();
-        // operator.configureControls();
-        
-        // initializeAutoBuilder();
-        // registerCommands();
-        // PathGroupLoader.loadPathGroups();
-        // // Load the auto command
-        // try {
-        //   PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-        //   auto = new PathPlannerAuto("Path Name");
-        // } catch (IOException | ParseException e) {
-        //   e.printStackTrace();
-        // }
-        // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        driver.configureControls();
+        operator.configureControls();
+
+        initializeAutoBuilder();
+        registerCommands();
+        PathGroupLoader.loadPathGroups();
+        // Load the auto command
+        try {
+        PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+        auto = new PathPlannerAuto("Path Name");
+        } catch (IOException | ParseException e) {
+        e.printStackTrace();
+        }
+        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -139,7 +139,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -177,15 +176,14 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-// Autos 
+  // Autos
 
   /**
    * Initialize the SendableChooser on the SmartDashbboard.
@@ -204,6 +202,7 @@ public class RobotContainer {
 
   /**
    * Gets the auto command from SmartDashboard
+   * 
    * @return
    */
   public Command getAutoCommand() {
@@ -213,16 +212,14 @@ public class RobotContainer {
     return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-
