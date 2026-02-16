@@ -191,9 +191,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		lastGoalRad = best;
 
-		if(Math.abs(best - lastGoalRad) < Math.PI/2){
-			best = setpointFilter.calculate(best);
-		}
+		// always apply filter to smooth setpoint
+		best = setpointFilter.calculate(best);
 
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
@@ -221,7 +220,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 			.withPosition(motorGoalRotations)
 			.withFeedForward(robotTurnCompensation));
 
-		Logger.recordOutput("Turret/FilteredSetpoint", Units.radiansToDegrees(filteredSetpoint));
+		Logger.recordOutput("Turret/FilteredSetpoint", Units.radiansToDegrees(best));
 
 		lastFrameVelocity = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble());
 
