@@ -16,6 +16,10 @@ public class IntakeConstants {
     public static final double gearRatio = 36.0/12.0;
     /** radius (inches) of the rack gear which is a 10 tooth pinion at 10 DP */
     public static final double radiusRackPinion = 0.5;
+    /** roller current limits */
+    public static final double rCurrentLimits = 10.0;
+    /**right and left motor current limits */
+    public static final double extendCurrentLimits = 40.0;
 
     // Intake positions
 

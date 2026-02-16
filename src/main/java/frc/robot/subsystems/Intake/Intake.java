@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -74,11 +75,10 @@ public class Intake extends SubsystemBase {
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
         // config the current limits (low value for testing)
-        // add constant for currentLimits
         rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(40.0)
+        .withStatorCurrentLimit(IntakeConstants.extendCurrentLimits)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(40.0)
+        .withSupplyCurrentLimit(IntakeConstants.extendCurrentLimits)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -101,9 +101,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         config.CurrentLimits
-        .withStatorCurrentLimit(10.0)
+        .withStatorCurrentLimit(IntakeConstants.rCurrentLimits)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(10.0)
+        .withSupplyCurrentLimit(IntakeConstants.rCurrentLimits)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -126,7 +126,7 @@ public class Intake extends SubsystemBase {
 
         // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
-
+        
         // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
@@ -148,7 +148,7 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
         SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
         SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
-        SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.5), this));
+        SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.8), this));
         SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.5), this));
         SmartDashboard.putData("Roller Stop", new InstantCommand(() -> this.spin(0.0), this));
         SmartDashboard.putData("Zero Motors", new InstantCommand(this::zeroMotors));
@@ -241,6 +241,7 @@ public class Intake extends SubsystemBase {
     public void setPosition(double setpoint) {
         double motorRotations =inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
+
     }
 
     /**
