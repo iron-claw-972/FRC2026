@@ -196,8 +196,7 @@ public class AutoShootCommand extends Command {
         // Add 180 degrees to the rotation bc robot is backwards
         drivepose = new Pose2d(
                 currentPose.getTranslation(),
-                currentPose.getRotation()
-        );
+                currentPose.getRotation());
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
         drivepose.exp(
                 new Twist2d(

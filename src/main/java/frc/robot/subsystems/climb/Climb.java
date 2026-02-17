@@ -21,10 +21,10 @@ import frc.robot.constants.IdConstants;
 import frc.robot.util.ClimbArmSim;
 
 public class Climb extends SubsystemBase {
-    
+
     private double startingPosition = 0;
 
-    //Motors
+    // Motors
     // TODO: tune better once design is finalized
     private final PIDController pid = new PIDController(0.4, 4, 0.04);
 
@@ -34,12 +34,11 @@ public class Climb extends SubsystemBase {
     private final DCMotor climbGearBox = DCMotor.getKrakenX60(1);
     private TalonFXSimState encoderSim;
 
-    //Mechism2d display
+    // Mechism2d display
     private final Mechanism2d simulationMechanism = new Mechanism2d(3, 3);
     private final MechanismRoot2d mechanismRoot = simulationMechanism.getRoot("Climb", 1.5, 1.5);
     private final MechanismLigament2d simLigament = mechanismRoot.append(
-        new MechanismLigament2d("angle", 1, startingPosition, 4, new Color8Bit(Color.kAntiqueWhite))
-    );
+            new MechanismLigament2d("angle", 1, startingPosition, 4, new Color8Bit(Color.kAntiqueWhite)));
 
     private final double climbGearRatio = 54 / 10 * 60 / 18; // gear ratio of 18
     private ClimbArmSim climbSim;
@@ -48,19 +47,18 @@ public class Climb extends SubsystemBase {
     public Climb() {
         if (isSimulation()) {
             encoderSim = motorLeft.getSimState();
-            encoderSim.setRawRotorPosition(Units.degreesToRotations(startingPosition)*climbGearRatio);
+            encoderSim.setRawRotorPosition(Units.degreesToRotations(startingPosition) * climbGearRatio);
 
             climbSim = new ClimbArmSim(
-                climbGearBox, 
-                climbGearRatio, 
-                0.1, 
-                0.127, 
-                0, //min angle 
-                Units.degreesToRadians(90), //max angle
-                true, 
-                Units.degreesToRadians(startingPosition),
-                60
-            );
+                    climbGearBox,
+                    climbGearRatio,
+                    0.1,
+                    0.127,
+                    0, // min angle
+                    Units.degreesToRadians(90), // max angle
+                    true,
+                    Units.degreesToRadians(startingPosition),
+                    60);
 
             climbSim.setIsClimbing(true);
         }
@@ -68,8 +66,8 @@ public class Climb extends SubsystemBase {
         pid.setIZone(1);
         pid.setSetpoint(Units.degreesToRadians(startingPosition));
 
-        motorLeft.setPosition(Units.degreesToRotations(startingPosition)*climbGearRatio);
-        motorRight.setPosition(Units.degreesToRotations(startingPosition)*climbGearRatio);
+        motorLeft.setPosition(Units.degreesToRotations(startingPosition) * climbGearRatio);
+        motorRight.setPosition(Units.degreesToRotations(startingPosition) * climbGearRatio);
 
         SmartDashboard.putData("PID", pid);
         SmartDashboard.putData("Climb Display", simulationMechanism);
@@ -78,9 +76,9 @@ public class Climb extends SubsystemBase {
     }
 
     @Override
-    public void periodic() { 
+    public void periodic() {
         double motorPosition = motorLeft.getPosition().getValueAsDouble();
-        double currentPosition = Units.rotationsToRadians(motorPosition/climbGearRatio);
+        double currentPosition = Units.rotationsToRadians(motorPosition / climbGearRatio);
 
         power = pid.calculate(currentPosition);
 
@@ -106,6 +104,7 @@ public class Climb extends SubsystemBase {
 
     /**
      * Sets the motor to an angle from 0-90 deg
+     * 
      * @param angle in degrees
      */
     public void setAngle(double angle) {
@@ -115,6 +114,7 @@ public class Climb extends SubsystemBase {
 
     /**
      * Gets the current position of the motor in degrees
+     * 
      * @return The angle in degrees
      */
     public double getAngle() {
@@ -124,7 +124,7 @@ public class Climb extends SubsystemBase {
     /**
      * Turns the motor to 90 degrees (extended positiion)
      */
-    public void extend(){
+    public void extend() {
         double extendAngle = 90;
         setAngle(extendAngle);
     }
@@ -132,11 +132,11 @@ public class Climb extends SubsystemBase {
     /**
      * Turns the motor to 0 degrees (climb position)
      */
-    public void climb(){
+    public void climb() {
         setAngle(startingPosition);
     }
 
-    public boolean isSimulation(){
+    public boolean isSimulation() {
         return RobotBase.isSimulation();
     }
 }

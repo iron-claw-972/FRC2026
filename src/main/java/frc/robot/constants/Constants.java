@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class Constants {
 
-    // constants:   
+    // constants:
 
     public static final double GRAVITY_ACCELERATION = 9.8;
     public static final double ROBOT_VOLTAGE = 12.0;
@@ -17,7 +17,7 @@ public class Constants {
     public static final CANBus RIO_CAN = new CANBus("rio");
     public static final CANBus SUBSYSTEM_CANIVORE_CAN = new CANBus("CANivoreSub");
 
-    // Logging 
+    // Logging
     public static final boolean USE_TELEMETRY = true;
 
     public static enum Mode {
@@ -67,13 +67,13 @@ public class Constants {
     public static final double DEFAULT_DEADBAND = 0.00005;
 
     public static final double TRANSLATIONAL_DEADBAND = 0.01;
-    
+
     public static final double ROTATION_DEADBAND = 0.01;
-    
+
     public static final double HEADING_DEADBAND = 0.05;
     public static final double HEADING_SLEWRATE = 10;
 
-    //Modes
+    // Modes
     public static final Mode SIM_MODE = Mode.SIM;
     public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
 
