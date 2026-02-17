@@ -88,7 +88,6 @@ public class RobotContainer {
 
       case Vivace:
         linearClimb = new LinearClimb();
-        break;
 
       case Phil: // AKA "IHOP"
 
@@ -112,10 +111,10 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-        PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-        auto = new PathPlannerAuto("Path Name");
+          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+          auto = new PathPlannerAuto("Path Name");
         } catch (IOException | ParseException e) {
-        e.printStackTrace();
+          e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
