@@ -71,9 +71,13 @@ public enum RobotId {
             }
         }
 
-		if (robotId == RobotId.Default) {
-			throw new RuntimeException("RobotId is set to Default (or was unset)! Please set it to something.");
-		}
+        if (robotId == RobotId.Default) {
+            if (Robot.isSimulation()) {
+                robotId = RobotId.SwerveCompetition; // Default to competition robot for simulation
+            } else {
+                throw new RuntimeException("RobotId is set to Default (or was unset)! Please set it to something.");
+            }
+        }
 
         // return the robot identity
         return robotId;
