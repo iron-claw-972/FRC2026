@@ -17,7 +17,7 @@ import frc.robot.constants.Climb.ClimbConstants;
 public class LinearClimb extends SubsystemBase {
     private final TalonFX motor;
     private boolean calibrating = false;
-    private double counter = 0;
+    private int counter = 0;
     private double downPosition = ClimbConstants.OFFSET;
     private double upPosition = 0;
     private double climbPosition = ClimbConstants.CLIMB_OFFSET;
@@ -37,7 +37,7 @@ public class LinearClimb extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         motor.getConfigurator().apply(config);
 
-        setCurrentLimits(ClimbConstants.DEFAULT_CURRENT_LIMIT);
+        setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
@@ -47,6 +47,9 @@ public class LinearClimb extends SubsystemBase {
         SmartDashboard.putNumber("Position", getPosition());
 
         motor.setPosition(0);
+
+        // calibrate on startup to find hardstop
+        hardstopCalibration();
     }
 
     /**
@@ -62,8 +65,26 @@ public class LinearClimb extends SubsystemBase {
         return pid.atSetpoint();
     }
 
+    /**
+     * Returns the current position of the climb motor.
+     * 
+     * @return Position in motor rotations. Positive values move the climb mechanism
+     *         UP (toward the hardstop). Higher values = higher physical position.
+     *         Use {@link #getAsMeters()} for linear distance in meters.
+     */
     public double getPosition() {
         return motor.getPosition().getValueAsDouble();
+    }
+
+    /**
+     * Returns the climb position converted to linear distance in meters.
+     * This is useful for debugging and logging.
+     * 
+     * @return Linear position in meters, calculated as:
+     *         rotations * gearRatio * 2 * PI * radius
+     */
+    public double getAsMeters() {
+        return getPosition() * ClimbConstants.CLIMB_GEAR_RATIO * 2 * Math.PI * ClimbConstants.RADIUS;
     }
 
     public void goUp() {
@@ -110,16 +131,17 @@ public class LinearClimb extends SubsystemBase {
     public void hardstopCalibration() {
         calibrating = true;
         counter = 0;
-        setCurrentLimits(ClimbConstants.WEAK_CURRENT);
+        setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
     }
 
     public void stopCalibrating() {
-        downPosition = motor.getPosition().getValueAsDouble() - ClimbConstants.CALIBRATION_POSITION_OFFSET;
-        upPosition = downPosition - ClimbConstants.OFFSET;
-        climbPosition = upPosition + ClimbConstants.CLIMB_OFFSET;
+        double hardstopPosition = motor.getPosition().getValueAsDouble();
+        downPosition = hardstopPosition - ClimbConstants.OFFSET;
+        climbPosition = downPosition + ClimbConstants.CLIMB_OFFSET;
+        upPosition = hardstopPosition;
         setSetpoint(downPosition);
         calibrating = false;
         counter = 0;
-        setCurrentLimits(ClimbConstants.STRONG_CURRENT);
+        setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
     }
 }
