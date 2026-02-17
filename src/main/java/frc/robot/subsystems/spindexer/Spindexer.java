@@ -50,9 +50,13 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         SmartDashboard.putNumber("Spindexer Power", power);
         SmartDashboard.putNumber("Spindexer Velocity", inputs.spindexerVelocity);
+        
+        // scale threshold based on power
+        double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
+        SmartDashboard.putNumber("Spindexer Velocity Threshold", velocityThreshold);
         SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
 
-        boolean isSpindexerSlow = inputs.spindexerVelocity < SpindexerConstants.spindexerVelocityWithBall;
+        boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
         if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
             ballCount++;
         }
@@ -73,7 +77,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     @Override
     public void updateInputs() {
-        inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble();
+        inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble() * SpindexerConstants.gearRatio;
         inputs.spindexerCurrent = motor.getStatorCurrent().getValueAsDouble();
         Logger.processInputs("Spindexer", inputs);
     }
