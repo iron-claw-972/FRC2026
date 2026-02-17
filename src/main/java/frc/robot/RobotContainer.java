@@ -73,7 +73,6 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    // climb = new Climb();
     // display the current robot id on smartdashboard
     SmartDashboard.putString("RobotID", robotId.toString());
 
@@ -94,21 +93,26 @@ public class RobotContainer {
         intake = new Intake();
         climb = new Climb();
         spindexer = new Spindexer();
+        break;
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
         shooter = new Shooter();
-        //hood = new Hood();
+        // hood = new Hood();
+        break;
 
       case SwerveCompetition: // AKA "Vantage"
+        break;
 
       case BetaBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        // fall-through
+        break;
 
       case Vivace:
+        break;
 
       case Phil: // AKA "IHOP"
+        break;
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
@@ -117,11 +121,11 @@ public class RobotContainer {
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -134,7 +138,7 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -154,7 +158,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -192,15 +195,14 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-// Autos 
+  // Autos
 
   /**
    * Initialize the SendableChooser on the SmartDashbboard.
@@ -219,6 +221,7 @@ public class RobotContainer {
 
   /**
    * Gets the auto command from SmartDashboard
+   * 
    * @return
    */
   public Command getAutoCommand() {
@@ -228,16 +231,14 @@ public class RobotContainer {
     return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-
