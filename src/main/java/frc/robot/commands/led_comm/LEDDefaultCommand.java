@@ -1,6 +1,7 @@
 package frc.robot.commands.led_comm;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -27,22 +28,19 @@ public class LEDDefaultCommand extends Command {
 
     @Override
     public void execute() {
-        if (climbAligned()) {
-            // When aligned to climb
-            led.setTwoColorWave(255, 0, 100, 100, 0, 255);
-        } else if (vision.oneCameraDisconnected()) {
+        if (vision.oneCameraDisconnected()) {
             // flash if camera disconnected
-            led.setStrobeLights(255, 0, 0);
+            led.setStrobeLights(255, 100, 0);
         } else if (playingDefense()) {
             // When playing defense
             led.defenseLights();
-        }
-
-        // else if (outtake.coralLoaded()){
-        // //When coral detected
-        // led.setLEDs(0, 255, 0);
-        // }
-        else if (allianceIsRed) {
+        } else if (DriverStation.isAutonomous() && allianceIsRed){
+            // Dimmer light for auto in red alliance
+            led.setLEDs(100, 0, 0);
+        } else if (DriverStation.isAutonomous()){
+            // Dimmer light for auto in blue alliance
+            led.setLEDs(0, 0, 100);
+        } else if (allianceIsRed) {
             // Red alliance
             led.setTwoColorWave(255, 0, 0, 255, 255, 255);
         } else {
