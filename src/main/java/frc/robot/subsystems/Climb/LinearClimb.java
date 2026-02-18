@@ -93,19 +93,19 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * goes to the up position
      */
     public void goUp() {
-        setSetpoint(Units.radiansToRotations(upPosition / ClimbConstants.WHEEL_RADIUS));
+        setSetpoint((Units.radiansToRotations(upPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
     /**
      * goes to the down position
      */
     public void goDown() {
-        setSetpoint(Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS));
+        setSetpoint((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
     /**
      * goes to the climb position
      */
     public void climb() {
-        setSetpoint(Units.radiansToRotations(climbPosition / ClimbConstants.WHEEL_RADIUS));
+        setSetpoint((Units.radiansToRotations(climbPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
 
     @Override
