@@ -45,9 +45,6 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
         SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
         SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
-        SmartDashboard.putData("Hardstop Calibrate", new InstantCommand(() -> hardstopCalibration()));
-        SmartDashboard.putData("Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-        SmartDashboard.putNumber("Position", getPosition());
 
         motor.setPosition(0);
 
