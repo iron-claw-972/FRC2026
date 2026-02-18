@@ -6,15 +6,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
 
-public class Spindexer extends SubsystemBase implements SpindexerIO{
+public class Spindexer extends SubsystemBase implements SpindexerIO {
     TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID);
 
     private double power = 0.0;
     public int ballCount = 0;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
+    private boolean wasAboveThreshold = false;
 
-    public Spindexer(){
-        //SmartDashboard.putData("Turn on Spindexer", new InstantCommand(()-> turnOnSpindexer()));
+    public Spindexer() {
+        // SmartDashboard.putData("Turn on Spindexer", new InstantCommand(()->
+        // turnOnSpindexer()));
     }
 
     @Override
@@ -23,19 +25,23 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
         SmartDashboard.putNumber("Spindexer Power", power);
 
         motor.set(power);
-        if (inputs.spindexerVelocity < SpindexerConstants.spindexerVelocityWithBall) {
+        updateInputs();
+
+        boolean isAboveThreshold = inputs.spindexerVelocity >= SpindexerConstants.spindexerVelocityWithBall;
+        if (wasAboveThreshold && !isAboveThreshold && power > 0.1) {
             ballCount++;
         }
+        wasAboveThreshold = isAboveThreshold;
     }
 
     /**
-     * @return 
+     * @return
      */
-    public void maxSpindexer(){
+    public void maxSpindexer() {
         power = 0.5;
     }
 
-    public void stopSpindexer(){
+    public void stopSpindexer() {
         power = 0.0;
     }
 
