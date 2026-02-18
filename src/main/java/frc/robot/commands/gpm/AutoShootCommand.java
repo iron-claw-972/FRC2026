@@ -35,27 +35,6 @@ public class AutoShootCommand extends Command {
     private Shooter shooter;
     private Spindexer spindexer;
 
-    private enum WantedState {
-        IDLE,
-        SHOOTING,
-        PASSING
-    }
-
-    private enum CurrentState {
-        IDLE,
-        STARTING_UP,
-        TURNING_AROUND,
-        SHOOTING,
-        PASSING
-    }
-
-    private WantedState wantedState = WantedState.IDLE;
-    private CurrentState currentState = CurrentState.IDLE;
-
-    private void updateStates(){
-
-    }
-
     //TODO: find maximum interpolation
     private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
 
