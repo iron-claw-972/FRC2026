@@ -34,8 +34,6 @@ public class Hood extends SubsystemBase implements HoodIO{
 
 	private double FEEDFORWARD_KV = 0.12;
 
-    //private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
-
 	private Rotation2d goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastFilteredRad = 0.0;
