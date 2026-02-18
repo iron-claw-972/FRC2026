@@ -6,7 +6,7 @@ public class ClimbConstants {
 
     // CHANGE LATER
     // gear ratio for converting motor rotations to linear distance
-    public final static double CLIMB_GEAR_RATIO = 1.0 / 45.0;
+    public final static double CLIMB_GEAR_RATIO = 45.0;
     public final static double WHEEL_RADIUS = Units.inchesToMeters(0.334);
     public final static double BOTTOM_POSITION = Units.inchesToMeters(-8);
     public final static double CLIMB_POSITION = Units.inchesToMeters(-6);

@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
 
-public class LinearClimb extends SubsystemBase {
+public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     private final TalonFX motor;
     private boolean calibrating = false;
     private double downPosition = ClimbConstants.BOTTOM_POSITION;
     private double upPosition = ClimbConstants.UP_POSITION;
     private double climbPosition = ClimbConstants.CLIMB_POSITION;
+
+    private LinearClimbIOInputs inputs = new LinearClimbIOInputs();
 
     private final PIDController pid = new PIDController(
             ClimbConstants.PID_P,
@@ -85,7 +87,7 @@ public class LinearClimb extends SubsystemBase {
      *         rotations * gearRatio * 2 * PI * radius
      */
     public double getAsMeters() {
-        return getPosition() * ClimbConstants.CLIMB_GEAR_RATIO * 2 * Math.PI * ClimbConstants.WHEEL_RADIUS;
+        return inputs.positionMeters;
     }
     /**
      * goes to the up position
@@ -148,5 +150,11 @@ public class LinearClimb extends SubsystemBase {
         motor.setPosition(downPosition);
         calibrating = false;
         setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
+    }
+
+    @Override
+    public void updateInputs() {
+        inputs.positionMeters = Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO;
+        inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
     }
 }
