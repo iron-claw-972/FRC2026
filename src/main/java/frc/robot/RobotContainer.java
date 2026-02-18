@@ -142,6 +142,8 @@ public class RobotContainer {
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
 
+    SmartDashboard.putString("RobotId", RobotId.getRobotId().name());
+
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
     LiveWindow.disableAllTelemetry();
