@@ -13,8 +13,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -24,6 +26,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -56,10 +59,13 @@ public class RobotContainer {
 
   private Command auto = new DoNothing();
 
-
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LinearClimb linearClimb = null;
+
+  // Auto Command selection
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -94,23 +100,28 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
+        linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
+        driver = new PS5ControllerDriverConfig(drive, linearClimb);
+        ((PS5ControllerDriverConfig)driver).setShooter(shooter);
+        ((PS5ControllerDriverConfig)driver).setTurret(turret);
+        ((PS5ControllerDriverConfig)driver).setHood(hood);
+        ((PS5ControllerDriverConfig)driver).setIntake(intake);
+        ((PS5ControllerDriverConfig)driver).setSpindexer(spindexer);
         operator = new Operator(drive);
         // added indexer here for now
-        
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -123,7 +134,7 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -134,6 +145,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    autoChooserInit();
   }
 
   /**
@@ -143,7 +155,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -165,6 +176,21 @@ public class RobotContainer {
   public void registerCommands() {
   }
 
+  /**
+   * Initialize the SendableChooser on the SmartDashboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
+  }
+
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
     return () -> {
       // Boolean supplier that controls when the path will be mirrored for the red
@@ -181,28 +207,28 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
+    return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-
