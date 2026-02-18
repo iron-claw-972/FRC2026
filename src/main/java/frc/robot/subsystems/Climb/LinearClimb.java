@@ -23,6 +23,8 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     private double upPosition = ClimbConstants.UP_POSITION;
     private double climbPosition = ClimbConstants.CLIMB_POSITION;
 
+    private boolean calibrateOnStartUp = false;
+
     private LinearClimbIOInputs inputs = new LinearClimbIOInputs();
 
     private final PIDController pid = new PIDController(
@@ -49,7 +51,9 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         motor.setPosition(0);
 
         // calibrate on startup to find hardstop
-        hardstopCalibration();
+        if(calibrateOnStartUp){
+            hardstopCalibration();
+        }
     }
 
     /**
@@ -60,6 +64,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     public void setSetpoint(double setpoint) {
         pid.setSetpoint(setpoint);
     }
+
     /**
      * @return when the position is within 0.2 rotations
      */
@@ -88,18 +93,21 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     public double getAsMeters() {
         return inputs.positionMeters;
     }
+
     /**
      * goes to the up position
      */
     public void goUp() {
         setSetpoint((Units.radiansToRotations(upPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
+
     /**
      * goes to the down position
      */
     public void goDown() {
         setSetpoint((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
     }
+
     /**
      * goes to the climb position
      */
@@ -120,6 +128,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         
         Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
     }
+
     /**
      * sets supply and stator current limits
      * @param limit the current limit for stator and supply current
@@ -136,6 +145,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
 
         motor.getConfigurator().apply(config);
     }
+
     /**
      * Sets the motor to a slow speed until it hits the hard stop
      */
@@ -143,6 +153,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         calibrating = true;
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
     }
+
     /**
      * stops calibration and sets current limits to normal. 
      */
