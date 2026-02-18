@@ -126,8 +126,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
 		motor.setPosition(motorRotations);
 
-		motor.setPosition(0.0); //TODO: remove after hardcrt works
-
 		SmartDashboard.putData("Turret Mech", mech);
 
 	}
