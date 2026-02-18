@@ -33,8 +33,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private static final double MIN_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MIN_ANGLE);
 	private static final double MAX_ANGLE_RAD = Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
-	private static final double MAX_VEL_RAD_PER_SEC = 600;
-	private static final double MAX_ACCEL_RAD_PER_SEC2 = 120.0;
+	private static final double MAX_VEL_RAD_PER_SEC = TurretConstants.MAX_VELOCITY;
+	private static final double MAX_ACCEL_RAD_PER_SEC2 = TurretConstants.MAX_ACCELERATION;
 
 	private static final double EXTRAPOLATION_TIME_CONSTANT = 0.06;
 
@@ -42,8 +42,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private double FEEDFORWARD_KV = 0.185;
 
-	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
-	, 0.02);
+	// Super low magnitude filter for the position to make it less jittery
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
@@ -70,7 +70,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
-    // private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0.010);
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 	/* ---------------- Constructor ---------------- */
@@ -107,6 +106,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
+		//TODO: replace this stuff with Chinese Remainder Theorem calculator -- ignore this for now
+
 		double leftAbs = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET);
 		double rightAbs = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
 
@@ -126,7 +127,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
 		motor.setPosition(motorRotations);
 
-		motor.setPosition(0.0); //TODO: remove after hardcrt works
+		motor.setPosition(0.0); //TODO: remove after chinese remainder theorem works
 
 		SmartDashboard.putData("Turret Mech", mech);
 
@@ -134,6 +135,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	/* ---------------- Public API ---------------- */
 
+	/**
+	 * Sets the setpoint position and velocity of the turret. Call in command execute.
+	 * @param angle
+	 * @param velocityRadPerSec
+	 */
 	public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
@@ -146,8 +152,18 @@ public class Turret extends SubsystemBase implements TurretIO{
 		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(2.0);
 	}
 
+	/**
+	 * @return Posiiton of the turret in radians
+	 */
 	public double getPositionRad() {
 		return Units.rotationsToRadians(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+	}
+
+	/**
+	 * @return Posiiton of the turret in radians
+	 */
+	public double getPositionDeg() {
+		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 	}
 
 	/* ---------------- Periodic ---------------- */
@@ -193,10 +209,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// Tells the Kraken to get to this position using 1000Hz profile
 		double motorGoalRotations = Units.radiansToRotations(best) * GEAR_RATIO;
 
+		// Clamp position setpoint to min and max angles
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * GEAR_RATIO, Units.degreesToRotations(180) * GEAR_RATIO);
 			
+		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * FEEDFORWARD_KV;
 
+		// Sets motor control with feedforward
 		motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
 			.withFeedForward(robotTurnCompensation));
@@ -236,6 +255,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 	}
 
+	// Also ignore this for now
 	private double wrapUnit(double value) {
 		value %= 1.0;
 		if (value < 0) value += 1.0;

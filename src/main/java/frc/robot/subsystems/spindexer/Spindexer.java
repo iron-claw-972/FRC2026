@@ -3,10 +3,8 @@ package frc.robot.subsystems.spindexer;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.spindexer.SpindexerIO;
 
 public class Spindexer extends SubsystemBase implements SpindexerIO{
     TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID);
@@ -23,14 +21,18 @@ public class Spindexer extends SubsystemBase implements SpindexerIO{
     public void periodic() {
         power = SmartDashboard.getNumber("Spindexer Power", power);
         SmartDashboard.putNumber("Spindexer Power", power);
+
         motor.set(power);
         if (inputs.spindexerVelocity < SpindexerConstants.spindexerVelocityWithBall) {
             ballCount++;
         }
     }
 
+    /**
+     * @return 
+     */
     public void maxSpindexer(){
-        power = 1.0;
+        power = 0.5;
     }
 
     public void stopSpindexer(){

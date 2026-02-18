@@ -1,7 +1,5 @@
 package frc.robot.commands.gpm;
 
-import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,7 +20,6 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
@@ -80,11 +77,9 @@ public class AutoShootCommand extends Command {
 
     private TurretState goalState;
 
-    private final double phaseDelay = 0.03;
+    private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
     private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
-
-    private double velocityAdjustment = 0;
 
     public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -104,12 +99,12 @@ public class AutoShootCommand extends Command {
 
     public void updateSetpoints(Pose2d drivepose) {
         Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
-        double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
         
         // If the robot is moving, adjust the target position based on velocity
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
         ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
 
+        // Rotational adjustment is not being used, since turret is in center of robot
         double turretVelocityX =
             fieldRelVel.vxMetersPerSecond
                 + fieldRelVel.omegaRadiansPerSecond
@@ -123,7 +118,6 @@ public class AutoShootCommand extends Command {
 
         double timeOfFlight;
         Pose2d lookaheadPose = turretPosition;
-        //double lookaheadTurretToTargetDistance = turretToTargetDistance;
 
         /*
          * Loop (20) until lookaheadPose converges BECAUSE -->
@@ -145,25 +139,29 @@ public class AutoShootCommand extends Command {
                 new Pose2d(
                     turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
                     turretPosition.getRotation());
-            //lookaheadTurretToTargetDistance = target.getDistance(lookaheadPose.getTranslation());
         }
 
+        // Get the field angle relative to the target pose
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
         if (lastTurretAngle == null) {
             lastTurretAngle = turretAngle;
         }
+
+        // Take the filtered average as the turret's velocity when robot is moving translationally
         turretVelocity =
-        turretAngleFilter.calculate(
-            turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
+        turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
+        
         lastTurretAngle = turretAngle;
 
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
+        // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
+
         // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
         double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
         if (potentialSetpoint > turretRange/2) {
@@ -180,19 +178,19 @@ public class AutoShootCommand extends Command {
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
 
-        if (Math.abs(lastTurretAngle.getDegrees() - turretSetpoint) > 90) {
-            velocityAdjustment = -drivetrain.getAngularRate(2) * 1.0;
-        }
     }
 
     public void updateDrivePose(){
         Pose2d currentPose = drivetrain.getPose();
-        // Add 180 degrees to the rotation bc robot is backwards
+
         drivepose = new Pose2d(
             currentPose.getTranslation(), 
+            // Uncomment this if robot is backwards
             currentPose.getRotation()//.plus(new Rotation2d(Math.PI))
         );
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
+
+        // Add a phase delay extrapolation component for latency delay
         drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
@@ -206,8 +204,8 @@ public class AutoShootCommand extends Command {
         updateSetpoints(drivepose);
 
         turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
-        //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        //shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
+        shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
@@ -222,10 +220,10 @@ public class AutoShootCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        // Set the turret to a safe position when the command ends
+        // Set the turret and hood to a safe position when the command ends
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         shooter.setShooter(0.0);
-        //hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
+        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
         if(spindexer != null){
             spindexer.stopSpindexer();
         }
