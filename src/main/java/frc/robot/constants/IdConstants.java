@@ -21,7 +21,7 @@ public class IdConstants {
 
     // Climb
     public static final int CLIMB_MOTOR_ID = 8;
-    
+
     // Intake
     // extender right and left motor CAN ID
     public static final int RIGHT_MOTOR_ID = 1;
