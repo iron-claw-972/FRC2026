@@ -38,11 +38,14 @@ public class IdConstants {
 
     // Spindexer
     public static final int SPINDEXER_ID = 12;
+    
+    // Climb
+    public static final int CLIMB_MOTOR_ID = 8;
 
     // Intake
     // extender right and left motor CAN ID
     public static final int RIGHT_MOTOR_ID = 1;
     public static final int LEFT_MOTOR_ID = 2;
-    // roller motor CAN ID 
+    // roller motor CAN ID
     public static final int ROLLER_MOTOR_ID = 3;
 }
