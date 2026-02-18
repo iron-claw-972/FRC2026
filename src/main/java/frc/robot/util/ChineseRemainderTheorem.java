@@ -2,13 +2,12 @@ package frc.robot.util;
 
 public final class ChineseRemainderTheorem {
 
-    private ChineseRemainderTheorem() {
-    }
+    private ChineseRemainderTheorem() {}
 
     /**
      * Computes x such that:
-     * x ≡ a (mod n1)
-     * x ≡ b (mod n2)
+     *   x ≡ a (mod n1)
+     *   x ≡ b (mod n2)
      *
      * n1 and n2 MUST be coprime.
      *
@@ -24,8 +23,9 @@ public final class ChineseRemainderTheorem {
         int invN1modN2 = modInverse(n1, n2);
         int invN2modN1 = modInverse(n2, n1);
 
-        int result = (a * n2 * invN2modN1 +
-                b * n1 * invN1modN2) % N;
+        int result =
+                (a * n2 * invN2modN1 +
+                 b * n1 * invN1modN2) % N;
 
         return (result + N) % N;
     }

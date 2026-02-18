@@ -35,7 +35,7 @@ public class IdConstants {
     public static final int HOOD_ID = 11;
 
     // Spindexer
-    public static final int SPINDEXER_ID = 16;
+    public static final int SPINDEXER_ID = 12;
 
     // Intake
     public static final int INTAKE_BASE_LEFT_ID = 13;
