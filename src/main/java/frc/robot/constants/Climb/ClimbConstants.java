@@ -1,13 +1,16 @@
 package frc.robot.constants.Climb;
 
+import edu.wpi.first.math.util.Units;
+
 public class ClimbConstants {
 
     // CHANGE LATER
     // gear ratio for converting motor rotations to linear distance
     public final static double CLIMB_GEAR_RATIO = 1.0 / 45.0;
-    public final static double RADIUS = 0.3;
-    public final static double OFFSET = 100.0;
-    public final static double CLIMB_OFFSET = 80.0;
+    public final static double WHEEL_RADIUS = Units.inchesToMeters(0.334);
+    public final static double BOTTOM_POSITION = Units.inchesToMeters(-8);
+    public final static double CLIMB_POSITION = Units.inchesToMeters(-6);
+    public final static double UP_POSITION = 0.0;
 
     // current limits (in amps)
     // CALIBRATION: Low current while finding hardstop to prevent damage
