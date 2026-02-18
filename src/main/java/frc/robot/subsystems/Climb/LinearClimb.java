@@ -17,7 +17,6 @@ import frc.robot.constants.Climb.ClimbConstants;
 public class LinearClimb extends SubsystemBase {
     private final TalonFX motor;
     private boolean calibrating = false;
-    private int counter = 0;
     private double downPosition = ClimbConstants.OFFSET;
     private double upPosition = 0;
     private double climbPosition = ClimbConstants.CLIMB_OFFSET;
@@ -101,16 +100,15 @@ public class LinearClimb extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!calibrating) {
+        if (calibrating) {
             double power = pid.calculate(motor.getPosition().getValueAsDouble());
             power = MathUtil.clamp(power, ClimbConstants.MIN_POWER, ClimbConstants.MAX_POWER);
             motor.set(power);
         } else {
-            if (counter > ClimbConstants.CALIBRATION_COUNTER_LIMIT) {
+            if (!calibrating) {
                 stopCalibrating();
             }
             motor.set(ClimbConstants.CALIBRATION_POWER);
-            counter += 1;
         }
         SmartDashboard.putNumber("Position", getPosition());
     }
@@ -130,7 +128,6 @@ public class LinearClimb extends SubsystemBase {
 
     public void hardstopCalibration() {
         calibrating = true;
-        counter = 0;
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
     }
 
@@ -141,7 +138,6 @@ public class LinearClimb extends SubsystemBase {
         upPosition = hardstopPosition;
         setSetpoint(downPosition);
         calibrating = false;
-        counter = 0;
         setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
     }
 }
