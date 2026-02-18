@@ -1,4 +1,4 @@
-package frc.robot.constants.Climb;
+package frc.robot.subsystems.Climb;
 
 import edu.wpi.first.math.util.Units;
 
