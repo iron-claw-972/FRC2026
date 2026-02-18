@@ -24,10 +24,10 @@ public class FieldConstants {
 
   /** Location of hub target */
   public static final Translation3d HUB_BLUE =
-      new Translation3d(Units.inchesToMeters(156.8 + 20), 4.035, Units.inchesToMeters(72));
+      new Translation3d(Units.inchesToMeters(156.8 + 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
   
   public static final Translation3d HUB_RED =
-      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(156.8 + 20), 4.035 + .67, Units.inchesToMeters(72));
+      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(156.8 - 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
     
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
@@ -36,10 +36,10 @@ public class FieldConstants {
     new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(BLUE_BORDER + 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(BLUE_BORDER - 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
-    new Translation3d(BLUE_BORDER + 5, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(BLUE_BORDER - 5, RIGHT_SIDE_TARGET, 0);
 
 
   public static final Translation3d ALLIANCE_LEFT_RED =
@@ -47,6 +47,12 @@ public class FieldConstants {
 
   public static final Translation3d ALLIANCE_RIGHT_RED =
     new Translation3d(RED_BORDER + 5, RIGHT_SIDE_TARGET, 0);
+
+  public static final Translation3d ALLIANCE_CENTER_BLUE =
+    new Translation3d(BLUE_BORDER - 5, FIELD_WIDTH/2, 0);
+  
+  public static final Translation3d ALLIANCE_CENTER_RED =
+    new Translation3d(RED_BORDER + 5, FIELD_WIDTH/2, 0);
 
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
   public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
@@ -81,7 +87,7 @@ public class FieldConstants {
     }
   }
 
-  public static Translation3d getAllianceTranslation(boolean sideLeft) {
+  public static Translation3d getAllianceSideTranslation(boolean sideLeft) {
     if (sideLeft) {
       if (Robot.getAlliance() == Alliance.Blue) {
         return ALLIANCE_LEFT_BLUE;
@@ -94,6 +100,14 @@ public class FieldConstants {
       } else {
         return ALLIANCE_RIGHT_RED;
       }
+    }
+  }
+
+  public static Translation3d getAllianceCenterTranslation() {
+    if (Robot.getAlliance() == Alliance.Blue) {
+      return ALLIANCE_CENTER_BLUE;
+    } else {
+      return ALLIANCE_CENTER_RED;
     }
   }
 

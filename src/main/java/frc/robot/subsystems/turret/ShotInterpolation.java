@@ -20,6 +20,7 @@ public class ShotInterpolation {
         hoodAngleMap.put(0.0, Units.degreesToRadians(90));
         hoodAngleMap.put(1.0, Units.degreesToRadians(90));
 
+        //TODO: find actual values from video motion
         exitVelocityMap.put(1.0, 2.0);
         exitVelocityMap.put(2.0, 4.0);
     }

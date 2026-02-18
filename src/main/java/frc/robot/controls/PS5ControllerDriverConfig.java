@@ -77,6 +77,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 else{
                     intake.retract();
                     intake.spinStop();
+                    intakeBoolean = true;
                 }
             }));
         }

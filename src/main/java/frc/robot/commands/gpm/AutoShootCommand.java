@@ -189,7 +189,6 @@ public class AutoShootCommand extends Command {
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
         SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
-        System.out.println("COMMAND IS WORKINNGGG");
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
