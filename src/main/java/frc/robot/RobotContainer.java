@@ -26,6 +26,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -47,9 +48,11 @@ public class RobotContainer {
   private Vision vision = null;
   private Command auto = new DoNothing();
 
+
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private Intake intake = null;
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -69,6 +72,7 @@ public class RobotContainer {
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
+        intake = new Intake();
         break;
 
       case TestBed2:
@@ -89,11 +93,14 @@ public class RobotContainer {
       case Phil: // AKA "IHOP"
 
       case PrimeJr:
+        intake = new Intake();
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive);
         operator = new Operator(drive);
+        // added indexer here for now
+        
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
