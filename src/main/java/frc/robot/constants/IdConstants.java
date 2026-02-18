@@ -38,8 +38,9 @@ public class IdConstants {
     public static final int SPINDEXER_ID = 12;
 
     // Intake
-    public static final int INTAKE_BASE_LEFT_ID = 13;
-    public static final int INTAKE_BASE_RIGHT_ID = 14;
-    public static final int INTAKE_FLYWHEEL_ID = 15;
-    public static final int INTAKE_ENCODER_ID = 2;
+    // extender right and left motor CAN ID
+    public static final int RIGHT_MOTOR_ID = 1;
+    public static final int LEFT_MOTOR_ID = 2;
+    // roller motor CAN ID 
+    public static final int ROLLER_MOTOR_ID = 3;
 }
