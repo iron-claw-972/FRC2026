@@ -2,7 +2,6 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,7 +13,6 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
@@ -35,8 +33,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Intake intake;
     private Spindexer spindexer;
 
-    private Pose2d alignmentPose = null;
-    private Command turretAutoShoot;
     private Command autoShoot;
 
     private boolean intakeBoolean = true;

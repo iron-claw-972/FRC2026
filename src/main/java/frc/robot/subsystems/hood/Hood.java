@@ -24,13 +24,12 @@ public class Hood extends SubsystemBase implements HoodIO{
     private double MIN_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MIN_ANGLE);
 	private double MAX_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MAX_ANGLE);
 
-	private double MAX_VEL_RAD_PER_SEC = 25;
-	private double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
+	private double MAX_VEL_RAD_PER_SEC = HoodConstants.MAX_VELOCITY;
+	private double MAX_ACCEL_RAD_PER_SEC2 = HoodConstants.MAX_ACCELERATION;
 
     private double GEAR_RATIO = HoodConstants.HOOD_GEAR_RATIO;
 
-	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
-	, 0.02);
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
 	private double FEEDFORWARD_KV = 0.12;
 
