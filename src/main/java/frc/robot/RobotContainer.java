@@ -26,6 +26,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -48,10 +49,10 @@ public class RobotContainer {
   private Vision vision = null;
   private Command auto = new DoNothing();
 
-
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LinearClimb linearClimb = null;
   private Intake intake = null;
 
   // Auto Command selection
@@ -81,7 +82,7 @@ public class RobotContainer {
       default:
 
       case WaffleHouse:
-      
+
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -89,6 +90,7 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
+        linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -97,19 +99,18 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, linearClimb);
         operator = new Operator(drive);
         // added indexer here for now
-        
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
 
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -122,7 +123,7 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -142,7 +143,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -180,15 +180,14 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-// Autos 
+  // Autos
 
   /**
    * Initialize the SendableChooser on the SmartDashbboard.
@@ -207,6 +206,7 @@ public class RobotContainer {
 
   /**
    * Gets the auto command from SmartDashboard
+   * 
    * @return
    */
   public Command getAutoCommand() {
@@ -216,16 +216,14 @@ public class RobotContainer {
     return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-
