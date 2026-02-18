@@ -48,8 +48,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-	private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
-    private final CANcoder encoderRight = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
+	private final CANcoder encoderLeft = new CANcoder(IdConstants.TURRET_ENCODER_LEFT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;

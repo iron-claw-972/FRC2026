@@ -19,8 +19,10 @@ public class IdConstants {
     // LEDs
     public static final int CANDLE_ID = 1;
 
-    // Motor ID
+    // Turret
     public static final int TURRET_MOTOR_ID = 20;
+    public static final int TURRET_ENCODER_LEFT_ID = 0;
+    public static final int TURRET_ENCODER_RIGHT_ID = 1;
 
     // Shooter
     public static final int SHOOTER_LEFT_ID = 10;

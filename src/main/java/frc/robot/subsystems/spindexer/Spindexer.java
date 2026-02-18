@@ -10,7 +10,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID);
 
     private double power = 0.0;
-    public int ballCount = 0;
+    private int ballCount = 0;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
     private boolean wasAboveThreshold = false;
 

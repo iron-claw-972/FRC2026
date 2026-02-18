@@ -104,6 +104,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
      */
     @AutoLogOutput(key="Shooter/TargetSpeed")
     public double getTargetVelocity(){
-        return Units.rotationsToRadians(shooterTargetSpeed);
+        return shooterTargetSpeed;
     }
 }

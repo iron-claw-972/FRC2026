@@ -31,8 +31,6 @@ public class Hood extends SubsystemBase implements HoodIO{
 
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
-	private double FEEDFORWARD_KV = 0.12;
-
 	private Rotation2d goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastFilteredRad = 0.0;
@@ -116,7 +114,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(MIN_ANGLE_RAD) * GEAR_RATIO, Units.radiansToRotations(MAX_ANGLE_RAD) * GEAR_RATIO);
 		
 		// Multiply goal velocity by kV
-		double velocityCompensation = goalVelocityRadPerSec * FEEDFORWARD_KV;
+		double velocityCompensation = goalVelocityRadPerSec * HoodConstants.FEEDFORWARD_KV;
 
 		// Set control with feedforward
 		motor.setControl(mmVoltageRequest

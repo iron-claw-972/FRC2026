@@ -14,4 +14,6 @@ public class HoodConstants {
 
     public static final double MAX_ANGLE = 82; // degrees
     public static final double MIN_ANGLE = 58.5; // degrees 
+
+    public static final double FEEDFORWARD_KV = 0.12;
 }
