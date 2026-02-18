@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -12,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -34,53 +36,58 @@ public class Hood extends SubsystemBase implements HoodIO{
 
     private double GEAR_RATIO = HoodConstants.HOOD_GEAR_RATIO;
 
-    private static final PIDController positionPID = new PIDController(6, 0, 0.2);
+	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
+	, 0.02);
 
-    private final TrapezoidProfile profile = new TrapezoidProfile(
-		new TrapezoidProfile.Constraints(
-				MAX_VEL_RAD_PER_SEC,
-				MAX_ACCEL_RAD_PER_SEC2));
-    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
+	private double FEEDFORWARD_KV = 0.12;
 
-	private State setpoint = new State();
+    //private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(0.1, 1. / DCMotor.getKrakenX60(1).KvRadPerSecPerVolt, 0);
 
 	private Rotation2d goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
 	private double goalVelocityRadPerSec = 0.0;
+	private double lastFilteredRad = 0.0;
+	private double lastRawSetpoint = 0.0;
 
-	private static double kP = 2.0;
-	private static double kD = 0.2;
+	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
     public Hood(){
-		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
-        motor.setNeutralMode(NeutralModeValue.Coast);
-
-        motor.getConfigurator().apply(
-				new Slot0Configs()
-						.withKP(kP)
-						.withKD(kD));
+		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
+		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    
+		config.Slot0.kP = 2.0; 
+		config.Slot0.kS = 0.1; // Static friction compensation
+		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
+		config.Slot0.kD = 0.02; // The "Braking" term to stop overshoot
 
-        motor.getConfigurator().apply(
-				new com.ctre.phoenix6.configs.TalonFXConfiguration() {
-					{
-						MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-					}
-				});
+		var mm = config.MotionMagic;
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(MAX_ACCEL_RAD_PER_SEC2) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
+        motor.getConfigurator().apply(config);
 
-        setpoint = new State(getPositionRad() / GEAR_RATIO, 0.0);
+		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
 
 		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
 		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
 		SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
     }
 
-    public double getPositionRad(){
+	/**
+	 * @return Position of the MOTOR in radians
+	 */
+    public double getMotorPositionRad(){
         return Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
     }
 
+	/**
+	 * Sets the setpoint position and velocity of the hood
+	 * @param angle
+	 * @param velocityRadPerSec
+	 */
     public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
@@ -89,40 +96,38 @@ public class Hood extends SubsystemBase implements HoodIO{
     @Override
     public void periodic() {
 		updateInputs();
+		Logger.processInputs("Hood", inputs);
 
-        State goalState = new State(
-				MathUtil.clamp(goalAngle.getRadians(), MIN_ANGLE_RAD, MAX_ANGLE_RAD),
-				goalVelocityRadPerSec);
+		double setpointRad = goalAngle.getRadians();
 
-		setpoint = profile.calculate(
-				Constants.LOOP_TIME,
-				setpoint,
-				goalState);
+        // calculate shortest angular delta
+		double delta = setpointRad - lastRawSetpoint;
+		delta = MathUtil.angleModulus(delta);
+		
+		// filter delta
+		double filteredDelta = setpointFilter.calculate(delta);
+		
+		// apply filtered range
+		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastRawSetpoint = setpointRad;
+		setpointRad = lastFilteredRad;
 
-		double motorVelRotPerSec = Units.radiansToRotations(setpoint.velocity) * GEAR_RATIO;
+		// Tells the Kraken to get to this position using 1000Hz profile
+		double motorGoalRotations = Units.radiansToRotations(setpointRad) * GEAR_RATIO;
 
-		double targetVelocity;
+		//Clamp the setpoint rotations
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(HoodConstants.MIN_ANGLE) * GEAR_RATIO, Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
+		
+		double velocityCompensation = goalVelocityRadPerSec * FEEDFORWARD_KV;
 
-        double motorSetpointPosition = (setpoint.position) * GEAR_RATIO;
-
-		targetVelocity = positionPID.calculate(
-				motor.getPosition().getValue().in(edu.wpi.first.units.Units.Radians),
-				motorSetpointPosition);
-			
-		targetVelocity += Units.rotationsToRadians(motorVelRotPerSec);
-
-		double voltage = feedForward.calculate(targetVelocity);
-
-		motor.setVoltage(voltage);
+		motor.setControl(mmVoltageRequest
+			.withPosition(motorGoalRotations)
+			.withFeedForward(velocityCompensation));
 
         Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Hood/velocitySetpoint", targetVelocity / GEAR_RATIO);
-		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(setpoint.position) / GEAR_RATIO);
+		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / GEAR_RATIO);
+		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()) / GEAR_RATIO);
 
-		SmartDashboard.putData("Hood PID", positionPID);
-
-		SmartDashboard.putNumber("Turret Position Deg", Units.radiansToDegrees(getPositionRad()) / GEAR_RATIO);
-		Logger.processInputs("Hood", inputs);
 	}
 
     @Override

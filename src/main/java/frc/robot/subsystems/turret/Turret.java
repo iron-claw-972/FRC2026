@@ -61,7 +61,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
 	private double lastGoalRad = 0.0;
-	private State setpoint = new State();
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
 
@@ -93,8 +92,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
         motor.getConfigurator().apply(config);
 
-		setpoint = new State(getPositionRad(), 0.0);
-		lastGoalRad = setpoint.position;
+		lastGoalRad = 0.0;
 
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
@@ -141,8 +139,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 		goalVelocityRadPerSec = velocityRadPerSec;
 	}
 
-	public boolean atGoal() {
-		return Math.abs(setpoint.position - getPositionRad()) < Units.degreesToRadians(2.0);
+	/**
+	 * @return If the turret is at setpoint with tolerance of 2 degrees
+	 */
+	public boolean atSetpoint() {
+		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(2.0);
 	}
 
 	public double getPositionRad() {
@@ -201,7 +202,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 			.withFeedForward(robotTurnCompensation));
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/setpointDeg", Units.radiansToDegrees(setpoint.position));
+		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
