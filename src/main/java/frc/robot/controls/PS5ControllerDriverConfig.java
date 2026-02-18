@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
+import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -20,9 +21,11 @@ import lib.controllers.PS5Controller.PS5Button;
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
+    private LinearClimb climb;
 
-    public PS5ControllerDriverConfig(Drivetrain drive) {
+    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb) {
         super(drive);
+        this.climb = climb;
     }
 
     public void configureControls() {
@@ -44,6 +47,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+        
+        if (climb != null) {
+            driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
+                climb.hardstopCalibration();
+            })).onFalse(new InstantCommand(() -> {
+                climb.stopCalibrating();
+            }));
+        }
     }
     
     @Override

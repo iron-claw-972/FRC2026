@@ -99,7 +99,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, linearClimb);
         operator = new Operator(drive);
         // added indexer here for now
 
