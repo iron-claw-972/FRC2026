@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Climb;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -118,7 +120,8 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         } else {
             motor.set(ClimbConstants.CALIBRATION_POWER);
         }
-        SmartDashboard.putNumber("Position", getPosition());
+        
+        Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
     }
     /**
      * sets supply and stator current limits
@@ -147,7 +150,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * stops calibration and sets current limits to normal. 
      */
     public void stopCalibrating() {
-        motor.setPosition(downPosition);
+        motor.setPosition((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
         calibrating = false;
         setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
     }
