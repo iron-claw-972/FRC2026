@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import yams.gearing.GearBox;
 
 public class Hood extends SubsystemBase implements HoodIO{
     private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
@@ -84,13 +85,20 @@ public class Hood extends SubsystemBase implements HoodIO{
     }
 
 	/**
-	 * Sets the setpoint position and velocity of the hood
+	 * Sets the setpoint position and velocity of the hood. Call in command execute.
 	 * @param angle
 	 * @param velocityRadPerSec
 	 */
     public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
+	}
+
+	/**
+	 * @return Position of turret in degrees
+	 */
+	public double getPositionDeg(){
+		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 	}
 
     @Override
@@ -116,10 +124,12 @@ public class Hood extends SubsystemBase implements HoodIO{
 		double motorGoalRotations = Units.radiansToRotations(setpointRad) * GEAR_RATIO;
 
 		//Clamp the setpoint rotations
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(HoodConstants.MIN_ANGLE) * GEAR_RATIO, Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(MIN_ANGLE_RAD) * GEAR_RATIO, Units.radiansToRotations(MAX_ANGLE_RAD) * GEAR_RATIO);
 		
+		// Multiply goal velocity by kV
 		double velocityCompensation = goalVelocityRadPerSec * FEEDFORWARD_KV;
 
+		// Set control with feedforward
 		motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
 			.withFeedForward(velocityCompensation));
