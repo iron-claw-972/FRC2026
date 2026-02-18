@@ -13,7 +13,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -106,34 +105,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 					false,
 					0.0);
 		}
-		// Do this for both encoders in the constructor
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
-				% TurretConstants.LEFT_ENCODER_TEETH;
-		SmartDashboard.putNumber("Left Tooth", leftTooth);
-
-		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
-				% TurretConstants.RIGHT_ENCODER_TEETH;
-		SmartDashboard.putNumber("Right Tooth", rightTooth);
-
-		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
-		SmartDashboard.putNumber("Turret Index", turretIndex);
-
-		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
-        * TurretConstants.RIGHT_ENCODER_TEETH;
-
-		double turretRotations = turretIndex / (double) 140.0;
-
-		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
-		motor.setPosition(motorRotations);
-
 		SmartDashboard.putData("Turret Mech", mech);
 
 	}
@@ -162,6 +133,36 @@ public class Turret extends SubsystemBase implements TurretIO{
 	public void periodic() {
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
+
+		// Do this for both encoders in the constructor
+		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
+
+		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
+
+		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
+
+		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
+
+		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
+				% TurretConstants.LEFT_ENCODER_TEETH;
+		SmartDashboard.putNumber("Left Tooth", leftTooth);
+
+		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
+				% TurretConstants.RIGHT_ENCODER_TEETH;
+		SmartDashboard.putNumber("Right Tooth", rightTooth);
+
+		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
+		SmartDashboard.putNumber("Turret Index", turretIndex);
+
+		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
+        * TurretConstants.RIGHT_ENCODER_TEETH;
+
+		double turretRotations = turretIndex / (double) 140.0;
+		SmartDashboard.putNumber("CRT thing out", Units.rotationsToDegrees(turretRotations));
+
+		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
+		// motor.setPosition(motorRotations);
+
 		
 		// Position extrapolation
 		double lookAheadSeconds = EXTRAPOLATION_TIME_CONSTANT; 
