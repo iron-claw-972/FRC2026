@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
-import frc.robot.util.FieldZone;
 
 public class FieldConstants {
   /** Width of the field [meters] */
@@ -51,6 +50,20 @@ public class FieldConstants {
 
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
   public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
+
+	public enum ShootingTarget {
+		HUB,
+		NEUTRAL,
+		ALLIANCE,
+		OPPOSITION, // not sure why you'd ever do this :)
+	}
+
+	public enum FieldZone {
+		ALLIANCE,
+		NEUTRAL,
+		OPPOSITION,
+		TRENCH_BUMP
+	}
 
   public static Translation3d getHubTranslation() {
     if (Robot.getAlliance() == Alliance.Blue) {
