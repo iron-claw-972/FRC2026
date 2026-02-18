@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.util.ChineseRemainderTheorem;
 
 public class Turret extends SubsystemBase implements TurretIO{
 
@@ -108,24 +107,24 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		//TODO: replace this stuff with Chinese Remainder Theorem calculator -- ignore this for now
 
-		double leftAbs = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET);
-		double rightAbs = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
+		// double leftAbs = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET);
+		// double rightAbs = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
-				% TurretConstants.LEFT_ENCODER_TEETH;
+		// int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
+		// 		% TurretConstants.LEFT_ENCODER_TEETH;
 
-		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
-				% TurretConstants.RIGHT_ENCODER_TEETH;
+		// int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
+		// 		% TurretConstants.RIGHT_ENCODER_TEETH;
 
-		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
+		// int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
 
-		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
-        * TurretConstants.RIGHT_ENCODER_TEETH;
+		// double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
+        // * TurretConstants.RIGHT_ENCODER_TEETH;
 
-		double turretRotations = turretIndex / (double) totalTeeth;
+		// double turretRotations = turretIndex / (double) totalTeeth;
 
-		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
-		motor.setPosition(motorRotations);
+		// double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
+		// motor.setPosition(motorRotations);
 
 		motor.setPosition(0.0); //TODO: remove after chinese remainder theorem works
 

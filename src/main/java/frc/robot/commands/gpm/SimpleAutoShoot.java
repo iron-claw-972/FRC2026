@@ -22,12 +22,10 @@ import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
-import frc.robot.util.Vision.TurretVision;
 
 public class SimpleAutoShoot extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
-    private TurretVision turretVision;
     private Shooter shooter;
 
     private double fieldAngleRad;

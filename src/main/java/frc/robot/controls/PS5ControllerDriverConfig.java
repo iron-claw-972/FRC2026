@@ -18,8 +18,7 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
+import frc.robot.subsystems.Intake.Intake;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -75,13 +74,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         if(intake != null){
             driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()->{
                 if(intakeBoolean){
-                    intake.setSetpoint(IntakeConstants.INTAKE_ANGLE);
-                    intake.setFlyWheel();
+                    intake.extend();
+                    intake.spinStart();
                     intakeBoolean = false;
                 }
                 else{
-                    intake.setSetpoint(IntakeConstants.STOW_ANGLE);
-                    intake.stopFlyWheel();
+                    intake.retract();
+                    intake.spinStop();
                 }
             }));
         }
