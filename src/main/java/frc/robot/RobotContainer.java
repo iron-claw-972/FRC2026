@@ -13,10 +13,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -29,6 +27,10 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.spindexer.Spindexer;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -46,16 +48,18 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
+  private Turret turret = null;
+  private Shooter shooter = null;
+  private Hood hood = null;
+  private Spindexer spindexer = null;
+  private Intake intake = null;
+
   private Command auto = new DoNothing();
 
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
-  private Intake intake = null;
-
-  // Auto Command selection
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -63,16 +67,10 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    // display the current robot id on smartdashboard
-    SmartDashboard.putString("RobotID", robotId.toString());
-
-    // Filling the SendableChooser on SmartDashboard
-    autoChooserInit();
-
+    // climb = new Climb();
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
-        intake = new Intake();
         break;
 
       case TestBed2:
@@ -80,8 +78,15 @@ public class RobotContainer {
 
       default:
 
-      case WaffleHouse:
-      
+      case PrimeJr: // AKA Valence
+        spindexer = new Spindexer();
+        intake = new Intake();
+
+      case WaffleHouse: // AKA Betabot
+        turret = new Turret();
+        shooter = new Shooter();
+        hood = new Hood();
+
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -92,12 +97,9 @@ public class RobotContainer {
 
       case Phil: // AKA "IHOP"
 
-      case PrimeJr:
-        intake = new Intake();
-
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
         // added indexer here for now
         
@@ -106,7 +108,6 @@ public class RobotContainer {
         DetectedObject.setDrive(drive);
         
         // SignalLogger.start();
-
         driver.configureControls();
         operator.configureControls();
         
@@ -188,32 +189,8 @@ public class RobotContainer {
     }
   }
 
-// Autos 
-
-  /**
-   * Initialize the SendableChooser on the SmartDashbboard.
-   * Fill the SendableChooser with available Commands.
-   */
-  public void autoChooserInit() {
-    // add the options to the Chooser
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
-
-    // put the Chooser on the SmartDashboard
-    SmartDashboard.putData("Auto chooser", autoChooser);
-  }
-
-  /**
-   * Gets the auto command from SmartDashboard
-   * @return
-   */
-  public Command getAutoCommand() {
-    // get the selected Command
-    Command autoSelected = autoChooser.getSelected();
-
-    return autoSelected;
+  public Command getAutoCommand(){
+    return auto;
   }
 
   public void logComponents(){
