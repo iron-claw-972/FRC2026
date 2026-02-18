@@ -50,8 +50,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
-	private final CANcoder encoderLeft = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
-    private final CANcoder encoderRight = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
+	private final CANcoder encoderLeft = new CANcoder(1, Constants.SUBSYSTEM_CANIVORE_CAN);
+    private final CANcoder encoderRight = new CANcoder(0, Constants.SUBSYSTEM_CANIVORE_CAN);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -106,22 +106,30 @@ public class Turret extends SubsystemBase implements TurretIO{
 					false,
 					0.0);
 		}
+		// Do this for both encoders in the constructor
+		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
 
-		double leftAbs = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET);
-		double rightAbs = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
+		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
+
+		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
+
+		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
 		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
 				% TurretConstants.LEFT_ENCODER_TEETH;
+		SmartDashboard.putNumber("Left Tooth", leftTooth);
 
 		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
 				% TurretConstants.RIGHT_ENCODER_TEETH;
+		SmartDashboard.putNumber("Right Tooth", rightTooth);
 
 		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
+		SmartDashboard.putNumber("Turret Index", turretIndex);
 
 		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
         * TurretConstants.RIGHT_ENCODER_TEETH;
 
-		double turretRotations = turretIndex / (double) totalTeeth;
+		double turretRotations = turretIndex / (double) 140.0;
 
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
 		motor.setPosition(motorRotations);
@@ -207,6 +215,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
+
+		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
+		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
+
 
 	}
 
