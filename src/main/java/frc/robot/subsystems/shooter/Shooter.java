@@ -81,7 +81,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     /**@return velocity in m/s */
-    public double getShooterVelcoity(){
+    public double getShooterVelocity(){
         return inputs.shooterSpeedLeft;
     }
 
@@ -96,7 +96,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
      * @return Whether the shooter is at the target speed with tolerance of 1 m/s
      */
     public boolean atTargetSpeed(){
-        return Math.abs(getShooterVelcoity() - shooterTargetSpeed) < 1.0;
+        return Math.abs(getShooterVelocity() - shooterTargetSpeed) < 1.0;
     }
 
     /**
