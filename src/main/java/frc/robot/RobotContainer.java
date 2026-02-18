@@ -111,12 +111,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, linearClimb);
-        ((PS5ControllerDriverConfig)driver).setShooter(shooter);
-        ((PS5ControllerDriverConfig)driver).setTurret(turret);
-        ((PS5ControllerDriverConfig)driver).setHood(hood);
-        ((PS5ControllerDriverConfig)driver).setIntake(intake);
-        ((PS5ControllerDriverConfig)driver).setSpindexer(spindexer);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
         // added indexer here for now
 

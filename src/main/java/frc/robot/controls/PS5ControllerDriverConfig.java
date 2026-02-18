@@ -37,28 +37,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Spindexer spindexer;
     private LinearClimb climb;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb) {
+    public PS5ControllerDriverConfig(Drivetrain drive, Shooter shooter, Turret turret, Hood hood, Intake intake, Spindexer spindexer) {
         super(drive);
-        this.climb = climb;
-    }
-
-    public void setIntake(Intake intake) {
-        this.intake = intake;
-    }
-
-    public void setTurret(Turret turret) {
-        this.turret = turret;
-    }
-
-    public void setHood(Hood hood) {
-        this.hood = hood;
-    }
-
-    public void setShooter(Shooter shooter) {
         this.shooter = shooter;
-    }
-
-    public void setSpindexer(Spindexer spindexer) {
+        this.turret = turret;
+        this.hood = hood;
+        this.intake = intake;
         this.spindexer = spindexer;
     }
 
