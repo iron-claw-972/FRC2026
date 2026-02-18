@@ -13,8 +13,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -62,13 +64,21 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
+  // Auto Command selection
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    // climb = new Climb();
+    // display the current robot id on smartdashboard
+    SmartDashboard.putString("RobotID", robotId.toString());
+
+    // Filling the SendableChooser on SmartDashboard
+    autoChooserInit();
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -83,21 +93,25 @@ public class RobotContainer {
         intake = new Intake();
         climb = new Climb();
         spindexer = new Spindexer();
+        break;
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
         shooter = new Shooter();
-        //hood = new Hood();
+        break;
 
       case SwerveCompetition: // AKA "Vantage"
+        break;
 
       case BetaBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        // fall-through
+        break;
 
       case Vivace:
+        break;
 
       case Phil: // AKA "IHOP"
+        break;
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
@@ -106,11 +120,11 @@ public class RobotContainer {
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -123,10 +137,12 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    SmartDashboard.putString("RobotId", RobotId.getRobotId().name());
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
@@ -143,7 +159,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -181,28 +196,50 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+  // Autos
+
+  /**
+   * Initialize the SendableChooser on the SmartDashbboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  /**
+   * Gets the auto command from SmartDashboard
+   * 
+   * @return
+   */
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
+    return autoSelected;
+  }
+
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-

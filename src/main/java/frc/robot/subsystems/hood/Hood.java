@@ -2,7 +2,6 @@ package frc.robot.subsystems.hood;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -25,16 +24,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Hood extends SubsystemBase implements HoodIO{
-    private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
+public class Hood extends SubsystemBase implements HoodIO {
+	private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
-    private double MIN_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MIN_ANGLE);
+	private double MIN_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MIN_ANGLE);
 	private double MAX_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MAX_ANGLE);
 
 	private double MAX_VEL_RAD_PER_SEC = 25;
 	private double MAX_ACCEL_RAD_PER_SEC2 = 160.0;
 
-    private double GEAR_RATIO = HoodConstants.HOOD_GEAR_RATIO;
+	private double GEAR_RATIO = HoodConstants.HOOD_GEAR_RATIO;
 
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02
 	, 0.02);
@@ -58,7 +57,6 @@ public class Hood extends SubsystemBase implements HoodIO{
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     
-		config.Slot0.kP = 2.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
 		config.Slot0.kD = 0.02; // The "Braking" term to stop overshoot
@@ -70,31 +68,12 @@ public class Hood extends SubsystemBase implements HoodIO{
         motor.getConfigurator().apply(config);
 
 		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
-
-		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
-		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
-		SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
-    }
-
-	/**
-	 * @return Position of the MOTOR in radians
-	 */
-    public double getMotorPositionRad(){
-        return Units.rotationsToRadians(motor.getPosition().getValueAsDouble());
-    }
-
-	/**
-	 * Sets the setpoint position and velocity of the hood
-	 * @param angle
-	 * @param velocityRadPerSec
-	 */
-    public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
 	}
 
-    @Override
-    public void periodic() {
+	@Override
+	public void periodic() {
 		updateInputs();
 		Logger.processInputs("Hood", inputs);
 
@@ -130,7 +109,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 
 	}
 
-    @Override
+	@Override
 	public void updateInputs() {
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / GEAR_RATIO;

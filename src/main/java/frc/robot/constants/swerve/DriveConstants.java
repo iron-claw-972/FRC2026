@@ -141,6 +141,9 @@ public class DriveConstants {
         /* Neutral Modes */
         public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
         public static final NeutralModeValue STEER_NEUTRAL_MODE = NeutralModeValue.Brake;
+
+        /* Gyro mount pose roll in deg (180.0 if placed under the robot) */
+        public static double GYRO_MOUNT_POSE_ROLL = 0.0; 
     
         /* Drive Motor PID Values */
         public static final double[] P_VALUES = {
@@ -209,9 +212,12 @@ public class DriveConstants {
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
-
+                // Gear ratios 
                 DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
                 STEER_GEAR_RATIO = 287.0 / 11.0;
+
+                // Gyro is mounted under the robot 
+                GYRO_MOUNT_POSE_ROLL = 180.0; 
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
@@ -257,10 +263,10 @@ public class DriveConstants {
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
 
             } else if (robotId == RobotId.Vertigo) {
-                STEER_OFFSET_FRONT_LEFT = 4.185;
-                STEER_OFFSET_FRONT_RIGHT = 101.519+90;
-                STEER_OFFSET_BACK_LEFT = 38.997+180;
-                STEER_OFFSET_BACK_RIGHT = 242.847-90;
+                STEER_OFFSET_FRONT_LEFT = Units.radiansToDegrees(3.43);
+                STEER_OFFSET_FRONT_RIGHT = Units.radiansToDegrees(1.91) + 180;
+                STEER_OFFSET_BACK_LEFT = Units.radiansToDegrees(2.28);
+                STEER_OFFSET_BACK_RIGHT = Units.radiansToDegrees(5.03);
                 
                 DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 

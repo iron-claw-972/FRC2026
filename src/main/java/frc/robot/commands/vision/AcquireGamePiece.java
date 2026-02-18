@@ -10,11 +10,12 @@ import frc.robot.util.Vision.DetectedObject;
 public class AcquireGamePiece extends SequentialCommandGroup {
     /**
      * Intakes a game piece
-     * 
+     *
      * @param gamePiece The supplier for the game piece to intake
-     * @param drive The drivetrain
+     * @param drive     The drivetrain
      */
-    public AcquireGamePiece(Supplier<DetectedObject> gamePiece, Drivetrain drive){
+    public AcquireGamePiece(Supplier<DetectedObject> gamePiece, Drivetrain drive) {
+        // TODO: Replace DoNothing with next year's intake command
         addCommands(new DoNothing().deadlineFor(new DriveToGamePiece(gamePiece, drive)));
     }
 }
