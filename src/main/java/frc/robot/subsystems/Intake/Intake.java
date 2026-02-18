@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -37,11 +36,11 @@ public class Intake extends SubsystemBase {
 
     // create the motors
     /** Motor to move the roller */
-    private TalonFX rollerMotor = new TalonFX(IdConstants.RIGHT_MOTOR_ID, Constants.CANIVORE_SUB);
+    private TalonFX rollerMotor = new TalonFX(IdConstants.ROLLER_MOTOR_ID, Constants.CANIVORE_SUB);
     /** Right motor (master) */
-    private TalonFX rightMotor = new TalonFX(IdConstants.LEFT_MOTOR_ID, Constants.CANIVORE_SUB);
+    private TalonFX rightMotor = new TalonFX(IdConstants.RIGHT_MOTOR_ID, Constants.CANIVORE_SUB);
     /** Left motor (slave) */
-    private TalonFX leftMotor = new TalonFX(IdConstants.ROLLER_MOTOR_ID, Constants.CANIVORE_SUB);
+    private TalonFX leftMotor = new TalonFX(IdConstants.LEFT_MOTOR_ID, Constants.CANIVORE_SUB);
 
     /** Motor characteristics for the roller motor, a single Kraken X44 (aka gearbox) */
     private final DCMotor dcMotorRoller = DCMotor.getKrakenX44(1);
@@ -75,9 +74,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
+        .withStatorCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
+        .withSupplyCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
@@ -100,9 +99,9 @@ public class Intake extends SubsystemBase {
 
         // config the current limits (low value for testing)
         config.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
+        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
+        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
         .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
