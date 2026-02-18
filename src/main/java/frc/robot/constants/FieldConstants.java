@@ -49,8 +49,8 @@ public class FieldConstants {
   public static final Translation3d ALLIANCE_RIGHT_RED =
     new Translation3d(RED_BORDER + 5, RIGHT_SIDE_TARGET, 0);
 
-  public static final double BlueAllianceLine = BLUE_BORDER; // That's the distance from one side to the blue bump
-  public static final double RedAllianceLine = RED_BORDER; // 
+  public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
+  public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
 
   public static Translation3d getHubTranslation() {
     if (Robot.getAlliance() == Alliance.Blue) {
@@ -87,13 +87,13 @@ public class FieldConstants {
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
     //double y = drivepose.getY();
-    if(x < FieldConstants.RedAllianceLine) { // inside red
+    if(x < FieldConstants.RED_ALLIANCE_LINE) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
       } else {
         return FieldZone.OPPOSITION;
       }
-    } else if (x > FieldConstants.BlueAllianceLine) {
+    } else if (x > FieldConstants.BLUE_ALLIANCE_LINE) {
       if (Robot.getAlliance() == Alliance.Blue) {
         return FieldZone.ALLIANCE;
       } else {
