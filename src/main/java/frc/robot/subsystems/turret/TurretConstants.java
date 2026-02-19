@@ -4,8 +4,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class TurretConstants {
-    public static double MAX_ANGLE = 200;
-    public static double MIN_ANGLE = -200;
+    public static double MAX_ANGLE = 200; // deg
+    public static double MIN_ANGLE = -200; // deg
 
     public static double MAX_VELOCITY = 600; // rad/s
     public static double MAX_ACCELERATION = 120.0; // rad/s^2
