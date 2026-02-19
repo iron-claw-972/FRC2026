@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -119,15 +120,22 @@ public class Intake extends SubsystemBase {
         motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
         motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
 
-        // set the brake mode
-        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
-
         // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
-
-        config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
+
+        leftMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Brake)
+        );
+
+        rightMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
+        );
+
+        leftMotor.setPosition(0.0);
+        rightMotor.setPosition(0.0);
 
         // Build the mechanism for display
         mechanism = new Mechanism2d(80, 80);
@@ -235,7 +243,7 @@ public class Intake extends SubsystemBase {
     public void setPosition(double setpoint) {
         double motorRotations =inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
-
+        leftMotor.setControl(voltageRequest.withPosition(motorRotations));
     }
 
     /**
