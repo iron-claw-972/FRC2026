@@ -158,7 +158,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	}
 
 	/**
-	 * @return Posiiton of the turret in radians
+	 * @return Posiiton of the turret in degrees
 	 */
 	public double getPositionDeg() {
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
