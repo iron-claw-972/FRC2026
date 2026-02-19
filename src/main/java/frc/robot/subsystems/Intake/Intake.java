@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -81,7 +82,6 @@ public class Intake extends SubsystemBase {
 
         // config Slot 0 PID params
         var slot0Configs = rollerConfig.Slot0;
-        // TODO: set PID parameters
         slot0Configs.kP = 5.0;
         slot0Configs.kI = 0.0;
         slot0Configs.kD = 0.0;
@@ -125,11 +125,9 @@ public class Intake extends SubsystemBase {
         // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
 
+        config.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
-
-        // make the left motor follow but oppose the right motor
-        leftMotor.setControl(new Follower(rightMotor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         // Build the mechanism for display
         mechanism = new Mechanism2d(80, 80);
