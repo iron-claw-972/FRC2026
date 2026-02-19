@@ -75,12 +75,14 @@ public class Robot extends LoggedRobot {
         //     changes networktables.json, networktables.json.bck (both Untracked)
         //   Uncomment the next line, set the desired RobotId, deploy, and then comment the line out
         //  RobotId.setRobotId(RobotId.SwerveCompetition);
-        DriveConstants.update(RobotId.getRobotId());
+        
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
 
-          // Record metadata
+        DriveConstants.update(robotId);
+
+        // Record metadata
         Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
