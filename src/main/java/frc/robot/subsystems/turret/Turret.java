@@ -158,6 +158,9 @@ public class Turret extends SubsystemBase implements TurretIO{
         * TurretConstants.RIGHT_ENCODER_TEETH;
 
 		double turretRotations = turretIndex / (double) 140.0;
+		if(Units.rotationsToDegrees(turretRotations) > 500.0){
+			turretRotations -= Units.degreesToRotations(846.0);
+		}
 		SmartDashboard.putNumber("CRT thing out", Units.rotationsToDegrees(turretRotations));
 
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
