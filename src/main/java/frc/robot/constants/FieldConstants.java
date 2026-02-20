@@ -3,6 +3,8 @@ package frc.robot.constants;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,6 +23,19 @@ public class FieldConstants {
   public static final double BLUE_BORDER = FIELD_LENGTH - Units.inchesToMeters(180);
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.25;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
+  // TODO: Find this
+  /**The coordinate of the climb position */
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+
+  public static final Pose2d getClimbLocation(){
+    if (Robot.getAlliance() == Alliance.Blue){
+      return BLUE_CLIMB_LOCATION;
+    }
+    else{
+      return RED_CLIMB_LOCATION;
+    }
+  }
 
   /** Location of hub target */
   public static final Translation3d HUB_BLUE =

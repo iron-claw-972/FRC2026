@@ -123,14 +123,14 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
 
     @Override
     public void periodic() {
+        double power = pid.calculate(motor.getPosition().getValueAsDouble());
         // if it is not calibrating, do normal stuff
         if (!calibrating) {
-            double power = pid.calculate(motor.getPosition().getValueAsDouble());
             power = MathUtil.clamp(power, -MAX_POWER, MAX_POWER);
-            motor.set(power);
-        } else {
-            motor.set(ClimbConstants.CALIBRATION_POWER);
+        } else{
+            power = ClimbConstants.CALIBRATION_POWER;
         }
+        motor.set(power);
         
         Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
     }

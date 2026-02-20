@@ -21,7 +21,7 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.turret.ShotInterpolation;
+import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.ShooterPhysics;

@@ -113,7 +113,6 @@ public class RobotContainer {
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
-        // added indexer here for now
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);

@@ -1,11 +1,14 @@
 package frc.robot.subsystems.Intake;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -25,7 +28,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
     private final Mechanism2d mechanism;
     private final MechanismLigament2d robotExtension;
@@ -58,30 +61,28 @@ public class Intake extends SubsystemBase {
 
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
+    private double setpointInches = 0.0;
+
+    private boolean calibrating = false;
+
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+
     public Intake() {
      
         // get the maximum free speed
         double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
-        // safety margin, limits velocity to half free speed
-        maxVelocity = 0.5 * maxFreeSpeed;
+        // safety margin, limits velocity to .75 free speed
+        maxVelocity = 0.75 * maxFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
         // Configure the motors
         // Build the configuration for the roller
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
-        // config the current limits (low value for testing)
-        rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
-        .withSupplyCurrentLimitEnable(true);
-
         // config Slot 0 PID params
         var slot0Configs = rollerConfig.Slot0;
-        // TODO: set PID parameters
         slot0Configs.kP = 5.0;
         slot0Configs.kI = 0.0;
         slot0Configs.kD = 0.0;
@@ -106,7 +107,6 @@ public class Intake extends SubsystemBase {
 
         // config Slot 0 PID params
         var rollerSlot0Configs = config.Slot0;
-        // TODO: set PID parameters
         rollerSlot0Configs.kP = 5.0;
         rollerSlot0Configs.kI = 0.0;
         rollerSlot0Configs.kD = 0.0;
@@ -119,18 +119,20 @@ public class Intake extends SubsystemBase {
         motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
         motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
 
-        // set the brake mode
-        config.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
-
-        // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
-
-        //left motor is weaker
-        // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
-        // make the left motor follow but oppose the right motor
-        leftMotor.setControl(new Follower(rightMotor.getDeviceID(), MotorAlignmentValue.Opposed));
+        leftMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
+        );
+
+        rightMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
+        );
+
+        leftMotor.setPosition(0.0);
+        rightMotor.setPosition(0.0);
 
         // Build the mechanism for display
         mechanism = new Mechanism2d(80, 80);
@@ -143,19 +145,16 @@ public class Intake extends SubsystemBase {
 
         // add some test commands.
         SmartDashboard.putData("Extension Mechanism", mechanism);
-        SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
-        SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
-        SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
-        SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.8), this));
-        SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.8), this));
-        SmartDashboard.putData("Roller Stop", new InstantCommand(() -> this.spin(0.0), this));
-        SmartDashboard.putData("Zero Motors", new InstantCommand(this::zeroMotors));
-
+        SmartDashboard.putData("START INTAKE COMMAND", new InstantCommand(()->{
+            extend();
+            spinStart();
+        }));
+        SmartDashboard.putData("END INTAKE COMMAND", new InstantCommand(()->{
+            intermediateExtend();
+            spinStop();
+        }));
 
         if (RobotBase.isSimulation()) {
-            // build the simulation resources
-
             // Extender simulation
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
@@ -186,7 +185,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         // Report position to SmartDashboard
         double inchExtension = getPosition();
-        SmartDashboard.putNumber("Intake Position:", inchExtension);
+        Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
         // Report velocity to SmartDashbboard
@@ -194,6 +193,13 @@ public class Intake extends SubsystemBase {
         double velocity = rollerMotor.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Roller Velocity", velocity);
 
+        if(calibrating){
+            leftMotor.set(-0.1);
+            rightMotor.set(-0.1);
+        }
+
+        updateInputs();
+        Logger.processInputs("Intake", inputs);
     }
 
     public void simulationPeriodic(){
@@ -222,10 +228,7 @@ public class Intake extends SubsystemBase {
         voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
         rollerSim.setInputVoltage(voltage);
         rollerSim.update(0.020);
-        // Sanity check:
-        // the X44 has a top speed of 7530 RPM = 125 RPS
-        // If the drive is 0.2, then ultimate speed should be 125 RPS * 0.2 = 25 RPS
-        // result is 26 RPS.
+
         double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
 
         rollerMotor.getSimState().setRotorVelocity(velocity);
@@ -236,9 +239,11 @@ public class Intake extends SubsystemBase {
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations =inchesToRotations(setpoint);
+        double motorRotations = inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
+        leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 
+        setpointInches = setpoint;
     }
 
     /**
@@ -246,8 +251,7 @@ public class Intake extends SubsystemBase {
      * @return inches
      */
     public double getPosition(){
-        double motorRotations = rightMotor.getPosition().getValueAsDouble();
-        return rotationsToInches(motorRotations);
+        return inputs.leftPosition;
     }
 
     /**
@@ -297,15 +301,31 @@ public class Intake extends SubsystemBase {
         spin(0.0);
     }
 
+    /**
+     * Reverses the intake roller
+     */
+    public void spinReverse(){
+        spin(-IntakeConstants.SPEED);
+    }
+
     /** Extend the intake the maximum distance. */
     public void extend() {
        setPosition(IntakeConstants.MAX_EXTENSION);
     }
 
-    /** Retract the intake to its starting position. */
-    public void retract(){
-        setPosition(IntakeConstants.STARTING_POINT);
+    /** Extend to a position that doesn't hit the spindexer */
+    public void intermediateExtend(){
+        setPosition(IntakeConstants.INTERMEDIATE_EXTENSION);
+    }
 
+    /** Retract the intake to a safe starting position. */
+    public void retract(){
+        setPosition(IntakeConstants.STOW_EXTENSION);
+    }
+
+    /** Goes to the zero position */
+    public void zeroPosition(){
+        setPosition(0.0);
     }
 
     public void zeroMotors() {
@@ -322,4 +342,49 @@ public class Intake extends SubsystemBase {
         rightMotor.close();
         rollerMotor.close();
     }
+
+    /**
+     * Starts calibrating by running it backwards
+     */
+    public void calibrate(){
+        setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
+        calibrating = true;
+    }
+
+    /**
+     * Stops, zeros, and moves it to retract position
+     */
+    public void stopCalibrating(){
+        calibrating = false;
+        zeroMotors();
+        setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
+        retract();
+    }
+
+    /**
+     * sets supply and stator current limits
+     * @param limit the current limit for stator and supply current
+     */
+    public void setCurrentLimits(double limit) {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.CurrentLimits = new CurrentLimitsConfigs();
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = limit;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = limit;
+
+        leftMotor.getConfigurator().apply(config);
+        rightMotor.getConfigurator().apply(config);
+    }
+
+    @Override
+    public void updateInputs() {
+        inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
+        inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
+        inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+    }
+
 }
