@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units;
 
 public class IntakeConstants {
     /** Intake roller motor speed in range [-1, 1] */
-    public static final double SPEED = 0.8;
+    public static final double SPEED = 1.0;
     /** 12 tooth pinion driving 36 tooth driven gear */
     public static final double GEAR_RATIO = 36.0/12.0;
     /** radius (inches) of the rack gear which is a 10 tooth pinion at 10 DP */

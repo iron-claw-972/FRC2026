@@ -25,6 +25,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private LinearClimb climb;
     private Intake intake;
 
+    private boolean intakeBoolean = true;
+
     public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb, Intake intake) {
         super(drive);
         this.climb = climb;
@@ -50,6 +52,26 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain()::alignWheels,
             interrupted->getDrivetrain().setStateDeadband(true),
             ()->false, getDrivetrain()).withTimeout(2));
+
+        // Intake
+        if (intake != null) {
+            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
+                if (intakeBoolean) {
+                    intake.extend();
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else {
+                    intake.intermediateExtend();
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
+            }));
+
+            driver.get(PS5Controller.DPad.DOWN).onTrue(new InstantCommand(() -> {
+                intake.retract();
+                intakeBoolean = true;
+            }));
+        }
         
         if (climb != null) {
             driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
