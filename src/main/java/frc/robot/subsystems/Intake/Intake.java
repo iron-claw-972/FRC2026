@@ -355,11 +355,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * Stops, zeros, and moves it to retract position
      */
     public void stopCalibrating(){
-        calibrating = false;
         zeroMotors();
         setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
+        calibrating = false;
         retract();
-        
     }
 
     /**
