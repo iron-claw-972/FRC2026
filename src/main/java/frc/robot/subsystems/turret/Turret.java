@@ -145,28 +145,26 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
 				% TurretConstants.LEFT_ENCODER_TEETH;
-		SmartDashboard.putNumber("Left Tooth", leftTooth);
+		//SmartDashboard.putNumber("Left Tooth", leftTooth);
 
 		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
 				% TurretConstants.RIGHT_ENCODER_TEETH;
-		SmartDashboard.putNumber("Right Tooth", rightTooth);
+		//SmartDashboard.putNumber("Right Tooth", rightTooth);
 
 		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
-		SmartDashboard.putNumber("Turret Index", turretIndex);
+		//SmartDashboard.putNumber("Turret Index", turretIndex);
 
-		double totalTeeth = TurretConstants.LEFT_ENCODER_TEETH
-        * TurretConstants.RIGHT_ENCODER_TEETH;
-
-		double turretRotations = turretIndex / (double) 140.0;
+		double turretRotations = turretIndex / (double) TurretConstants.TURRET_TEETH_COUNT;
 		if(Units.rotationsToDegrees(turretRotations) > 500.0){
 			turretRotations -= Units.degreesToRotations(846.0);
 		}
-		SmartDashboard.putNumber("CRT thing out", Units.rotationsToDegrees(turretRotations));
+		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRotations));
 
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
+
+		//Sets the initial motor position
 		motor.setPosition(motorRotations);
 
-		
 		// Position extrapolation
 		double lookAheadSeconds = EXTRAPOLATION_TIME_CONSTANT; 
     	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
