@@ -26,8 +26,6 @@ public class ClimbConstants {
     public final static double PID_TOLERANCE = 0.2;
 
     // Motor Limits
-    public final static double MIN_POWER = -0.2;
-    public final static double MAX_POWER = 0.2;
     public final static double CALIBRATION_POWER = 0.15;
 
     // Calibration
