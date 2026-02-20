@@ -15,7 +15,7 @@ public class TurretConstants {
     public static double TURRET_RADIUS = TURRET_WIDTH / 2;
 
     public static double TURRET_TEETH_COUNT = 140.0; // the turret teeth count
-    public static double TURRET_GEAR_RATIO = 36.81818182;
+    public static double GEAR_RATIO = 36.81818182;
     public static int LEFT_ENCODER_TEETH = 15; // gear teeth
     public static int RIGHT_ENCODER_TEETH = 22; // read above
     public static int ENCODER_COUNT_TOTAL = 8192; // how many intervals it can have, like clicks on a clock chat gpt explained to me
@@ -27,4 +27,8 @@ public class TurretConstants {
     public static Translation3d DISTANCE_FROM_ROBOT_CENTER = new Translation3d(0,0, Units.inchesToMeters(22.172)); //meters
 
     public static double CRT_TOLERANCE = 0.01;
+
+	public static final double EXTRAPOLATION_TIME_CONSTANT = 0.06;
+
+	public static final double FEEDFORWARD_KV = 0.185;
 }

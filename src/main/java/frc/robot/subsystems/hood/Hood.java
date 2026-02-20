@@ -21,14 +21,6 @@ import frc.robot.constants.IdConstants;
 public class Hood extends SubsystemBase implements HoodIO{
     private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.SUBSYSTEM_CANIVORE_CAN);
 
-    private double MIN_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MIN_ANGLE);
-	private double MAX_ANGLE_RAD = Units.degreesToRadians(HoodConstants.MAX_ANGLE);
-
-	private double MAX_VEL_RAD_PER_SEC = HoodConstants.MAX_VELOCITY;
-	private double MAX_ACCEL_RAD_PER_SEC2 = HoodConstants.MAX_ACCELERATION;
-
-    private double GEAR_RATIO = HoodConstants.HOOD_GEAR_RATIO;
-
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
 	private Rotation2d goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
@@ -52,12 +44,12 @@ public class Hood extends SubsystemBase implements HoodIO{
 		config.Slot0.kD = 0.02; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
-		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(MAX_VEL_RAD_PER_SEC) * GEAR_RATIO;
-		mm.MotionMagicAcceleration = Units.radiansToRotations(MAX_ACCEL_RAD_PER_SEC2) * GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(HoodConstants.MAX_VELOCITY) * HoodConstants.HOOD_GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * HoodConstants.HOOD_GEAR_RATIO; // Lowered for belt safety
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
         motor.getConfigurator().apply(config);
 
-		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * GEAR_RATIO);
+		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
 		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
 		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
@@ -85,7 +77,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 	 * @return Position of turret in degrees
 	 */
 	public double getPositionDeg(){
-		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
+		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
 	}
 
     @Override
@@ -108,10 +100,10 @@ public class Hood extends SubsystemBase implements HoodIO{
 		setpointRad = lastFilteredRad;
 
 		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(setpointRad) * GEAR_RATIO;
+		double motorGoalRotations = Units.radiansToRotations(setpointRad) * HoodConstants.HOOD_GEAR_RATIO;
 
 		//Clamp the setpoint rotations
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(MIN_ANGLE_RAD) * GEAR_RATIO, Units.radiansToRotations(MAX_ANGLE_RAD) * GEAR_RATIO);
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MIN_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MAX_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO);
 		
 		// Multiply goal velocity by kV
 		double velocityCompensation = goalVelocityRadPerSec * HoodConstants.FEEDFORWARD_KV;
@@ -122,15 +114,15 @@ public class Hood extends SubsystemBase implements HoodIO{
 			.withFeedForward(velocityCompensation));
 
         Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / GEAR_RATIO);
-		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()) / GEAR_RATIO);
+		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
+		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()) / HoodConstants.HOOD_GEAR_RATIO);
 
 	}
 
     @Override
 	public void updateInputs() {
-		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / GEAR_RATIO;
-		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / GEAR_RATIO;
+		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
+		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 	}
 }
