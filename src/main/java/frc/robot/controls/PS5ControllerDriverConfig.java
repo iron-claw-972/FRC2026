@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -22,10 +23,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = ()->false;
     private LinearClimb climb;
+    private Intake intake;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb) {
+    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb, Intake intake) {
         super(drive);
         this.climb = climb;
+        this.intake = intake;
     }
 
     public void configureControls() {
