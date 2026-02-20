@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.util.ChineseRemainderTheorem;
 
 public class Turret extends SubsystemBase implements TurretIO{
 	// Super low magnitude filter for the position to make it less jittery
