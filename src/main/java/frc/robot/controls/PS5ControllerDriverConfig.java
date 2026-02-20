@@ -12,6 +12,7 @@ import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.spindexer.Spindexer;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
@@ -24,13 +25,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = ()->false;
     private LinearClimb climb;
     private Intake intake;
+    private Spindexer spindexer;
 
     private boolean intakeBoolean = true;
 
-    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb, Intake intake) {
+    public PS5ControllerDriverConfig(Drivetrain drive, LinearClimb climb, Intake intake, Spindexer spindexer) {
         super(drive);
         this.climb = climb;
         this.intake = intake;
+        this.spindexer = spindexer;
     }
 
     public void configureControls() {
@@ -71,6 +74,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 intake.retract();
                 intakeBoolean = true;
             }));
+        }
+
+        if (spindexer != null){
+            driver.get(PS5Controller.DPad.RIGHT).onTrue(new InstantCommand(()->spindexer.maxSpindexer()));
+            driver.get(PS5Controller.DPad.LEFT).onTrue(new InstantCommand(()->spindexer.stopSpindexer()));
         }
         
         if (climb != null) {

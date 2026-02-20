@@ -30,6 +30,7 @@ import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -54,6 +55,7 @@ public class RobotContainer {
   private Operator operator = null;
   private LinearClimb linearClimb = null;
   private Intake intake = null;
+  private Spindexer spinexer = null;
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -96,10 +98,11 @@ public class RobotContainer {
 
       case PrimeJr:
         intake = new Intake();
+        spinexer = new Spindexer();
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, linearClimb);
+        driver = new PS5ControllerDriverConfig(drive, linearClimb, intake, spinexer);
         operator = new Operator(drive);
         // added indexer here for now
 
