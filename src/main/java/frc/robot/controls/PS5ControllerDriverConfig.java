@@ -93,6 +93,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 intake.retract();
                 intakeBoolean = true;
             }));
+
+            // Calibration
+            driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(()->{
+                intake.calibrate();
+            })).onFalse(new InstantCommand(()->{
+                intake.stopCalibrating();
+            }));
         }
 
         // Spindexer

@@ -2,6 +2,7 @@ package frc.robot.subsystems.Intake;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -342,13 +343,40 @@ public class Intake extends SubsystemBase implements IntakeIO{
         rollerMotor.close();
     }
 
+    /**
+     * Starts calibrating by running it backwards
+     */
     public void calibrate(){
+        setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
         calibrating = true;
     }
+
+    /**
+     * Stops, zeros, and moves it to retract position
+     */
     public void stopCalibrating(){
         calibrating = false;
         zeroMotors();
+        setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
         retract();
+    }
+
+    /**
+     * sets supply and stator current limits
+     * @param limit the current limit for stator and supply current
+     */
+    public void setCurrentLimits(double limit) {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.CurrentLimits = new CurrentLimitsConfigs();
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = limit;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = limit;
+
+        leftMotor.getConfigurator().apply(config);
+        rightMotor.getConfigurator().apply(config);
     }
 
     @Override
