@@ -77,8 +77,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         if (spindexer != null){
-            driver.get(PS5Controller.DPad.RIGHT).onTrue(new InstantCommand(()->spindexer.maxSpindexer()));
-            driver.get(PS5Controller.DPad.LEFT).onTrue(new InstantCommand(()->spindexer.stopSpindexer()));
+            driver.get(PS5Controller.DPad.RIGHT).toggleOnTrue(new InstantCommand(()->spindexer.maxSpindexer())).toggleOnFalse(new InstantCommand(()->spindexer.stopSpindexer()));
         }
         
         if (climb != null) {
