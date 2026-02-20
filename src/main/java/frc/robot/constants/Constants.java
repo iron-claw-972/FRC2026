@@ -14,7 +14,6 @@ public class Constants {
 
     // CAN bus names
     public static final CANBus CANIVORE_CAN = new CANBus("CANivore");
-    public static final CANBus SUBSYSTEM_CANIVORE_CAN = CANIVORE_CAN;
     public static final CANBus CANIVORE_SUB = new CANBus("CANivoreSub");
     public static final CANBus RIO_CAN = new CANBus("rio");
 
