@@ -1,6 +1,8 @@
 package frc.robot.commands.led_comm;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LED.LED;
@@ -11,19 +13,19 @@ import frc.robot.util.Vision.Vision;
 public class LEDDefaultCommand extends Command {
     private Vision vision;
     private LED led;
+    private PS5Controller controller;
     // private Outtake outtake;
     private Drivetrain drivetrain;
-    // TODO: change this to actual climb coordinate
-    private double climbYCoordinate = 1.08;
     private boolean allianceIsRed = DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
     private String gameData = DriverStation.getGameSpecificMessage();
 
-    public LEDDefaultCommand(LED led, Drivetrain drivetrain, Vision vision) {
+    public LEDDefaultCommand(LED led, Drivetrain drivetrain, Vision vision, PS5Controller controller) {
         this.led = led;
         // this.outtake = outtake;
         this.drivetrain = drivetrain;
         this.vision = vision;
+        this.controller = controller;
         addRequirements(led);
     }
 
@@ -33,6 +35,14 @@ public class LEDDefaultCommand extends Command {
         if (vision.oneCameraDisconnected()) {
             // flash if camera disconnected
             led.setStrobeLights(255, 100, 0);
+        } else if (fiveSecondsBeforeChange() && allianceIsRed) {
+            // blink alliance color and rumble if red alliance 5 seconds before hub shifts
+            led.setStrobeLights(255, 0, 0);
+            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+        } else if (fiveSecondsBeforeChange()) {
+            // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
+            led.setStrobeLights(0, 0, 255);
+            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
         } else if (playingDefense()) {
             // When playing defense
             led.defenseLights();
@@ -63,11 +73,6 @@ public class LEDDefaultCommand extends Command {
         }
     }
 
-    // private boolean climbAligned() {
-    //     double yCoordinate = drivetrain.getPose().getY();
-    //     return Math.abs(yCoordinate - climbYCoordinate) < 0.03;
-    // }
-
     private boolean playingDefense() {
         double xCoordinate = drivetrain.getPose().getX();
         double xCoordinateHalfway = 50;
@@ -75,6 +80,14 @@ public class LEDDefaultCommand extends Command {
             return xCoordinate > xCoordinateHalfway;
         } else if (!allianceIsRed) {
             return xCoordinate < xCoordinateHalfway;
+        }
+        return false;
+    }
+
+    private boolean fiveSecondsBeforeChange() {
+        double time = DriverStation.getMatchTime();
+        if((time <= 135 && time >= 130) || (time <= 110 && time >= 105) || (time <= 85 && time >= 80) || (time <= 60 && time >= 55) || (time <= 35 && time >= 30)){
+            return true;
         }
         return false;
     }
