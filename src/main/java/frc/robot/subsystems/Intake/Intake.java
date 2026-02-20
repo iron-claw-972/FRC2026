@@ -5,11 +5,9 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -62,6 +60,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
 
+    private double setpointInches = 0.0;
+
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake() {
@@ -77,13 +77,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // Configure the motors
         // Build the configuration for the roller
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
-
-        // config the current limits (low value for testing)
-        rollerConfig.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.ROLLER_CURRENT_LIMITS)
-        .withSupplyCurrentLimitEnable(true);
 
         // config Slot 0 PID params
         var slot0Configs = rollerConfig.Slot0;
@@ -111,7 +104,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // config Slot 0 PID params
         var rollerSlot0Configs = config.Slot0;
-        // TODO: set PID parameters
         rollerSlot0Configs.kP = 5.0;
         rollerSlot0Configs.kI = 0.0;
         rollerSlot0Configs.kD = 0.0;
@@ -121,21 +113,19 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
-        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
-        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
+        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2 * 1.5;
+        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2 * 1.5;
 
-        // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
-        // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Brake)
+            .withNeutralMode(NeutralModeValue.Coast)
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake)
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
         leftMotor.setPosition(0.0);
@@ -152,19 +142,18 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // add some test commands.
         SmartDashboard.putData("Extension Mechanism", mechanism);
-        SmartDashboard.putData("Extend Intake", new InstantCommand(this::extend));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(this::retract));
-        SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
-        SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
-        SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.8), this));
-        SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.5), this));
-        SmartDashboard.putData("Roller Stop", new InstantCommand(() -> this.spin(0.0), this));
-        SmartDashboard.putData("Zero Motors", new InstantCommand(this::zeroMotors));
+        SmartDashboard.putData("START INTAKE COMMAND", new InstantCommand(()->{
+            extend();
+            spinStart();
+        }));
+        SmartDashboard.putData("END INTAKE COMMAND", new InstantCommand(()->{
+            intermediateExtend();
+            spinStop();
+        }));
+        
 
 
         if (RobotBase.isSimulation()) {
-            // build the simulation resources
-
             // Extender simulation
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
@@ -195,8 +184,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     public void periodic() {
         // Report position to SmartDashboard
         double inchExtension = getPosition();
-        SmartDashboard.putNumber("Intake Position:", inchExtension);
-        //Logger.recordOutput("Intake/Setpoint", rotationsToInches(voltageRequest.getPositionMeasure().));
+        Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
         // Report velocity to SmartDashbboard
@@ -234,10 +222,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
         rollerSim.setInputVoltage(voltage);
         rollerSim.update(0.020);
-        // Sanity check:
-        // the X44 has a top speed of 7530 RPM = 125 RPS
-        // If the drive is 0.2, then ultimate speed should be 125 RPS * 0.2 = 25 RPS
-        // result is 26 RPS.
+
         double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
 
         rollerMotor.getSimState().setRotorVelocity(velocity);
@@ -248,9 +233,11 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations =inchesToRotations(setpoint);
+        double motorRotations = inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
+
+        setpointInches = setpoint;
     }
 
     /**
@@ -258,8 +245,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @return inches
      */
     public double getPosition(){
-        double motorRotations = rightMotor.getPosition().getValueAsDouble();
-        return rotationsToInches(motorRotations);
+        return inputs.leftPosition;
     }
 
     /**
@@ -309,15 +295,31 @@ public class Intake extends SubsystemBase implements IntakeIO{
         spin(0.0);
     }
 
+    /**
+     * Reverses the intake roller
+     */
+    public void spinReverse(){
+        spin(-IntakeConstants.SPEED);
+    }
+
     /** Extend the intake the maximum distance. */
     public void extend() {
        setPosition(IntakeConstants.MAX_EXTENSION);
     }
 
-    /** Retract the intake to its starting position. */
-    public void retract(){
-        setPosition(IntakeConstants.STARTING_POINT);
+    /** Extend to a position that doesn't hit the spindexer */
+    public void intermediateExtend(){
+        setPosition(IntakeConstants.INTERMEDIATE_EXTENSION);
+    }
 
+    /** Retract the intake to a safe starting position. */
+    public void retract(){
+        setPosition(IntakeConstants.STOW_EXTENSION);
+    }
+
+    /** Goes to the zero position */
+    public void zeroPosition(){
+        setPosition(0.0);
     }
 
     public void zeroMotors() {
