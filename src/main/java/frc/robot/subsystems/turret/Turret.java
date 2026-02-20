@@ -164,7 +164,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("CRT thing out", Units.rotationsToDegrees(turretRotations));
 
 		double motorRotations = turretRotations * TurretConstants.TURRET_GEAR_RATIO;
-		// motor.setPosition(motorRotations);
+		motor.setPosition(motorRotations);
 
 		
 		// Position extrapolation
