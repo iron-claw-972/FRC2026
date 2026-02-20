@@ -82,11 +82,24 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     intake.spinStart();
                     intakeBoolean = false;
                 } else {
-                    intake.retract();
+                    intake.intermediateExtend();
                     intake.spinStop();
                     intakeBoolean = true;
                 }
             }));
+
+            // Retract if hold for 3 seconds
+            driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(()->{
+                intake.retract();
+                intakeBoolean = true;
+            }));
+        }
+
+        // Spindexer
+        if (spindexer != null){
+            // Will only run if we are not calling default shoot command
+            driver.get(PS5Button.LB).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
+            .onFalse(new InstantCommand(()-> spindexer.stopSpindexer()));
         }
 
         // Auto shoot
