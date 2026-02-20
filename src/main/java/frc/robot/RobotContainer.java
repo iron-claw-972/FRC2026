@@ -94,18 +94,18 @@ public class RobotContainer {
         intake = new Intake();
 
       case WaffleHouse: // AKA Betabot
-        turret = new Turret();
-        shooter = new Shooter();
-        hood = new Hood();
+        // turret = new Turret();
+        // shooter = new Shooter();
+        // hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        //vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-        linearClimb = new LinearClimb();
+        //linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 

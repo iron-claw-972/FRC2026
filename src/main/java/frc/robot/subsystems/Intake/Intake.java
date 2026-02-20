@@ -194,7 +194,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         SmartDashboard.putNumber("Roller Velocity", velocity);
 
         if(calibrating){
-            leftMotor.set(-0.1);
+            leftMotor.set(0.1);
             rightMotor.set(-0.1);
         }
 
@@ -359,6 +359,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         zeroMotors();
         setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
         retract();
+        
     }
 
     /**
