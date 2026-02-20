@@ -150,8 +150,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
             intermediateExtend();
             spinStop();
         }));
-        
-
 
         if (RobotBase.isSimulation()) {
             // Extender simulation
