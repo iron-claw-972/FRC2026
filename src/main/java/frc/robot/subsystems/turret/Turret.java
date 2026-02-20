@@ -91,14 +91,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		}
 		SmartDashboard.putData("Turret Mech", mech);
 
-		
-		// Do this for both encoders in the constructor
 		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-
 		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
 
 		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-
 		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
 		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
