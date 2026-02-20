@@ -125,6 +125,7 @@ public class Intake extends SubsystemBase {
         // apply the configuration to the right motor (master)
         rightMotor.getConfigurator().apply(config);
 
+        //left motor is weaker
         // apply the configuration to the left motor (slave)
         leftMotor.getConfigurator().apply(config);
 
@@ -147,7 +148,7 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putData("Intake On", new InstantCommand(this::spinStart));
         SmartDashboard.putData("Intake Off", new InstantCommand(this::spinStop));
         SmartDashboard.putData("Roller Spin Forward",  new InstantCommand(() -> this.spin(0.8), this));
-        SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.5), this));
+        SmartDashboard.putData("Roller Spin Reverse", new InstantCommand(() -> this.spin(-0.8), this));
         SmartDashboard.putData("Roller Stop", new InstantCommand(() -> this.spin(0.0), this));
         SmartDashboard.putData("Zero Motors", new InstantCommand(this::zeroMotors));
 
