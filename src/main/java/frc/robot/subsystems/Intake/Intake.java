@@ -70,8 +70,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
         double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
-        // safety margin, limits velocity to half free speed
-        maxVelocity = 0.5 * maxFreeSpeed;
+        // safety margin, limits velocity to .75 free speed
+        maxVelocity = 0.75 * maxFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
         // Configure the motors
@@ -113,8 +113,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
-        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2 * 1.5;
-        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2 * 1.5;
+        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
+        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
 
         rightMotor.getConfigurator().apply(config);
         leftMotor.getConfigurator().apply(config);
