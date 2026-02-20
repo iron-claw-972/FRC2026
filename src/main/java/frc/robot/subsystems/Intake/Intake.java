@@ -62,6 +62,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     private double setpointInches = 0.0;
 
+    private boolean calibrating = false;
+
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake() {
@@ -189,6 +191,11 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // this returns rotations per second.
         double velocity = rollerMotor.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Roller Velocity", velocity);
+
+        if(calibrating){
+            leftMotor.set(-0.1);
+            rightMotor.set(-0.1);
+        }
 
         updateInputs();
         Logger.processInputs("Intake", inputs);
@@ -336,7 +343,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void calibrate(){
-        
+        calibrating = true;
+    }
+    public void stopCalibrating(){
+        calibrating = false;
+        zeroMotors();
+        retract();
     }
 
     @Override
