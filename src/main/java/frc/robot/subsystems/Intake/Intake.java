@@ -335,6 +335,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
         rollerMotor.close();
     }
 
+    public void calibrate(){
+        
+    }
+
     @Override
     public void updateInputs() {
         inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
