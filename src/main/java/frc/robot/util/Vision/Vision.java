@@ -95,6 +95,12 @@ public class Vision {
         }
       }
     }
+
+    Pose3d[] tags = new Pose3d[FieldConstants.field.getTags().size()];
+    for (int i = 0; i < FieldConstants.field.getTags().size(); i++) {
+      tags[i] = (FieldConstants.field.getTagPose(i+1).get());
+    }
+    Logger.recordOutput("AprilTags", tags);
   }
 
 
