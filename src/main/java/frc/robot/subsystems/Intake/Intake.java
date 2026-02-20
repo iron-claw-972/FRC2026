@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -27,7 +29,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
     private final Mechanism2d mechanism;
     private final MechanismLigament2d robotExtension;
@@ -59,6 +61,8 @@ public class Intake extends SubsystemBase {
     private ElevatorSim intakeSim;
 
     private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
+
+    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake() {
      
@@ -192,6 +196,7 @@ public class Intake extends SubsystemBase {
         // Report position to SmartDashboard
         double inchExtension = getPosition();
         SmartDashboard.putNumber("Intake Position:", inchExtension);
+        //Logger.recordOutput("Intake/Setpoint", rotationsToInches(voltageRequest.getPositionMeasure().));
         robotExtension.setLength(inchExtension);
 
         // Report velocity to SmartDashbboard
@@ -199,6 +204,8 @@ public class Intake extends SubsystemBase {
         double velocity = rollerMotor.getVelocity().getValueAsDouble();
         SmartDashboard.putNumber("Roller Velocity", velocity);
 
+        updateInputs();
+        Logger.processInputs("Intake", inputs);
     }
 
     public void simulationPeriodic(){
@@ -327,4 +334,13 @@ public class Intake extends SubsystemBase {
         rightMotor.close();
         rollerMotor.close();
     }
+
+    @Override
+    public void updateInputs() {
+        inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
+        inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
+        inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+    }
+
 }
