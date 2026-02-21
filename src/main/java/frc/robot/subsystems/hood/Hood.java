@@ -134,7 +134,12 @@ public class Hood extends SubsystemBase implements HoodIO{
 	public void calibrate(){
 		calibrating = true;
 		setCurrentLimits(HoodConstants.CALIBRATING_CURRENT_LIMIT);
-		calibrateDebouncer.calculate(calibrating)
+		boolean atZero = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
+		boolean calibrated = calibrateDebouncer.calculate(atZero);
+		if (calibrated){
+			calibrating = false;
+			motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
+		}
 	}
 
 	/**
