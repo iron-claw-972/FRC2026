@@ -180,11 +180,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
-        // Report velocity to SmartDashbboard
-        // this returns rotations per second.
-        double velocity = rollerMotor.getVelocity().getValueAsDouble();
-        SmartDashboard.putNumber("Roller Velocity", velocity);
-
         if(calibrating){
             leftMotor.set(0.1);
             rightMotor.set(-0.1);
@@ -195,7 +190,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void simulationPeriodic(){
-        // simulate the motor activities
 
         // get the applied motor voltage
         double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
@@ -376,6 +370,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
         inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
     }
 
 }
