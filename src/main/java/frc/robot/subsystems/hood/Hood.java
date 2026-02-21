@@ -36,7 +36,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     
 		config.Slot0.kP = 2.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation

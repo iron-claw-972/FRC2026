@@ -122,11 +122,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     }));
         }
 
+        // Climb
         if (climb != null) {
+            // Calibration
             driver.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
                 climb.hardstopCalibration();
             })).onFalse(new InstantCommand(() -> {
                 climb.stopCalibrating();
+            }));
+
+            // Climb climb
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(()-> {
+                climb.goDown();
             }));
         }
     }

@@ -21,9 +21,9 @@ public class IntakeConstants {
 
 
     /** max extension in inches */
-    public static final double MAX_EXTENSION = 10.0; // inches
+    public static final double MAX_EXTENSION = 10.0 - 2.0; // inches
 
-    public static final double INTERMEDIATE_EXTENSION = 5.0; //inches
+    public static final double INTERMEDIATE_EXTENSION = 5.0 - 2.0; //inches
 
     public static final double STOW_EXTENSION = 0.2; // inches
 
