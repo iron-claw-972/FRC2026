@@ -65,7 +65,7 @@ public class VisionConstants {
     /**
      * The maximum distance to the tag to use
      */
-    public static final double MAX_DISTANCE = 2;
+    public static final double MAX_DISTANCE = 999;
 
     /** If vision should use manual calculations */
     public static final boolean USE_MANUAL_CALCULATIONS = true;
@@ -128,7 +128,7 @@ public class VisionConstants {
      * <p>
      * Only affects calculations using PhotonVision, not manual calculations.
      */
-    public static final double HIGHEST_AMBIGUITY = 0.01;
+    public static final double HIGHEST_AMBIGUITY = 1.00;
 
     public static final int MAX_EMPTY_TICKS = 10;
 
@@ -153,7 +153,7 @@ public class VisionConstants {
     public static final ArrayList<Pair<String, Transform3d>> APRIL_TAG_CAMERAS = new ArrayList<Pair<String, Transform3d>>(
             List.of(
                 new Pair<String, Transform3d>(
-                        "CameraFront",
+                        "CameraRight",
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(10.485), Units.inchesToMeters(10.217),
                                         Units.inchesToMeters(11.012)),

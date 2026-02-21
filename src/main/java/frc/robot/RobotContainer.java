@@ -105,7 +105,7 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        linearClimb = new LinearClimb();
+        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 

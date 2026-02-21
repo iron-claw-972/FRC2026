@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -111,6 +112,7 @@ public class Drivetrain extends SubsystemBase {
     private double centerOfMassHeight = 0;
 
     private Rotation2d rawGyroRotation = new Rotation2d();
+
 
 
     /**
@@ -355,6 +357,27 @@ public class Drivetrain extends SubsystemBase {
             modules[i].setDesiredState(swerveModuleStates[i], isOpenLoop);
         }
     }
+
+    private boolean trenchAssist = false;
+    private boolean trenchAlign = false;
+
+    public boolean getTrenchAssist() {
+        return trenchAssist;
+    }
+
+    public boolean getTrenchAlign() {
+        return trenchAlign;
+    }
+
+    public void setTrenchAssist(boolean target){
+        trenchAssist = target;
+    }
+
+    public void setTrenchAlign(boolean target){
+        trenchAlign = target;
+    }
+
+
 
     /**
      * Sets the chassis speeds of the robot.

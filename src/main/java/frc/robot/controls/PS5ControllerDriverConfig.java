@@ -74,61 +74,70 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
-        // Intake
-        if (intake != null) {
-            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
-                if (intakeBoolean) {
-                    intake.extend();
-                    intake.spinStart();
-                    intakeBoolean = false;
-                } else {
-                    intake.intermediateExtend();
-                    intake.spinStop();
-                    intakeBoolean = true;
-                }
-            }));
+        driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
+            .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
 
-            // Retract if hold for 3 seconds
-            driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(()->{
-                intake.retract();
-                intakeBoolean = true;
-            }));
+        driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
+            .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
 
-            // Calibration
-            driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(()->{
-                intake.calibrate();
-            })).onFalse(new InstantCommand(()->{
-                intake.stopCalibrating();
-            }));
-        }
 
-        // Spindexer
-        if (spindexer != null){
-            // Will only run if we are not calling default shoot command
-            driver.get(PS5Button.LB).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
-            .onFalse(new InstantCommand(()-> spindexer.stopSpindexer()));
-        }
 
-        // Auto shoot
-        if (turret != null) {
-            driver.get(PS5Button.SQUARE).onTrue(
-                    new InstantCommand(() -> {
-                        if (autoShoot != null && autoShoot.isScheduled()) {
-                            autoShoot.cancel();
-                        } else {
-                            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
-                            CommandScheduler.getInstance().schedule(autoShoot);
-                        }
-                    }));
-        }
 
-        if (climb != null) {
-            driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
-                climb.hardstopCalibration();
-            })).onFalse(new InstantCommand(() -> {
-                climb.stopCalibrating();
-            }));
-        }
+        // // Intake
+        // if (intake != null) {
+        //     driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
+        //         if (intakeBoolean) {
+        //             intake.extend();
+        //             intake.spinStart();
+        //             intakeBoolean = false;
+        //         } else {
+        //             intake.intermediateExtend();
+        //             intake.spinStop();
+        //             intakeBoolean = true;
+        //         }
+        //     }));
+
+        //     // Retract if hold for 3 seconds
+        //     driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(()->{
+        //         intake.retract();
+        //         intakeBoolean = true;
+        //     }));
+
+        //     // Calibration
+        //     driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(()->{
+        //         intake.calibrate();
+        //     })).onFalse(new InstantCommand(()->{
+        //         intake.stopCalibrating();
+        //     }));
+        // }
+
+        // // Spindexer
+        // if (spindexer != null){
+        //     // Will only run if we are not calling default shoot command
+        //     driver.get(PS5Button.LB).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
+        //     .onFalse(new InstantCommand(()-> spindexer.stopSpindexer()));
+        // }
+
+        // // Auto shoot
+        // if (turret != null) {
+        //     driver.get(PS5Button.SQUARE).onTrue(
+        //             new InstantCommand(() -> {
+        //                 if (autoShoot != null && autoShoot.isScheduled()) {
+        //                     autoShoot.cancel();
+        //                 } else {
+        //                     autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
+        //                     CommandScheduler.getInstance().schedule(autoShoot);
+        //                 }
+        //             }));
+        // }
+
+        // if (climb != null) {
+        //     driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
+        //         climb.hardstopCalibration();
+        //     })).onFalse(new InstantCommand(() -> {
+        //         climb.stopCalibrating();
+        //     }));
+        // }
     }
 
     @Override

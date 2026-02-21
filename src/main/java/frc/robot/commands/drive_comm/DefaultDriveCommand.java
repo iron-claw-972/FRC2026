@@ -1,12 +1,19 @@
 package frc.robot.commands.drive_comm;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.util.TrenchAssist.TrenchAssist;
+import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 import frc.robot.util.Vision.DriverAssist;
 
 
@@ -15,7 +22,7 @@ import frc.robot.util.Vision.DriverAssist;
  */
 public class DefaultDriveCommand extends Command {
     protected final Drivetrain swerve;
-    private final BaseDriverConfig driver;
+    protected final BaseDriverConfig driver;
 
     public DefaultDriveCommand(
             Drivetrain swerve,
@@ -30,6 +37,9 @@ public class DefaultDriveCommand extends Command {
     public void initialize() {
         swerve.setStateDeadband(true);
     }
+
+    private boolean trenchAlign = false;
+    private boolean trenchAssist = true;
 
     @Override
     public void execute() {
@@ -50,7 +60,32 @@ public class DefaultDriveCommand extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(swerve, driverInput, swerve.getDesiredPose(), true);
 
-        drive(corrected);
+        Logger.recordOutput("TrenchAlign", swerve.getTrenchAlign());
+        if (swerve.getTrenchAlign()) {
+            for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
+                if (rectangle.contains(swerve.getPose().getTranslation())) {
+                    swerve.setIsAlign(true);
+
+                    if (swerve.getPose().getRotation().getDegrees() > 90
+                            && swerve.getPose().getRotation().getDegrees() < 270) {
+                        swerve.setAlignAngle(0.0);
+                    } else if (swerve.getPose().getRotation().getDegrees() > 270
+                            && swerve.getPose().getRotation().getDegrees() < 90) {
+                        swerve.setAlignAngle(Units.degreesToRadians(180));
+                    }
+                } else {
+                    swerve.setIsAlign(false);
+                }
+            }
+        }
+
+
+        Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
+        if (swerve.getTrenchAssist()){
+            drive(TrenchAssist.calculate(swerve, corrected));
+        } else {
+            drive(corrected);
+        }
     }
 
     /**
