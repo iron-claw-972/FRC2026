@@ -30,6 +30,8 @@ public class Hood extends SubsystemBase implements HoodIO{
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
+	private boolean calibrating = false;
+
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
     public Hood(){
@@ -115,7 +117,11 @@ public class Hood extends SubsystemBase implements HoodIO{
 
         Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
-		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()) / HoodConstants.HOOD_GEAR_RATIO);
+		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
+
+	}
+
+	public void calibrate(){
 
 	}
 
