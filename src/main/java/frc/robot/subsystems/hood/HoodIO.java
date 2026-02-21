@@ -4,8 +4,10 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface HoodIO {
     @AutoLog
-    public static class HoodInputsIO{
-        double measuredAngle = 0.0;
+    public static class HoodIOInputs{
+        public double positionDeg = HoodConstants.MAX_ANGLE;
+        public double velocityRadPerSec = 0.0;
+        public double motorCurrent = 0.0;
     }
 
     public void updateInputs();

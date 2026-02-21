@@ -73,14 +73,32 @@ public class Robot extends LoggedRobot {
         // To Set the Robot Identity
         //   SimGUI: Persistent Values, Preferences, RobotId, then restart Simulation
         //     changes networktables.json, networktables.json.bck (both Untracked)
-        //   Uncomment the next line, set the desired RobotId, deploydate, and then comment the line out
-        //RobotId.setRobotId(RobotId.WaffleHouse);
-        System.out.println("ROBOT ID: " + RobotId.getRobotId()); 
-        DriveConstants.update(RobotId.getRobotId());
+        //   Uncomment the next line, set the desired RobotId, deploy, and then comment the line out
+        //  RobotId.setRobotId(RobotId.SwerveCompetition);
+        
         RobotController.setBrownoutVoltage(6.0);
         // obtain this robot's identity
         RobotId robotId = RobotId.getRobotId();
 
+        DriveConstants.update(robotId);
+
+        // Record metadata
+        Logger.recordMetadata("ProjectName", BuildData.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildData.BUILD_DATE);
+        Logger.recordMetadata("GitSHA", BuildData.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildData.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildData.GIT_BRANCH);
+        switch (BuildData.DIRTY) {
+        case 0:
+            Logger.recordMetadata("GitDirty", "All changes committed");
+            break;
+        case 1:
+            Logger.recordMetadata("GitDirty", "Uncomitted changes");
+            break;
+        default:
+            Logger.recordMetadata("GitDirty", "Unknown");
+            break;
+        }
 
         robotContainer = new RobotContainer(robotId);
         

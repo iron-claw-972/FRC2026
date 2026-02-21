@@ -21,19 +21,33 @@ public class IdConstants {
     // LEDs
     public static final int CANDLE_ID = 1;
 
-    //TODO: get actual ID constants
+    // Turret
+    public static final int TURRET_MOTOR_ID = 20;
+    public static final int TURRET_ENCODER_LEFT_ID = 0;
+    public static final int TURRET_ENCODER_RIGHT_ID = 1;
 
-    //Shooter
-    public static final int SHOOTER_LEFT_ID = 6;
+    // Shooter
+    public static final int SHOOTER_LEFT_ID = 10;
     public static final int SHOOTER_RIGHT_ID = 4;
-    public static final int FEEDER_ID = 3;
-    public static final int SHOOTER_SENSOR_ID = 1;
+    public static final int FEEDER_ID = 21;
 
-    //Hood
-    public static final int HOOD_MOTOR_ID = 5;
+    // Climb
+    public static final int CLIMB_MOTOR_LEFT = 48;
+    public static final int CLIMB_MOTOR_RIGHT = 49;
+
+    // Hood
+    public static final int HOOD_ID = 11;
+
+    // Spindexer
+    public static final int SPINDEXER_ID = 12;
     
-    //Intake
-    public static final int BASE_MOTOR_ID = 7;
-    public static final int FLYWHEEL_MOTOR_ID = 8;
-    public static final int INTAKE_ENCODER_ID = 2;
+    // Climb
+    public static final int CLIMB_MOTOR_ID = 8;
+
+    // Intake
+    // extender right and left motor CAN ID
+    public static final int RIGHT_MOTOR_ID = 1;
+    public static final int LEFT_MOTOR_ID = 2;
+    // roller motor CAN ID
+    public static final int ROLLER_MOTOR_ID = 3;
 }
