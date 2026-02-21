@@ -190,7 +190,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void simulationPeriodic(){
-
         // get the applied motor voltage
         double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
 
