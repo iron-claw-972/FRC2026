@@ -2,6 +2,7 @@ package frc.robot.subsystems.hood;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -9,7 +10,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +34,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
 	private boolean calibrating = false;
+	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
@@ -50,6 +54,8 @@ public class Hood extends SubsystemBase implements HoodIO{
 		mm.MotionMagicAcceleration = Units.radiansToRotations(HoodConstants.MAX_ACCELERATION) * HoodConstants.HOOD_GEAR_RATIO; // Lowered for belt safety
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
         motor.getConfigurator().apply(config);
+
+		setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
 
 		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
@@ -110,10 +116,14 @@ public class Hood extends SubsystemBase implements HoodIO{
 		// Multiply goal velocity by kV
 		double velocityCompensation = goalVelocityRadPerSec * HoodConstants.FEEDFORWARD_KV;
 
-		// Set control with feedforward
-		motor.setControl(mmVoltageRequest
+		if (calibrating){
+			motor.set(0.1);
+		} else{
+			// Set control with feedforward
+			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
 			.withFeedForward(velocityCompensation));
+		}
 
         Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
@@ -122,8 +132,24 @@ public class Hood extends SubsystemBase implements HoodIO{
 	}
 
 	public void calibrate(){
-
+		calibrating = true;
+		setCurrentLimits(HoodConstants.CALIBRATING_CURRENT_LIMIT);
+		calibrateDebouncer.calculate(calibrating)
 	}
+
+	/**
+     * sets supply and stator current limits
+     * @param limitAmps the current limit for stator and supply current
+     */
+    public void setCurrentLimits(double limitAmps) {
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(limitAmps)
+        .withSupplyCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(limitAmps);
+
+        motor.getConfigurator().apply(limits);
+    }
 
     @Override
 	public void updateInputs() {
