@@ -32,6 +32,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
     private Command autoShoot = null;
+    private Command reverseMotors = null;
     private Shooter shooter;
     private Turret turret;
     private Hood hood;
@@ -63,7 +64,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+        driver.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
@@ -76,9 +77,20 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
+        // Reverse motors
+        if (intake != null && spindexer != null && shooter != null){
+            driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(()->{
+                reverseMotors = new ReverseMotors(intake, spindexer, shooter);
+                reverseMotors.schedule();
+            })
+            ).onFalse(new InstantCommand(()->{
+                reverseMotors.cancel();
+            }));
+        }
+
         // Intake
         if (intake != null) {
-            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
+            driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
                 if (intakeBoolean) {
                     intake.extend();
                     intake.spinStart();
@@ -91,7 +103,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Retract if hold for 3 seconds
-            driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(()->{
+            driver.get(PS5Button.RIGHT_TRIGGER).debounce(3.0).onTrue(new InstantCommand(()->{
                 intake.retract();
                 intakeBoolean = true;
             }));
@@ -104,17 +116,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
         }
 
-        // Reverse motors
-        if (intake != null && spindexer != null && shooter != null){
-            driver.get(PS5Button.CIRCLE).onTrue(
-                new ReverseMotors(intake, spindexer, shooter)
-            );
-        }
-
         // Spindexer
         if (spindexer != null){
             // Will only run if we are not calling default shoot command
-            driver.get(PS5Button.LB).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
+            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
             .onFalse(new InstantCommand(()-> spindexer.stopSpindexer()));
         }
 
@@ -141,7 +146,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Climb climb
-            driver.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(()-> {
+            driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()-> {
                 climb.goDown();
             }));
         }

@@ -44,9 +44,8 @@ public class ReverseMotors extends Command {
 
     @Override
     public void end(boolean interrupted){
-        intake.spinStop();
-        spindexer.stopSpindexer();
-        shooter.setShooter(0);
+        intake.spinStart();
+        spindexer.maxSpindexer();
     }
 
 }
