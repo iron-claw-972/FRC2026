@@ -10,6 +10,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,20 +28,16 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     /** whether the subsysgtem is calibrating */
     private boolean calibrating = false;
 
-    // why not use the ClimbConstants directly?
-    private double downPosition = ClimbConstants.BOTTOM_POSITION;
-    private double upPosition = ClimbConstants.UP_POSITION;
-    private double climbPosition = ClimbConstants.CLIMB_POSITION;
-
     /** should the subsystem perform calibration automatically */
     private boolean calibrateOnStartUp = false;
 
     private double MAX_POWER = 0.2;
 
+    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
+
     // logging information
     private LinearClimbIOInputs inputs = new LinearClimbIOInputs();
 
-    // TODO: what units?
     private final PIDController pid = new PIDController(
             ClimbConstants.PID_P,
             ClimbConstants.PID_I,
@@ -139,6 +137,10 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
             power = MathUtil.clamp(power, -MAX_POWER, MAX_POWER);
         } else{
             power = ClimbConstants.CALIBRATION_POWER;
+            boolean atHardStop = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= ClimbConstants.CALIBRATION_CURRENT_THRESHOLD;
+            if(calibrationDebouncer.calculate(atHardStop)){
+                stopCalibrating();
+            }
         }
         motor.set(power);
         
@@ -195,10 +197,10 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * stops calibration and sets current limits to normal. 
      */
     public void stopCalibrating() {
-        motor.setPosition((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        motor.setPosition(metersToRotations(ClimbConstants.BOTTOM_POSITION));
         calibrating = false;
         setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
-        setSetpoint((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        setSetpoint(metersToRotations(ClimbConstants.BOTTOM_POSITION));
     }
 
     @Override

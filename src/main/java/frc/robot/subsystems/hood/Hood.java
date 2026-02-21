@@ -118,6 +118,11 @@ public class Hood extends SubsystemBase implements HoodIO{
 
 		if (calibrating){
 			motor.set(0.1);
+			boolean atZero = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
+			boolean calibrated = calibrateDebouncer.calculate(atZero);
+			if (calibrated){
+				stopCalibrating();
+			}
 		} else{
 			// Set control with feedforward
 			motor.setControl(mmVoltageRequest
@@ -134,13 +139,13 @@ public class Hood extends SubsystemBase implements HoodIO{
 	public void calibrate(){
 		calibrating = true;
 		setCurrentLimits(HoodConstants.CALIBRATING_CURRENT_LIMIT);
-		boolean atZero = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
-		boolean calibrated = calibrateDebouncer.calculate(atZero);
-		if (calibrated){
-			calibrating = false;
-			motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
-			setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
-		}
+	}
+
+	public void stopCalibrating(){
+		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
+		goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
+		setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
+		calibrating = false;
 	}
 
 	/**

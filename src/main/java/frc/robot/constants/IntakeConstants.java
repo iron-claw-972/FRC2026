@@ -12,7 +12,8 @@ public class IntakeConstants {
     /**right and left motor current limits */
     public static final double EXTENDER_CURRENT_LIMITS = 40.0;
     /**Current limits when calibrating */
-    public static final double CALIBRATING_CURRENT_LIMITS = 30.0;
+    public static final double CALIBRATING_CURRENT_LIMITS = 10.0;
+    public static final double CALIBRATING_CURRENT_THRESHOLD = 9.0;
 
     public static final double ROLLER_MOI_KG_M_SQ = 0.5 * 0.020 * 0.020; // 0.5kg roller, 20mm radius for now
     public static final double ROLLER_GEARING = 2.0;

@@ -109,7 +109,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Calibration
-            driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(()->{
+            driver.get(PS5Button.PS).onTrue(new InstantCommand(()->{
                 intake.calibrate();
             })).onFalse(new InstantCommand(()->{
                 intake.stopCalibrating();

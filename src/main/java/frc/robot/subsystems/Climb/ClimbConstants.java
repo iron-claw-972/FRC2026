@@ -21,6 +21,7 @@ public class ClimbConstants {
     // CLIMB: High current for full-power climbing
     public final static double CALIBRATION_CURRENT = 7.0;
     public final static double CLIMB_CURRENT = 42.0;
+    public final static double CALIBRATION_CURRENT_THRESHOLD = 6.0;
 
     // PID Constants
     // TODO: what are the units? Inches? Meters?
