@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -100,6 +102,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             })).onFalse(new InstantCommand(()->{
                 intake.stopCalibrating();
             }));
+        }
+
+        // Reverse motors
+        if (intake != null && spindexer != null && shooter != null){
+            driver.get(PS5Button.CIRCLE).onTrue(
+                new ReverseMotors(intake, spindexer, shooter)
+            );
         }
 
         // Spindexer
