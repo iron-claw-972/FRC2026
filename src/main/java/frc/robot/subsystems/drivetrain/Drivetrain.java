@@ -344,6 +344,25 @@ public class Drivetrain extends SubsystemBase {
 
     // GETTERS AND SETTERS
 
+    private boolean trenchAssist = false;
+    private boolean trenchAlign = false;
+
+    public boolean getTrenchAssist() {
+        return trenchAssist;
+    }
+
+    public boolean getTrenchAlign() {
+        return trenchAlign;
+    }
+
+    public void setTrenchAssist(boolean target){
+        trenchAssist = target;
+    }
+
+    public void setTrenchAlign(boolean target){
+        trenchAlign = target;
+    }
+
     /**
      * Sets the desired states for all swerve modules.
      *
