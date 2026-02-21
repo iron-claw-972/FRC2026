@@ -110,7 +110,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Auto shoot
-        if (turret != null) {
+        if (turret != null && hood != null && shooter != null) {
             driver.get(PS5Button.SQUARE).onTrue(
                     new InstantCommand(() -> {
                         if (autoShoot != null && autoShoot.isScheduled()) {
@@ -123,7 +123,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         if (climb != null) {
-            driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
+            driver.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
                 climb.hardstopCalibration();
             })).onFalse(new InstantCommand(() -> {
                 climb.stopCalibrating();
