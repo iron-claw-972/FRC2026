@@ -59,6 +59,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         power = SpindexerConstants.spindexerMaxPower;
     }
 
+    public void reverseSpindexer(){
+        power = SpindexerConstants.spindexerReversePower;
+    }
+
     public void stopSpindexer() {
         power = 0.0;
     }
