@@ -9,8 +9,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
@@ -145,9 +148,28 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.stopCalibrating();
             }));
 
-            // Climb climb
+            // Climb retract
             driver.get(PS5Button.CROSS).onTrue(new InstantCommand(()-> {
-                climb.goDown();
+                climb.retract();
+            }));
+
+            // Drive to climb position and rumble
+            driver.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
+                new ClimbDriveCommand(climb, getDrivetrain()),
+                new InstantCommand(()-> this.startRumble()),
+                new WaitCommand(1),
+                new InstantCommand(()-> this.endRumble())
+            )
+            );
+        }
+
+        // Hood
+        if (hood != null) {
+            // Calibration
+            driver.get(PS5Button.PS).onTrue(new InstantCommand(()->{
+                hood.calibrate();
+            })).onFalse(new InstantCommand(()->{
+                hood.stopCalibrating();
             }));
         }
     }

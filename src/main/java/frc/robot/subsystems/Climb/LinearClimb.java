@@ -56,8 +56,8 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
-        SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
-        SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
+        SmartDashboard.putData("Go Down", new InstantCommand(() -> retract()));
+        SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition()));
 
         motor.setPosition(0);
 
@@ -116,7 +116,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     /**
      * goes to the down position
      */
-    public void goDown() {
+    public void retract() {
         MAX_POWER = 0.2;
         setSetpoint(metersToRotations(ClimbConstants.BOTTOM_POSITION));
     }
@@ -124,7 +124,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     /**
      * goes to the climb position
      */
-    public void climb() {
+    public void climbPosition() {
         MAX_POWER = 0.8;
         setSetpoint(metersToRotations(ClimbConstants.CLIMB_POSITION));
     }
