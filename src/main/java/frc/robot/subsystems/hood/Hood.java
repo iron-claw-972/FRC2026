@@ -139,6 +139,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 		if (calibrated){
 			calibrating = false;
 			motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
+			setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
 		}
 	}
 
