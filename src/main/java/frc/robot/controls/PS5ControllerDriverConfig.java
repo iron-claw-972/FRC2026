@@ -87,12 +87,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 reverseMotors.schedule();
             })
             ).onFalse(new InstantCommand(()->{
-                reverseMotors.cancel();
+                if(reverseMotors != null){
+                    reverseMotors.cancel();
+                }
             }));
         }
 
         // Intake
         if (intake != null) {
+            // Toggle intake
             driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
                 if (intakeBoolean) {
                     intake.extend();
