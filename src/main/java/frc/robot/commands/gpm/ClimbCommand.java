@@ -18,7 +18,8 @@ public class ClimbCommand extends SequentialCommandGroup{
                 new InstantCommand(() -> climb.goUp()),
                 new DriveToPose(drive, () -> FieldConstants.getClimbLocation())
             ),
-            new InstantCommand(() -> controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0))
+            // TODO: Make it stop rumbling after like a second
+            new InstantCommand(() -> controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0)) 
         );
     }
 
