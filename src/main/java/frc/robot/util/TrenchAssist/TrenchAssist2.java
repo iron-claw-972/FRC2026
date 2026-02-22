@@ -28,7 +28,7 @@ import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 
 public class TrenchAssist2 {
 
-    public static ChassisSpeeds calculate(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
+    public static ChassisSpeeds attempt2(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
         ChassisSpeeds speedsFieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeeds, drive.getYaw().unaryMinus()); //this singular unary minus is best we can get
         ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(speedsFieldRelative.vxMetersPerSecond, 0.0, speedsFieldRelative.omegaRadiansPerSecond);
 
@@ -39,21 +39,53 @@ public class TrenchAssist2 {
         return new ChassisSpeeds(y.getX(), y.getY(), x.omegaRadiansPerSecond);
     }
 
-    public static ChassisSpeeds funky(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
-        double yawRadians = drive.getYaw().unaryMinus().getRadians();
-        
-        double fieldRelativeX = chassisSpeeds.vxMetersPerSecond * Math.cos(yawRadians) - chassisSpeeds.vyMetersPerSecond * Math.sin(yawRadians);
-        double fieldRelativeY = chassisSpeeds.vxMetersPerSecond * Math.sin(yawRadians) + chassisSpeeds.vyMetersPerSecond * Math.cos(yawRadians);
-        
-        fieldRelativeY = 0;
-        
-        double neutralizedRobotX = fieldRelativeX * Math.cos(yawRadians) + fieldRelativeY * Math.sin(yawRadians);
-        double neutralizedRobotY = -fieldRelativeX * Math.sin(yawRadians) + fieldRelativeY * Math.cos(yawRadians);
+    public static ChassisSpeeds attempt3(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
+        ChassisSpeeds speedsFieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeeds, drive.getYaw().unaryMinus()); //this singular unary minus is best we can get
+        ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(speedsFieldRelative.vxMetersPerSecond, 0.0, speedsFieldRelative.omegaRadiansPerSecond);
 
-        var x = new Translation2d(neutralizedRobotX, neutralizedRobotY).rotateBy(drive.getYaw().unaryMinus());
+        Logger.recordOutput("slideTranslation", new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond));
 
-        return new ChassisSpeeds(x.getX(), x.getY(), chassisSpeeds.omegaRadiansPerSecond);
+        var x = new ChassisSpeeds(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+        var y = new Translation2d(x.vxMetersPerSecond, x.vyMetersPerSecond).rotateBy(drive.getYaw());
+
+        var z = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(y.getX(), y.getY(), x.omegaRadiansPerSecond), drive.getYaw());
+
+        return z;
     }
+
+    public static ChassisSpeeds calculate(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
+        //ChassisSpeeds speedsFieldRelative = ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeeds, drive.getYaw().unaryMinus()); //this singular unary minus is best we can get
+        ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, 0.0, chassisSpeeds.omegaRadiansPerSecond);
+
+        Logger.recordOutput("slideTranslation", new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond));
+
+        var x = new ChassisSpeeds(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+        var y = new Translation2d(x.vxMetersPerSecond, x.vyMetersPerSecond).rotateBy(drive.getYaw());
+
+        var z = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(y.getX(), y.getY(), x.omegaRadiansPerSecond), drive.getYaw());
+
+        return z;
+
+    }
+
+
+
+
+    // public static ChassisSpeeds funky(Drivetrain drive, ChassisSpeeds chassisSpeeds) {
+    //     double yawRadians = drive.getYaw().unaryMinus().getRadians();
+        
+    //     double fieldRelativeX = chassisSpeeds.vxMetersPerSecond * Math.cos(yawRadians) - chassisSpeeds.vyMetersPerSecond * Math.sin(yawRadians);
+    //     double fieldRelativeY = chassisSpeeds.vxMetersPerSecond * Math.sin(yawRadians) + chassisSpeeds.vyMetersPerSecond * Math.cos(yawRadians);
+        
+    //     fieldRelativeY = 0;
+        
+    //     double neutralizedRobotX = fieldRelativeX * Math.cos(yawRadians) + fieldRelativeY * Math.sin(yawRadians);
+    //     double neutralizedRobotY = -fieldRelativeX * Math.sin(yawRadians) + fieldRelativeY * Math.cos(yawRadians);
+
+    //     var x = new Translation2d(neutralizedRobotX, neutralizedRobotY).rotateBy(drive.getYaw().unaryMinus());
+
+    //     return new ChassisSpeeds(x.getX(), x.getY(), chassisSpeeds.omegaRadiansPerSecond);
+    // }
 
     public static ChassisSpeeds convertToChassisSpeedsRobotRelative(Translation2d translation, Drivetrain drive){
         Rotation2d yaw = drive.getYaw();

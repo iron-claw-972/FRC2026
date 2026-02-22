@@ -20,7 +20,7 @@ public class TrenchAssistConstants {
         new Rectangle2d(new Translation2d(99.99, 99.9), new Translation2d(0.0, 0.0)),
     };
 
-    public static final double[] SLIDE_ZONES = new double[]{
+    public static final double[] SLIDE_LATITUDES = new double[]{
         8.07 - Units.inchesToMeters(25.0),
         Units.inchesToMeters(25.0),
     };
