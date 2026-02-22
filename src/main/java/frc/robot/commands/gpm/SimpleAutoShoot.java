@@ -23,12 +23,10 @@ import frc.robot.subsystems.turret.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.FieldZone;
 import frc.robot.util.ShootingTarget;
-import frc.robot.util.Vision.TurretVision;
 
 public class SimpleAutoShoot extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
-    private TurretVision turretVision;
     private Shooter shooter;
 
     private double fieldAngleRad;
@@ -93,19 +91,6 @@ public class SimpleAutoShoot extends Command {
         // System.out.println("Aligning the turn to degree angle: " + turretSetpoint);
     }
 
-    public void adjustWithTurretCam() {
-        if(turretVision.canSeeTag(26) || turretVision.canSeeTag(10)){
-            // Adjust turret setpoint based on vision input
-            if(Robot.getAlliance() == Alliance.Blue){
-                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(26).get());
-            }
-            else{
-                yawToTagCamera = -1 * Units.radiansToDegrees(turretVision.getYawToTagRad(10).get());
-            }
-            double error = yawToTagCamera - yawToTag;
-            adjustedSetpoint = turretSetpoint + error;
-        }
-    }
 
     public void updateYawToTag(){
         // Calculate the yaw offset to the tag

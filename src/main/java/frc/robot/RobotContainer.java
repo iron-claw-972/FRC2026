@@ -59,7 +59,7 @@ public class RobotContainer {
   private Command auto = new DoNothing();
 
   // Controllers are defined here
-  private BaseDriverConfig driver = null;
+  private PS5ControllerDriverConfig driver = null;
   private Operator operator = null;
 
   /**

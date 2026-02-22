@@ -2,6 +2,7 @@ package frc.robot.util.TrenchAssist;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public class TrenchAssistConstants {
     public static final Rectangle2d[] OBSTACLES = new Rectangle2d[]{
@@ -19,5 +20,9 @@ public class TrenchAssistConstants {
         // new Rectangle2d(new Translation2d(99.99, 99.9), new Translation2d(0.0, 0.0)),
     };
 
+    public static final double[] SLIDE_ZONES = new double[]{
+        8.07 - Units.inchesToMeters(25.0),
+        Units.inchesToMeters(25.0),
+    };
 
 }

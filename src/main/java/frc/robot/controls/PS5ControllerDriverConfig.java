@@ -21,7 +21,7 @@ import lib.controllers.PS5Controller.PS5Button;
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
-    private final PS5Controller driver = new PS5Controller(Constants.DRIVER_JOY);
+    public final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
     private Command autoShoot = null;
@@ -40,27 +40,27 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
-        driver.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
+        controller.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
                 new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        driver.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+        controller.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
-        driver.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
+        controller.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
                 () -> getDrivetrain().setStateDeadband(false),
                 getDrivetrain()::alignWheels,
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
-        driver.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
+        controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
             .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
 
-        driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
+        controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
             .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
 
 
@@ -125,27 +125,27 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     @Override
     public double getRawSideTranslation() {
-        return driver.get(PS5Axis.LEFT_X);
+        return controller.get(PS5Axis.LEFT_X);
     }
 
     @Override
     public double getRawForwardTranslation() {
-        return driver.get(PS5Axis.LEFT_Y);
+        return controller.get(PS5Axis.LEFT_Y);
     }
 
     @Override
     public double getRawRotation() {
-        return driver.get(PS5Axis.RIGHT_X);
+        return controller.get(PS5Axis.RIGHT_X);
     }
 
     @Override
     public double getRawHeadingAngle() {
-        return Math.atan2(driver.get(PS5Axis.RIGHT_X), -driver.get(PS5Axis.RIGHT_Y)) - Math.PI / 2;
+        return Math.atan2(controller.get(PS5Axis.RIGHT_X), -controller.get(PS5Axis.RIGHT_Y)) - Math.PI / 2;
     }
 
     @Override
     public double getRawHeadingMagnitude() {
-        return Math.hypot(driver.get(PS5Axis.RIGHT_X), driver.get(PS5Axis.RIGHT_Y));
+        return Math.hypot(controller.get(PS5Axis.RIGHT_X), controller.get(PS5Axis.RIGHT_Y));
     }
 
     @Override
@@ -159,10 +159,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     }
 
     public void startRumble() {
-        driver.rumbleOn();
+        controller.rumbleOn();
     }
 
     public void endRumble() {
-        driver.rumbleOff();
+        controller.rumbleOff();
     }
 }

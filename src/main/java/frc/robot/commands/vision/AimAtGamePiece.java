@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
+import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.DetectedObject;
 
@@ -16,7 +17,7 @@ public class AimAtGamePiece extends DefaultDriveCommand {
     private static DetectedObject cachedObject;
   
 
-    public AimAtGamePiece(Drivetrain drive, BaseDriverConfig driver, Supplier<DetectedObject> objectSupplier){
+    public AimAtGamePiece(Drivetrain drive, PS5ControllerDriverConfig driver, Supplier<DetectedObject> objectSupplier){
         super(drive, driver);
         this.objectSupplier = objectSupplier;
     }

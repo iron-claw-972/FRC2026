@@ -3,6 +3,7 @@ package frc.robot.commands.drive_comm;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -11,21 +12,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
+import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.TrenchAssist.TrenchAssist;
+import frc.robot.util.TrenchAssist.TrenchAssist2;
 import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 import frc.robot.util.Vision.DriverAssist;
+import lib.controllers.PS5Controller.PS5Axis;
 
 /**
  * Default drive command. Drives robot using driver controls.
  */
 public class DefaultDriveCommand extends Command {
     protected final Drivetrain swerve;
-    protected final BaseDriverConfig driver;
+    protected final PS5ControllerDriverConfig driver;
 
     public DefaultDriveCommand(
             Drivetrain swerve,
-            BaseDriverConfig driver) {
+            PS5ControllerDriverConfig driver) {
         this.swerve = swerve;
         this.driver = driver;
 
@@ -45,6 +49,20 @@ public class DefaultDriveCommand extends Command {
         double forwardTranslation = driver.getForwardTranslation();
         double sideTranslation = driver.getSideTranslation();
         double rotation = -driver.getRotation();
+        // if (swerve.getTrenchAssist()) {
+        //     sideTranslation = Math
+        //             .sqrt(driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y)
+        //                     * driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y))
+        //             *
+        //             new Rotation2d(driver.controller.get(PS5Axis.LEFT_X), driver.controller.get(PS5Axis.LEFT_Y))
+        //                     .rotateBy(swerve.getYaw()).getCos();
+        //     forwardTranslation = Math
+        //             .sqrt(driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y)
+        //                     * driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y))
+        //             *
+        //             new Rotation2d(driver.controller.get(PS5Axis.LEFT_X), driver.controller.get(PS5Axis.LEFT_Y))
+        //                     .rotateBy(swerve.getYaw()).getSin();
+        // }
 
         double slowFactor = driver.getIsSlowMode() ? DriveConstants.SLOW_DRIVE_FACTOR : 1;
 
@@ -86,7 +104,7 @@ public class DefaultDriveCommand extends Command {
 
         Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         if (swerve.getTrenchAssist()) {
-            drive(TrenchAssist.calculate(swerve, corrected));
+            drive(TrenchAssist2.calculate(swerve, corrected));
         } else {
             drive(corrected);
         }
