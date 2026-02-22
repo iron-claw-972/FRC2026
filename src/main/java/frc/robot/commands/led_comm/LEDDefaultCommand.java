@@ -20,22 +20,20 @@ public class LEDDefaultCommand extends Command {
 
     private String gameData = DriverStation.getGameSpecificMessage();
 
-    public LEDDefaultCommand(LED led, Drivetrain drivetrain, Vision vision, PS5Controller controller) {
+    public LEDDefaultCommand(LED led) {
         this.led = led;
         // this.outtake = outtake;
-        this.drivetrain = drivetrain;
-        this.vision = vision;
-        this.controller = controller;
         addRequirements(led);
     }
 
     @Override
     public void execute() {
         double matchTime = DriverStation.getMatchTime();
-        if (vision.oneCameraDisconnected()) {
-            // flash if camera disconnected
-            led.setStrobeLights(255, 100, 0);
-        } else if (fiveSecondsBeforeChange() && allianceIsRed) {
+        // if (vision.oneCameraDisconnected()) {
+        //     // flash if camera disconnected
+        //     led.setStrobeLights(255, 100, 0);
+        // } else 
+        if (fiveSecondsBeforeChange() && allianceIsRed) {
             // blink alliance color and rumble if red alliance 5 seconds before hub shifts
             led.setStrobeLights(255, 0, 0);
             controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
@@ -43,10 +41,14 @@ public class LEDDefaultCommand extends Command {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
             controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
-        } else if (playingDefense()) {
-            // When playing defense
-            led.defenseLights();
-        } else if (DriverStation.isAutonomous() && allianceIsRed){
+        } else 
+        // if (playingDefense()) {
+        //     // When playing defense
+        //     //  TODO Need to remake defense lights, for some reason not there anymore
+        //     // led.defenseLights();
+        //     led.alternate(255, 0, 0, 0, 0, 255, 4, 0, 67);
+        // } else 
+        if (DriverStation.isAutonomous() && allianceIsRed){
             // Dimmer light for auto in red alliance
             led.setLEDs(100, 0, 0);
         } else if (DriverStation.isAutonomous()){
@@ -66,23 +68,27 @@ public class LEDDefaultCommand extends Command {
             led.setLEDs(0, 0, 0);
         } else if (allianceIsRed) {
             // Red alliance
-            led.setTwoColorWave(255, 0, 0, 255, 255, 255);
+            // TODO need to fix 2 color wave
+            //led.setTwoColorWave(255, 0, 0, 255, 255, 255);
+            led.setLEDs(255, 0, 0);
         } else {
             // Blue alliance
-            led.setTwoColorWave(0, 0, 255, 255, 255, 255);
+            // led.setTwoColorWave(0, 0, 255, 255, 255, 255);
+            // TODO remake 2 color wave
+            led.setLEDs(0, 0, 255);
         }
     }
 
-    private boolean playingDefense() {
-        double xCoordinate = drivetrain.getPose().getX();
-        double xCoordinateHalfway = 50;
-        if (allianceIsRed) {
-            return xCoordinate > xCoordinateHalfway;
-        } else if (!allianceIsRed) {
-            return xCoordinate < xCoordinateHalfway;
-        }
-        return false;
-    }
+    // private boolean playingDefense() {
+    //     double xCoordinate = drivetrain.getPose().getX();
+    //     double xCoordinateHalfway = 50;
+    //     if (allianceIsRed) {
+    //         return xCoordinate > xCoordinateHalfway;
+    //     } else if (!allianceIsRed) {
+    //         return xCoordinate < xCoordinateHalfway;
+    //     }
+    //     return false;
+    // }
 
     private boolean fiveSecondsBeforeChange() {
         double time = DriverStation.getMatchTime();

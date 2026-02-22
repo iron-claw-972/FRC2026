@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -28,6 +29,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.util.PathGroupLoader;
@@ -54,6 +56,7 @@ public class RobotContainer {
   private Operator operator = null;
   private LinearClimb linearClimb = null;
   private Intake intake = null;
+  private LED led = null;
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -77,6 +80,8 @@ public class RobotContainer {
         break;
 
       case TestBed2:
+        led = new LED();
+        led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:

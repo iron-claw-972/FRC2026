@@ -1,10 +1,12 @@
 package frc.robot.subsystems.LED;
 
+import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.SolidColor;
+import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
@@ -20,6 +22,7 @@ public class LED extends SubsystemBase {
 
 	private CANdle candle;
 	public static final int stripLength = 67;
+	private double counter = 0;
 
 	// Constructor
 	public LED() {
@@ -130,7 +133,14 @@ public class LED extends SubsystemBase {
 	 * @param blue  Blue value (0-255)
 	 */
 	public void setStrobeLights(int red, int green, int blue) {
-
+		counter++;
+		if (counter == 1) {
+			setLEDs(red, green, blue);
+		} else if (counter == 20) {
+			setLEDs(0, 0, 0);
+		} else if (counter >= 40) {
+			counter = 0;
+		}
 	}
 
 	/**
