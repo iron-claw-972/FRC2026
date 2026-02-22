@@ -21,8 +21,11 @@ public class TrenchAssistConstants {
     };
 
     public static final double[] SLIDE_LATITUDES = new double[]{
-        8.07 - Units.inchesToMeters(25.0),
-        Units.inchesToMeters(25.0),
+        // 8.07 - Units.inchesToMeters(30.0),
+        // Units.inchesToMeters(30.0), should be accurate, i think our field is slightly too small
+        6.550,
+        0.668,
+
     };
 
 }
