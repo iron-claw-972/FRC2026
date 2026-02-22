@@ -1,28 +1,13 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterConstants {
-    //TODO: find these values
-    public static final double FEEDER_RUN_POWER = 0.5; // meters per second??
-    public static final double SHOOTER_VELOCITY = 10.0; // meters per second
-    public static final double SHOOTER_GEAR_RATIO = 36.0 / 24.0; // gear ratio from motors to shooter wheel
-    // public static final double SHOOTER_LAUNCH_DIAMETER = 0.0762; // meters (3 inches)
-    public static final double SHOOTER_LAUNCH_DIAMETER = 0.1016; // meters (4 inches) I think this is right.
-    public static final double SHOOTER_RUN_POWER = 0.3;
-    public static final double SENSOR_DISTANNCE_THRESHOLD = 0.150; // meters
-    public static final double SENSOR_AMBIENCE_THRESHOLD = 0.100; // meters
+import edu.wpi.first.math.util.Units;
 
-    // in m/s
-    public static final double EXIT_VELOCITY_TOLERANCE = 1.0;
+public class ShooterConstants {
+    public static final double SHOOTER_VELOCITY = 1.0;
+    public static final double SHOOTER_LAUNCH_DIAMETER = Units.inchesToMeters(4.0);
 
     // for bang bang
-    // public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 50; // velocity (rotations per second)
-    public static final double MOTOR_VELOCITY_TOLERANCE = 3; // velocity (rotations per second)
-    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 150; // TUNE
-    public static final double MOTOR_BANG_BANG_MAX = 1.0;
-    public static final double MOTOR_BANG_BANG_MIN = 0.0;
-    public static final double kP = 676767676.0;
-    public static final double kD = 0.02;
-    public static final double kI = 0.0;
-    public static final double kV = 0.12;
-    public static final double SHOOTER_MAX_TORQUE_CURRENT = TORQUE_CURRENT_CONTROL_GOAL_AMP + 10.0;
+    public static final double TORQUE_CURRENT_CONTROL_TOLERANCE = 10; // velocity (rotations per second)
+
+    public static final double TORQUE_CURRENT_CONTROL_GOAL_AMP = 40; // TUNE
 }

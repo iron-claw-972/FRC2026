@@ -7,35 +7,33 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.AimAtPose;
-import frc.robot.commands.gpm.SimpleAutoShoot;
-import frc.robot.commands.gpm.TurretAutoShoot;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.Climb.LinearClimb;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -55,12 +53,19 @@ public class RobotContainer {
   private Vision vision = null;
   private Turret turret = null;
   private Shooter shooter = null;
-  private Climb climb = null;
+  private Hood hood = null;
+  private Spindexer spindexer = null;
+  private Intake intake = null;
+
   private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LinearClimb linearClimb = null;
+
+  // Auto Command selection
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -68,7 +73,12 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
-    climb = new Climb();
+    // display the current robot id on smartdashboard
+    SmartDashboard.putString("RobotID", robotId.toString());
+
+    // Filling the SendableChooser on SmartDashboard
+    autoChooserInit();
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -78,45 +88,52 @@ public class RobotContainer {
         break;
 
       default:
-      case SwerveCompetition:
 
-      case BetaBot:
-        
+      case PrimeJr: // AKA Valence
+        spindexer = new Spindexer();
+        intake = new Intake();
+
+      case WaffleHouse: // AKA Betabot
+        turret = new Turret();
+        shooter = new Shooter();
+        hood = new Hood();
+
+      case SwerveCompetition: // AKA "Vantage"
+
+      case BetaBot: // AKA "Pancake"
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-      case Phil:
-      case Vertigo:
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        turret = new Turret();
-        //shooter = new Shooter();
+        linearClimb = new LinearClimb();
 
+      case Phil: // AKA "IHOP"
+
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
+
         // SignalLogger.start();
-        
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String testingAuto = "Testing Over the Bump";
-          PathPlannerAuto.getPathGroupFromAutoFile(testingAuto);
-          auto = new PathPlannerAuto(testingAuto);
+          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
+          auto = new PathPlannerAuto("Path Name");
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -127,7 +144,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    SmartDashboard.putData("Aim at thingy", new AimAtPose(drive, turret, new Pose2d(FieldConstants.field.getTagPose(26).get().getTranslation().toTranslation2d(), Rotation2d.kZero)));
+    autoChooserInit();
   }
 
   /**
@@ -137,7 +154,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -157,7 +173,21 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-    NamedCommands.registerCommand("Auto shoot", new SimpleAutoShoot(turret, drive, shooter));
+  }
+
+  /**
+   * Initialize the SendableChooser on the SmartDashboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -176,28 +206,28 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
+    return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Preferences;
  */
 public enum RobotId {
     Default,
-    SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
+    PrimeJr, WaffleHouse, SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
     ClassBot1, ClassBot2, ClassBot3, ClassBot4,
     TestBed1, TestBed2;
 
@@ -24,7 +24,7 @@ public enum RobotId {
      */
     @Deprecated
     public boolean isClassBot() {
-        return this == ClassBot1 || this == ClassBot2 || this == ClassBot3 || this == ClassBot4;
+        return this == WaffleHouse || this == ClassBot1 || this == ClassBot2 || this == ClassBot3 || this == ClassBot4;
     }
 
     /**
@@ -68,6 +68,14 @@ public enum RobotId {
                 // yes, this instance is the desired RobotId
                 robotId = rid;
                 break;
+            }
+        }
+
+        if (robotId == RobotId.Default) {
+            if (Robot.isSimulation()) {
+                robotId = RobotId.SwerveCompetition; // Default to competition robot for simulation
+            } else {
+                throw new RuntimeException("RobotId is set to Default (or was unset)! Please set it to something.");
             }
         }
 

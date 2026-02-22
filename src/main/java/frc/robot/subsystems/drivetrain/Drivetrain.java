@@ -24,7 +24,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -187,7 +186,6 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Shot Distance", FieldConstants.getHubTranslation().toTranslation2d().getDistance(getPose().getTranslation()));
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
