@@ -43,7 +43,7 @@ public class PS5Controller extends Controller {
         RIGHT_JOY(12),
         PS(13),
         TOUCHPAD(14),
-        MUTE(15), Dpad;
+        MUTE(15);
 
         public final int id;
 
