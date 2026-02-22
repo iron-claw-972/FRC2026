@@ -19,6 +19,7 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.Intake.Intake;
 import lib.controllers.PS5Controller;
+import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
 
@@ -73,12 +74,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
-        // TrenchAlign - on TRIANGLE button
-        driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
+        // Trench align
+        driver.get(DPad.LEFT).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
                 .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
 
-        // TrenchAssist - on RB button
-        driver.get(PS5Button.RB).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
+        // Trench assist
+        driver.get(DPad.RIGHT).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
                 .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
 
         // Intake
