@@ -9,6 +9,7 @@ import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 // import frc.robot.subsystems.outtake.Outtake; // TODO: Outtake subsystem not implemented on current robot
 import frc.robot.util.Vision.Vision;
+import lib.controllers.PS5Controller.PS5Button;
 
 public class LEDDefaultCommand extends Command {
     private Vision vision;
@@ -18,7 +19,7 @@ public class LEDDefaultCommand extends Command {
     private Drivetrain drivetrain;
     private boolean allianceIsRed = DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
-    private String gameData = DriverStation.getGameSpecificMessage();
+    
 
     public LEDDefaultCommand(LED led) {
         this.led = led;
@@ -29,6 +30,7 @@ public class LEDDefaultCommand extends Command {
     @Override
     public void execute() {
         double matchTime = DriverStation.getMatchTime();
+        String gameData = DriverStation.getGameSpecificMessage();
         // if (vision.oneCameraDisconnected()) {
         //     // flash if camera disconnected
         //     led.setStrobeLights(255, 100, 0);
@@ -36,31 +38,28 @@ public class LEDDefaultCommand extends Command {
         if (fiveSecondsBeforeChange() && allianceIsRed) {
             // blink alliance color and rumble if red alliance 5 seconds before hub shifts
             led.setStrobeLights(255, 0, 0);
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            // controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
         } else if (fiveSecondsBeforeChange()) {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            // controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
         } else 
-        // if (playingDefense()) {
-        //     // When playing defense
-        //     //  TODO Need to remake defense lights, for some reason not there anymore
-        //     // led.defenseLights();
-        //     led.alternate(255, 0, 0, 0, 0, 255, 4, 0, 67);
-        // } else 
+        if (playingDefense) {
+            new DefenseLightsCommand(led, 0, 67);
+        } else 
         if (DriverStation.isAutonomous() && allianceIsRed){
             // Dimmer light for auto in red alliance
-            led.setLEDs(100, 0, 0);
+            led.setLEDs(50, 0, 0);
         } else if (DriverStation.isAutonomous()){
             // Dimmer light for auto in blue alliance
-            led.setLEDs(0, 0, 100);
+            led.setLEDs(0, 0, 50);
         } else if ((allianceIsRed && gameData.equals("B") && matchTime <= 105 && matchTime >= 80) || (allianceIsRed && gameData.equals("B") && matchTime <= 55 && matchTime >= 30)) {
             // turn light off for inactive hub if red alliance and blue inactive first
             led.setLEDs(0, 0, 0);
-        } else if ((allianceIsRed && gameData.equals("B") && matchTime <= 130 && matchTime >= 105) || (allianceIsRed && gameData.equals("B") && matchTime <= 80 && matchTime >= 55)) {
+        } else if ((allianceIsRed && gameData.equals("R") && matchTime <= 130 && matchTime >= 105) || (allianceIsRed && gameData.equals("R") && matchTime <= 80 && matchTime >= 55)) {
             // turn light off for inactive hub if red alliance and red inactive first
             led.setLEDs(0, 0, 0);
-        } else if ((gameData.equals("R") && matchTime <= 130 && matchTime >= 105) || (gameData.equals("R") && matchTime <= 80 && matchTime >= 55)) {
+        } else if ((gameData.equals("B") && matchTime <= 130 && matchTime >= 105) || (gameData.equals("B") && matchTime <= 80 && matchTime >= 55)) {
             // turn off lights for inactive hub if blue alliance and blue inactive first
             led.setLEDs(0, 0, 0);
         } else if ((gameData.equals("R") && matchTime <= 105 && matchTime >= 80) || (gameData.equals("R") && matchTime <= 55 && matchTime >= 30)) {
@@ -79,22 +78,15 @@ public class LEDDefaultCommand extends Command {
         }
     }
 
-    // private boolean playingDefense() {
-    //     double xCoordinate = drivetrain.getPose().getX();
-    //     double xCoordinateHalfway = 50;
-    //     if (allianceIsRed) {
-    //         return xCoordinate > xCoordinateHalfway;
-    //     } else if (!allianceIsRed) {
-    //         return xCoordinate < xCoordinateHalfway;
-    //     }
-    //     return false;
-    // }
-
     private boolean fiveSecondsBeforeChange() {
         double time = DriverStation.getMatchTime();
         if((time <= 135 && time >= 130) || (time <= 110 && time >= 105) || (time <= 85 && time >= 80) || (time <= 60 && time >= 55) || (time <= 35 && time >= 30)){
             return true;
         }
+        return false;
+    }
+
+    private boolean playingDefense() {
         return false;
     }
 }

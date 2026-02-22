@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.StripTypeValue;
 import com.ctre.phoenix6.signals.VBatOutputModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class LED extends SubsystemBase {
@@ -26,7 +27,7 @@ public class LED extends SubsystemBase {
 
 	// Constructor
 	public LED() {
-		candle = new CANdle(IdConstants.CANDLE_ID);
+		candle = new CANdle(IdConstants.CANDLE_ID, Constants.CANIVORE_SUB);
 		CANdleConfigurator configurator = candle.getConfigurator();
 
 		LEDConfigs ledConf = new LEDConfigs()
