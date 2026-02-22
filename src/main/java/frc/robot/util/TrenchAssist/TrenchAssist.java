@@ -1,11 +1,8 @@
 package frc.robot.util.TrenchAssist;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
-import org.opencv.core.Point;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
@@ -14,17 +11,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
-import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.util.Vision.DriverAssist;
-import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 
 public class TrenchAssist {
 

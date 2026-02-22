@@ -38,14 +38,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private LinearClimb climb;
 
     public PS5ControllerDriverConfig(
-        Drivetrain drive, 
-        Shooter shooter, 
-        Turret turret, 
-        Hood hood, 
-        Intake intake, 
-        Spindexer spindexer, 
-        LinearClimb climb
-    ){
+            Drivetrain drive,
+            Shooter shooter,
+            Turret turret,
+            Hood hood,
+            Intake intake,
+            Spindexer spindexer,
+            LinearClimb climb) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
@@ -76,11 +75,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // TrenchAlign - on TRIANGLE button
         driver.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
-            .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
+                .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
 
         // TrenchAssist - on RB button
         driver.get(PS5Button.RB).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
-            .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
+                .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
 
         // Intake
         if (intake != null) {
@@ -97,24 +96,24 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Retract if hold for 3 seconds
-            driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(()->{
+            driver.get(PS5Button.CROSS).debounce(3.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
             }));
 
             // Calibration
-            driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(()->{
+            driver.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
                 intake.calibrate();
-            })).onFalse(new InstantCommand(()->{
+            })).onFalse(new InstantCommand(() -> {
                 intake.stopCalibrating();
             }));
         }
 
         // Spindexer
-        if (spindexer != null){
+        if (spindexer != null) {
             // Will only run if we are not calling default shoot command
-            driver.get(PS5Button.LB).onTrue(new InstantCommand(()-> spindexer.maxSpindexer()))
-            .onFalse(new InstantCommand(()-> spindexer.stopSpindexer()));
+            driver.get(PS5Button.LB).onTrue(new InstantCommand(() -> spindexer.maxSpindexer()))
+                    .onFalse(new InstantCommand(() -> spindexer.stopSpindexer()));
         }
 
         // Auto shoot

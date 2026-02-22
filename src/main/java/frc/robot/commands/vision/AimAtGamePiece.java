@@ -7,7 +7,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
-import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.DetectedObject;
 
