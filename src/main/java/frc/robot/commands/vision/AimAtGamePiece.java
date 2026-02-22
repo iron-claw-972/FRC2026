@@ -17,7 +17,7 @@ public class AimAtGamePiece extends DefaultDriveCommand {
     private static DetectedObject cachedObject;
   
 
-    public AimAtGamePiece(Drivetrain drive, PS5ControllerDriverConfig driver, Supplier<DetectedObject> objectSupplier){
+    public AimAtGamePiece(Drivetrain drive, BaseDriverConfig driver, Supplier<DetectedObject> objectSupplier){
         super(drive, driver);
         this.objectSupplier = objectSupplier;
     }

@@ -25,11 +25,11 @@ import lib.controllers.PS5Controller.PS5Axis;
  */
 public class DefaultDriveCommand extends Command {
     protected final Drivetrain swerve;
-    protected final PS5ControllerDriverConfig driver;
+    protected final BaseDriverConfig driver;
 
     public DefaultDriveCommand(
             Drivetrain swerve,
-            PS5ControllerDriverConfig driver) {
+            BaseDriverConfig driver) {
         this.swerve = swerve;
         this.driver = driver;
 
@@ -49,20 +49,6 @@ public class DefaultDriveCommand extends Command {
         double forwardTranslation = driver.getForwardTranslation();
         double sideTranslation = driver.getSideTranslation();
         double rotation = -driver.getRotation();
-        // if (swerve.getTrenchAssist()) {
-        //     sideTranslation = Math
-        //             .sqrt(driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y)
-        //                     * driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y))
-        //             *
-        //             new Rotation2d(driver.controller.get(PS5Axis.LEFT_X), driver.controller.get(PS5Axis.LEFT_Y))
-        //                     .rotateBy(swerve.getYaw()).getCos();
-        //     forwardTranslation = Math
-        //             .sqrt(driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y)
-        //                     * driver.controller.get(PS5Axis.LEFT_X) * driver.controller.get(PS5Axis.LEFT_Y))
-        //             *
-        //             new Rotation2d(driver.controller.get(PS5Axis.LEFT_X), driver.controller.get(PS5Axis.LEFT_Y))
-        //                     .rotateBy(swerve.getYaw()).getSin();
-        // }
 
         double slowFactor = driver.getIsSlowMode() ? DriveConstants.SLOW_DRIVE_FACTOR : 1;
 
