@@ -91,6 +91,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		}
 		SmartDashboard.putData("Turret Mech", mech);
 
+		// TODO: the code below is problematic.
+		// It expects the leftTooth and rightTooth values to change synchronously,
+		// but that cannot be guaranteed due to encoder measurement error and backlash.
+		// The constructor should set the turret as uncalibrated.
+		// Periodic should check for reliable tooth counts (that is, not near a transistion)
+		// and do the calibration.
 		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
 		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
 
