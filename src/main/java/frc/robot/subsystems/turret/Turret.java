@@ -2,6 +2,7 @@ package frc.robot.subsystems.turret;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -30,6 +32,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+
+	private boolean calibrating;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -74,6 +78,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		mm.MotionMagicAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION) * TurretConstants.GEAR_RATIO; // Lowered for belt safety
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
         motor.getConfigurator().apply(config);
+
+		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 
 		lastGoalRad = 0.0;
 
@@ -203,10 +209,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
 
-		// Sets motor control with feedforward
-		motor.setControl(mmVoltageRequest
+		if(calibrating){
+			motor.set(0.05);
+			if(Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD){
+				stopCalibrating();
+			}
+		} else{
+			// Sets motor control with feedforward
+			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
 			.withFeedForward(robotTurnCompensation));
+		}
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
@@ -221,7 +234,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
 		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
 
-
+		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
+		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -248,10 +262,41 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 	}
 
+	/**
+     * sets supply and stator current limits
+     * @param limit the current limit for stator and supply current
+     */
+    public void setCurrentLimits(double limit) {
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(limit)
+        .withSupplyCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(limit);
+
+		if(limit == TurretConstants.NORMAL_CURRENT_LIMIT){
+			limits.SupplyCurrentLowerLimit = TurretConstants.CALIBRATION_CURRENT_LIMIT;
+			limits.SupplyCurrentLowerTime = 1.0; // Set to lower limit if over 1 second
+		}
+
+        motor.getConfigurator().apply(limits);
+    }
+
 	// Also ignore this for now
 	private double wrapUnit(double value) {
 		value %= 1.0;
 		if (value < 0) value += 1.0;
 		return value;
+	}
+
+	private void calibrate(){
+		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
+		calibrating = true;
+	}
+
+	private void stopCalibrating(){
+		motor.set(Units.degreesToRotations(TurretConstants.CALIBRATION_OFFSET) * TurretConstants.GEAR_RATIO);
+		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
+		calibrating = false;
+		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
 	}
 }
