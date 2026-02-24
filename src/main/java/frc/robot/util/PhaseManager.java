@@ -33,12 +33,12 @@ public class PhaseManager {
 
     private void updateCurrentState(Pose2d drivePose, Shooter shooter, Turret turret) {
         // if shooter is not trying to run -- idle
-        if (shooter.getTargetVelocityMPS() == 0.0) {
+        if (shooter.getTargetVelocity() == 0.0) {
             currentState = CurrentState.IDLE;
             return;
         }
         // if shooter velocity not ready yet -- starting up
-        if (!shooter.atTargetVelocity()) { // TODO: but then what happens when the ball goes in and the velocity dips??
+        if (!shooter.atTargetSpeed()) { // TODO: but then what happens when the ball goes in and the velocity dips??
             currentState = CurrentState.STARTING_UP;
             return;
         }
