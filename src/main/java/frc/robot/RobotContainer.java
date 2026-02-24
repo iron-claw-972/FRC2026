@@ -22,7 +22,6 @@ import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
