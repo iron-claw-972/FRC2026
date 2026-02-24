@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
@@ -79,7 +79,8 @@ public class Superstructure extends Command {
     }
 
     public void updateSetpoints(Pose2d drivepose) {
-        Pose2d turretPosition = drivepose.transformBy(new Transform2d((new Translation2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX(),TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY())), new Rotation2d()));
+		Pose2d turretPosition = drivepose.transformBy(
+				new Transform2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.toTranslation2d(), Rotation2d.kZero));
         
         // If the robot is moving, adjust the target position based on velocity
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
