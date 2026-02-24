@@ -143,7 +143,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	}
 
 	/**
-	 * @return If the turret is at setpoint with tolerance of 2 degrees
+	 * @return If the turret is at setpoint with tolerance of 5 degrees
 	 */
 	public boolean atSetpoint() {
 		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(5.0);

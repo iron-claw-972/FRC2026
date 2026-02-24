@@ -9,25 +9,15 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import lib.controllers.PS5Controller.PS5Button;
 
 public class ReverseMotors extends Command {
-    // Reverse motors (intake, spindexer, shooter: shoot out constant speed)
-
-        // if (intake != null && spindexer != null && shooter != null){
-        //     driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() ->{
-        //         intake.spinReverse();
-        //         // reverse spindexer
-        //         shooter.
-        //     }))
-        // }
     private Intake intake;
     private Spindexer spindexer;
-    private Shooter shooter;
 
 
-    public ReverseMotors(Intake intake, Spindexer spindexer, Shooter shooter){
+    public ReverseMotors(Intake intake, Spindexer spindexer){
         this.intake = intake;
         this.spindexer = spindexer;
 
-        addRequirements(intake, spindexer, shooter);
+        addRequirements(intake, spindexer);
     }
 
     @Override
@@ -39,7 +29,6 @@ public class ReverseMotors extends Command {
     public void execute(){
         intake.spinReverse();
         spindexer.reverseSpindexer();
-        shooter.setShooter(ShooterConstants.SHOOTER_VELOCITY);
     }
 
     @Override

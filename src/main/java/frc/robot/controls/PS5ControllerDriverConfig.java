@@ -83,7 +83,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Reverse motors
         if (intake != null && spindexer != null && shooter != null){
             driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(()->{
-                reverseMotors = new ReverseMotors(intake, spindexer, shooter);
+                reverseMotors = new ReverseMotors(intake, spindexer);
                 reverseMotors.schedule();
             })
             ).onFalse(new InstantCommand(()->{
