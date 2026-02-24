@@ -12,7 +12,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -34,6 +36,7 @@ public class Turret extends SubsystemBase implements TurretIO{
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private boolean calibrating;
+	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
 	/* ---------------- Hardware ---------------- */
 
@@ -211,7 +214,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		if(calibrating){
 			motor.set(0.05);
-			if(Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD){
+			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
+			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
 			}
 		} else{
