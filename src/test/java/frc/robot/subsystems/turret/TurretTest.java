@@ -70,23 +70,28 @@ public class TurretTest {
         for (double mainRotation = -0.6; mainRotation < 0.6; mainRotation += 0.0117) {
             // figure number of teeth on turret
             double teethMain = toothNumberFromRotations(mainRotation, m);
+            // figure rotations for the modulus wheels but drop whole rotations
             double m1Rotations = teethMain / m1 - Math.floor(teethMain / m1);
             double m2Rotations = teethMain / m2 - Math.floor(teethMain / m2);
-            // teeth for one
+            // teeth for the modulus sprockets
             double teethM1 = toothNumberFromRotations(m1Rotations, m1);
             double teethM2 = toothNumberFromRotations(m2Rotations, m2);
 
+            // if the teeth are not near transition zones
             if (toothGood(teethM1) && toothGood(teethM2)) {
+                // convert to nearest integer tooth
+                // ... we might get m1 or m2 instead of zero
                 int a = (int)Math.round(teethM1);
                 int b = (int)Math.round(teethM2);
 
+                // calculate of integer teeth moved on turret
                 int n = xgcd.chineseRemainder(a, b);
 
-                // wrap around
+                // wrap around (we want +- angle)
                 if (n > N / 2) n = n - N;
 
-                // reconstruction
-                double r = n + teethM1 - Math.round(teethM1);
+                // reconstruction (adding fractional tooth)
+                double r = n + (teethM1 - Math.round(teethM1));
 
                 // System.out.println("teeth " + teethMain + " " + n + " " + r);
 
