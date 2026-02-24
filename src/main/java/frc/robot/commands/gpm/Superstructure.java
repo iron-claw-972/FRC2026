@@ -24,11 +24,12 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
+import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
-public class AutoShootCommand extends Command {
+public class Superstructure extends Command {
     private Turret turret;
     private Drivetrain drivetrain;
     private Hood hood;
@@ -58,16 +59,17 @@ public class AutoShootCommand extends Command {
 
     private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
-    private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+    private Translation2d target = null;
 
-    public AutoShootCommand(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
+    private PhaseManager phaseManager = new PhaseManager();
+
+    public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
         this.hood = hood;
         this.shooter = shooter;
         this.spindexer = spindexer;
         drivepose  = drivetrain.getPose();
-        //drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
 
         goalState = ShooterPhysics.getShotParams(
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
@@ -106,7 +108,11 @@ public class AutoShootCommand extends Command {
          */
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
-            Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
+            
+            Translation3d target3d = new Translation3d(target.getX(), target.getY(), 
+                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+                FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
+
             goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
 				2.0);
@@ -177,34 +183,47 @@ public class AutoShootCommand extends Command {
                 robotRelVel.omegaRadiansPerSecond * phaseDelay));
     }
 
+    /**
+     * Stops and stows all subsystems involved in the command
+     */
+    public void stowEverything(){
+        turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
+        hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+        shooter.setShooter(0.0);
+        spindexer.stopSpindexer();
+    }
+
     @Override
     public void execute() {
+        // Phase manager stuff
+        phaseManager.update(drivepose, shooter, turret);
+        target = phaseManager.getTarget();
+
         updateDrivePose();
         updateSetpoints(drivepose);
 
-        turret.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(turretSetpoint)), turretVelocity - drivetrain.getAngularRate(2));
-        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
-        shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+        if (phaseManager.isIdle()) {
+            stowEverything();
+        } else {
+            turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+            shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+
+            if (phaseManager.shouldFeed()) {
+                spindexer.maxSpindexer();
+            } else {
+                spindexer.stopSpindexer();
+            }
+        }
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
         SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
-
-        /** Spindexer Stuff!! */
-        if(spindexer != null){
-            spindexer.maxSpindexer();
-        }
     }
 
     @Override
     public void end(boolean interrupted) {
-        // Set the turret and hood to a safe position when the command ends
-        turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
-        shooter.setShooter(0.0);
-        hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0.0);
-        if(spindexer != null){
-            spindexer.stopSpindexer();
-        }
+        stowEverything();
     }
 
 }

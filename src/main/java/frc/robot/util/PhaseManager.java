@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.FieldConstants.FieldZone;
 import frc.robot.subsystems.shooter.Shooter;
@@ -76,6 +77,13 @@ public class PhaseManager {
     }
     
     public boolean shouldFeed() {
-        return !(currentState == CurrentState.STARTING_UP) && !(currentState == CurrentState.TURNING_AROUND);
+        // TODO: I'm gonna comment out starting up until i find a solution
+        return !(currentState == CurrentState.TURNING_AROUND); //&& !(currentState == CurrentState.STARTING_UP);
+    }
+
+    public Translation2d getTarget() {
+        return wantedState == WantedState.SHOOTING ? 
+            FieldConstants.getHubTranslation().toTranslation2d() 
+            : FieldConstants.getOppositionTranslation(true).toTranslation2d();
     }
 }
