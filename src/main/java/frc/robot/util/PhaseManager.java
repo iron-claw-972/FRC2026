@@ -1,0 +1,81 @@
+package frc.robot.util;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.FieldConstants.FieldZone;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.turret.Turret;
+
+public class PhaseManager {
+    
+    public enum WantedState {
+        IDLE,
+        SHOOTING,
+        PASSING
+    }
+
+    public enum CurrentState {
+        IDLE,
+        STARTING_UP,
+        TURNING_AROUND,
+        SHOOTING,
+        PASSING
+    }
+
+    private WantedState wantedState = WantedState.SHOOTING;
+    private CurrentState currentState = CurrentState.IDLE;
+
+    public void update(Pose2d drivePose, Shooter shooter, Turret turret) {
+        updateWantedState(drivePose);
+        updateCurrentState(drivePose, shooter, turret);
+    }
+
+    private void updateCurrentState(Pose2d drivePose, Shooter shooter, Turret turret) {
+        // if shooter is not trying to run -- idle
+        if (shooter.getTargetVelocityMPS() == 0.0) {
+            currentState = CurrentState.IDLE;
+            return;
+        }
+        // if shooter velocity not ready yet -- starting up
+        if (!shooter.atTargetVelocity()) { // TODO: but then what happens when the ball goes in and the velocity dips??
+            currentState = CurrentState.STARTING_UP;
+            return;
+        }
+        // if turret is not at setpoint -- turning around
+        if (!turret.atSetpoint()) {
+            currentState = CurrentState.TURNING_AROUND;
+            return;
+        }
+        
+        FieldZone zone = FieldConstants.getZone(drivePose.getTranslation());
+        if (zone == FieldConstants.FieldZone.ALLIANCE) {
+            currentState = CurrentState.SHOOTING;
+        } else {
+            currentState = CurrentState.PASSING;
+        }
+    }
+
+    private void updateWantedState(Pose2d drivePose) {
+        FieldZone zone = FieldConstants.getZone(drivePose.getTranslation());
+        if (zone == FieldConstants.FieldZone.ALLIANCE) {
+            wantedState = WantedState.SHOOTING;
+        } else {
+            wantedState = WantedState.PASSING;
+        }
+    }
+
+    public WantedState getWantedState() { 
+        return wantedState; 
+    }
+    public CurrentState getCurrentState() { 
+        return currentState; 
+    }
+    
+    public boolean isIdle() { 
+        return wantedState == WantedState.IDLE; 
+    }
+    
+    public boolean shouldFeed() {
+        return !(currentState == CurrentState.STARTING_UP) && !(currentState == CurrentState.TURNING_AROUND);
+    }
+}
