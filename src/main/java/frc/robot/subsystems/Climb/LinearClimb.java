@@ -10,6 +10,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,17 +19,23 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
+/**
+ * Climber subsystem
+ */
 public class LinearClimb extends SubsystemBase implements LinearClimbIO{
+    /** climber motor */
     private final TalonFX motor;
+    /** whether the subsysgtem is calibrating */
     private boolean calibrating = false;
-    private double downPosition = ClimbConstants.BOTTOM_POSITION;
-    private double upPosition = ClimbConstants.UP_POSITION;
-    private double climbPosition = ClimbConstants.CLIMB_POSITION;
 
+    /** should the subsystem perform calibration automatically */
     private boolean calibrateOnStartUp = false;
 
     private double MAX_POWER = 0.2;
 
+    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
+
+    // logging information
     private LinearClimbIOInputs inputs = new LinearClimbIOInputs();
 
     private final PIDController pid = new PIDController(
@@ -48,8 +56,8 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
-        SmartDashboard.putData("Go Down", new InstantCommand(() -> goDown()));
-        SmartDashboard.putData("Climb", new InstantCommand(() -> climb()));
+        SmartDashboard.putData("Go Down", new InstantCommand(() -> retract()));
+        SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition()));
 
         motor.setPosition(0);
 
@@ -102,23 +110,23 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      */
     public void goUp() {
         MAX_POWER = 0.8;
-        setSetpoint((Units.radiansToRotations(upPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        setSetpoint(metersToRotations(ClimbConstants.UP_POSITION));
     }
 
     /**
      * goes to the down position
      */
-    public void goDown() {
+    public void retract() {
         MAX_POWER = 0.2;
-        setSetpoint((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        setSetpoint(metersToRotations(ClimbConstants.BOTTOM_POSITION));
     }
 
     /**
      * goes to the climb position
      */
-    public void climb() {
+    public void climbPosition() {
         MAX_POWER = 0.8;
-        setSetpoint((Units.radiansToRotations(climbPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        setSetpoint(metersToRotations(ClimbConstants.CLIMB_POSITION));
     }
 
     @Override
@@ -129,10 +137,35 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
             power = MathUtil.clamp(power, -MAX_POWER, MAX_POWER);
         } else{
             power = ClimbConstants.CALIBRATION_POWER;
+            boolean atHardStop = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= ClimbConstants.CALIBRATION_CURRENT_THRESHOLD;
+            if(calibrationDebouncer.calculate(atHardStop)){
+                stopCalibrating();
+            }
         }
         motor.set(power);
         
         Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+    }
+    /**
+     * converts motor rotations to meters
+     * @param motorRotations
+     * @return
+     */
+    public double rotationsToMeters(double motorRotations){
+        double circ = 2 * Math.PI * ClimbConstants.WHEEL_RADIUS;
+        double meters = motorRotations / ClimbConstants.CLIMB_GEAR_RATIO * circ;
+        return meters;
+    }
+
+    /**
+     * converts meters to motor rotations
+     * @param meters
+     * @return
+     */
+    public double metersToRotations(double meters){
+        double circ = 2 * Math.PI * ClimbConstants.WHEEL_RADIUS;
+        double motorRotations = meters / circ * ClimbConstants.CLIMB_GEAR_RATIO;
+        return motorRotations;
     }
 
     /**
@@ -164,10 +197,10 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * stops calibration and sets current limits to normal. 
      */
     public void stopCalibrating() {
-        motor.setPosition((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        motor.setPosition(metersToRotations(ClimbConstants.BOTTOM_POSITION));
         calibrating = false;
         setCurrentLimits(ClimbConstants.CLIMB_CURRENT);
-        setSetpoint((Units.radiansToRotations(downPosition / ClimbConstants.WHEEL_RADIUS)) * ClimbConstants.CLIMB_GEAR_RATIO);
+        setSetpoint(metersToRotations(ClimbConstants.BOTTOM_POSITION));
     }
 
     @Override

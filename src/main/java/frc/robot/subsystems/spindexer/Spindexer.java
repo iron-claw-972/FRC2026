@@ -6,7 +6,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -29,10 +28,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
         motor.getConfigurator().apply(limitConfig);
-
-        SmartDashboard.putData("Max speed spindexer", new InstantCommand(() -> maxSpindexer()));
-        SmartDashboard.putData("Turn off spindexer", new InstantCommand(() -> stopSpindexer()));
-        SmartDashboard.putData("Spindexer 50%", new InstantCommand(() -> setSpindexer(0.5)));
     }
 
     @Override
@@ -44,7 +39,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
-        SmartDashboard.putNumber("Spindexer Velocity Threshold", velocityThreshold);
         SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
 
         boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
@@ -56,6 +50,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public void maxSpindexer() {
         power = SpindexerConstants.spindexerMaxPower;
+    }
+
+    public void reverseSpindexer(){
+        power = SpindexerConstants.spindexerReversePower;
     }
 
     public void stopSpindexer() {
