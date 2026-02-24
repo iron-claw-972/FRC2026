@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import frc.robot.util.ExtendedGCD;
+
 public class TurretTest {
     /**
      * Compute a tooth number on a gear
@@ -50,5 +52,46 @@ public class TurretTest {
         assertFalse(toothGood(3.31));
         assertTrue(toothGood(2.71));
         assertTrue(toothGood(3.29));
+    }
+
+    /**
+     * Test ability to recover turret angle from moduli sprockets.
+     */
+    @Test
+    public void recoverTest() {
+        int m = 200;
+        int m1 = 15;
+        int m2 = 22;
+        int N = m1 * m2;
+
+        var xgcd = new ExtendedGCD(m1, m2);
+
+        // assume we are zeroed
+        for (double mainRotation = -0.6; mainRotation < 0.6; mainRotation += 0.0117) {
+            // figure number of teeth on turret
+            double teethMain = toothNumberFromRotations(mainRotation, m);
+            double m1Rotations = teethMain / m1 - Math.floor(teethMain / m1);
+            double m2Rotations = teethMain / m2 - Math.floor(teethMain / m2);
+            // teeth for one
+            double teethM1 = toothNumberFromRotations(m1Rotations, m1);
+            double teethM2 = toothNumberFromRotations(m2Rotations, m2);
+
+            if (toothGood(teethM1) && toothGood(teethM2)) {
+                int a = (int)Math.round(teethM1);
+                int b = (int)Math.round(teethM2);
+
+                int n = xgcd.chineseRemainder(a, b);
+
+                // wrap around
+                if (n > N / 2) n = n - N;
+
+                // reconstruction
+                double r = n + teethM1 - Math.round(teethM1);
+
+                // System.out.println("teeth " + teethMain + " " + n + " " + r);
+
+                assertEquals(teethMain, r, 0.0001);
+            }
+        }
     }
 }
