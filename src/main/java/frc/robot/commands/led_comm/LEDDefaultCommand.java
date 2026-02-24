@@ -38,13 +38,13 @@ public class LEDDefaultCommand extends Command {
         if (fiveSecondsBeforeChange() && allianceIsRed) {
             // blink alliance color and rumble if red alliance 5 seconds before hub shifts
             led.setStrobeLights(255, 0, 0);
-            // controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
         } else if (fiveSecondsBeforeChange()) {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
-            // controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
         } else 
-        if (playingDefense) {
+        if (playingDefense()) {
             new DefenseLightsCommand(led, 0, 67);
         } else 
         if (DriverStation.isAutonomous() && allianceIsRed){
@@ -87,6 +87,7 @@ public class LEDDefaultCommand extends Command {
     }
 
     private boolean playingDefense() {
+        // TODO: add automatic defense lights
         return false;
     }
 }
