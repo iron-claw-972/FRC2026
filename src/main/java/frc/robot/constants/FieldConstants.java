@@ -26,7 +26,7 @@ public class FieldConstants {
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
 
   /**The coordinate of the climb position */
-  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d());
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
   public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
 
   public static final Pose2d getClimbLocation(){
