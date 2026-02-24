@@ -62,6 +62,16 @@ public class ShooterPhysics {
 		return cvtShot(exitVel, height);
 	}
 
+	// provided for backwards compatability
+	public static Pair<TurretState, Double> getShotParamsWithT(Translation2d robotVelocity, Translation3d robotToTarget,
+			double height) {
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
+		double t = (-exitVel.getZ()
+				- Math.sqrt(Math.pow(exitVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ()))
+				/ -Constants.GRAVITY_ACCELERATION;
+		return new Pair<TurretState, Double>(cvtShot(exitVel, height), t);
+	}
+
 	/**
 	 * Calculates shot parameters for SOTM for a peak height using Physics™.
 	 *
