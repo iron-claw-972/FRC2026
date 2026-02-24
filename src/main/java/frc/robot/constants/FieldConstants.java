@@ -1,12 +1,14 @@
 package frc.robot.constants;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Robot;
 
 public class FieldConstants {
   /** Width of the field [meters] */
@@ -14,33 +16,149 @@ public class FieldConstants {
   /** Height of the field [meters] */
   public static final double FIELD_WIDTH = Units.inchesToMeters(26*12 + 5);
 
-  /** 
-   * ArrayList of April Tags to use when the field layout is not available.
-   * <p>
-   * Obtain AprilTag ID i with APRIL_TAGS.get(i-1).
-   */
-  public static final ArrayList<AprilTag> APRIL_TAGS = new ArrayList<AprilTag>(List.of(
-    new AprilTag(1 , new Pose3d(Units.inchesToMeters(657.37), Units.inchesToMeters(25.80), Units.inchesToMeters(58.50), new Rotation3d(0, 0, Units.degreesToRadians(126)))),
-    new AprilTag(2 , new Pose3d(Units.inchesToMeters(657.37), Units.inchesToMeters(291.20), Units.inchesToMeters(58.50), new Rotation3d(0, 0, Units.degreesToRadians(234)))),
-    new AprilTag(3 , new Pose3d(Units.inchesToMeters(455.15), Units.inchesToMeters(317.15), Units.inchesToMeters(51.25), new Rotation3d(0, 0, Units.degreesToRadians(270)))),
-    new AprilTag(4 , new Pose3d(Units.inchesToMeters(365.20), Units.inchesToMeters(241.64), Units.inchesToMeters(73.54), new Rotation3d(0, Units.degreesToRadians(30), 0))),
-    new AprilTag(5 , new Pose3d(Units.inchesToMeters(365.20), Units.inchesToMeters(75.39), Units.inchesToMeters(73.54), new Rotation3d(0, Units.degreesToRadians(30), 0))),
-    new AprilTag(6 , new Pose3d(Units.inchesToMeters(530.49), Units.inchesToMeters(130.17), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(300)))),
-    new AprilTag(7 , new Pose3d(Units.inchesToMeters(546.87), Units.inchesToMeters(158.50), Units.inchesToMeters(12.13), new Rotation3d(0, 0, 0))),
-    new AprilTag(8 , new Pose3d(Units.inchesToMeters(530.49), Units.inchesToMeters(186.83), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(60)))),
-    new AprilTag(9 , new Pose3d(Units.inchesToMeters(497.77), Units.inchesToMeters(186.83), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(120)))),
-    new AprilTag(10, new Pose3d(Units.inchesToMeters(481.39), Units.inchesToMeters(158.50), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(180)))),
-    new AprilTag(11, new Pose3d(Units.inchesToMeters(497.77), Units.inchesToMeters(130.17), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(240)))),
-    new AprilTag(12, new Pose3d(Units.inchesToMeters(33.51), Units.inchesToMeters(25.80), Units.inchesToMeters(58.50), new Rotation3d(0, 0, Units.degreesToRadians(54)))),
-    new AprilTag(13, new Pose3d(Units.inchesToMeters(33.51), Units.inchesToMeters(291.20), Units.inchesToMeters(58.50), new Rotation3d(0, 0, Units.degreesToRadians(306)))),
-    new AprilTag(14, new Pose3d(Units.inchesToMeters(325.68), Units.inchesToMeters(241.64), Units.inchesToMeters(73.54), new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(180)))),
-    new AprilTag(15, new Pose3d(Units.inchesToMeters(325.68), Units.inchesToMeters(75.39), Units.inchesToMeters(73.54), new Rotation3d(0, Units.degreesToRadians(30), Units.degreesToRadians(180)))),
-    new AprilTag(16, new Pose3d(Units.inchesToMeters(235.73), Units.inchesToMeters(-0.15), Units.inchesToMeters(51.25), new Rotation3d(0, 0, Units.degreesToRadians(90)))),
-    new AprilTag(17, new Pose3d(Units.inchesToMeters(160.39), Units.inchesToMeters(130.17), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(240)))),
-    new AprilTag(18, new Pose3d(Units.inchesToMeters(144.00), Units.inchesToMeters(158.50), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(180)))),
-    new AprilTag(19, new Pose3d(Units.inchesToMeters(160.39), Units.inchesToMeters(186.83), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(120)))),
-    new AprilTag(20, new Pose3d(Units.inchesToMeters(193.10), Units.inchesToMeters(186.83), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(60)))),
-    new AprilTag(21, new Pose3d(Units.inchesToMeters(209.49), Units.inchesToMeters(158.50), Units.inchesToMeters(12.13), new Rotation3d(0, 0, 0))),
-    new AprilTag(22, new Pose3d(Units.inchesToMeters(193.10), Units.inchesToMeters(130.17), Units.inchesToMeters(12.13), new Rotation3d(0, 0, Units.degreesToRadians(300))))
-  ));
+  /**Apriltag layout for 2026 REBUILT */
+  public static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+  public static final double RED_BORDER = Units.inchesToMeters(180);
+  public static final double BLUE_BORDER = FIELD_LENGTH - Units.inchesToMeters(180);
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.25;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
+  // TODO: Find this
+  /**The coordinate of the climb position */
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+
+  public static final Pose2d getClimbLocation(){
+    if (Robot.getAlliance() == Alliance.Blue){
+      return BLUE_CLIMB_LOCATION;
+    }
+    else{
+      return RED_CLIMB_LOCATION;
+    }
+  }
+
+  /** Location of hub target */
+  public static final Translation3d HUB_BLUE =
+      new Translation3d(Units.inchesToMeters(156.8 + 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
+  
+  public static final Translation3d HUB_RED =
+      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(156.8 - 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
+    
+  public static final Translation3d NEUTRAL_LEFT =
+    new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
+
+  public static final Translation3d NEUTRAL_RIGHT =
+    new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
+
+  public static final Translation3d ALLIANCE_LEFT_BLUE =
+    new Translation3d(BLUE_BORDER - 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+
+  public static final Translation3d ALLIANCE_RIGHT_BLUE =
+    new Translation3d(BLUE_BORDER - 5, RIGHT_SIDE_TARGET, 0);
+
+
+  public static final Translation3d ALLIANCE_LEFT_RED =
+    new Translation3d(RED_BORDER + 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+
+  public static final Translation3d ALLIANCE_RIGHT_RED =
+    new Translation3d(RED_BORDER + 5, RIGHT_SIDE_TARGET, 0);
+
+  public static final Translation3d ALLIANCE_CENTER_BLUE =
+    new Translation3d(BLUE_BORDER - 5, FIELD_WIDTH/2, 0);
+  
+  public static final Translation3d ALLIANCE_CENTER_RED =
+    new Translation3d(RED_BORDER + 5, FIELD_WIDTH/2, 0);
+
+  public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
+  public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
+
+	public enum ShootingTarget {
+		HUB,
+		NEUTRAL,
+		ALLIANCE,
+		OPPOSITION, // not sure why you'd ever do this :)
+	}
+
+	public enum FieldZone {
+		ALLIANCE,
+		NEUTRAL,
+		OPPOSITION,
+		TRENCH_BUMP
+	}
+
+  public static Translation3d getHubTranslation() {
+    if (Robot.getAlliance() == Alliance.Blue) {
+      return HUB_BLUE;
+    } else {
+      return HUB_RED;
+    }
+  }
+
+  public static Translation3d getNeutralTranslation(boolean sideLeft) {
+    if (sideLeft) {
+      return NEUTRAL_LEFT;
+    } else {
+      return NEUTRAL_RIGHT;
+    }
+  }
+
+  public static Translation3d getAllianceSideTranslation(boolean sideLeft) {
+    if (sideLeft) {
+      if (Robot.getAlliance() == Alliance.Blue) {
+        return ALLIANCE_LEFT_BLUE;
+      } else {
+        return ALLIANCE_LEFT_RED;
+      }
+    } else {
+      if (Robot.getAlliance() == Alliance.Blue) {
+        return ALLIANCE_RIGHT_BLUE;
+      } else {
+        return ALLIANCE_RIGHT_RED;
+      }
+    }
+  }
+
+  public static Translation3d getAllianceCenterTranslation() {
+    if (Robot.getAlliance() == Alliance.Blue) {
+      return ALLIANCE_CENTER_BLUE;
+    } else {
+      return ALLIANCE_CENTER_RED;
+    }
+  }
+
+  public static FieldZone getZone(Translation2d drivepose) {
+    double x = drivepose.getX();
+    //double y = drivepose.getY();
+    if(x < FieldConstants.RED_ALLIANCE_LINE) { // inside red
+      if (Robot.getAlliance() == Alliance.Red) {
+        return FieldZone.ALLIANCE;
+      } else {
+        return FieldZone.OPPOSITION;
+      }
+    } else if (x > FieldConstants.BLUE_ALLIANCE_LINE) {
+      if (Robot.getAlliance() == Alliance.Blue) {
+        return FieldZone.ALLIANCE;
+      } else {
+        return FieldZone.OPPOSITION;
+      }
+    } else {
+      return FieldZone.NEUTRAL;
+    }
+  }
+
+  public static Translation3d getOppositionTranslation(boolean sideLeft) {
+    if (sideLeft) {
+      if (Robot.getAlliance() == Alliance.Blue) {
+        return ALLIANCE_LEFT_RED;
+      } else {
+        return ALLIANCE_LEFT_BLUE;
+      }
+    } else {
+      if (Robot.getAlliance() == Alliance.Blue) {
+        return ALLIANCE_RIGHT_RED;
+      } else {
+        return ALLIANCE_RIGHT_BLUE;
+      }
+    }
+  }
 }

@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class Constants {
@@ -11,8 +13,9 @@ public class Constants {
     public static final double LOOP_TIME = 0.02;
 
     // CAN bus names
-    public static final String CANIVORE_CAN = "CANivore";
-    public static final String RIO_CAN = "rio";
+    public static final CANBus CANIVORE_CAN = new CANBus("CANivore");
+    public static final CANBus CANIVORE_SUB = new CANBus("CANivoreSub");
+    public static final CANBus RIO_CAN = new CANBus("rio");
 
     // Logging 
     public static final boolean USE_TELEMETRY = true;
