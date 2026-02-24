@@ -64,11 +64,11 @@
     },
     {
       "anchor": {
-        "x": 5.7049398496240595,
+        "x": 5.8960016556291395,
         "y": 4.038296992481204
       },
       "prevControl": {
-        "x": 6.311586466165413,
+        "x": 6.502648272170493,
         "y": 4.025109022556391
       },
       "nextControl": null,
@@ -79,15 +79,15 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7534675615212593,
-      "rotationDegrees": 45.0
+      "rotationDegrees": 135.0
     },
     {
       "waypointRelativePos": 2.0778523489932774,
-      "rotationDegrees": 45.0
+      "rotationDegrees": 135.0
     },
     {
       "waypointRelativePos": 2.521700223713649,
-      "rotationDegrees": -51.12369435851797
+      "rotationDegrees": 38.876
     }
   ],
   "constraintZones": [
@@ -130,13 +130,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Field Testing Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

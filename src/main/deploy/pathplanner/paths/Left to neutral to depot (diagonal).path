@@ -64,32 +64,32 @@
     },
     {
       "anchor": {
-        "x": 5.916583026285472,
-        "y": 5.201112001911139
+        "x": 5.946014234875446,
+        "y": 5.492870699881376
       },
       "prevControl": {
-        "x": 6.21376543175226,
-        "y": 5.1960727035599605
+        "x": 6.2431966403422345,
+        "y": 5.487831401530197
       },
       "nextControl": {
-        "x": 5.263739822137,
-        "y": 5.212182212063977
+        "x": 5.293171030726975,
+        "y": 5.503940910034214
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.6937744360902256,
-        "y": 5.201112001911139
+        "x": 3.6865836298932395,
+        "y": 5.492870699881376
       },
       "prevControl": {
-        "x": 3.9888322003988153,
-        "y": 5.214306565468976
+        "x": 3.981641394201829,
+        "y": 5.506065263439213
       },
       "nextControl": {
-        "x": 3.124067643786618,
-        "y": 5.1756355244559655
+        "x": 3.116876837589632,
+        "y": 5.467394222426202
       },
       "isLocked": false,
       "linkedName": null
@@ -142,24 +142,24 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 0.4120781527531097,
+      "rotationDegrees": 180.0
     },
     {
       "waypointRelativePos": 1.2283611599297022,
-      "rotationDegrees": 39.34995956941872
+      "rotationDegrees": 145.82109874494995
     },
     {
       "waypointRelativePos": 2.5766695957820738,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 3.847874720357959,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 40.392
     },
     {
       "waypointRelativePos": 5.3154362416107235,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 40.392
     }
   ],
   "constraintZones": [
@@ -228,13 +228,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -89.60319923509195
   },
   "reversed": false,
   "folder": "Left Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 179.44468519034675
   },
   "useDefaultConstraints": true
 }
