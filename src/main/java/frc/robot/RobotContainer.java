@@ -24,10 +24,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
-import frc.robot.commands.gpm.ClimbCommand;
+import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
@@ -200,7 +202,7 @@ public class RobotContainer {
     }
 
     if (linearClimb != null && drive != null){
-      NamedCommands.registerCommand("Climb", new ClimbCommand(linearClimb, drive, ps5));
+      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive, ps5));
     }
 
   }
