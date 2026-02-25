@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -26,6 +28,7 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
+import frc.robot.util.PhaseManager.CurrentState;
 import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
@@ -208,7 +211,13 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+            
+            if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            } else{
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+            }
+            
             shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
             if (phaseManager.shouldFeed()) {

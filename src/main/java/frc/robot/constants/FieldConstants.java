@@ -20,8 +20,8 @@ public class FieldConstants {
   /** Height of the field [meters] */
   public static final double FIELD_WIDTH = field.getFieldWidth();
 
-  public static final double RED_BORDER = Units.inchesToMeters(180);
-  public static final double BLUE_BORDER = FIELD_LENGTH - Units.inchesToMeters(180);
+  public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
+  public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.25;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
 
@@ -40,10 +40,10 @@ public class FieldConstants {
 
   /** Location of hub target */
   public static final Translation3d HUB_BLUE =
-      new Translation3d(Units.inchesToMeters(156.8 + 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
+      new Translation3d(Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
   
   public static final Translation3d HUB_RED =
-      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(156.8 - 20), FIELD_WIDTH/2, Units.inchesToMeters(72));
+      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
     
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
@@ -52,23 +52,23 @@ public class FieldConstants {
     new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(BLUE_BORDER - 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(BLUE_BORDER - 2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
-    new Translation3d(BLUE_BORDER - 5, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(BLUE_BORDER - 2, RIGHT_SIDE_TARGET, 0);
 
 
   public static final Translation3d ALLIANCE_LEFT_RED =
-    new Translation3d(RED_BORDER + 5, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(RED_BORDER + 2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_RED =
-    new Translation3d(RED_BORDER + 5, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(RED_BORDER + 2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_CENTER_BLUE =
-    new Translation3d(BLUE_BORDER - 5, FIELD_WIDTH/2, 0);
+    new Translation3d(BLUE_BORDER - 2, FIELD_WIDTH/2, 0);
   
   public static final Translation3d ALLIANCE_CENTER_RED =
-    new Translation3d(RED_BORDER + 5, FIELD_WIDTH/2, 0);
+    new Translation3d(RED_BORDER + 2, FIELD_WIDTH/2, 0);
 
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
   public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
@@ -130,6 +130,10 @@ public class FieldConstants {
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
     //double y = drivepose.getY();
+    if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > BLUE_ALLIANCE_LINE)
+        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE){
+          return FieldZone.TRENCH_BUMP;
+        }
     if(x < FieldConstants.RED_ALLIANCE_LINE) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
@@ -152,13 +156,14 @@ public class FieldConstants {
       if (Robot.getAlliance() == Alliance.Blue) {
         return ALLIANCE_LEFT_RED;
       } else {
-        return ALLIANCE_LEFT_BLUE;
+        // Reversed it so we shoot same side, but probably need to change this
+        return ALLIANCE_RIGHT_BLUE;
       }
     } else {
       if (Robot.getAlliance() == Alliance.Blue) {
         return ALLIANCE_RIGHT_RED;
       } else {
-        return ALLIANCE_RIGHT_BLUE;
+        return ALLIANCE_LEFT_BLUE;
       }
     }
   }
