@@ -146,7 +146,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Intake fuel",
+      "name": "Intake",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": 5.318335208099032,
       "command": {
