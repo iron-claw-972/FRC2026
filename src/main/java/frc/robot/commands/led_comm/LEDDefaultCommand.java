@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 // import frc.robot.subsystems.outtake.Outtake; // TODO: Outtake subsystem not implemented on current robot
@@ -21,17 +22,20 @@ public class LEDDefaultCommand extends Command {
 
     
 
-    public LEDDefaultCommand(LED led) {
+    public LEDDefaultCommand(LED led, PS5Controller controller) {
         this.led = led;
+        this.controller = controller;
         // this.outtake = outtake;
         addRequirements(led);
     }
 
     @Override
     public void execute() {
+        controller = new PS5Controller(Constants.DRIVER_JOY);
+
         double matchTime = DriverStation.getMatchTime();
         String gameData = DriverStation.getGameSpecificMessage();
-        // if (vision.oneCameraDisconnected()) {
+        // if (vision.oneCameraDisconnected() || DriverStation.isJoystickConnected(Constants.DRIVER_JOY)) {
         //     // flash if camera disconnected
         //     led.setStrobeLights(255, 100, 0);
         // } else 
@@ -59,22 +63,20 @@ public class LEDDefaultCommand extends Command {
         } else if ((allianceIsRed && gameData.equals("R") && matchTime <= 130 && matchTime >= 105) || (allianceIsRed && gameData.equals("R") && matchTime <= 80 && matchTime >= 55)) {
             // turn light off for inactive hub if red alliance and red inactive first
             led.setLEDs(0, 0, 0);
-        } else if ((gameData.equals("B") && matchTime <= 130 && matchTime >= 105) || (gameData.equals("B") && matchTime <= 80 && matchTime >= 55)) {
+        } else if ((!allianceIsRed && gameData.equals("B") && matchTime <= 130 && matchTime >= 105) || (!allianceIsRed && gameData.equals("B") && matchTime <= 80 && matchTime >= 55)) {
             // turn off lights for inactive hub if blue alliance and blue inactive first
             led.setLEDs(0, 0, 0);
-        } else if ((gameData.equals("R") && matchTime <= 105 && matchTime >= 80) || (gameData.equals("R") && matchTime <= 55 && matchTime >= 30)) {
+        } else if ((!allianceIsRed && gameData.equals("R") && matchTime <= 105 && matchTime >= 80) || (!allianceIsRed && gameData.equals("R") && matchTime <= 55 && matchTime >= 30)) {
             // turn light off for inactive hub if blue alliance and red inactive first
             led.setLEDs(0, 0, 0);
         } else if (allianceIsRed) {
             // Red alliance
-            // TODO need to fix 2 color wave
-            //led.setTwoColorWave(255, 0, 0, 255, 255, 255);
-            led.setLEDs(255, 0, 0);
+            led.setTwoColorWave(255, 0, 0, 255, 255, 255);
+            // led.setLEDs(255, 0, 0);
         } else {
             // Blue alliance
-            // led.setTwoColorWave(0, 0, 255, 255, 255, 255);
-            // TODO remake 2 color wave
-            led.setLEDs(0, 0, 255);
+            led.setTwoColorWave(0, 0, 255, 255, 255, 255);
+            // led.setLEDs(0, 0, 255);
         }
     }
 

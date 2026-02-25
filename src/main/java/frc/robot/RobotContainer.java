@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private Operator operator = null;
   private LinearClimb linearClimb = null;
   private LED led = null;
+  private PS5Controller controller = null;
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -89,7 +91,8 @@ public class RobotContainer {
 
       case TestBed2:
         led = new LED();
-        led.setDefaultCommand(new LEDDefaultCommand(led));
+        controller = new PS5Controller(Constants.DRIVER_JOY);
+        led.setDefaultCommand(new LEDDefaultCommand(led, controller));
         break;
 
       default:
