@@ -81,9 +81,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 () -> false, getDrivetrain()).withTimeout(2));
 
         // Trench align
-        controller.get(DPad.LEFT).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
-                .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
-
         controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(true); getDrivetrain().setTrenchAlign(true);}))
             .onFalse(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(false); getDrivetrain().setTrenchAlign(false);}));
 

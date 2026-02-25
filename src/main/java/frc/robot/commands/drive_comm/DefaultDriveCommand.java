@@ -42,9 +42,6 @@ public class DefaultDriveCommand extends Command {
 
     }
 
-    private boolean trenchAlign = false;
-    private boolean trenchAssist = true;
-
     @Override
     public void execute() {
         double forwardTranslation = driver.getForwardTranslation();

@@ -12,8 +12,6 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class TrenchAssist2 {
 
-    // private static final double SCALE = 1.0;
-
     public static ChassisSpeeds calculate(Drivetrain drive, ChassisSpeeds chassisSpeeds, PIDController pid) {
         // ChassisSpeeds speedsFieldRelative =
         // ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeeds,
@@ -41,11 +39,9 @@ public class TrenchAssist2 {
         ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, impulse,
                 chassisSpeeds.omegaRadiansPerSecond);
 
-        var x = new ChassisSpeeds(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond,
-                chassisSpeeds.omegaRadiansPerSecond);
-        var y = new Translation2d(x.vxMetersPerSecond, x.vyMetersPerSecond).rotateBy(drive.getYaw());
+        var y = new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond).rotateBy(drive.getYaw());
 
-        var z = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(y.getX(), y.getY(), x.omegaRadiansPerSecond),
+        var z = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(y.getX(), y.getY(), horizontalSpeeds.omegaRadiansPerSecond),
                 drive.getYaw());
 
         return z;
