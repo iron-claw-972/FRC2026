@@ -21,7 +21,7 @@ import frc.robot.util.Vision.DriverAssist;
  */
 public class DefaultDriveCommand extends Command {
     protected final Drivetrain swerve;
-    protected final BaseDriverConfig driver;
+    private final BaseDriverConfig driver;
     private PIDController trenchAssistPid = new PIDController(9, 0.0, 3);
 
     public DefaultDriveCommand(
