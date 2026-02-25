@@ -5,177 +5,105 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.shooter.ShooterIO.ShooterIOInputs;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     
-    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.RIO_CAN);
-    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.RIO_CAN);
-    private TalonFX feederMotor = new TalonFX(IdConstants.FEEDER_ID, Constants.RIO_CAN);
-
-    //rotations/sec
+    private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.CANIVORE_SUB);
+    private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.CANIVORE_SUB);
 
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
 
-    public double shooterPower = 0.5;
-    private double feederPower = 0;
-    
-    //Velocity in rotations per second
+    // Velocity in rotations per second
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
-    private ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+    private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    // for tracking current phase: used to adjust the setting
-    private FlywheelPhase phase;
-
-    private double torqueCurrentDebounceTime = 0.5;
-
-    VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
-    TorqueCurrentFOC torqueCurrentFOC = new TorqueCurrentFOC(0);
-
-    /*
-     * Debouncers take in certain statement. If it is false: it checks for how long (the first parameter) 
-     * If it is long enough then return True. 
-     */
-    private Debouncer torqueCurrentDebouncer = new Debouncer(torqueCurrentDebounceTime, DebounceType.kFalling);
-
-    @AutoLogOutput private long launchCount = 0;
-    private boolean lastTorqueCurrentControl = false;
-
-    public enum FlywheelPhase {
-        BANG_BANG,
-        CONSTANT_TORQUE,
-        START_UP
-    }
+    double powerModifier = 1.0;
 
     public Shooter(){
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = ShooterConstants.kP; //tune p value
-        config.Slot0.kI = ShooterConstants.kI;
-        config.Slot0.kD = ShooterConstants.kD;
-        config.Slot0.kV = ShooterConstants.kV; //Maximum rps = 100 --> 12V/100rps
+        updateInputs();
         
-        config.TorqueCurrent.PeakReverseTorqueCurrent = ShooterConstants.SHOOTER_MAX_TORQUE_CURRENT; // we are making this a BANG BANG controller for talon fx
-        config.MotorOutput.PeakForwardDutyCycle = ShooterConstants.MOTOR_BANG_BANG_MAX; // bang bang up
-        // tune this 
-        config.MotorOutput.PeakReverseDutyCycle = ShooterConstants.MOTOR_BANG_BANG_MIN; // bang bang down
-
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Slot0.kP = 0.15; //tune p value
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0.0;
+        config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
         
-        shooterMotorRight.getConfigurator().apply(
+        shooterMotorLeft.getConfigurator().apply(
             new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
-        shooterMotorLeft.getConfigurator().apply(
+        shooterMotorRight.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
-        // set start up for phase initially:
-        phase = FlywheelPhase.START_UP;
-
-        feederMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
-        );
-
-        SmartDashboard.putData("Turn on shooter", new InstantCommand(() -> setShooter(ShooterConstants.SHOOTER_VELOCITY)));
-        SmartDashboard.putData("Turn ALL off", new InstantCommand(() -> deactivateShooterAndFeeder()));
-        SmartDashboard.putData("Turn off Shooter", new InstantCommand(() -> setShooter(0)));
+        SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
     }
 
-    public void periodic() {
-        //runVelocity(Units.rotationsToRadians(shooterTargetSpeed));
-        SmartDashboard.putNumber("Shot Power", shooterPower);
-        shooterPower = SmartDashboard.getNumber("Shot Power", shooterPower);
-
-        if (phase == FlywheelPhase.BANG_BANG || phase == FlywheelPhase.START_UP) { // shooter target speed is in RPS
-            // Duty-cycle bang-bang (apply to both) 100% speeds
-            shooterMotorLeft.setControl(velocityDutyCycle.withVelocity(shooterTargetSpeed).withAcceleration(67676767)); // spin as fast as possible shooter target speed
-            shooterMotorRight.setControl(velocityDutyCycle.withVelocity(shooterTargetSpeed).withAcceleration(67676767)); // same here
-        } else {
-            // Torque-current bang-bang
-            shooterMotorLeft.setControl(torqueCurrentFOC.withOutput(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
-            shooterMotorRight.setControl(torqueCurrentFOC.withOutput(ShooterConstants.TORQUE_CURRENT_CONTROL_GOAL_AMP));
-        }
-        feederMotor.set(feederPower);
-
+    @Override
+    public void periodic(){
         updateInputs();
+
+        powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
+        SmartDashboard.putNumber("shooter power modifier", powerModifier);
+        
+        // Convert to RPS
+        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+
+        // Sets the motor control to target velocity
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
+        
+        Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+    }
+
+    /**
+     * Sets the target speed of the shooter
+     * @param linearVelocityMps
+     */
+    public void setShooter(double linearVelocityMps) {
+        shooterTargetSpeed = linearVelocityMps;
+    }
+
+    /**@return velocity in m/s */
+    public double getShooterVelocity(){
+        return inputs.shooterSpeedLeft;
+    }
+
+    @Override
+    public void updateInputs(){
+        inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
+        inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         Logger.processInputs("Shooter", inputs);
     }
 
-    /** Run closed loop at the specified velocity. */
-    private void runVelocity(double velocityRadsPerSec) {
-        // if we are not in the tolerance
-        double math = Math.abs(Units.rotationsToRadians(getShooterVelcoity()) - velocityRadsPerSec);
-        System.out.println(math);
-        boolean inTolerance =
-            math
-                <= Units.rotationsToRadians(ShooterConstants.MOTOR_VELOCITY_TOLERANCE);
-        // If we are not in tolerance we calculate for how long
-        boolean torqueCurrentControl = torqueCurrentDebouncer.calculate(inTolerance); // this calculates if the logic has been occuring long enough
-        
-        if (!torqueCurrentControl && lastTorqueCurrentControl) {
-            launchCount++;
-        }
-        lastTorqueCurrentControl = torqueCurrentControl;
-
-        phase =
-            torqueCurrentControl
-                ? FlywheelPhase.CONSTANT_TORQUE
-                : FlywheelPhase.BANG_BANG;
-        shooterTargetSpeed = Units.radiansToRotations(velocityRadsPerSec);
-        Logger.recordOutput("Shooter/Setpoint", velocityRadsPerSec);
+    /**
+     * @return Whether the shooter is at the target speed with tolerance of 1 m/s
+     */
+    public boolean atTargetSpeed(){
+        return Math.abs(getShooterVelocity() - shooterTargetSpeed) < 1.0;
     }
 
-
-    public void deactivateShooterAndFeeder() {
-        setShooter(0);
-        System.out.println("Shooter deactivated");
-    }
-
-    public void setFeeder(double power){
-        System.out.println("VELOCITY: " + getShooterVelcoity()); 
-        feederPower = power;
-    }
-
-    public void setShooter(double velocityRPS) {
-        shooterTargetSpeed = velocityRPS;
-        System.out.println("Shooter is working");
-    }
-
-    public void setFeederPower(double power) {
-        this.feederPower = power;
-    }
-
-    public double getShooterVelcoity() {
-        return inputs.leftShooterVelocity; // assuming they are the same rn
-    }
-
-    public void updateInputs() {
-
-        inputs.leftShooterVelocity = shooterMotorLeft.getVelocity().getValueAsDouble();
-        inputs.rightShooterVelocity = shooterMotorRight.getVelocity().getValueAsDouble();
-        inputs.leftShooterCurrent = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-        inputs.rightShooterCurrent = shooterMotorRight.getStatorCurrent().getValueAsDouble();
-    
-        System.out.println(phase);
+    /**
+     * @return Gets the target velocity in m/s
+     */
+    @AutoLogOutput(key="Shooter/TargetSpeed")
+    public double getTargetVelocity(){
+        return shooterTargetSpeed;
     }
 }
