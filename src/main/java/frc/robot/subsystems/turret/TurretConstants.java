@@ -7,6 +7,8 @@ public class TurretConstants {
     public static double MAX_ANGLE = 200; // Deg
     public static double MIN_ANGLE = -200; // Deg
 
+    public static double CALIBRATION_OFFSET = 0.0; // TODO: find this at hardstop
+
     public static double MAX_VELOCITY = 600; // rad/s
     public static double MAX_ACCELERATION = 120.0; // rad/s^2
 
@@ -31,4 +33,9 @@ public class TurretConstants {
 	public static final double EXTRAPOLATION_TIME_CONSTANT = 0.06;
 
 	public static final double FEEDFORWARD_KV = 0.185;
+
+    public static final double NORMAL_CURRENT_LIMIT = 50.0; // A
+    public static final double CALIBRATION_CURRENT_LIMIT = 10.0; // A
+    public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
+
 }

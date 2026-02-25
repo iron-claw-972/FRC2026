@@ -11,6 +11,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -22,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -64,6 +65,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     private double setpointInches = 0.0;
 
     private boolean calibrating = false;
+    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
@@ -145,14 +147,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // add some test commands.
         SmartDashboard.putData("Extension Mechanism", mechanism);
-        SmartDashboard.putData("START INTAKE COMMAND", new InstantCommand(()->{
-            extend();
-            spinStart();
-        }));
-        SmartDashboard.putData("END INTAKE COMMAND", new InstantCommand(()->{
-            intermediateExtend();
-            spinStop();
-        }));
 
         if (RobotBase.isSimulation()) {
             // Extender simulation
@@ -188,14 +182,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
-        // Report velocity to SmartDashbboard
-        // this returns rotations per second.
-        double velocity = rollerMotor.getVelocity().getValueAsDouble();
-        SmartDashboard.putNumber("Roller Velocity", velocity);
-
         if(calibrating){
-            leftMotor.set(-0.1);
+            leftMotor.set(0.1);
             rightMotor.set(-0.1);
+            boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
+            if(calibrationDebouncer.calculate(atHardStop)){
+                stopCalibrating();
+            }
         }
 
         updateInputs();
@@ -203,8 +196,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void simulationPeriodic(){
-        // simulate the motor activities
-
         // get the applied motor voltage
         double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
 
@@ -355,9 +346,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * Stops, zeros, and moves it to retract position
      */
     public void stopCalibrating(){
-        calibrating = false;
         zeroMotors();
         setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
+        calibrating = false;
         retract();
     }
 
@@ -366,17 +357,14 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param limit the current limit for stator and supply current
      */
     public void setCurrentLimits(double limit) {
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(limit)
+        .withSupplyCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(limit);
 
-        config.CurrentLimits = new CurrentLimitsConfigs();
-
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = limit;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = limit;
-
-        leftMotor.getConfigurator().apply(config);
-        rightMotor.getConfigurator().apply(config);
+        leftMotor.getConfigurator().apply(limits);
+        rightMotor.getConfigurator().apply(limits);
     }
 
     @Override
@@ -385,6 +373,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
         inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
     }
 
 }

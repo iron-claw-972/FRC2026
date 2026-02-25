@@ -213,7 +213,8 @@ public class DriveConstants {
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
                 // Gear ratios 
-                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0);
+                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
+                // DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
                 STEER_GEAR_RATIO = 287.0 / 11.0;
 
                 // Gyro is mounted under the robot 
