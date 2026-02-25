@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5467141162514837,
-        "y": 0.6942704626334513
+        "x": 3.547,
+        "y": 0.694
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.83681954887218,
-        "y": 0.7017406015037613
+        "x": 5.837105432620696,
+        "y": 0.70147013887031
       },
       "isLocked": false,
       "linkedName": null
@@ -83,7 +83,30 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Extend intake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend intake"
+        }
+      }
+    },
+    {
+      "name": "Intake fuel",
+      "waypointRelativePos": 0.15748031496062947,
+      "endWaypointRelativePos": 2.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
