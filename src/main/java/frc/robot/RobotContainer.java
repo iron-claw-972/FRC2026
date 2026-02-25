@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DoNothing;
+import frc.robot.commands.auto_comm.FollowPathCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbCommand;
@@ -213,10 +214,14 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+    // autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    // autoChooser.addOption("Do nada", new DoNothing());
+    // autoChooser.addOption("Spin my wheels", new DoNothing());
+    // autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    autoChooser.setDefaultOption(null, auto);
+    autoChooser.addOption("Extend intake", new FollowPathCommand("Extend intake", drive));
+    
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
