@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class TrenchAssist2 {
@@ -19,7 +20,7 @@ public class TrenchAssist2 {
 
         double distanceFromSlideLatitude;
 
-        if (drive.getPose().getY() > (8.07 / 2.0)) {
+        if (drive.getPose().getY() > (FieldConstants.FIELD_WIDTH / 2.0)) {
             distanceFromSlideLatitude = (drive.getPose().getY() - TrenchAssistConstants.SLIDE_LATITUDES[0]);
         } else {
             distanceFromSlideLatitude = (drive.getPose().getY() - TrenchAssistConstants.SLIDE_LATITUDES[1]);
@@ -29,14 +30,14 @@ public class TrenchAssist2 {
                 new Pose2d[] { new Pose2d(2.0, TrenchAssistConstants.SLIDE_LATITUDES[0], Rotation2d.kZero),
                         new Pose2d(2.0, TrenchAssistConstants.SLIDE_LATITUDES[1], Rotation2d.kZero) });
 
-        double impulse = pid.calculate(distanceFromSlideLatitude, 0);
+        double correctionVelocity = pid.calculate(distanceFromSlideLatitude, 0);
 
         if (distanceFromSlideLatitude < Units.inchesToMeters(3)){
-            impulse = 0.0;
+            correctionVelocity = 0.0;
         }
 
 
-        ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, impulse,
+        ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, correctionVelocity,
                 chassisSpeeds.omegaRadiansPerSecond);
 
         var y = new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond).rotateBy(drive.getYaw());

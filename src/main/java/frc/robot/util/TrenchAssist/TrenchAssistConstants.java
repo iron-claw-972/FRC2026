@@ -3,6 +3,7 @@ package frc.robot.util.TrenchAssist;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.constants.FieldConstants;
 
 public class TrenchAssistConstants {
     public static final Rectangle2d[] OBSTACLES = new Rectangle2d[] {
@@ -21,7 +22,7 @@ public class TrenchAssistConstants {
     };
 
     public static final double[] SLIDE_LATITUDES = new double[]{
-        8.07 - Units.inchesToMeters(30.0),
+        FieldConstants.FIELD_WIDTH - Units.inchesToMeters(30.0),
         Units.inchesToMeters(30.0), // should be accurate, i think our field is slightly too small
         // 6.550,
         // 0.668,
