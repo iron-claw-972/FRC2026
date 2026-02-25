@@ -9,6 +9,7 @@ public interface IntakeIO {
         public static double rightPosition = 0.0;
         public static double leftCurrent = 0.0;
         public static double rightCurrent = 0.0;
+        public static double rollerVelocity = 0.0;
     }
 
     public void updateInputs();

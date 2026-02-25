@@ -25,7 +25,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.auto_comm.FollowPathCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
-import frc.robot.commands.gpm.ClimbCommand;
+import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -107,18 +107,18 @@ public class RobotContainer {
         intake = new Intake();
 
       case WaffleHouse: // AKA Betabot
-        turret = new Turret();
+        // turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        //vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-        linearClimb = new LinearClimb();
+        //linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -203,7 +203,7 @@ public class RobotContainer {
     }
 
     if (linearClimb != null && drive != null){
-      NamedCommands.registerCommand("Climb", new ClimbCommand(linearClimb, drive, ps5));
+      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive, ps5));
     }
 
   }
