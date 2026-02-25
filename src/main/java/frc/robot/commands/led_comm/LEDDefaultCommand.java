@@ -5,24 +5,26 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
+import frc.robot.controls.BaseDriverConfig;
+import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-// import frc.robot.subsystems.outtake.Outtake; // TODO: Outtake subsystem not implemented on current robot
 import frc.robot.util.Vision.Vision;
 import lib.controllers.PS5Controller.PS5Button;
 
 public class LEDDefaultCommand extends Command {
     private Vision vision;
     private LED led;
-    private PS5Controller controller;
+    private PS5ControllerDriverConfig controller;
     // private Outtake outtake;
     private Drivetrain drivetrain;
     private boolean allianceIsRed = DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
     
 
-    public LEDDefaultCommand(LED led, PS5Controller controller) {
+    public LEDDefaultCommand(LED led, PS5ControllerDriverConfig controller) {
         this.led = led;
         this.controller = controller;
         // this.outtake = outtake;
@@ -31,52 +33,61 @@ public class LEDDefaultCommand extends Command {
 
     @Override
     public void execute() {
-        controller = new PS5Controller(Constants.DRIVER_JOY);
-
+        
         double matchTime = DriverStation.getMatchTime();
         String gameData = DriverStation.getGameSpecificMessage();
         // if (vision.oneCameraDisconnected() || DriverStation.isJoystickConnected(Constants.DRIVER_JOY)) {
         //     // flash if camera disconnected
         //     led.setStrobeLights(255, 100, 0);
+        //     controller.endRumble();
         // } else 
         if (fiveSecondsBeforeChange() && allianceIsRed) {
             // blink alliance color and rumble if red alliance 5 seconds before hub shifts
             led.setStrobeLights(255, 0, 0);
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            controller.startRumble();
         } else if (fiveSecondsBeforeChange()) {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+            controller.startRumble();
         } else 
         if (playingDefense()) {
             new DefenseLightsCommand(led, 0, 67);
+            controller.endRumble();
         } else 
         if (DriverStation.isAutonomous() && allianceIsRed){
             // Dimmer light for auto in red alliance
             led.setLEDs(50, 0, 0);
+            controller.endRumble();
         } else if (DriverStation.isAutonomous()){
             // Dimmer light for auto in blue alliance
             led.setLEDs(0, 0, 50);
+            controller.endRumble();
         } else if ((allianceIsRed && gameData.equals("B") && matchTime <= 105 && matchTime >= 80) || (allianceIsRed && gameData.equals("B") && matchTime <= 55 && matchTime >= 30)) {
             // turn light off for inactive hub if red alliance and blue inactive first
             led.setLEDs(0, 0, 0);
+            controller.endRumble();
         } else if ((allianceIsRed && gameData.equals("R") && matchTime <= 130 && matchTime >= 105) || (allianceIsRed && gameData.equals("R") && matchTime <= 80 && matchTime >= 55)) {
             // turn light off for inactive hub if red alliance and red inactive first
             led.setLEDs(0, 0, 0);
+            controller.endRumble();
         } else if ((!allianceIsRed && gameData.equals("B") && matchTime <= 130 && matchTime >= 105) || (!allianceIsRed && gameData.equals("B") && matchTime <= 80 && matchTime >= 55)) {
             // turn off lights for inactive hub if blue alliance and blue inactive first
             led.setLEDs(0, 0, 0);
+            controller.endRumble();
         } else if ((!allianceIsRed && gameData.equals("R") && matchTime <= 105 && matchTime >= 80) || (!allianceIsRed && gameData.equals("R") && matchTime <= 55 && matchTime >= 30)) {
             // turn light off for inactive hub if blue alliance and red inactive first
             led.setLEDs(0, 0, 0);
+            controller.endRumble();
         } else if (allianceIsRed) {
             // Red alliance
             led.setTwoColorWave(255, 0, 0, 255, 255, 255);
             // led.setLEDs(255, 0, 0);
+            controller.endRumble();
         } else {
             // Blue alliance
             led.setTwoColorWave(0, 0, 255, 255, 255, 255);
             // led.setLEDs(0, 0, 255);
+            controller.endRumble();
         }
     }
 

@@ -67,7 +67,7 @@ public class RobotContainer {
   private Operator operator = null;
   private LinearClimb linearClimb = null;
   private LED led = null;
-  private PS5Controller controller = null;
+  private PS5ControllerDriverConfig controller = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -91,7 +91,6 @@ public class RobotContainer {
 
       case TestBed2:
         led = new LED();
-        controller = new PS5Controller(Constants.DRIVER_JOY);
         led.setDefaultCommand(new LEDDefaultCommand(led, controller));
         break;
 
