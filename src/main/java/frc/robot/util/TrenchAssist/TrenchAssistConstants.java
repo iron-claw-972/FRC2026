@@ -21,11 +21,11 @@ public class TrenchAssistConstants {
             new Rectangle2d(new Translation2d(99.99, 99.9), new Translation2d(0.0, 0.0)),
     };
 
-    public static final double[] SLIDE_LATITUDES = new double[]{
-        FieldConstants.FIELD_WIDTH - Units.inchesToMeters(30.0),
-        Units.inchesToMeters(30.0), // should be accurate, i think our field is slightly too small
-        // 6.550,
-        // 0.668,
+    public static final double[] SLIDE_LATITUDES = new double[] {
+            FieldConstants.FIELD_WIDTH - Units.inchesToMeters(30.0),
+            Units.inchesToMeters(30.0), // should be accurate, i think our field is slightly too small
+            // 6.550,
+            // 0.668,
 
     };
 

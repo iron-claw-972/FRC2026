@@ -32,17 +32,18 @@ public class TrenchAssist2 {
 
         double correctionVelocity = pid.calculate(distanceFromSlideLatitude, 0);
 
-        if (distanceFromSlideLatitude < Units.inchesToMeters(3)){
+        if (distanceFromSlideLatitude < Units.inchesToMeters(3)) {
             correctionVelocity = 0.0;
         }
-
 
         ChassisSpeeds horizontalSpeeds = new ChassisSpeeds(chassisSpeeds.vxMetersPerSecond, correctionVelocity,
                 chassisSpeeds.omegaRadiansPerSecond);
 
-        var y = new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond).rotateBy(drive.getYaw());
+        var y = new Translation2d(horizontalSpeeds.vxMetersPerSecond, horizontalSpeeds.vyMetersPerSecond)
+                .rotateBy(drive.getYaw());
 
-        var z = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(y.getX(), y.getY(), horizontalSpeeds.omegaRadiansPerSecond),
+        var z = ChassisSpeeds.fromFieldRelativeSpeeds(
+                new ChassisSpeeds(y.getX(), y.getY(), horizontalSpeeds.omegaRadiansPerSecond),
                 drive.getYaw());
 
         return z;

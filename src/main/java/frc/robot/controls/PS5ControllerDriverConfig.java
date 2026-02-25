@@ -4,7 +4,6 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.PS5Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -81,11 +80,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 () -> false, getDrivetrain()).withTimeout(2));
 
         // Trench align
-        controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(true); getDrivetrain().setTrenchAlign(true);}))
-            .onFalse(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(false); getDrivetrain().setTrenchAlign(false);}));
+        controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
+            getDrivetrain().setTrenchAssist(true);
+            getDrivetrain().setTrenchAlign(true);
+        }))
+                .onFalse(new InstantCommand(() -> {
+                    getDrivetrain().setTrenchAssist(false);
+                    getDrivetrain().setTrenchAlign(false);
+                }));
 
-        controller.get(DPad.LEFT).onTrue(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(true); getDrivetrain().setTrenchAlign(true);}))
-            .onFalse(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(false); getDrivetrain().setTrenchAlign(false);}));
+        controller.get(DPad.LEFT).onTrue(new InstantCommand(() -> {
+            getDrivetrain().setTrenchAssist(true);
+            getDrivetrain().setTrenchAlign(true);
+        }))
+                .onFalse(new InstantCommand(() -> {
+                    getDrivetrain().setTrenchAssist(false);
+                    getDrivetrain().setTrenchAlign(false);
+                }));
 
         // Reverse motors
         if (intake != null && spindexer != null && shooter != null) {
