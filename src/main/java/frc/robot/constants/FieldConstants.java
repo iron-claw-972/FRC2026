@@ -11,21 +11,22 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 
 public class FieldConstants {
-  /** Width of the field [meters] */
-  public static final double FIELD_LENGTH = Units.inchesToMeters(57*12 + 6+7.0/8.0);
-  /** Height of the field [meters] */
-  public static final double FIELD_WIDTH = Units.inchesToMeters(26*12 + 5);
 
   /**Apriltag layout for 2026 REBUILT */
   public static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+
+  /** Width of the field [meters] */
+  public static final double FIELD_LENGTH = field.getFieldLength();
+  /** Height of the field [meters] */
+  public static final double FIELD_WIDTH = field.getFieldWidth();
 
   public static final double RED_BORDER = Units.inchesToMeters(180);
   public static final double BLUE_BORDER = FIELD_LENGTH - Units.inchesToMeters(180);
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.25;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
-  // TODO: Find this
+
   /**The coordinate of the climb position */
-  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
   public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
 
   public static final Pose2d getClimbLocation(){
