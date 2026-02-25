@@ -32,7 +32,7 @@ public class TrenchAssist {
 
         double correctionVelocity = pid.calculate(distanceFromSlideLatitude, 0);
 
-        if (distanceFromSlideLatitude < Units.inchesToMeters(3)) {
+        if (Math.abs(distanceFromSlideLatitude) < Units.inchesToMeters(3)) {
             correctionVelocity = 0.0;
         }
 
