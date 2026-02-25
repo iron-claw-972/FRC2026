@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
@@ -34,7 +35,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
     private Command autoShoot = null;
-    private Command reverseMotors = null;
     private Shooter shooter;
     private Turret turret;
     private Hood hood;
@@ -79,17 +79,20 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 interrupted -> getDrivetrain().setStateDeadband(true),
                 () -> false, getDrivetrain()).withTimeout(2));
 
+        // Trench align
+        controller.get(DPad.LEFT).whileTrue(new StartEndCommand(
+                () -> {
+                    getDrivetrain().setTrenchAssist(true);
+                    getDrivetrain().setTrenchAlign(true);
+                },
+                () -> {
+                    getDrivetrain().setTrenchAssist(false);
+                    getDrivetrain().setTrenchAlign(false);
+                }));
+
         // Reverse motors
-        if (intake != null && spindexer != null && shooter != null){
-            driver.get(PS5Button.CIRCLE).onTrue(new InstantCommand(()->{
-                reverseMotors = new ReverseMotors(intake, spindexer);
-                reverseMotors.schedule();
-            })
-            ).onFalse(new InstantCommand(()->{
-                if(reverseMotors != null){
-                    reverseMotors.cancel();
-                }
-            }));
+        if (intake != null && spindexer != null && shooter != null) {
+            controller.get(PS5Button.CIRCLE).whileTrue(new ReverseMotors(intake, spindexer));
         }
 
         // Intake
@@ -130,15 +133,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Auto shoot
         if (turret != null && hood != null && shooter != null) {
-            driver.get(PS5Button.SQUARE).onTrue(
-                    new InstantCommand(() -> {
-                        if (autoShoot != null && autoShoot.isScheduled()) {
-                            autoShoot.cancel();
-                        } else {
-                            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
-                            CommandScheduler.getInstance().schedule(autoShoot);
-                        }
-                    }));
+            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
+            controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
         // Climb
