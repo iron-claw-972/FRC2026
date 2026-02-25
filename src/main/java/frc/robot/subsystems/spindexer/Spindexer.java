@@ -6,11 +6,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.subsystems.spindexer.SpindexerIO;
 
 public class Spindexer extends SubsystemBase implements SpindexerIO {
     private TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID, Constants.CANIVORE_SUB);

@@ -7,21 +7,28 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
@@ -32,6 +39,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
+import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.PathGroupLoader;
@@ -63,6 +71,10 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
+  // TODO: move to correct robot and put the correct port?
+  private PS5Controller ps5 = new PS5Controller(0);
+
+
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -173,6 +185,26 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
+    if (intake != null){
+      NamedCommands.registerCommand("Extend intake", new InstantCommand(()-> intake.extend()));
+      NamedCommands.registerCommand("Retract intake", new InstantCommand(()-> intake.retract()));
+    }
+
+    if (intake != null && spindexer != null){ 
+      NamedCommands.registerCommand("Intake", new ParallelCommandGroup(
+        new InstantCommand(()->intake.spin(IntakeConstants.SPEED)),
+        new InstantCommand(()-> spindexer.setSpindexer(SpindexerConstants.spindexerMaxPower))
+      ));
+    }
+
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+    }
+
+    if (linearClimb != null && drive != null){
+      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive, ps5));
+    }
+
   }
 
   /**
