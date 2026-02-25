@@ -99,6 +99,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 		SmartDashboard.putData("Turret Mech", mech);
+		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
+		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 
 		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
 		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
@@ -237,9 +239,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
 		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
 		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
-
-		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 	}
 
 	/* ---------------- Simulation ---------------- */
