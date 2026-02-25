@@ -16,12 +16,12 @@ import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.Intake.Intake;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
@@ -93,7 +93,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         if (intake != null && spindexer != null && shooter != null) {
             controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
                 reverseMotors = new ReverseMotors(intake, spindexer);
-                reverseMotors.schedule();
+				CommandScheduler.getInstance().schedule(reverseMotors);
             })).onFalse(new InstantCommand(() -> {
                 if (reverseMotors != null) {
                     reverseMotors.cancel();

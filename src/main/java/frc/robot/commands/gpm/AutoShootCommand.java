@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.ShooterPhysics;
@@ -70,6 +70,7 @@ public class AutoShootCommand extends Command {
         //drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
 
         goalState = ShooterPhysics.getShotParams(
+				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
@@ -107,11 +108,13 @@ public class AutoShootCommand extends Command {
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
-            goalState = ShooterPhysics.getShotParams(
+            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
+					Translation2d.kZero,
 				target3d.minus(lookahead3d),
 				2.0);
+			goalState = goalStateWithT.getFirst();
 
-            timeOfFlight = goalState.timeOfFlight();
+            timeOfFlight = goalStateWithT.getSecond();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =

@@ -72,6 +72,7 @@ public class Superstructure extends Command {
         drivepose  = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
+				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
@@ -114,11 +115,13 @@ public class Superstructure extends Command {
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
-            goalState = ShooterPhysics.getShotParams(
+            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
+					Translation2d.kZero,
 				target3d.minus(lookahead3d),
 				2.0);
+			goalState = goalStateWithT.getFirst();
 
-            timeOfFlight = goalState.timeOfFlight();
+            timeOfFlight = goalStateWithT.getSecond();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
