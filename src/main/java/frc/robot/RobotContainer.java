@@ -202,7 +202,7 @@ public class RobotContainer {
     }
 
     if (linearClimb != null && drive != null){
-      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive, ps5));
+      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
     }
 
   }
