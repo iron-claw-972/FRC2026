@@ -2,6 +2,7 @@ package frc.robot.commands.drive_comm;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -26,6 +27,7 @@ import lib.controllers.PS5Controller.PS5Axis;
 public class DefaultDriveCommand extends Command {
     protected final Drivetrain swerve;
     protected final BaseDriverConfig driver;
+    private PIDController trenchAssistPid = new PIDController(9, 0.0, 3);
 
     public DefaultDriveCommand(
             Drivetrain swerve,
@@ -39,6 +41,10 @@ public class DefaultDriveCommand extends Command {
     @Override
     public void initialize() {
         swerve.setStateDeadband(true);
+
+        trenchAssistPid.setIZone(2);
+        trenchAssistPid.setIntegratorRange(-1, 1);
+
     }
 
     private boolean trenchAlign = false;
@@ -90,13 +96,11 @@ public class DefaultDriveCommand extends Command {
 
         Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         if (swerve.getTrenchAssist()) {
-            drive(TrenchAssist2.calculate(swerve, corrected));
+            drive(TrenchAssist2.calculate(swerve, corrected, trenchAssistPid));
         } else {
+            trenchAssistPid.reset();
             drive(corrected);
         }
-
-        Logger.recordOutput("isAlign", swerve.getIsAlign());
-        Logger.recordOutput("alignAngle", swerve.getAlignAngle());
     }
 
     /**

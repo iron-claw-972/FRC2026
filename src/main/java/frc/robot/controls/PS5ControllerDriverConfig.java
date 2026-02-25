@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PS5Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
+import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
 
@@ -60,8 +62,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAlign(true)))
             .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAlign(false)));
 
-        controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> getDrivetrain().setTrenchAssist(true)))
-            .onFalse(new InstantCommand(() -> getDrivetrain().setTrenchAssist(false)));
+        controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(true); getDrivetrain().setTrenchAlign(true);}))
+            .onFalse(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(false); getDrivetrain().setTrenchAlign(false);}));
+
+        controller.get(DPad.LEFT).onTrue(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(true); getDrivetrain().setTrenchAlign(true);}))
+            .onFalse(new InstantCommand(() -> {getDrivetrain().setTrenchAssist(false); getDrivetrain().setTrenchAlign(false);}));
 
 
 
