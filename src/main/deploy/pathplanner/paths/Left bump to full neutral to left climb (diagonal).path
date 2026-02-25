@@ -110,8 +110,12 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 0.0,
+      "rotationDegrees": 37.936
+    },
+    {
       "waypointRelativePos": 0.833037300177617,
-      "rotationDegrees": 37.93600000000001
+      "rotationDegrees": 37.936
     },
     {
       "waypointRelativePos": 1.4547069271758435,
@@ -140,7 +144,41 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Intake fuel",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 5.318335208099032,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake"
+        }
+      }
+    },
+    {
+      "name": "Extend intake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend intake"
+        }
+      }
+    },
+    {
+      "name": "Climb",
+      "waypointRelativePos": 6.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Climb"
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -157,7 +195,7 @@
   "folder": "Left Autos",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 41.309
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
