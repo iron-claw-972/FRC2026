@@ -24,7 +24,6 @@ import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
@@ -33,10 +32,10 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.hood.Hood;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -100,18 +99,18 @@ public class RobotContainer {
         intake = new Intake();
 
       case WaffleHouse: // AKA Betabot
-        turret = new Turret();
+        // turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-        linearClimb = new LinearClimb();
+        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
