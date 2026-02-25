@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.constants.FieldConstants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
-public class TrenchAssist2 {
+public class TrenchAssist {
 
     public static ChassisSpeeds calculate(Drivetrain drive, ChassisSpeeds chassisSpeeds, PIDController pid) {
         // ChassisSpeeds speedsFieldRelative =
