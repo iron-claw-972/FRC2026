@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.constants.FieldConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -76,7 +77,14 @@ public class DefaultDriveCommand extends Command {
                 swerve.setIsAlign(true);
 
                 double yawDegrees = swerve.getYaw().getDegrees();
-                double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
+                double snappedDeg;
+
+                if (swerve.getPose().getX() > FieldConstants.FIELD_LENGTH / 2) {
+                    snappedDeg = (swerve.getYaw().getDegrees() > 135 || swerve.getYaw().getDegrees() < 225) ? 180 : 0;
+                } else {
+                    snappedDeg = (swerve.getYaw().getDegrees() < 45 || swerve.getYaw().getDegrees() > 315) ? 180 : 0;
+                }
+
                 swerve.setAlignAngle(Units.degreesToRadians(snappedDeg));
             } else {
                 Logger.recordOutput("InAlignZone", false);
