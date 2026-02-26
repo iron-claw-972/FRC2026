@@ -112,7 +112,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }, intake));
 
             // Retract if hold for 3 seconds
-            controller.get(PS5Button.RIGHT_TRIGGER).debounce(3.0).onTrue(new InstantCommand(() -> {
+            controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
                 intake.spinStop();
