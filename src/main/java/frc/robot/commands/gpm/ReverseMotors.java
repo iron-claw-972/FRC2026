@@ -23,14 +23,15 @@ public class ReverseMotors extends Command {
 
     @Override
     public void execute(){
+        intake.extend();
         intake.spinReverse();
-        spindexer.reverseSpindexer();
+        //spindexer.reverseSpindexer();
     }
 
     @Override
     public void end(boolean interrupted){
-        intake.spinStart();
-        spindexer.maxSpindexer();
+        intake.spinStop();
+        //spindexer.maxSpindexer();
     }
 
 }

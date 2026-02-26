@@ -22,8 +22,8 @@ public class TurretConstants {
     public static int RIGHT_ENCODER_TEETH = 22; // read above
     public static int ENCODER_COUNT_TOTAL = 8192; // how many intervals it can have, like clicks on a clock chat gpt explained to me
 
-    public static double LEFT_ENCODER_OFFSET = 0.463379; //  rot
-    public static double RIGHT_ENCODER_OFFSET = 0.197266; //  rot
+    public static double LEFT_ENCODER_OFFSET = 0.364502; //  rot
+    public static double RIGHT_ENCODER_OFFSET = 0.718506; //  rot
 
     // Turret is in center of robot, but make use of the height in shooter physics
     public static Translation3d DISTANCE_FROM_ROBOT_CENTER = new Translation3d(0,0, Units.inchesToMeters(22.172)); //meters
@@ -34,7 +34,7 @@ public class TurretConstants {
 
 	public static final double FEEDFORWARD_KV = 0.185;
 
-    public static final double NORMAL_CURRENT_LIMIT = 50.0; // A
+    public static final double NORMAL_CURRENT_LIMIT = 20.0; // A
     public static final double CALIBRATION_CURRENT_LIMIT = 10.0; // A
     public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
 

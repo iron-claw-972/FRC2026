@@ -28,6 +28,7 @@ import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
@@ -104,18 +105,18 @@ public class RobotContainer {
         intake = new Intake();
 
       case WaffleHouse: // AKA Betabot
-        // turret = new Turret();
+        turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
+        //linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 

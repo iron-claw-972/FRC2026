@@ -36,7 +36,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
     private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     // logging information
-    private LinearClimbIOInputs inputs = new LinearClimbIOInputs();
+    private LinearClimbIOInputsAutoLogged inputs = new LinearClimbIOInputsAutoLogged();
 
     private final PIDController pid = new PIDController(
             ClimbConstants.PID_P,
@@ -73,6 +73,9 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * @param setpoint in rotations
      */
     public void setSetpoint(double setpoint) {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        motor.getConfigurator().apply(config);
         pid.setSetpoint(setpoint);
     }
 
@@ -145,6 +148,8 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
         motor.set(power);
         
         Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint()) * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+        updateInputs();
+        Logger.processInputs("LinearClimb", inputs);
     }
     /**
      * converts motor rotations to meters

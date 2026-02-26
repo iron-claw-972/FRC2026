@@ -114,6 +114,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.RIGHT_TRIGGER).debounce(3.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
+                intake.spinStop();
             }));
 
             // Calibration
@@ -121,6 +122,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 intake.calibrate();
             })).onFalse(new InstantCommand(() -> {
                 intake.stopCalibrating();
+            }));
+
+            // Stop intake roller
+            controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
+                intake.spinStop();
             }));
         }
 
@@ -140,7 +146,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Climb
         if (climb != null) {
             // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            controller.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
                 climb.hardstopCalibration();
             })).onFalse(new InstantCommand(() -> {
                 climb.stopCalibrating();

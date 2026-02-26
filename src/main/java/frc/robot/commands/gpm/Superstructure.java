@@ -217,7 +217,7 @@ public class Superstructure extends Command {
             } else{
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
             }
-            
+
             shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
             if (phaseManager.shouldFeed()) {
@@ -230,6 +230,8 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
         SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+
+        SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }
 
     @Override

@@ -69,7 +69,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     
 		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
@@ -129,6 +129,14 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		//Sets the initial motor position
 		motor.setPosition(motorRotations);
+
+		motor.setPosition(0.0);
+
+		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
+		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
+		SmartDashboard.putData("Turn to 90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);}));
+		SmartDashboard.putData("Turn to 200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);}));
+		SmartDashboard.putData("Turn to -200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);}));
 
 	}
 
