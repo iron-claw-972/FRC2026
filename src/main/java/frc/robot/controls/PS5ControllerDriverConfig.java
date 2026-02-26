@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
+import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
@@ -108,21 +109,25 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     intake.spinStop();
                     intakeBoolean = true;
                 }
-            }));
+            }, intake));
 
             // Retract if hold for 3 seconds
             controller.get(PS5Button.RIGHT_TRIGGER).debounce(3.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
                 intake.spinStop();
-            }));
+            }, intake));
+
+            // Make the intake go in and out while shooter
+            controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
+                .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
             // Calibration
             controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
                 intake.calibrate();
             })).onFalse(new InstantCommand(() -> {
                 intake.stopCalibrating();
-            }));
+            }, intake));
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
