@@ -118,7 +118,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 intake.spinStop();
             }, intake));
 
-            // Make the intake go in and out while shooter
+            // Make the intake go in and out while shooting
             controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
                 .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
