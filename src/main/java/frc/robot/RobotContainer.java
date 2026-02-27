@@ -137,8 +137,9 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          PathPlannerAuto.getPathGroupFromAutoFile("Command Name");
-          auto = new PathPlannerAuto("Path Name");
+          String leftSideAuto = "Left Side Auto";
+          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
+          auto = new PathPlannerAuto(leftSideAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
@@ -155,7 +156,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    autoChooserInit();
+    //autoChooserInit();
   }
 
   /**
@@ -191,8 +192,8 @@ public class RobotContainer {
 
     if (intake != null && spindexer != null){ 
       NamedCommands.registerCommand("Intake", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spin(IntakeConstants.SPEED)),
-        new InstantCommand(()-> spindexer.setSpindexer(SpindexerConstants.spindexerMaxPower))
+        new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
+        //new InstantCommand(()-> spindexer.setSpindexer(SpindexerConstants.spindexerMaxPower))
       ));
     }
 
