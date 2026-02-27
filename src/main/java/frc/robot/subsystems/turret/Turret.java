@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.ChineseRemainderTheorem;
+import frc.robot.util.ModifiedCRT;
 
 public class Turret extends SubsystemBase implements TurretIO{
 	// Super low magnitude filter for the position to make it less jittery
@@ -69,7 +70,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		motor.setNeutralMode(NeutralModeValue.Brake);
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
-		config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     
 		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
@@ -98,6 +99,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 					false,
 					0.0);
 		}
+
 		SmartDashboard.putData("Turret Mech", mech);
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
@@ -108,28 +110,23 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
 		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-		int leftTooth = (int) Math.round(leftAbs * TurretConstants.LEFT_ENCODER_TEETH)
-				% TurretConstants.LEFT_ENCODER_TEETH;
-		//SmartDashboard.putNumber("Left Tooth", leftTooth);
+		ModifiedCRT crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
-		int rightTooth = (int) Math.round(rightAbs * TurretConstants.RIGHT_ENCODER_TEETH)
-				% TurretConstants.RIGHT_ENCODER_TEETH;
-		//SmartDashboard.putNumber("Right Tooth", rightTooth);
-
-		int turretIndex = ChineseRemainderTheorem.solve(leftTooth, TurretConstants.LEFT_ENCODER_TEETH, rightTooth, TurretConstants.RIGHT_ENCODER_TEETH);
+		double turretRot = crt.solve(leftAbs, rightAbs);
 		//SmartDashboard.putNumber("Turret Index", turretIndex);
 
-		double turretRotations = turretIndex / (double) TurretConstants.TURRET_TEETH_COUNT;
-		if(Units.rotationsToDegrees(turretRotations) > 500.0){
-			turretRotations -= Units.degreesToRotations(846.0);
-		}
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRotations));
+		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
 
-		double motorRotations = turretRotations * TurretConstants.GEAR_RATIO;
+		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
 
 		//Sets the initial motor position
 		motor.setPosition(motorRotations);
 
+		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
+		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
+		SmartDashboard.putData("Turn to 90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);}));
+		SmartDashboard.putData("Turn to 200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);}));
+		SmartDashboard.putData("Turn to -200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);}));
 	}
 
 	/* ---------------- Public API ---------------- */
@@ -257,11 +254,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void updateInputs() {
-		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
+		// inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = encoderLeft.getAbsolutePosition().getValueAsDouble();
-        inputs.encoderRightRot = encoderRight.getAbsolutePosition().getValueAsDouble();
+        inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
+        inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 	}
 

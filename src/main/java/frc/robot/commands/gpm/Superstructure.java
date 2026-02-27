@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -26,6 +28,7 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
+import frc.robot.util.PhaseManager.CurrentState;
 import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
@@ -116,7 +119,8 @@ public class Superstructure extends Command {
 
             goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
-				2.0);
+                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+				2.0 : 3.0);
 
             timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
@@ -207,7 +211,13 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+            
+            if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            } else{
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+            }
+
             shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
             if (phaseManager.shouldFeed()) {
@@ -220,6 +230,8 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
         SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
         SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+
+        SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }
 
     @Override

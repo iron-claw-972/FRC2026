@@ -25,7 +25,7 @@ public class DriveConstants {
      */
     public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.832;
 
-    public static double ROBOT_MASS = 31;
+    public static double ROBOT_MASS = Units.lbsToKilograms(108.3 + 13 + 13.4 + 5.0);
 
     /** Radius of the drive wheels [meters]. */
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
@@ -213,8 +213,8 @@ public class DriveConstants {
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
 
                 // Gear ratios 
-                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
-                // DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
+                //DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
+                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
                 STEER_GEAR_RATIO = 287.0 / 11.0;
 
                 // Gyro is mounted under the robot 
