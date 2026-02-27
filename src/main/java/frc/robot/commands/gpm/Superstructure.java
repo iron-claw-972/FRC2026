@@ -62,9 +62,11 @@ public class Superstructure extends Command {
 
     private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
-    private Translation2d target = null;
+    private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
+
+    private double hoodOffset = 0.0;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -143,6 +145,8 @@ public class Superstructure extends Command {
         
         lastTurretAngle = turretAngle;
 
+        Logger.recordOutput("Turret/Target Pose", target);
+
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
         // Subtract the rotational angle of the robot from the setpoint
@@ -200,9 +204,11 @@ public class Superstructure extends Command {
 
     @Override
     public void execute() {
+        hoodOffset = SmartDashboard.getNumber("Hood Offset", hoodOffset);
+        SmartDashboard.putNumber("Hood Offset", hoodOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
-        target = phaseManager.getTarget();
+        //target = phaseManager.getTarget();
 
         updateDrivePose();
         updateSetpoints(drivepose);
@@ -213,12 +219,12 @@ public class Superstructure extends Command {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
             
             if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE - hoodOffset), 0.0);
             } else{
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
             }
 
-            shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+            shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
             // if (phaseManager.shouldFeed()) {
             //     spindexer.maxSpindexer();

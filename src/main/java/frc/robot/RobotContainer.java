@@ -145,7 +145,7 @@ public class RobotContainer {
           e.printStackTrace();
         }
         if(turret != null){
-          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+          //turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;

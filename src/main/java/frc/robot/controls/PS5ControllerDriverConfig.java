@@ -16,6 +16,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
+import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -146,7 +147,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Auto shoot
         if (turret != null && hood != null && shooter != null) {
-            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
+            autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 

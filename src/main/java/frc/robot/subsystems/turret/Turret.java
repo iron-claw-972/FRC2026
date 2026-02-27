@@ -72,10 +72,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     
-		config.Slot0.kP = 12.0; 
+		config.Slot0.kP = 10.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
-		config.Slot0.kD = 0.15; // The "Braking" term to stop overshoot
+		config.Slot0.kD = 0.20; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
@@ -122,7 +122,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		//Sets the initial motor position
 		motor.setPosition(motorRotations);
 
-		motor.setPosition(0.0);
+		motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
 		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
@@ -256,7 +256,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void updateInputs() {
-		// inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
+		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
         inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
