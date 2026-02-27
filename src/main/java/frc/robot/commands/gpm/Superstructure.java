@@ -1,7 +1,5 @@
 package frc.robot.commands.gpm;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -27,8 +25,8 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
-import frc.robot.util.ShooterPhysics;
 import frc.robot.util.PhaseManager.CurrentState;
+import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
@@ -75,6 +73,7 @@ public class Superstructure extends Command {
         drivepose  = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
+				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
@@ -117,12 +116,14 @@ public class Superstructure extends Command {
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
-            goalState = ShooterPhysics.getShotParams(
+            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
+					Translation2d.kZero,
 				target3d.minus(lookahead3d),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
 				2.0 : 3.0);
+			goalState = goalStateWithT.getFirst();
 
-            timeOfFlight = goalState.timeOfFlight();
+            timeOfFlight = goalStateWithT.getSecond();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
