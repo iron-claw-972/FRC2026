@@ -214,7 +214,7 @@ public class DriveConstants {
 
                 // Gear ratios 
                 //DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
-                DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
+                DRIVE_GEAR_RATIO = (54.0 / 12.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
                 STEER_GEAR_RATIO = 287.0 / 11.0;
 
                 // Gyro is mounted under the robot 
