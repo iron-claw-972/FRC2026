@@ -87,6 +87,6 @@ public class PhaseManager {
     public Translation2d getTarget() {
         return wantedState == WantedState.SHOOTING ? 
             FieldConstants.getHubTranslation().toTranslation2d() 
-            : FieldConstants.getOppositionTranslation(true).toTranslation2d();
+            : FieldConstants.getAllianceSideTranslation(true).toTranslation2d();
     }
 }
