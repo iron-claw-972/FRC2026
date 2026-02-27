@@ -23,6 +23,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.Intake.Intake;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
@@ -92,8 +93,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 }));
 
         // Reverse motors
-        if (intake != null && spindexer != null && shooter != null) {
+        if (intake != null && spindexer != null) {
             controller.get(PS5Button.CIRCLE).whileTrue(new ReverseMotors(intake, spindexer));
+            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
         }
 
         // Intake
@@ -178,6 +180,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             })).onFalse(new InstantCommand(() -> {
                 hood.stopCalibrating();
             }));
+
+            // Set the hood down -- for safety measures under trench
+            controller.get(DPad.RIGHT).whileTrue(new InstantCommand(()->{
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            }, hood));
         }
     }
 

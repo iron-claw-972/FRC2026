@@ -13,7 +13,7 @@ public class ReverseMotors extends Command {
         this.intake = intake;
         this.spindexer = spindexer;
 
-        addRequirements(intake, spindexer);
+        addRequirements(intake);
     }
 
     @Override
