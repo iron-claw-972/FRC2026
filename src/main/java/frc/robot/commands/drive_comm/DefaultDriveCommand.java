@@ -9,11 +9,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
-import frc.robot.constants.FieldConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.util.TrenchAssist.TrenchAssist;
+import frc.robot.util.TrenchAssist.TrenchAssist2;
 import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 import frc.robot.util.Vision.DriverAssist;
 
@@ -77,14 +76,7 @@ public class DefaultDriveCommand extends Command {
                 swerve.setIsAlign(true);
 
                 double yawDegrees = swerve.getYaw().getDegrees();
-                double snappedDeg;
-
-                if (swerve.getPose().getX() < FieldConstants.FIELD_LENGTH / 2) {
-                    snappedDeg = (swerve.getYaw().getDegrees() > 135 || swerve.getYaw().getDegrees() < 225) ? 180 : 0;
-                } else {
-                    snappedDeg = (yawDegrees < 45 || yawDegrees > 315) ? 0 : 180;
-                }
-
+                double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
                 swerve.setAlignAngle(Units.degreesToRadians(snappedDeg));
             } else {
                 Logger.recordOutput("InAlignZone", false);
@@ -96,7 +88,7 @@ public class DefaultDriveCommand extends Command {
 
         Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         if (swerve.getTrenchAssist()) {
-            drive(TrenchAssist.calculate(swerve, corrected, trenchAssistPid));
+            drive(TrenchAssist2.calculate(swerve, corrected, trenchAssistPid));
         } else {
             trenchAssistPid.reset();
             drive(corrected);
