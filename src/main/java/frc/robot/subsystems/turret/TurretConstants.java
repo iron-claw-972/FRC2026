@@ -34,7 +34,7 @@ public class TurretConstants {
 
 	public static final double FEEDFORWARD_KV = 0.185;
 
-    public static final double NORMAL_CURRENT_LIMIT = 20.0; // A
+    public static final double NORMAL_CURRENT_LIMIT = 30.0; // A
     public static final double CALIBRATION_CURRENT_LIMIT = 10.0; // A
     public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
 
