@@ -195,7 +195,7 @@ public class Superstructure extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
-        spindexer.stopSpindexer();
+        //spindexer.stopSpindexer();
     }
 
     @Override
@@ -220,11 +220,11 @@ public class Superstructure extends Command {
 
             shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
-            if (phaseManager.shouldFeed()) {
-                spindexer.maxSpindexer();
-            } else {
-                spindexer.stopSpindexer();
-            }
+            // if (phaseManager.shouldFeed()) {
+            //     spindexer.maxSpindexer();
+            // } else {
+            //     spindexer.stopSpindexer();
+            // }
         }
 
         SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
