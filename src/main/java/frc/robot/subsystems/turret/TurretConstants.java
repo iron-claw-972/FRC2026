@@ -16,7 +16,7 @@ public class TurretConstants {
     public static double TURRET_WIDTH = Units.inchesToMeters(6.4);
     public static double TURRET_RADIUS = TURRET_WIDTH / 2;
 
-    public static double TURRET_TEETH_COUNT = 140.0; // the turret teeth count
+    public static int TURRET_TEETH_COUNT = 140; // the turret teeth count
     public static double GEAR_RATIO = 25.454545454;
     public static int LEFT_ENCODER_TEETH = 15; // gear teeth
     public static int RIGHT_ENCODER_TEETH = 22; // read above
@@ -39,3 +39,23 @@ public class TurretConstants {
     public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
 
 }
+/*
+turret is 140
+left encoder is 15
+right encoder is 22
+
+turret cannot go beyond 15 * 22 teeth (330) (2.3 rotations)
+2.3 * 360 = 828 deg (range of values we can have in degrees)
+
+picking 532 deg
+
+e_1_val = 532 * (140/15) % 360 = 285.33_
+e_2_val = 532 * (140/22) % 360 = 145.45_45
+
+(n + (E/360))Gr = A
+n = number of possible countable rot
+array only needs to be 0 - less than the teeth count of the other gear.
+
+
+
+*/
