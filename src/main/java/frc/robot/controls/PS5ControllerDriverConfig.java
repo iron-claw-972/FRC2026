@@ -183,7 +183,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             // }));
 
             // Set the hood down -- for safety measures under trench
-            controller.get(DPad.RIGHT).whileTrue(new InstantCommand(()->{
+            controller.get(DPad.LEFT).whileTrue(new InstantCommand(()->{
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
             }, hood));
         }
