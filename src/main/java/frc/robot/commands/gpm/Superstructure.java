@@ -78,7 +78,7 @@ public class Superstructure extends Command {
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
-        addRequirements(turret);
+        addRequirements(turret, shooter, hood);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
