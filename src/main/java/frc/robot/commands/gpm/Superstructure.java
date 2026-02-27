@@ -62,7 +62,8 @@ public class Superstructure extends Command {
 
     private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
-    private Translation2d target = FieldConstants.getHubTranslation().toTranslation2d();
+    //TODO: Change this back
+    private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
 
@@ -122,9 +123,10 @@ public class Superstructure extends Command {
             goalState = ShooterPhysics.getShotParams(
 				target3d.minus(lookahead3d),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
-				2.0 : 3.0);
+				2.0 : 5.0);
 
-            timeOfFlight = goalState.timeOfFlight();
+            double TOFAdjustment = 0.75;
+            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
@@ -208,7 +210,7 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Hood Offset", hoodOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
-        //target = phaseManager.getTarget();
+        target = phaseManager.getTarget();
 
         updateDrivePose();
         updateSetpoints(drivepose);
@@ -221,7 +223,7 @@ public class Superstructure extends Command {
             if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE - hoodOffset), 0.0);
             } else{
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
             }
 
             shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));

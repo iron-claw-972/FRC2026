@@ -134,13 +134,13 @@ public class FieldConstants {
         || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE){
           return FieldZone.TRENCH_BUMP;
         }
-    if(x < FieldConstants.RED_ALLIANCE_LINE) { // inside red
+    if(x > FieldConstants.RED_ALLIANCE_LINE) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
       } else {
         return FieldZone.OPPOSITION;
       }
-    } else if (x > FieldConstants.BLUE_ALLIANCE_LINE) {
+    } else if (x < FieldConstants.BLUE_ALLIANCE_LINE) {
       if (Robot.getAlliance() == Alliance.Blue) {
         return FieldZone.ALLIANCE;
       } else {

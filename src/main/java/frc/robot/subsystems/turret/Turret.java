@@ -122,7 +122,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		//Sets the initial motor position
 		motor.setPosition(motorRotations);
 
-		motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
+		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
+
+		motor.setPosition(0.0);
 
 		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
 		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));

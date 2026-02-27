@@ -176,11 +176,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Hood
         if (hood != null) {
             // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-                hood.calibrate();
-            })).onFalse(new InstantCommand(() -> {
-                hood.stopCalibrating();
-            }));
+            // controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            //     hood.calibrate();
+            // })).onFalse(new InstantCommand(() -> {
+            //     hood.stopCalibrating();
+            // }));
 
             // Set the hood down -- for safety measures under trench
             controller.get(DPad.RIGHT).whileTrue(new InstantCommand(()->{
