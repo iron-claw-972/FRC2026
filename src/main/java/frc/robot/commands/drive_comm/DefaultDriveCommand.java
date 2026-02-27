@@ -79,7 +79,7 @@ public class DefaultDriveCommand extends Command {
                 double yawDegrees = swerve.getYaw().getDegrees();
                 double snappedDeg;
 
-                if (swerve.getPose().getX() < FieldConstants.FIELD_LENGTH / 2) {
+                if (swerve.getPose().getX() < swerve.getDesiredPose().getX()) {
                     snappedDeg = (swerve.getYaw().getDegrees() > 135 || swerve.getYaw().getDegrees() < 225) ? 180 : 0;
                 } else {
                     snappedDeg = (swerve.getYaw().getDegrees() < 45 || swerve.getYaw().getDegrees() > 315) ? 0 : 180;
