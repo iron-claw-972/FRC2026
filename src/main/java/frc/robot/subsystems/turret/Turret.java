@@ -64,6 +64,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
+	ModifiedCRT crt;
+
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
@@ -110,9 +112,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
 		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-		ModifiedCRT crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
+		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
-		double turretRot = crt.solve(leftAbs, rightAbs);
+		double turretRot = crt.solve(leftAbs, rightAbs); 
 		//SmartDashboard.putNumber("Turret Index", turretIndex);
 
 		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
@@ -120,9 +122,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
 
 		//Sets the initial motor position
+		inputs.positionDeg = turretRot;
 		motor.setPosition(motorRotations);
-
-		motor.setPosition(0.0);
 
 		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
 		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
@@ -256,12 +257,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void updateInputs() {
-		// inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
         inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
         inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
+		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
 	}
 
 	/**
