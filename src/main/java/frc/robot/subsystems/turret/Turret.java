@@ -64,6 +64,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
+	ModifiedCRT crt;
+
 	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
@@ -110,9 +112,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
 		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-		ModifiedCRT crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
+		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
-		double turretRot = crt.solve(leftAbs, rightAbs);
+		double turretRot = crt.solve(leftAbs, rightAbs); 
 		//SmartDashboard.putNumber("Turret Index", turretIndex);
 
 		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
@@ -120,6 +122,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
 
 		//Sets the initial motor position
+		inputs.positionDeg = turretRot;
 		motor.setPosition(motorRotations);
 
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
@@ -264,6 +267,7 @@ public class Turret extends SubsystemBase implements TurretIO{
         inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
         inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
+		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
 	}
 
 	/**
