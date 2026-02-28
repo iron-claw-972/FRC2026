@@ -33,6 +33,12 @@ public class ShotInterpolation {
         exitVelocityMap.put(7.9, 17.1);
         exitVelocityMap.put(8.0, 17.9);
         exitVelocityMap.put(8.08, 19.0);
+        exitVelocityMap.put( 21.0, 19.0);
+
+        exitVelocityMap.put(9.90, 14.0);
+        exitVelocityMap.put(9.95, 16.5);
+        exitVelocityMap.put(10.0, 19.2);
+        exitVelocityMap.put(11.0, 26.0);
         exitVelocityMap.put(25.0, 25.0* 3.2);
         //exitVelocityMap.put(null, null);
     }

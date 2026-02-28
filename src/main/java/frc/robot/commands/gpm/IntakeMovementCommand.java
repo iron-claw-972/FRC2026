@@ -15,7 +15,7 @@ public class IntakeMovementCommand extends Command {
 
     @Override
     public void execute() {
-        intake.spinStop();
+        intake.spinStart();
         if ((int) (Timer.getFPGATimestamp() / interval) % 2 == 0) {
             intake.extend(); 
         } else {
@@ -25,6 +25,6 @@ public class IntakeMovementCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        
+       intake.extend(); 
     }
 }

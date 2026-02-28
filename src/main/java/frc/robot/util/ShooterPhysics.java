@@ -12,7 +12,7 @@ import frc.robot.constants.Constants;
 public class ShooterPhysics {
 	// pitch in radians, going up from the horizontal
 	// exit velocity speed in m/s
-	public record TurretState(Rotation2d yaw, double pitch, double exitVel, double height) {
+	public record TurretState(Rotation2d yaw, double pitch, double exitVel, double height, double timeOfFlight) {
 		public boolean satisfies(Constraints constraints) {
 			if (height < constraints.height())
 				return false;
@@ -24,126 +24,131 @@ public class ShooterPhysics {
 		}
 	};
 
-	// note: minPitch must be < 75°
+	/**
+	 * Specifies the constraints of the shot.
+	 *
+	 * @param height The minimum apex height of the shot.
+	 * @param maxVel The maximum exit velocity of the shooter
+	 * @param minPitch The minimum pitch covered by the hood
+	 * @param maxPitch The maximum pitch covered by the hood
+	 */
 	public record Constraints(double height, double maxVel, double minPitch, double maxPitch) {
-		// performs some sanity checks
-		public boolean check() {
-			if (height <= 0)
-				return false;
-			if (maxVel <= 0)
-				return false;
-			if (minPitch <= 0)
-				return false;
-			if (maxPitch >= Math.PI / 2)
-				return false;
-			if (minPitch >= maxPitch)
-				return false;
-
-			// this causes problems and isn't likely to actually occur
-			if (minPitch > Units.degreesToRadians(75))
-				return false;
-
-			return true;
-		}
 	};
 
 	/**
-	 * Calculates shot parameters for SOTM for a peak height using Physics™.
+	 * Calculates shot parameters for SOTM using Physics™.
 	 *
 	 * @param robotVelocity The x and y velocity of the robot, field relative.
 	 * @param robotToTarget The robot to target transform. Angles are field
 	 *                      relative, positions are with the robot as the origin.
-	 * @param height        The peak height the trajectory should reach.
+	 * @param peakHeight        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
-			double height) {
-		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
-		return cvtShot(exitVel, height);
-	}
-
-	// provided for backwards compatability
-	public static Pair<TurretState, Double> getShotParamsWithT(Translation2d robotVelocity, Translation3d robotToTarget,
-			double height) {
-		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, height);
-		double t = (-exitVel.getZ()
-				- Math.sqrt(Math.pow(exitVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ()))
-				/ -Constants.GRAVITY_ACCELERATION;
-		return new Pair<TurretState, Double>(cvtShot(exitVel, height), t);
+			double peakHeight) {
+		double zExitVel = Math.sqrt(2 * peakHeight * Constants.GRAVITY_ACCELERATION);
+		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
+		Translation3d exitVel = getRequiredExitVelocity(robotVelocity, robotToTarget, peakHeight);
+		return cvtShot(exitVel, peakHeight, t);
 	}
 
 	/**
-	 * Calculates shot parameters for SOTM for a peak height using Physics™.
+	 * Calculates shot parameters for stationary shooting using Physics™.
 	 *
-	 * @param robotVelocity The x and y velocity of the robot, field relative.
 	 * @param robotToTarget The robot to target transform. Angles are field
 	 *                      relative, positions are with the robot as the origin.
-	 * @param constraints   The constraints on the shooter.
+	 * @param peakHeight        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
+	public static TurretState getShotParams(Translation3d robotToTarget, double peakHeight) {
+		return getShotParams(new Translation2d(0, 0), robotToTarget, peakHeight);
+	}
+	
+	public static Optional<TurretState> getConstrainedParams(Translation3d robotToTarget, Constraints constraints){
+		return getConstrainedParams(new Translation2d(0, 0), robotToTarget, constraints);
+	}
+
 	public static Optional<TurretState> getConstrainedParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			Constraints constraints) {
-		if (!constraints.check())
-			throw new IllegalArgumentException("Provided constraints are invalid (" + constraints + ").");
-
 		// establish a lower bound
-		double minHeight = Math.max(Math.max(robotToTarget.getZ(), constraints.height()), 0.01);
+		double minHeight = Math.max(robotToTarget.getZ(), constraints.height());
 		Optional<TurretState> withMinPitch = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
-		if (withMinPitch.isPresent())
-			minHeight = Math.max(minHeight, withMinPitch.get().height());
-
-		TurretState withMinHeight = getShotParams(robotVelocity, robotToTarget, minHeight);
+		if (withMinPitch.isPresent()) {
+			minHeight = Math.min(minHeight, withMinPitch.get().height());
+		}
+		Translation3d minVel = getRequiredExitVelocity(robotVelocity, robotToTarget, minHeight);
+		double minT = (-minVel.getZ() - Math.sqrt(Math.pow(minVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
+		TurretState withMinHeight = cvtShot(minVel, minHeight, minT);
 		if (withMinHeight.satisfies(constraints))
 			return Optional.of(withMinHeight);
 
-		TurretState withMinSpeed = withMinimumSpeed(robotVelocity, robotToTarget);
-		if (withMinSpeed.exitVel() > constraints.maxVel())
+		// the only reason this is empty is if the highest posible trajectory is too low
+		// to intersect the goal
+		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
+		if (withMaxPitchOpt.isEmpty())
 			return Optional.empty();
+		TurretState withMaxPitch = withMaxPitchOpt.get();
+
+		// the range from withMinHeight to withMaxPitch will satisfy pitch and height
+		// constraints
+		// now we need to satisfy the speed constraint
+
+		TurretState withMinSpeed = withMinimumSpeed(robotVelocity, robotToTarget);
+		// ordered such that the first element is valid and the second is not
+		Pair<TurretState, TurretState> newRange;
 
 		if (withMinSpeed.height() < withMinHeight.height()) {
 			// the minimum speed is below the lower bound, but doesn't satisfy constraints
 			return Optional.empty();
-		} else {
-			// the first element is lower than the second, the first satisfies the angle but
-			// not the velocity and the second satisfies the velocity but may or may not
-			// satisfy the angle
-			var newRange = new Pair<TurretState, TurretState>(withMinHeight, withMinSpeed);
 
-			// now we binary search the new range to find the lowest value that satisfies
-			// the velocity constraint, we know velocity is decreasing on the interval
-
-			// use a 1cm tolerance
-			while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) > .01) {
-				double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
-				TurretState guess = getShotParams(robotVelocity, robotToTarget, avgHeight);
-				if (guess.exitVel() > constraints.maxVel())
-					newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
-				else
-					newRange = new Pair<TurretState, TurretState>(newRange.getFirst(), guess);
-
-			}
-
-			if (newRange.getSecond().satisfies(constraints))
-				return Optional.of(newRange.getSecond());
+		} else if (withMinSpeed.height() > withMaxPitch.height()) {
+			// the minimum speed is above the upper bound
+			if (withMaxPitch.satisfies(constraints))
+				// keep optimizing to find the lowest height
+				newRange = new Pair<TurretState, TurretState>(withMaxPitch, withMinHeight);
 			else
 				return Optional.empty();
+
+		} else {
+			// the minimum speed is within the ok range
+			assert withMinSpeed.satisfies(constraints);
+			newRange = new Pair<TurretState, TurretState>(withMinSpeed, withMinHeight);
 		}
+
+		// now we binary search the new range
+		TurretState lastValid = newRange.getFirst();
+		// use a 5cm tolerance
+		while (Math.abs(newRange.getFirst().height() - newRange.getSecond().height()) < .05) {
+			double avgHeight = (newRange.getFirst().height() + newRange.getSecond().height()) / 2;
+			Translation3d guessVel = getRequiredExitVelocity(robotVelocity, robotToTarget, avgHeight);
+			double guessT = (-guessVel.getZ() - Math.sqrt(Math.pow(guessVel.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * robotToTarget.getZ())) / -Constants.GRAVITY_ACCELERATION;
+			TurretState guess = cvtShot(guessVel, avgHeight, guessT);
+			if (guess.satisfies(constraints)) {
+				if (guess.height() < lastValid.height()) lastValid = guess;
+				newRange = new Pair<TurretState, TurretState>(guess, newRange.getSecond());
+			} else {
+				newRange = new Pair<TurretState, TurretState>(newRange.getFirst(), guess);
+			}
+		}
+
+		return Optional.of(lastValid);
 	}
 
-	static TurretState cvtShot(Translation3d velocity, double height) {
+	public static TurretState cvtShot(Translation3d velocity, double height, double timeOfFlight) {
 		Translation2d onGround = velocity.toTranslation2d();
 		Rotation2d yaw = onGround.getAngle();
 		double magnitude2d = onGround.getNorm();
 
 		double pitch = new Translation2d(magnitude2d, velocity.getZ()).getAngle().getRadians();
+		pitch %= Math.PI * 2;
 		double speed = velocity.getDistance(Translation3d.kZero);
 
-		return new TurretState(yaw, pitch, speed, height);
+		return new TurretState(yaw, pitch, speed, height, timeOfFlight);
 	}
 
 	/**
 	 * Actually does the SOTM math. Assumes shots are from (0, 0, 0). This is only
-	 * package scope so it can be unit tested, and shouldn't be called directly.
+	 * public so it can be unit tested, and shouldn't be called directly.
 	 *
 	 * @param robotVelocity The velocity of the robot, field relative.
 	 * @param target        The translation from the robot to the target, field
@@ -153,7 +158,7 @@ public class ShooterPhysics {
 	 *                      trajectory.
 	 * @return Velocity that should be imparted on the ball, field relative.
 	 */
-	static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
+	public static Translation3d getRequiredExitVelocity(Translation2d robotVelocity, Translation3d target,
 			double peakZ) {
 		if (target.getZ() > peakZ)
 			throw new IllegalArgumentException(
@@ -168,10 +173,7 @@ public class ShooterPhysics {
 		// peakZ = .5 * v_z_exit_vel² / g
 		// v_z_exit_vel² = 2 * peakZ * g
 		// v_z_exit_vel = √(2 * peakZ * g)
-		// keep a second variable to avoid floating point precision issues where the
-		// sqrt for t ends up being NaN sometimes when peakZ = target.getZ()
-		double zExitVelSquared = 2 * peakZ * Constants.GRAVITY_ACCELERATION;
-		double zExitVel = Math.sqrt(zExitVelSquared);
+		double zExitVel = Math.sqrt(2 * peakZ * Constants.GRAVITY_ACCELERATION);
 
 		// now we need time to hit target
 		// z_target = v_z_exit_vel * t - .5 * g * t²
@@ -182,13 +184,11 @@ public class ShooterPhysics {
 		// t = (-v_z_exit_vel ± √(v_z_exit_vel² - 2 * g * z_target)) / -g
 		// onlz use - because we only want the part where it's coming down, and that
 		// gives the longer time
-		double t = (-zExitVel - Math.sqrt(zExitVelSquared - 2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
+		double t = (-zExitVel - Math.sqrt(Math.pow(zExitVel, 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ()))
 				/ -Constants.GRAVITY_ACCELERATION;
 
-		// this is not equivalent to t <= 0 because of NaNs
-		if (!(t > 0))
-			throw new RuntimeException("Time should never be negative (got t=" + t + " with target: " + target
-					+ " and peakZ: " + peakZ + ").");
+		if (t < 0)
+			throw new RuntimeException("Time should never be negative (got t=" + t + ").");
 
 		// calculate x and z exit_vel
 		// x = (v_x_robot + v_x_exit_vel) * t
@@ -201,124 +201,87 @@ public class ShooterPhysics {
 		return new Translation3d(xExitVel, yExitVel, zExitVel);
 	}
 
-	// gets the derivative of velocity with respect to height at shot
-	private static double getVelocityDiff(TurretState shot, Translation2d initialVelocity, Translation3d target) {
-		return (getShotParams(initialVelocity, target, shot.height() + .01).exitVel() - shot.exitVel()) / .01;
-	}
-
 	// call with default tolerance
-	static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
-		return withMinimumSpeed(initialVelocity, target, 0.001);
+	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target) {
+		return withMinimumSpeed(initialVelocity, target, 0.1);
 	}
 
-	static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
+	public static TurretState withMinimumSpeed(Translation2d initialVelocity, Translation3d target,
 			double tolerance) {
-		// System.out.println("!!! inv:" + initialVelocity + " tgt:" + target + " tlr:"
-		// + tolerance);
-		// trying to calculate a shot for height=0 returns NaN
-		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
 
-		TurretState first = getShotParams(initialVelocity, target, effectiveMinHeight);
-		// if the minimum velocity is below our minimum height, that's the closest we
-		// can get
-		if (getVelocityDiff(first, initialVelocity, target) >= 0)
-			return first;
+		// calculate minimum velocity: v² = g * (R + √(R² + h²))
+		double horizontalDist = target.toTranslation2d().getNorm();
+		double verticalDist = target.getZ();
+		double g = Constants.GRAVITY_ACCELERATION;
+		double robotSpeed = initialVelocity.getNorm();
 
-		// if a shot requires going up a kilometer, it's probably not doable
-		TurretState second = getShotParams(initialVelocity, target, 1000.);
-		// just return something
-		if (getVelocityDiff(second, initialVelocity, target) < 0)
-			return second;
+		double minProjectileSpeed = Math
+				.sqrt(g * (horizontalDist + Math.sqrt(horizontalDist * horizontalDist + verticalDist * verticalDist)));
+		double minSpeed = Math.max(0, minProjectileSpeed - robotSpeed);
 
-		int maxIters = 50;
-		var range = new Pair<TurretState, TurretState>(first, second);
+		// guess a peak height
+		double guess = target.getZ() + 2;
+		int maxIters = 20;
 		while (maxIters >= 0) {
 			maxIters--;
-			assert range.getSecond().height() > range.getFirst().height();
 
-			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
-			TurretState guess = getShotParams(initialVelocity, target, guessHeight);
-			double diff = getVelocityDiff(guess, initialVelocity, target);
+			// this will throw an exception, so avoid it
+			// we still might have just overshot, so keep checking
+			if (guess < target.getZ())
+				guess = target.getZ();
 
-			// System.out.println("diff:" + diff + "\t\t" + range);
+			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
+			double guessT = (-guessVelocity.getZ() - Math.sqrt(Math.pow(guessVelocity.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ())) / -Constants.GRAVITY_ACCELERATION;
+			double guessSpeed = guessVelocity.getNorm();
+			double difference = minSpeed - guessSpeed;
 
-			if (Math.abs(range.getSecond().exitVel() - range.getFirst().exitVel()) <= tolerance)
-				return guess;
+			// we've already hit minimum height and are trying to go lower
+			if (guess <= target.getZ() && difference < 0)
+				throw new RuntimeException("Incorrect minimum speed calculation in ShooterPhysics.java");
 
-			if (diff > 0)
-				range = new Pair<TurretState, TurretState>(range.getFirst(), guess);
-			else
-				range = new Pair<TurretState, TurretState>(guess, range.getSecond());
+			if (Math.abs(difference) <= tolerance)
+    			return cvtShot(guessVelocity, guess, guessT);
+
+			guess += difference * 1.7; // experimentally determined value
 		}
 
-		throw new RuntimeException(
-				"Solving for minumum velocity did not converge (velocity: " + initialVelocity + ", target: "
-						+ target + ", tolerance: " + tolerance + ").");
-
+		throw new RuntimeException("Failed to compute a trajectory for a minimum speed.");
 	}
 
-	static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
+	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch) {
-		return withAngle(initialVelocity, target, pitch, 0.001);
+		return withAngle(initialVelocity, target, pitch, Units.degreesToRadians(1));
 	}
 
-	// note: this behaves badly with high angles
-	// this isn't a problem when this is called from getConstrainedParams because
-	// that will only use this method to solve for the lower bound
-	static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
+	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
-		if (pitch <= 0 || pitch >= Math.PI / 2)
-			throw new IllegalArgumentException("Pitch must be in the range 0 < pitch < pi/2 (got: " + pitch + ").");
 
-		// System.out.println(
-		// "Solving for pitch=" + pitch + " with target=" + target + " and
-		// initialVelocity=" + initialVelocity);
-
-		// trying to calculate a shot for height=0 returns NaN
-		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
-
-		TurretState first = getShotParams(initialVelocity, target, effectiveMinHeight);
-		TurretState second = getShotParams(initialVelocity, target, 1000.);
-
-		if (first.pitch() > pitch)
-			if (first.pitch() <= pitch + tolerance)
-				return Optional.of(first);
-			else
-				return Optional.empty();
-		else if (second.pitch() < pitch)
-			return Optional.of(second); // it's close enough
-
-		int maxIters = 50;
-		var range = new Pair<TurretState, TurretState>(first, second);
+		// guess a peak height
+		double guess = target.getZ() + 2;
+		int maxIters = 20;
 		while (maxIters >= 0) {
 			maxIters--;
-			assert range.getSecond().height() > range.getFirst().height();
 
-			double guessHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
-			TurretState guess = getShotParams(initialVelocity, target, guessHeight);
+			// this will throw an exception, so avoid it
+			// we still might have just overshot, so keep checking
+			if (guess < target.getZ())
+				guess = target.getZ();
 
-			// System.out.println(range + "\t\tguess=" + guess);
+			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
+			double guessT = (-guessVelocity.getZ() - Math.sqrt(Math.pow(guessVelocity.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ())) / -Constants.GRAVITY_ACCELERATION;
+			TurretState polar = cvtShot(guessVelocity, guess, guessT);
+			double difference = pitch - polar.pitch();
 
-			if (range.getSecond().pitch() - range.getFirst().pitch() <= tolerance) {
-				// we've found a valid angle
-				if (Math.abs(range.getFirst().pitch() - pitch) <= tolerance)
-					return Optional.of(range.getFirst());
-				if (Math.abs(range.getSecond().pitch() - pitch) <= tolerance)
-					return Optional.of(range.getSecond());
+			// we've already hit minimum height and are trying to go lower
+			if (guess <= target.getZ() && difference < 0)
+				return Optional.empty();
 
-				// we've narrowed the range but haven't found a valid angle
-				// should be covered by the checks before the loop
-				throw new RuntimeException(
-						"Solving for angle resulted in an empty range " + range + " (pitch: " + pitch + ").");
-			}
+			if (Math.abs(difference) <= tolerance)
+				return Optional.of(polar);
 
-			if (guess.pitch() > pitch)
-				range = new Pair<TurretState, TurretState>(range.getFirst(), guess);
-			else
-				range = new Pair<TurretState, TurretState>(guess, range.getSecond());
+			guess += difference * 0.7; // TODO: find better value
 		}
 
-		throw new RuntimeException("Solving for angle did not converge (velocity: " + initialVelocity + ", target: "
-				+ target + ", pitch: " + pitch + ", tolerance: " + tolerance + ").");
+		throw new RuntimeException("Solving for angle did not converge.");
 	}
 }

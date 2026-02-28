@@ -119,16 +119,14 @@ public class Superstructure extends Command {
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
-            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
+            goalState = ShooterPhysics.getShotParams(
 					Translation2d.kZero,
 				target3d.minus(lookahead3d),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
 				2.0 : 5.0);
-            
-            goalState = goalStateWithT.getFirst();
 
             double TOFAdjustment = 0.75;
-            timeOfFlight = goalStateWithT.getSecond() * TOFAdjustment;
+            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
@@ -223,7 +221,7 @@ public class Superstructure extends Command {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
             
             if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE - hoodOffset), 0.0);
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
             } else{
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
             }

@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import static edu.wpi.first.units.Units.Gs;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -108,13 +110,12 @@ public class AutoShootCommand extends Command {
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
-            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
+            goalState = ShooterPhysics.getShotParams(
 					Translation2d.kZero,
 				target3d.minus(lookahead3d),
 				2.0);
-			goalState = goalStateWithT.getFirst();
 
-            timeOfFlight = goalStateWithT.getSecond();
+            timeOfFlight = goalState.timeOfFlight();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
