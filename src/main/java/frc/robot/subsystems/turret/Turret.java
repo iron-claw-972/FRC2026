@@ -74,10 +74,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     
-		config.Slot0.kP = 10.0; 
+		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
-		config.Slot0.kD = 0.20; // The "Braking" term to stop overshoot
+		config.Slot0.kD = 0.50; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
@@ -115,10 +115,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
 		double turretRot = crt.solve(leftAbs, rightAbs); 
-		//SmartDashboard.putNumber("Turret Index", turretIndex);
-
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
-
+		
 		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
 
 		//Sets the initial motor position
@@ -243,6 +240,19 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
 		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
 		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
+
+
+		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
+		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
+
+		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
+		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
+
+		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
+
+		double turretRot = crt.solve(leftAbs, rightAbs); 
+
+		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
 	}
 
 	/* ---------------- Simulation ---------------- */

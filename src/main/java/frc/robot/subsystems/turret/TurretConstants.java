@@ -10,7 +10,8 @@ public class TurretConstants {
     public static double CALIBRATION_OFFSET = 0.0; // TODO: find this at hardstop
 
     public static double MAX_VELOCITY = 600; // rad/s
-    public static double MAX_ACCELERATION = 120.0; // rad/s^2
+    // public static double MAX_ACCELERATION = 120.0; // rad/s^2
+    public static double MAX_ACCELERATION = 320.0; // rad/s^2
 
     // Not using this, but just in case
     public static double TURRET_WIDTH = Units.inchesToMeters(6.4);

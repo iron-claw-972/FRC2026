@@ -45,7 +45,58 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Getting Ready",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "parallel",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Stop Intake Seizure"
+                    }
+                  },
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Stop Spindexer"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "parallel",
+              "data": {
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Extend Intake"
+                    }
+                  },
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Spin Intake Rollers"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

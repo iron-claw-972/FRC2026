@@ -12,7 +12,7 @@ import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.util.TrenchAssist.TrenchAssist2;
+import frc.robot.util.TrenchAssist.TrenchAssist;
 import frc.robot.util.TrenchAssist.TrenchAssistConstants;
 import frc.robot.util.Vision.DriverAssist;
 
@@ -88,7 +88,7 @@ public class DefaultDriveCommand extends Command {
 
         Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         if (swerve.getTrenchAssist()) {
-            drive(TrenchAssist2.calculate(swerve, corrected, trenchAssistPid));
+            drive(TrenchAssist.calculate(swerve, corrected, trenchAssistPid));
         } else {
             trenchAssistPid.reset();
             drive(corrected);

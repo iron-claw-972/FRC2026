@@ -25,6 +25,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
+import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
@@ -147,7 +148,7 @@ public class RobotContainer {
           e.printStackTrace();
         }
         if(turret != null){
-          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+          //turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
@@ -192,8 +193,8 @@ public class RobotContainer {
 
   public void registerCommands() {
     if (intake != null){
-      NamedCommands.registerCommand("Extend intake", new InstantCommand(()-> intake.extend()));
-      NamedCommands.registerCommand("Retract intake", new InstantCommand(()-> intake.retract()));
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(()-> intake.extend()));
+      NamedCommands.registerCommand("Retract Intake", new InstantCommand(()-> intake.retract()));
     }
 
     if (intake != null && spindexer != null){ 
@@ -203,11 +204,16 @@ public class RobotContainer {
       NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
         new InstantCommand(()->intake.spinStop())
       ));
+      Command intakeMovement = new IntakeMovementCommand(intake);
+      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
+
+
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Spin Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
+      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
     }
 
