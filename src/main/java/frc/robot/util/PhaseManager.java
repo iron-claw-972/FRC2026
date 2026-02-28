@@ -84,9 +84,10 @@ public class PhaseManager {
         return !(currentState == CurrentState.TURNING_AROUND) && !(currentState == CurrentState.UNDER_TRENCH); //&& !(currentState == CurrentState.STARTING_UP);
     }
 
-    public Translation2d getTarget() {
-        return wantedState == WantedState.SHOOTING ? 
-            FieldConstants.getHubTranslation().toTranslation2d() 
-            : FieldConstants.getAllianceSideTranslation(true).toTranslation2d();
+    public Translation2d getTarget(Pose2d drivePose) {
+        return wantedState == WantedState.SHOOTING ? FieldConstants.getHubTranslation().toTranslation2d()
+                : (FieldConstants.isOnLeftSideOfField(drivePose.getTranslation())
+                        ? FieldConstants.getAllianceSideTranslation(true).toTranslation2d()
+                        : FieldConstants.getAllianceSideTranslation(false).toTranslation2d());
     }
 }
