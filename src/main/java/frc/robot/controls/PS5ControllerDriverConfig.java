@@ -16,6 +16,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
+import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
@@ -83,7 +84,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 () -> false, getDrivetrain()).withTimeout(2));
 
         // Trench align
-        controller.get(DPad.LEFT).whileTrue(new StartEndCommand(
+        controller.get(PS5Button.CIRCLE).whileTrue(new StartEndCommand(
                 () -> {
                     getDrivetrain().setTrenchAssist(true);
                     getDrivetrain().setTrenchAlign(true);
@@ -95,7 +96,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Reverse motors
         if (intake != null && spindexer != null) {
-            controller.get(PS5Button.CIRCLE).whileTrue(new ReverseMotors(intake, spindexer));
             controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
         }
 
@@ -141,8 +141,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Spindexer
         if (spindexer != null) {
             // Will only run if we are not calling default shoot command
-            controller.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(() -> spindexer.maxSpindexer()))
-                    .onFalse(new InstantCommand(() -> spindexer.stopSpindexer()));
+            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer, turret));
         }
 
         // Auto shoot

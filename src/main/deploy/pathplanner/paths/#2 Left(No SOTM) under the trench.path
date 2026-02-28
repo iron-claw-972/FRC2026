@@ -114,6 +114,28 @@
           ]
         }
       }
+    },
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0.9111361079864995,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Hood Down"
+        }
+      }
+    },
+    {
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 1.7885264341957245,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
     }
   ],
   "globalConstraints": {

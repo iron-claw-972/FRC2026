@@ -87,7 +87,8 @@ public class PhaseManager {
     public Translation2d getTarget(Pose2d drivePose) {
         return wantedState == WantedState.SHOOTING ? FieldConstants.getHubTranslation().toTranslation2d()
                 : (FieldConstants.isOnLeftSideOfField(drivePose.getTranslation())
-                        ? FieldConstants.getAllianceSideTranslation(true).toTranslation2d()
-                        : FieldConstants.getAllianceSideTranslation(false).toTranslation2d());
+                //TODO: reversed for sm reason
+                        ? FieldConstants.getAllianceSideTranslation(false).toTranslation2d()
+                        : FieldConstants.getAllianceSideTranslation(true).toTranslation2d());
     }
 }

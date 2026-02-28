@@ -124,7 +124,7 @@ public class Superstructure extends Command {
 					Translation2d.kZero,
 				target3d.minus(lookahead3d),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
-				2.0 : 5.0);
+				2.0 : 2.0);
 
             double TOFAdjustment = 0.75;
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
@@ -213,7 +213,7 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Turret Offset", turretOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
-        target = phaseManager.getTarget();
+        target = phaseManager.getTarget(drivepose);
 
         updateDrivePose();
         updateSetpoints(drivepose);
@@ -223,11 +223,11 @@ public class Superstructure extends Command {
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
             
-            if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
-            } else{
+            // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
+            //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            // } else{
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
-            }
+            // }
 
             shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
@@ -238,9 +238,9 @@ public class Superstructure extends Command {
             // }
         }
 
-        SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
-        SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
-        SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
 
         SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }

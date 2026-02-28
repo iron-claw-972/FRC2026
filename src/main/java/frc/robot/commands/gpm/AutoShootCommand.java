@@ -190,9 +190,9 @@ public class AutoShootCommand extends Command {
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
-        SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
-        SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
-        SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
 
         /** Spindexer Stuff!! */
         if(spindexer != null){

@@ -146,10 +146,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	}
 
 	/**
-	 * @return If the turret is at setpoint with tolerance of 5 degrees
+	 * @return If the turret is at setpoint with tolerance of 10 degrees
 	 */
 	public boolean atSetpoint() {
-		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(5.0);
+		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(10.0);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
 
 		// Clamp position setpoint to min and max angles
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(-180) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(180) * TurretConstants.GEAR_RATIO);
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
 			
 		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;

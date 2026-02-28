@@ -92,7 +92,7 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    autoChooserInit();
+    //autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -141,12 +141,13 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left Side Auto";
+          String leftSideAuto = "Left(No SOTM) - Under Trench";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
           auto = new PathPlannerAuto(leftSideAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
+        
         if(turret != null){
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
@@ -218,9 +219,8 @@ public class RobotContainer {
     }
 
     if (hood != null){
-      Command hoodDown = new InstantCommand(()-> {hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0);}, hood);
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hoodDown.schedule();}));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hoodDown.cancel();}));
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hood.forceHoodDown(true);}));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hood.forceHoodDown(false);}));
     }
 
 
@@ -268,11 +268,8 @@ public class RobotContainer {
     }
   }
 
-  public Command getAutoCommand() {
-    // get the selected Command
-    Command autoSelected = autoChooser.getSelected();
-
-    return autoSelected;
+  public Command getAutoCommand(){
+    return auto;
   }
 
   public void logComponents() {
