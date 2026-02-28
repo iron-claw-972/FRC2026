@@ -77,7 +77,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
-		config.Slot0.kD = 0.50; // The "Braking" term to stop overshoot
+		config.Slot0.kD = 0.2; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;

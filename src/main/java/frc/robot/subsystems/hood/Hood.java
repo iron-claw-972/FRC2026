@@ -36,6 +36,8 @@ public class Hood extends SubsystemBase implements HoodIO{
 	private boolean calibrating = false;
 	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
+	private boolean forceHoodDown = false;
+
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
     public Hood(){
@@ -88,10 +90,19 @@ public class Hood extends SubsystemBase implements HoodIO{
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
 	}
 
+	public void forceHoodDown(boolean taranNathan){
+		forceHoodDown = taranNathan;
+	}
+
     @Override
     public void periodic() {
 		updateInputs();
 		Logger.processInputs("Hood", inputs);
+
+		if (forceHoodDown){
+			goalAngle = Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE);
+			goalVelocityRadPerSec = 0.0;
+		}
 
 		double setpointRad = goalAngle.getRadians();
 

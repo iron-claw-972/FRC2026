@@ -22,8 +22,8 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.25;
-  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.75;
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.10;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.90;
 
   /**The coordinate of the climb position */
   public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
@@ -151,19 +151,30 @@ public class FieldConstants {
     }
   }
 
+  /**
+   * 
+   * @return Whether Y coordinate is in the upper half (left side on blue alliance)
+   */
+  public static boolean isOnLeftSideOfField(Translation2d drivepose){
+    if (drivepose.getY() > FIELD_WIDTH/2){
+      return true;
+    }
+    return false;
+  }
+
   public static Translation3d getOppositionTranslation(boolean sideLeft) {
     if (sideLeft) {
       if (Robot.getAlliance() == Alliance.Blue) {
         return ALLIANCE_LEFT_RED;
       } else {
         // Reversed it so we shoot same side, but probably need to change this
-        return ALLIANCE_RIGHT_BLUE;
+        return ALLIANCE_LEFT_BLUE;
       }
     } else {
       if (Robot.getAlliance() == Alliance.Blue) {
         return ALLIANCE_RIGHT_RED;
       } else {
-        return ALLIANCE_LEFT_BLUE;
+        return ALLIANCE_RIGHT_BLUE;
       }
     }
   }
