@@ -31,7 +31,7 @@ public class Hood extends SubsystemBase implements HoodIO{
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
 
-	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
+	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
 	private boolean calibrating = false;
 	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);

@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
@@ -38,6 +39,7 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
@@ -145,7 +147,7 @@ public class RobotContainer {
           e.printStackTrace();
         }
         if(turret != null){
-          //turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
@@ -195,15 +197,26 @@ public class RobotContainer {
     }
 
     if (intake != null && spindexer != null){ 
-      NamedCommands.registerCommand("Intake", new ParallelCommandGroup(
+      NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
         new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-        //new InstantCommand(()-> spindexer.setSpindexer(SpindexerConstants.spindexerMaxPower))
+      ));
+      NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
+        new InstantCommand(()->intake.spinStop())
       ));
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+      NamedCommands.registerCommand("Spin Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
     }
+
+    if (hood != null){
+      Command hoodDown = new InstantCommand(()-> {hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0);}, hood);
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hoodDown.schedule();}));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hoodDown.cancel();}));
+    }
+
 
     if (linearClimb != null && drive != null){
       NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));

@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "#1 Left under the trench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "#2 Left(No SOTM) under the trench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "#3(No SOTM) Left under the trench"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
