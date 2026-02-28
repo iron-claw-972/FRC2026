@@ -60,12 +60,13 @@ public class Superstructure extends Command {
 
     private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
-    //TODO: Change this back
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
 
     private double hoodOffset = 0.0;
+
+    private double turretOffset = 0.0;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -158,7 +159,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
         double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
@@ -210,6 +211,8 @@ public class Superstructure extends Command {
     public void execute() {
         hoodOffset = SmartDashboard.getNumber("Hood Offset", hoodOffset);
         SmartDashboard.putNumber("Hood Offset", hoodOffset);
+        turretOffset = SmartDashboard.getNumber("Turret Offset", turretOffset);
+        SmartDashboard.putNumber("Turret Offset", turretOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget();
