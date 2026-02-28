@@ -30,7 +30,8 @@ public class ReverseMotors extends Command {
 
     @Override
     public void end(boolean interrupted){
-        intake.spinStop();
+        intake.extend();
+        intake.spinStart();
         //spindexer.maxSpindexer();
     }
 

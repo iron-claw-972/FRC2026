@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -68,6 +70,8 @@ public class Superstructure extends Command {
 
     private double turretOffset = 0.0;
 
+    private double distanceFromTarget = 0.0;
+
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
@@ -126,7 +130,7 @@ public class Superstructure extends Command {
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
 				2.0 : 2.0);
 
-            double TOFAdjustment = 0.75;
+            double TOFAdjustment = 0.85;
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
@@ -175,6 +179,7 @@ public class Superstructure extends Command {
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
 
+        distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
     }
 
     public void updateDrivePose(){
@@ -226,10 +231,13 @@ public class Superstructure extends Command {
             // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
             //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
             // } else{
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
+                //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
             // }
 
-            shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            Logger.recordOutput("Distance From Target", distanceFromTarget);
+            //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
             // if (phaseManager.shouldFeed()) {
             //     spindexer.maxSpindexer();
