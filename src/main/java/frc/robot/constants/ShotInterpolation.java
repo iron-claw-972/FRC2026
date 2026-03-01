@@ -1,8 +1,6 @@
 package frc.robot.constants;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.hood.HoodConstants;
 
 public class ShotInterpolation {
     public static final InterpolatingDoubleTreeMap timeOfFlightMap = new InterpolatingDoubleTreeMap();
@@ -44,7 +42,6 @@ public class ShotInterpolation {
         exitVelocityMap.put(10.0, 19.2);
         exitVelocityMap.put(11.0, 26.0);
         exitVelocityMap.put(25.0, 25.0* 3.2);
-        //exitVelocityMap.put(null, null);
 
         shooterVelocityMap.put(1.49, 11.5);
         shooterVelocityMap.put(2.09, 12.5);
