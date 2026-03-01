@@ -13,7 +13,8 @@ public final class ChineseRemainderTheorem {
      *
      * Returns x in range [0, n1*n2)
      */
-    public static int solve(int a, int n1, int b, int n2) {
+
+     public static int solve(int a, int n1, int b, int n2) {
         if (gcd(n1, n2) != 1) {
             throw new IllegalArgumentException("Moduli must be coprime for CRT.");
         }

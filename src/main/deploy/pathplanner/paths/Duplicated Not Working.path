@@ -1,0 +1,150 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.842,
+        "y": 4.478
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.592775800711744,
+        "y": 7.429525504151838
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.730830367740831,
+        "y": 8.67
+      },
+      "prevControl": {
+        "x": 7.0789534313387525,
+        "y": 8.67
+      },
+      "nextControl": {
+        "x": 3.9343350188895077,
+        "y": 8.67
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.5353499406880196,
+        "y": 7.526358244365362
+      },
+      "prevControl": {
+        "x": 2.9979952550415194,
+        "y": 8.591518386714121
+      },
+      "nextControl": {
+        "x": 2.3695164161432727,
+        "y": 7.1445554785530385
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.18,
+        "y": 5.966
+      },
+      "prevControl": {
+        "x": 2.224810422787547,
+        "y": 6.241444208960923
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.21847246891652505,
+      "rotationDegrees": 40.0
+    },
+    {
+      "waypointRelativePos": 0.4476021314387213,
+      "rotationDegrees": 150.0
+    },
+    {
+      "waypointRelativePos": 0.927175843694493,
+      "rotationDegrees": -179.587
+    },
+    {
+      "waypointRelativePos": 1.4422735346358764,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Retract Intake",
+      "waypointRelativePos": 0.65466816647919,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Retract Intake"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Stop Intake Rollers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0.9111361079864995,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Hood Down"
+        }
+      }
+    },
+    {
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 1.7885264341957245,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Left Autos",
+  "idealStartingState": {
+    "velocity": 0.0,
+    "rotation": -110.0
+  },
+  "useDefaultConstraints": true
+}

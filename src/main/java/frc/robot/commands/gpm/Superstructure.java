@@ -26,7 +26,6 @@ import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
-import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
 public class Superstructure extends Command {
@@ -35,9 +34,6 @@ public class Superstructure extends Command {
     private Hood hood;
     private Shooter shooter;
     private Spindexer spindexer;
-
-    //TODO: find maximum interpolation
-    private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
 
     private double turretSetpoint;
     private double hoodSetpoint;
@@ -59,9 +55,15 @@ public class Superstructure extends Command {
 
     private final double phaseDelay = 0.03; // Extrapolation delay due to latency
 
-    private Translation2d target = null;
+    private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
+
+    private double hoodOffset = 0.0;
+
+    private double turretOffset = 0.0;
+
+    private double distanceFromTarget = 0.0;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -72,10 +74,11 @@ public class Superstructure extends Command {
         drivepose  = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
+				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
         
-        addRequirements(turret);
+        addRequirements(turret, shooter);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
@@ -115,10 +118,13 @@ public class Superstructure extends Command {
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
+					Translation2d.kZero,
 				target3d.minus(lookahead3d),
-				2.0);
+                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+				2.0 : 2.0);
 
-            timeOfFlight = goalState.timeOfFlight();
+            double TOFAdjustment = 0.85;
+            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
@@ -139,6 +145,8 @@ public class Superstructure extends Command {
         
         lastTurretAngle = turretAngle;
 
+        Logger.recordOutput("Turret/Target Pose", target);
+
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
         // Subtract the rotational angle of the robot from the setpoint
@@ -146,7 +154,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
         double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
@@ -164,6 +172,7 @@ public class Superstructure extends Command {
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
 
+        distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
     }
 
     public void updateDrivePose(){
@@ -191,14 +200,18 @@ public class Superstructure extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
-        spindexer.stopSpindexer();
+        //spindexer.stopSpindexer();
     }
 
     @Override
     public void execute() {
+        hoodOffset = SmartDashboard.getNumber("Hood Offset", hoodOffset);
+        SmartDashboard.putNumber("Hood Offset", hoodOffset);
+        turretOffset = SmartDashboard.getNumber("Turret Offset", turretOffset);
+        SmartDashboard.putNumber("Turret Offset", turretOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
-        target = phaseManager.getTarget();
+        target = phaseManager.getTarget(drivepose);
 
         updateDrivePose();
         updateSetpoints(drivepose);
@@ -207,19 +220,30 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodSetpoint), hoodVelocity);
-            shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+            
+            // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
+            //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
+            // } else{
+                //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
+            // }
 
-            if (phaseManager.shouldFeed()) {
-                spindexer.maxSpindexer();
-            } else {
-                spindexer.stopSpindexer();
-            }
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            Logger.recordOutput("Distance From Target", distanceFromTarget);
+            //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
+
+            // if (phaseManager.shouldFeed()) {
+            //     spindexer.maxSpindexer();
+            // } else {
+            //     spindexer.stopSpindexer();
+            // }
         }
 
-        SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
-        SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
-        SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+
+        SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }
 
     @Override

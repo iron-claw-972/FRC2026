@@ -183,12 +183,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
         robotExtension.setLength(inchExtension);
 
         if(calibrating){
-            leftMotor.set(0.1);
+            leftMotor.set(-0.1);
             rightMotor.set(-0.1);
             boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            if(calibrationDebouncer.calculate(atHardStop)){
-                stopCalibrating();
-            }
+            // if(calibrationDebouncer.calculate(atHardStop)){
+            //     stopCalibrating();
+            // }
         }
 
         updateInputs();
@@ -230,6 +230,15 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
+        leftMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
+        );
+
+        rightMotor.getConfigurator().apply(
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
+        );
+
         double motorRotations = inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
