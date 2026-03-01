@@ -142,8 +142,9 @@ public class RobotContainer {
         // Load the auto command
         try {
           String leftSideAuto = "Left(No SOTM) - Under Trench";
-          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
-          auto = new PathPlannerAuto(leftSideAuto);
+          String rightSideAuto = "Right(2) - Under Trench";
+          PathPlannerAuto.getPathGroupFromAutoFile(rightSideAuto);
+          auto = new PathPlannerAuto(rightSideAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }

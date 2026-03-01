@@ -20,23 +20,23 @@
         "y": 0.5865314569536417
       },
       "prevControl": {
-        "x": 6.035164509263001,
-        "y": 0.617600951415989
+        "x": 6.83902728351127,
+        "y": 0.5974377224199281
       },
       "nextControl": {
-        "x": 3.0682440376782023,
-        "y": 0.24599719472861176
+        "x": 3.157328753736785,
+        "y": 0.5592661840649349
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.6398096026490065,
+        "x": 0.62,
         "y": 0.65
       },
       "prevControl": {
-        "x": 1.0581491579606932,
+        "x": 1.0383395553116865,
         "y": 0.7153598580391806
       },
       "nextControl": null,
@@ -57,6 +57,19 @@
       "maxWaypointRelativePos": 1.1968831168831167,
       "constraints": {
         "maxVelocity": 4.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.4128233970753654,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -88,6 +101,41 @@
               }
             }
           ]
+        }
+      }
+    },
+    {
+      "name": "Extend Intake",
+      "waypointRelativePos": 1.2508436445444353,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Stop Hood Down"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Extend Intake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 1.277840269966252,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Spindexer"
         }
       }
     }

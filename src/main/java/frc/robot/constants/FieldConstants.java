@@ -22,8 +22,8 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.10;
-  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.90;
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.12;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.88;
 
   /**The coordinate of the climb position */
   public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
@@ -52,17 +52,17 @@ public class FieldConstants {
     new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(BLUE_BORDER - 2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(BLUE_BORDER - 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
-    new Translation3d(BLUE_BORDER - 2, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
 
 
   public static final Translation3d ALLIANCE_LEFT_RED =
-    new Translation3d(RED_BORDER + 2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_RED =
-    new Translation3d(RED_BORDER + 2, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(RED_BORDER + 2.2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_CENTER_BLUE =
     new Translation3d(BLUE_BORDER - 2, FIELD_WIDTH/2, 0);
