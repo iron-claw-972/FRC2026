@@ -8,24 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.277290738661256,
-        "y": 1.0393553862482001
+        "x": 7.441542111506526,
+        "y": 1.2107117437722423
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.7871026490066235,
-        "y": 0.5865314569536417
+        "x": 7.387746144721234,
+        "y": 1.2107117437722423
       },
       "prevControl": {
-        "x": 6.83902728351127,
-        "y": 0.5974377224199281
+        "x": 8.11688346339922,
+        "y": 1.9690145551973557
       },
       "nextControl": {
-        "x": 3.157328753736785,
-        "y": 0.5592661840649349
+        "x": 7.118766310794782,
+        "y": 0.9309727164887294
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.4713997627520765,
+        "y": 0.65
+      },
+      "prevControl": {
+        "x": 4.171640146504625,
+        "y": 0.6887086146050574
+      },
+      "nextControl": {
+        "x": 2.7711593789995277,
+        "y": 0.6112913853949425
       },
       "isLocked": false,
       "linkedName": null
@@ -46,7 +62,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.4412580943570767,
+      "waypointRelativePos": 1.9,
       "rotationDegrees": 180.0
     }
   ],
@@ -54,9 +70,9 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.3407792207792205,
-      "maxWaypointRelativePos": 1.1968831168831167,
+      "maxWaypointRelativePos": 1.4,
       "constraints": {
-        "maxVelocity": 4.0,
+        "maxVelocity": 3.0,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -66,11 +82,24 @@
     },
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.4128233970753654,
-      "maxWaypointRelativePos": 2.0,
+      "minWaypointRelativePos": 1.85,
+      "maxWaypointRelativePos": 3.0,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.5129358830146232,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 1.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -106,7 +135,7 @@
     },
     {
       "name": "Extend Intake",
-      "waypointRelativePos": 1.2508436445444353,
+      "waypointRelativePos": 1.5,
       "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
@@ -130,7 +159,7 @@
     },
     {
       "name": "Start Spindexer",
-      "waypointRelativePos": 1.277840269966252,
+      "waypointRelativePos": 1.55,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
