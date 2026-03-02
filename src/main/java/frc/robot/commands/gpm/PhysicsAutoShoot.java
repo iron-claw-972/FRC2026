@@ -13,6 +13,7 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.ShooterPhysics;
 
@@ -20,19 +21,21 @@ public class PhysicsAutoShoot extends Command {
 	private Turret turret;
 	private Hood hood;
 	private Shooter shooter;
+	private Spindexer spindexer;
 	private Drivetrain drivetrain;
 	private ShooterPhysics.Constraints constraints;
 
-	public PhysicsAutoShoot(Turret turret, Hood hood, Shooter shooter, Drivetrain drivetrain) {
+	public PhysicsAutoShoot(Turret turret, Hood hood, Shooter shooter, Spindexer spindexer, Drivetrain drivetrain) {
 		this.turret = turret;
 		this.hood = hood;
 		this.shooter = shooter;
+		this.spindexer = spindexer;
 		this.drivetrain = drivetrain;
 
 		this.constraints = new ShooterPhysics.Constraints(2.2, ShooterConstants.SHOOTER_VELOCITY,
 				Units.degreesToRadians(HoodConstants.MIN_ANGLE), Units.degreesToRadians(HoodConstants.MAX_ANGLE));
 
-		addRequirements(turret, hood, shooter);
+		addRequirements(turret, hood, shooter, spindexer);
 	}
 
 	@Override
@@ -64,6 +67,7 @@ public class PhysicsAutoShoot extends Command {
 			turret.setFieldRelativeTarget(state.yaw(), yawSlope);
 			hood.setFieldRelativeTarget(new Rotation2d(state.pitch()), hoodSlope);
 			shooter.setShooter(state.exitVel());
+			spindexer.maxSpindexer();
 
 		} else if (stateOpt.isPresent() && futureStateOpt.isEmpty()) {
 			ShooterPhysics.TurretState state = stateOpt.get();
@@ -71,6 +75,11 @@ public class PhysicsAutoShoot extends Command {
 			turret.setFieldRelativeTarget(state.yaw(), 0.0);
 			hood.setFieldRelativeTarget(new Rotation2d(state.pitch()), 0.0);
 			shooter.setShooter(state.exitVel());
+			spindexer.maxSpindexer();
+
+		} else {
+			shooter.setShooter(0);
+			spindexer.stopSpindexer();
 		}
 	}
 
@@ -80,5 +89,6 @@ public class PhysicsAutoShoot extends Command {
 		turret.setFieldRelativeTarget(new Rotation2d(turret.getPositionRad()), 0.0);
 		hood.setFieldRelativeTarget(new Rotation2d(0), 0.0);
 		shooter.setShooter(0);
+		spindexer.stopSpindexer();
 	}
 }
