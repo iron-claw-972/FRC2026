@@ -252,7 +252,7 @@ public class ShooterPhysics {
 		}
 
 		throw new RuntimeException(
-				"Solving for minumum velocity did not converge (velocity: " + initialVelocity + ", target: "
+				"Solving for minimum velocity did not converge (velocity: " + initialVelocity + ", target: "
 						+ target + ", tolerance: " + tolerance + ").");
 
 	}
