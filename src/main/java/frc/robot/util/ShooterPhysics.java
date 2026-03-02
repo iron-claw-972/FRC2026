@@ -286,7 +286,10 @@ public class ShooterPhysics {
 			else
 				return Optional.empty();
 		else if (second.pitch() < pitch)
-			return Optional.of(second); // it's close enough
+			if (Math.abs(second.pitch() - pitch) <= tolerance)
+				return Optional.of(second); // it's close enough
+			else
+				return Optional.empty(); // give up
 
 		int maxIters = 50;
 		var range = new Pair<TurretState, TurretState>(first, second);
