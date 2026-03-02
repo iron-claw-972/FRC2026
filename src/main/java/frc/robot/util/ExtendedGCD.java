@@ -21,6 +21,7 @@ public class ExtendedGCD {
      * Computes the greatest common divisor (available as instance.r)
      * and Bezout's identity.
      * Precomputed values are used to quickly execute the Chinese Remainder Theorem.
+     * 
      * @param a first modulus
      * @param b second modulus
      */
@@ -76,6 +77,7 @@ public class ExtendedGCD {
     /**
      * Use the Chinese Remainder Theorem to compute R such that
      * R mod m1 = r1 and R mod m2 = r2.
+     * 
      * @param r1 remainder modulo m1
      * @param r2 remainder modulo m2
      * @return a number with those moduli.
@@ -92,32 +94,33 @@ public class ExtendedGCD {
 
     /**
      * Calculate the unique inverse of a modulo n.
+     * 
      * @param a number to calculate the inverse.
      * @param n modulus of the group.
      * @return the inverse of a modulo n
      */
     public static int inverse(int a, int n) {
-      int t1 = 0;
-      int t2 = 1;
-      int r1 = n;
-      int r2 = a;
+        int t1 = 0;
+        int t2 = 1;
+        int r1 = n;
+        int r2 = a;
 
-      while (r2 != 0) {
-        int quotient = r1 / r2;
+        while (r2 != 0) {
+            int quotient = r1 / r2;
 
-        int tp = t1 - quotient * t2;
-        int rp = r1 - quotient * r2;
-        
-        t1 = t2;
-        t2 = tp;
+            int tp = t1 - quotient * t2;
+            int rp = r1 - quotient * r2;
 
-        r1 = r2;
-        r2 = rp;
-      }
+            t1 = t2;
+            t2 = tp;
 
-      if (r1 > 1) {
-        throw new IllegalStateException("a is not invertible");
-      }
+            r1 = r2;
+            r2 = rp;
+        }
+
+        if (r1 > 1) {
+            throw new IllegalStateException("a is not invertible");
+        }
 
         return (t1 < 0) ? t1 + n : t1;
     }
@@ -126,12 +129,14 @@ public class ExtendedGCD {
      * Euclid's Greatest Common Divisor algorithm.
      * Find the largest integer that divides both a and b.
      * One of a and b must be non zero because gcd(0,0) is infinite.
+     * 
      * @param a first integer
      * @param b second integer
      * @return greatest common divisor of a and b
      */
     public static int gcd(int a, int b) {
-        // enforce non negative ints so we do not rely on truncating division / remainder.
+        // enforce non negative ints so we do not rely on truncating division /
+        // remainder.
         a = Math.abs(a);
         b = Math.abs(b);
 
@@ -141,11 +146,10 @@ public class ExtendedGCD {
                 throw new IllegalArgumentException("gcd(0,0) is infinite.");
             }
             return a;
-        }
-        else {
+        } else {
             // tail recursive call
             return gcd(b, a % b);
         }
     }
-    
+
 }

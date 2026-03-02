@@ -16,7 +16,7 @@ public class TurretConstants {
     public static double TURRET_WIDTH = Units.inchesToMeters(6.4);
     public static double TURRET_RADIUS = TURRET_WIDTH / 2;
 
-    public static double TURRET_TEETH_COUNT = 140.0; // the turret teeth count
+    public static int TURRET_TEETH_COUNT = 140; // the turret teeth count
     public static double GEAR_RATIO = 25.454545454;
     public static int LEFT_ENCODER_TEETH = 15; // gear teeth
     public static int RIGHT_ENCODER_TEETH = 22; // read above

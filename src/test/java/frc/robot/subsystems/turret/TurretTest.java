@@ -11,7 +11,8 @@ import frc.robot.util.ExtendedGCD;
 public class TurretTest {
     /**
      * Compute a tooth number on a gear
-     * @param rev number of rotations reported by the encoder
+     * 
+     * @param rev   number of rotations reported by the encoder
      * @param teeth number of teeth on the gear
      * @return computed tooth number
      */
@@ -22,8 +23,10 @@ public class TurretTest {
     /**
      * Determine whether a tooth number is reliable.
      * It is reliable if the tooth is close to the center of the tooth.
+     * 
      * @param tooth tooth number as a double (e.g., 3.1416)
-     * @return true if the tooth number is close to an integer (i.e., far away from 0.5).
+     * @return true if the tooth number is close to an integer (i.e., far away from
+     *         0.5).
      */
     boolean toothGood(double tooth) {
         // use rounding to find the closest tooth
@@ -38,8 +41,8 @@ public class TurretTest {
     @Test
     public void toothTest() {
         // compute the tooth number by rounding
-        assertEquals(3, (int)Math.round(2.51));
-        assertEquals(3, (int)Math.round(3.49));
+        assertEquals(3, (int) Math.round(2.51));
+        assertEquals(3, (int) Math.round(3.49));
 
         // test that the tooth number is well known
         assertFalse(Math.abs(3.0 - 2.69) < 0.3);
@@ -59,9 +62,9 @@ public class TurretTest {
      */
     @Test
     public void recoverTest() {
-        int m = 200;
-        int m1 = 15;
-        int m2 = 22;
+        int m =  TurretConstants.TURRET_TEETH_COUNT;
+        int m1 = TurretConstants.LEFT_ENCODER_TEETH;
+        int m2 = TurretConstants.RIGHT_ENCODER_TEETH;
         int N = m1 * m2;
 
         var xgcd = new ExtendedGCD(m1, m2);
@@ -81,14 +84,15 @@ public class TurretTest {
             if (toothGood(teethM1) && toothGood(teethM2)) {
                 // convert to nearest integer tooth
                 // ... we might get m1 or m2 instead of zero
-                int a = (int)Math.round(teethM1);
-                int b = (int)Math.round(teethM2);
+                int a = (int) Math.round(teethM1);
+                int b = (int) Math.round(teethM2);
 
                 // calculate of integer teeth moved on turret
                 int n = xgcd.chineseRemainder(a, b);
 
                 // wrap around (we want +- angle)
-                if (n > N / 2) n = n - N;
+                if (n > N / 2)
+                    n = n - N;
 
                 // reconstruction (adding fractional tooth)
                 double r = n + (teethM1 - Math.round(teethM1));
