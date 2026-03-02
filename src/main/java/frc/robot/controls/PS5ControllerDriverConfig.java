@@ -132,7 +132,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
-                intake.spinStop();
+                if(intakeBoolean){
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else{
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
             }));
         }
 

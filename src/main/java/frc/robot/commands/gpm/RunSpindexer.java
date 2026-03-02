@@ -17,11 +17,11 @@ public class RunSpindexer extends Command {
 
     @Override
     public void execute() {
-        //if (turret.atSetpoint()){
+        if (turret.atSetpoint()){
             spindexer.maxSpindexer();
-        // } else{
-        //     spindexer.stopSpindexer();
-        // }
+         } else{
+             spindexer.stopSpindexer();
+        }
     }
 
     @Override
