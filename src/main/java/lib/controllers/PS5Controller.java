@@ -106,10 +106,14 @@ public class PS5Controller extends Controller {
     public Joystick get() {
         return controller;
     }
-    public void rumbleOn(){
-        controller.setRumble(RumbleType.kBothRumble,0.1);
+
+    public void rumbleOn() {
+        controller.setRumble(Joystick.RumbleType.kLeftRumble, 1.0);
+        controller.setRumble(Joystick.RumbleType.kRightRumble, 1.0);
     }
-    public void rumbleOff(){
-        controller.setRumble(RumbleType.kBothRumble,0);
+
+    public void rumbleOff() {
+        controller.setRumble(Joystick.RumbleType.kLeftRumble, 0.0);
+        controller.setRumble(Joystick.RumbleType.kRightRumble, 0.0);
     }
 }

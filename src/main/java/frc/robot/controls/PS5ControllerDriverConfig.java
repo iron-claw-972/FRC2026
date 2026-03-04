@@ -181,6 +181,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 hood.stopCalibrating();
             }));
         }
+
+        // rumble test
+        controller.get(PS5Button.TOUCHPAD).onTrue(new SequentialCommandGroup(
+                new InstantCommand(() -> controller.rumbleOn()),
+                new WaitCommand(0.5),
+                new InstantCommand(() -> controller.rumbleOff())));
     }
 
     @Override
