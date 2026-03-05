@@ -6,11 +6,8 @@ import frc.robot.subsystems.turret.Turret;
 
 public class RunSpindexer extends Command {
     private Spindexer spindexer;
-    private Turret turret;
-
-    public RunSpindexer(Spindexer spindexer, Turret turret){
+    public RunSpindexer(Spindexer spindexer){
         this.spindexer = spindexer;
-        this.turret = turret;
         
         addRequirements(spindexer);
     }
