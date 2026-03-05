@@ -143,8 +143,9 @@ public class RobotContainer {
         try {
           String leftSideAuto = "Left(No SOTM) - Under Trench";
           String rightSideAuto = "Right(2) - Under Trench";
-          PathPlannerAuto.getPathGroupFromAutoFile(rightSideAuto);
-          auto = new PathPlannerAuto(rightSideAuto);
+          String testing = "Straight Test";
+          PathPlannerAuto.getPathGroupFromAutoFile(testing);
+          auto = new PathPlannerAuto(testing);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
