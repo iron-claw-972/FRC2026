@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -36,6 +38,12 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
       getDrivetrain().setDesiredPose(() -> null);
       CommandScheduler.getInstance().cancelAll();
     }));
+
+   // rumble test
+    driver.get(Button.A).onTrue(new SequentialCommandGroup(
+        new InstantCommand(() -> driver.setRumble(GameController.RumbleStatus.RUMBLE_ON)),
+        new WaitCommand(0.5),
+        new InstantCommand(() -> driver.setRumble(GameController.RumbleStatus.RUMBLE_OFF))));
   }
 
   @Override
@@ -76,6 +84,14 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
 
   public GameController getGameController() {
     return driver;
+  }
+
+  public void startRumble() {
+    driver.setRumble(GameController.RumbleStatus.RUMBLE_ON);
+  }
+
+  public void endRumble() {
+    driver.setRumble(GameController.RumbleStatus.RUMBLE_OFF);
   }
 
 }
