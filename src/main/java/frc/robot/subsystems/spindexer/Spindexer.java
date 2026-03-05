@@ -42,8 +42,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         updateInputs();
         Logger.processInputs("Spindexer", inputs);
 
-        // reverse on jam
-        checkJam();
         if (state == SpindexerState.MAX) {
             motor.set(SpindexerConstants.spindexerMaxPower);
         } else if (state == SpindexerState.REVERSE) {
@@ -65,14 +63,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         wasSpindexerSlow = isSpindexerSlow;
     }
 
-    public void checkJam() {
-        // if a current spike then reverse
-        if (inputs.spindexerCurrent >= SpindexerConstants.JAM_CURRENT_THRESHOLD) {
-            state = SpindexerState.REVERSE;
-            System.out.println("Jammed: Reversing");
-        }
-    }
-
     public void maxSpindexer() {
         state = SpindexerState.MAX;
     }
@@ -88,6 +78,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public void setSpindexer(double power) {
         this.power = power;
         state = SpindexerState.CUSTOM;
+    }
+
+    public double getStatorCurrent() {
+        return inputs.spindexerCurrent;
     }
 
     @Override
