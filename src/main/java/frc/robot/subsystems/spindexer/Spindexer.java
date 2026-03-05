@@ -42,6 +42,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         updateInputs();
         Logger.processInputs("Spindexer", inputs);
 
+        // reverse on jam
+        checkJam();
         if (state == SpindexerState.MAX) {
             motor.set(SpindexerConstants.spindexerMaxPower);
         } else if (state == SpindexerState.REVERSE) {
@@ -51,7 +53,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         } else {
             motor.set(power);
         }
-        
+
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
         SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
@@ -61,6 +63,14 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             ballCount++;
         }
         wasSpindexerSlow = isSpindexerSlow;
+    }
+
+    public void checkJam() {
+        // if a current spike then reverse
+        if (inputs.spindexerCurrent >= SpindexerConstants.JAM_CURRENT_THRESHOLD) {
+            state = SpindexerState.REVERSE;
+            System.out.println("Jammed: Reversing");
+        }
     }
 
     public void maxSpindexer() {
