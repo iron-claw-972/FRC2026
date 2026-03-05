@@ -112,7 +112,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 }
             }, intake));
 
-            // Retract if hold for 3 seconds
+            // Retract if hold for 2 seconds
             controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
@@ -139,7 +139,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Spindexer
         if (spindexer != null) {
             // Will only run if we are not calling default shoot command
-            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer, turret));
+            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer));
         }
 
         // Auto shoot

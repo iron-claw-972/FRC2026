@@ -156,10 +156,7 @@ public class FieldConstants {
    * @return Whether Y coordinate is in the upper half (left side on blue alliance)
    */
   public static boolean isOnLeftSideOfField(Translation2d drivepose){
-    if (drivepose.getY() > FIELD_WIDTH/2){
-      return true;
-    }
-    return false;
+    return drivepose.getY() > FIELD_WIDTH/2;
   }
 
   public static Translation3d getOppositionTranslation(boolean sideLeft) {
