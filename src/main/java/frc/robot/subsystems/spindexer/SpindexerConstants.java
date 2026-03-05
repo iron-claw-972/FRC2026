@@ -8,4 +8,5 @@ public class SpindexerConstants {
     public static final double CURRENT_SPIKE_LIMIT = 80;
     public static final double CURRENT_TIME_LIMIT = 1.0; //s
     public static final double JAM_CURRENT_THRESHOLD = 9.0; // A
+    public static final double JAM_DEBOUNCE_TIME = 0.3; // seconds
 }

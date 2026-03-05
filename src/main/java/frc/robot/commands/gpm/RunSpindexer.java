@@ -10,7 +10,7 @@ import frc.robot.subsystems.turret.Turret;
 public class RunSpindexer extends Command {
     private Spindexer spindexer;
     private Turret turret;
-    private Debouncer jam_debouncer = new Debouncer(0.3, DebounceType.kFalling);
+    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kFalling);
     private boolean reversing = false;
     public RunSpindexer(Spindexer spindexer, Turret turret){
         this.spindexer = spindexer;
@@ -28,6 +28,7 @@ public class RunSpindexer extends Command {
         boolean jammed = spindexer.getStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
         if (jammed) {
             reversing = true;
+            jam_debouncer.calculate(false); 
         }
 
         if (reversing) {
