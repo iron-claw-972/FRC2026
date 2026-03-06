@@ -77,4 +77,5 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
   public GameController getGameController() {
     return driver;
   }
+
 }

@@ -163,8 +163,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.retract();
             }));
 
-            // Drive to climb position
-            controller.get(PS5Button.TRIANGLE).onTrue(new ClimbDriveCommand(climb, getDrivetrain()));
+            // Drive to climb position and rumble
+            controller.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
+                    new ClimbDriveCommand(climb, getDrivetrain()),
+                    new InstantCommand(() -> this.startRumble()),
+                    new WaitCommand(1),
+                    new InstantCommand(() -> this.endRumble())));
         }
 
         // Hood
@@ -218,5 +222,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     @Override
     public boolean getIsAlign() {
         return false;
+    }
+
+    public void startRumble() {
+        controller.rumbleOn();
+    }
+
+    public void endRumble() {
+        controller.rumbleOff();
     }
 }
