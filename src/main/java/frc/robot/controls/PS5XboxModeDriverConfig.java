@@ -36,7 +36,7 @@ import lib.controllers.GameController.DPad;
  * - install ViGEmBus driver (if app doesn't auto prompt)
  * - in dsx, set "controller emulation" to Xbox 360
  * - ensure rumble is enabled in dsx settings
- * - once code is depoloyed, change controller to "Xbox 360" controller in driverstation
+ * - once code is depoloyed, change controller to "Xbox 360" in driverstation
  */
 
 public class PS5XboxModeDriverConfig extends BaseDriverConfig {
