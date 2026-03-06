@@ -8,13 +8,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
-import frc.robot.commands.gpm.PhysicsAutoShoot;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.constants.Constants;
@@ -147,7 +145,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Auto shoot
         if (turret != null && hood != null && shooter != null && getDrivetrain() != null) {
-            autoShoot = new PhysicsAutoShoot(turret, hood, shooter, getDrivetrain(), spindexer);
+            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
