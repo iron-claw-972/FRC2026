@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
@@ -93,7 +91,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         if (intake != null && spindexer != null && shooter != null) {
             controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
                 reverseMotors = new ReverseMotors(intake, spindexer);
-                reverseMotors.schedule();
+                CommandScheduler.getInstance().schedule(reverseMotors);
             })).onFalse(new InstantCommand(() -> {
                 if (reverseMotors != null) {
                     reverseMotors.cancel();
@@ -164,12 +162,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.retract();
             }));
 
-            // Drive to climb position and rumble
-            controller.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
-                    new ClimbDriveCommand(climb, getDrivetrain()),
-                    new InstantCommand(() -> this.startRumble()),
-                    new WaitCommand(1),
-                    new InstantCommand(() -> this.endRumble())));
+            // Drive to climb position
+            controller.get(PS5Button.TRIANGLE).onTrue(new ClimbDriveCommand(climb, getDrivetrain()));
         }
 
         // Hood
@@ -216,15 +210,5 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     @Override
     public boolean getIsAlign() {
         return false;
-    }
-
-    // doesn't work on ps5 controllers, use PS5XboxModeDriverConfig instead
-    public void startRumble() {
-        controller.rumbleOn();
-    }
-
-    // doesn't work on ps5 controllers, use PS5XboxModeDriverConfig instead
-    public void endRumble() {
-        controller.rumbleOff();
     }
 }

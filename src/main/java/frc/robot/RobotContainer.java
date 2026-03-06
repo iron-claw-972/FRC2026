@@ -24,7 +24,6 @@ import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
-import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.controls.PS5XboxModeDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;

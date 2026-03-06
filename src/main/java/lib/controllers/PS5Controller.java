@@ -1,7 +1,6 @@
 package lib.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.function.BooleanSupplier;
@@ -57,11 +56,13 @@ public class PS5Controller extends Controller {
         LEFT_Y(1),
         RIGHT_X(2),
         /**
-         * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully pressed
+         * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully
+         * pressed
          */
         LEFT_TRIGGER(3),
         /**
-         * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully pressed
+         * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully
+         * pressed
          */
         RIGHT_TRIGGER(4),
         RIGHT_Y(5);
@@ -105,15 +106,5 @@ public class PS5Controller extends Controller {
 
     public Joystick get() {
         return controller;
-    }
-
-    public void rumbleOn() {
-        controller.setRumble(Joystick.RumbleType.kLeftRumble, 1.0);
-        controller.setRumble(Joystick.RumbleType.kRightRumble, 1.0);
-    }
-
-    public void rumbleOff() {
-        controller.setRumble(Joystick.RumbleType.kLeftRumble, 0.0);
-        controller.setRumble(Joystick.RumbleType.kRightRumble, 0.0);
     }
 }
