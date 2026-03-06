@@ -17,21 +17,30 @@ import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.Intake.Intake;
-import lib.controllers.PS5Controller;
-import lib.controllers.PS5Controller.DPad;
-import lib.controllers.PS5Controller.PS5Axis;
-import lib.controllers.PS5Controller.PS5Button;
+import lib.controllers.GameController;
+import lib.controllers.GameController.Axis;
+import lib.controllers.GameController.Button;
+import lib.controllers.GameController.DPad;
 
 /**
- * Driver controls for the PS5 controller
+ * Driver config for PS5 controllers using Xbox 360 emulation mode.
+ * This lets SCUF and other PS5 controllers work with WPILib rumble.
+ * 
+ * Setup:
+ * - download DSX (https://dualsensex.com/download/)
+ * - install ViGEmBus driver (if app doesn't auto prompt)
+ * - in dsx, set "controller emulation" to Xbox 360
+ * - ensure rumble is enabled in dsx settings
+ * - once code is depoloyed, change controller to "Xbox 360" controller in driverstation
  */
-public class PS5ControllerDriverConfig extends BaseDriverConfig {
-    private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
+
+public class PS5XboxModeDriverConfig extends BaseDriverConfig {
+    private final GameController controller = new GameController(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
     private Command autoShoot = null;
@@ -43,7 +52,31 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Spindexer spindexer;
     private LinearClimb climb;
 
-    public PS5ControllerDriverConfig(
+    // PS5 button aliases
+    private final Button CROSS = Button.A;
+    private final Button CIRCLE = Button.B;
+    private final Button SQUARE = Button.X;
+    private final Button TRIANGLE = Button.Y;
+    private final Button LB = Button.LB;
+    private final Button RB = Button.RB;
+    private final Button CREATE = Button.BACK;
+    private final Button OPTIONS = Button.START;
+    private final Button LEFT_JOY = Button.LEFT_JOY;
+    private final Button RIGHT_JOY = Button.RIGHT_JOY;
+
+    // PS5 trigger buttons
+    private final BooleanSupplier LEFT_TRIGGER_BUTTON = controller.LEFT_TRIGGER_BUTTON;
+    private final BooleanSupplier RIGHT_TRIGGER_BUTTON = controller.RIGHT_TRIGGER_BUTTON;
+
+    // PS5 axis aliases
+    private final Axis LEFT_X = Axis.LEFT_X;
+    private final Axis LEFT_Y = Axis.LEFT_Y;
+    private final Axis RIGHT_X = Axis.RIGHT_X;
+    private final Axis RIGHT_Y = Axis.RIGHT_Y;
+    private final Axis LEFT_TRIGGER = Axis.LEFT_TRIGGER;
+    private final Axis RIGHT_TRIGGER = Axis.RIGHT_TRIGGER;
+
+    public PS5XboxModeDriverConfig(
             Drivetrain drive,
             Shooter shooter,
             Turret turret,
@@ -62,18 +95,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     public void configureControls() {
         // Reset the yaw. Mainly useful for testing/driver practice
-        controller.get(PS5Button.CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
+        controller.get(CREATE).onTrue(new InstantCommand(() -> getDrivetrain().setYaw(
                 new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
+        controller.get(RB).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
 
         // Align wheels
-        controller.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
+        controller.get(DPad.RIGHT).onTrue(new FunctionalCommand(
                 () -> getDrivetrain().setStateDeadband(false),
                 getDrivetrain()::alignWheels,
                 interrupted -> getDrivetrain().setStateDeadband(true),
@@ -91,7 +124,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Reverse motors
         if (intake != null && spindexer != null && shooter != null) {
-            controller.get(PS5Button.CIRCLE).onTrue(new InstantCommand(() -> {
+            controller.get(CIRCLE).onTrue(new InstantCommand(() -> {
                 reverseMotors = new ReverseMotors(intake, spindexer);
                 reverseMotors.schedule();
             })).onFalse(new InstantCommand(() -> {
@@ -104,7 +137,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Intake
         if (intake != null) {
             // Toggle intake
-            controller.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+            controller.get(RIGHT_TRIGGER_BUTTON).onTrue(new InstantCommand(() -> {
                 if (intakeBoolean) {
                     intake.extend();
                     intake.spinStart();
@@ -117,13 +150,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
 
             // Retract if hold for 3 seconds
-            controller.get(PS5Button.RIGHT_TRIGGER).debounce(3.0).onTrue(new InstantCommand(() -> {
+            controller.get(RIGHT_TRIGGER_BUTTON).debounce(3.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
             }));
 
             // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            controller.get(LEFT_JOY).onTrue(new InstantCommand(() -> {
                 intake.calibrate();
             })).onFalse(new InstantCommand(() -> {
                 intake.stopCalibrating();
@@ -133,13 +166,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Spindexer
         if (spindexer != null) {
             // Will only run if we are not calling default shoot command
-            controller.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(() -> spindexer.maxSpindexer()))
+            controller.get(LEFT_TRIGGER_BUTTON).onTrue(new InstantCommand(() -> spindexer.maxSpindexer()))
                     .onFalse(new InstantCommand(() -> spindexer.stopSpindexer()));
         }
 
         // Auto shoot
         if (turret != null && hood != null && shooter != null) {
-            controller.get(PS5Button.SQUARE).onTrue(
+            controller.get(SQUARE).onTrue(
                     new InstantCommand(() -> {
                         if (autoShoot != null && autoShoot.isScheduled()) {
                             autoShoot.cancel();
@@ -153,19 +186,19 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         // Climb
         if (climb != null) {
             // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            controller.get(OPTIONS).onTrue(new InstantCommand(() -> {
                 climb.hardstopCalibration();
             })).onFalse(new InstantCommand(() -> {
                 climb.stopCalibrating();
             }));
 
             // Climb retract
-            controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
+            controller.get(CROSS).onTrue(new InstantCommand(() -> {
                 climb.retract();
             }));
 
             // Drive to climb position and rumble
-            controller.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
+            controller.get(TRIANGLE).onTrue(new SequentialCommandGroup(
                     new ClimbDriveCommand(climb, getDrivetrain()),
                     new InstantCommand(() -> this.startRumble()),
                     new WaitCommand(1),
@@ -174,38 +207,43 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Hood
         if (hood != null) {
-            // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            controller.get(LEFT_JOY).onTrue(new InstantCommand(() -> {
                 hood.calibrate();
             })).onFalse(new InstantCommand(() -> {
                 hood.stopCalibrating();
             }));
         }
+
+        // Rumble test
+        controller.get(RIGHT_JOY).onTrue(new SequentialCommandGroup(
+                new InstantCommand(() -> controller.setRumble(GameController.RumbleStatus.RUMBLE_ON)),
+                new WaitCommand(0.5),
+                new InstantCommand(() -> controller.setRumble(GameController.RumbleStatus.RUMBLE_OFF))));
     }
 
     @Override
     public double getRawSideTranslation() {
-        return controller.get(PS5Axis.LEFT_X);
+        return controller.get(LEFT_X);
     }
 
     @Override
     public double getRawForwardTranslation() {
-        return controller.get(PS5Axis.LEFT_Y);
+        return controller.get(LEFT_Y);
     }
 
     @Override
     public double getRawRotation() {
-        return controller.get(PS5Axis.RIGHT_X);
+        return controller.get(RIGHT_X);
     }
 
     @Override
     public double getRawHeadingAngle() {
-        return Math.atan2(controller.get(PS5Axis.RIGHT_X), -controller.get(PS5Axis.RIGHT_Y)) - Math.PI / 2;
+        return Math.atan2(controller.get(RIGHT_X), -controller.get(RIGHT_Y)) - Math.PI / 2;
     }
 
     @Override
     public double getRawHeadingMagnitude() {
-        return Math.hypot(controller.get(PS5Axis.RIGHT_X), controller.get(PS5Axis.RIGHT_Y));
+        return Math.hypot(controller.get(RIGHT_X), controller.get(RIGHT_Y));
     }
 
     @Override
@@ -218,13 +256,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         return false;
     }
 
-    // doesn't work on ps5 controllers, use PS5XboxModeDriverConfig instead
     public void startRumble() {
-        controller.rumbleOn();
+        controller.setRumble(GameController.RumbleStatus.RUMBLE_ON);
     }
 
-    // doesn't work on ps5 controllers, use PS5XboxModeDriverConfig instead
     public void endRumble() {
-        controller.rumbleOff();
+        controller.setRumble(GameController.RumbleStatus.RUMBLE_OFF);
     }
 }
