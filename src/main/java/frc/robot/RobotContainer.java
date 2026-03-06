@@ -141,8 +141,8 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left(No SOTM) - Under Trench";
-          String rightSideAuto = "Right(2) - Under Trench";
+          //String leftSideAuto = "Left(No SOTM) - Under Trench";
+          //String rightSideAuto = "Right(2) - Under Trench";
           String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(testing);
           auto = new PathPlannerAuto(testing);
@@ -210,7 +210,6 @@ public class RobotContainer {
       Command intakeMovement = new IntakeMovementCommand(intake);
       NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
       NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
 
     }
 

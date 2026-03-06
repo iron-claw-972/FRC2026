@@ -6,18 +6,21 @@ import frc.robot.subsystems.turret.Turret;
 
 public class RunSpindexer extends Command {
     private Spindexer spindexer;
-    public RunSpindexer(Spindexer spindexer){
+    private Turret turret;
+    private boolean spindexerOn;
+    public RunSpindexer(Spindexer spindexer, Turret turret){
         this.spindexer = spindexer;
-        
+        this.turret = turret;
+        this.spindexerOn = false;
         addRequirements(spindexer);
     }
 
     @Override
     public void execute() {
-        if (turret.atSetpoint()){
+        if (turret.atSetpoint()) {
             spindexer.maxSpindexer();
-         } else{
-             spindexer.stopSpindexer();
+         } else {
+            spindexer.stopSpindexer();
         }
     }
 

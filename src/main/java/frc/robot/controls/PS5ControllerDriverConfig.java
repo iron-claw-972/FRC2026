@@ -149,10 +149,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(() -> {
                 if (spindexerBoolean) {
                     spindexer.maxSpindexer();
-                    intakeBoolean = false;
+                    spindexerBoolean = false;
                 } else {
                     spindexer.stopSpindexer();
-                    intakeBoolean = true;
+                    spindexerBoolean = true;
                 }
             }));
         }

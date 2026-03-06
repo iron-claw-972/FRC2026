@@ -185,14 +185,6 @@ public class FieldConstants {
     }
   }
 
-  public static FieldZone getWorkingZone(Translation2d drivepose) {
-    double x = drivepose.getX();
-    double y = drivepose.getY();
-    Alliance alliance = Robot.getAlliance();
-
-
-  }
-
   /**
    * 
    * @return Whether Y coordinate is in the upper half (left side on blue alliance)
