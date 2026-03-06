@@ -11,7 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
@@ -23,10 +22,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
-import frc.robot.commands.gpm.Superstructure;
+import frc.robot.commands.gpm.PhysicsAutoShoot;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -40,10 +38,8 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
@@ -149,8 +145,8 @@ public class RobotContainer {
           e.printStackTrace();
         }
         
-        if(turret != null){
-          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+        if(turret != null && hood != null && shooter != null && drive != null){
+          turret.setDefaultCommand(new PhysicsAutoShoot(turret, hood, shooter, drive, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
@@ -214,7 +210,7 @@ public class RobotContainer {
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
-      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+      NamedCommands.registerCommand("Auto shoot", new PhysicsAutoShoot(turret, hood, shooter, drive, spindexer));
       NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
     }

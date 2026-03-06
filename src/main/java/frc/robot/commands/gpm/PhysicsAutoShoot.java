@@ -13,7 +13,9 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.ShooterPhysics;
 
 public class PhysicsAutoShoot extends Command {
@@ -21,27 +23,36 @@ public class PhysicsAutoShoot extends Command {
 	private Hood hood;
 	private Shooter shooter;
 	private Drivetrain drivetrain;
+	private Spindexer spindexer;
 	private ShooterPhysics.Constraints constraints;
 
-	public PhysicsAutoShoot(Turret turret, Hood hood, Shooter shooter, Drivetrain drivetrain) {
+	public PhysicsAutoShoot(Turret turret, Hood hood, Shooter shooter, Drivetrain drivetrain, Spindexer spindexer) {
 		this.turret = turret;
 		this.hood = hood;
 		this.shooter = shooter;
 		this.drivetrain = drivetrain;
+		this.spindexer = spindexer;
 
 		this.constraints = new ShooterPhysics.Constraints(2.2, ShooterConstants.SHOOTER_VELOCITY,
 				Units.degreesToRadians(HoodConstants.MIN_ANGLE), Units.degreesToRadians(HoodConstants.MAX_ANGLE));
 
-		addRequirements(turret, hood, shooter);
+		addRequirements(turret, hood, shooter, spindexer);
 	}
 
 	@Override
 	public void execute() {
-		ChassisSpeeds chassisSpeeds = drivetrain.getChassisSpeeds();
-		Translation2d robotVelocity = new Translation2d(chassisSpeeds.vxMetersPerSecond,
-				chassisSpeeds.vyMetersPerSecond);
+		ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
+		ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
+		Translation2d robotVelocity = new Translation2d(fieldRelVel.vxMetersPerSecond,
+				fieldRelVel.vyMetersPerSecond);
+		
+		// use turret position
+		Translation3d turretPosition = new Translation3d(
+			drivetrain.getPose().getX(),
+			drivetrain.getPose().getY(),
+			TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
 		Translation3d robotToTarget = FieldConstants.getHubTranslation()
-				.minus(new Translation3d(drivetrain.getPose().getTranslation()));
+				.minus(turretPosition);
 
 		var stateOpt = ShooterPhysics.getConstrainedParams(
 				robotVelocity,
@@ -64,6 +75,7 @@ public class PhysicsAutoShoot extends Command {
 			turret.setFieldRelativeTarget(state.yaw(), yawSlope);
 			hood.setFieldRelativeTarget(new Rotation2d(state.pitch()), hoodSlope);
 			shooter.setShooter(state.exitVel());
+			if (spindexer != null) spindexer.maxSpindexer();
 
 		} else if (stateOpt.isPresent() && futureStateOpt.isEmpty()) {
 			ShooterPhysics.TurretState state = stateOpt.get();
@@ -71,6 +83,7 @@ public class PhysicsAutoShoot extends Command {
 			turret.setFieldRelativeTarget(state.yaw(), 0.0);
 			hood.setFieldRelativeTarget(new Rotation2d(state.pitch()), 0.0);
 			shooter.setShooter(state.exitVel());
+			if (spindexer != null) spindexer.maxSpindexer();
 		}
 	}
 
@@ -80,5 +93,6 @@ public class PhysicsAutoShoot extends Command {
 		turret.setFieldRelativeTarget(new Rotation2d(turret.getPositionRad()), 0.0);
 		hood.setFieldRelativeTarget(new Rotation2d(0), 0.0);
 		shooter.setShooter(0);
+		if (spindexer != null) spindexer.stopSpindexer();
 	}
 }
