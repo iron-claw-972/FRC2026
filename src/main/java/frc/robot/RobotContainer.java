@@ -13,19 +13,26 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.drive_comm.FaceForward;
+import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Climb.LinearClimb;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.spindexer.Spindexer;
+import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -43,11 +50,21 @@ public class RobotContainer {
   // The robot's subsystems are defined here...
   private Drivetrain drive = null;
   private Vision vision = null;
+  private Turret turret = null;
+  private Shooter shooter = null;
+  private Hood hood = null;
+  private Spindexer spindexer = null;
+  private Intake intake = null;
+
   private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LinearClimb linearClimb = null;
+
+  // Auto Command selection
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -55,6 +72,12 @@ public class RobotContainer {
    * Different robots may have different subsystems.
    */
   public RobotContainer(RobotId robotId) {
+    // display the current robot id on smartdashboard
+    SmartDashboard.putString("RobotID", robotId.toString());
+
+    // Filling the SendableChooser on SmartDashboard
+    autoChooserInit();
+
     // dispatch on the robot
     switch (robotId) {
       case TestBed1:
@@ -64,28 +87,39 @@ public class RobotContainer {
         break;
 
       default:
-      case SwerveCompetition:
 
-      case BetaBot:
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+      case PrimeJr: // AKA Valence
+        spindexer = new Spindexer();
+        intake = new Intake();
+
+      case WaffleHouse: // AKA Betabot
+        // turret = new Turret();
+        shooter = new Shooter();
+        hood = new Hood();
+
+      case SwerveCompetition: // AKA "Vantage"
+
+      case BetaBot: // AKA "Pancake"
+        // vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:
-      case Phil:
-      case Vertigo:
+        // linearClimb = new LinearClimb();
+
+      case Phil: // AKA "IHOP"
+
+      case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
-        
-        // SignalLogger.start();
-        
 
+        // SignalLogger.start();
         driver.configureControls();
         operator.configureControls();
-        
+
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
@@ -98,7 +132,7 @@ public class RobotContainer {
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
-      }
+    }
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -109,7 +143,9 @@ public class RobotContainer {
     // LiveWindow is causing periodic loop overruns
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
-    
+
+    SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    autoChooserInit();
   }
 
   /**
@@ -119,7 +155,6 @@ public class RobotContainer {
     if (drive != null)
       drive.setVisionEnabled(enabled);
   }
-
 
   public void initializeAutoBuilder() {
     AutoBuilder.configure(
@@ -139,7 +174,21 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
+  }
 
+  /**
+   * Initialize the SendableChooser on the SmartDashboard.
+   * Fill the SendableChooser with available Commands.
+   */
+  public void autoChooserInit() {
+    // add the options to the Chooser
+    autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    autoChooser.addOption("Do nada", new DoNothing());
+    autoChooser.addOption("Spin my wheels", new DoNothing());
+    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -158,28 +207,28 @@ public class RobotContainer {
   }
 
   public boolean brownout() {
-    if(RobotController.getBatteryVoltage() < 6.0) {
+    if (RobotController.getBatteryVoltage() < 6.0) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+  public Command getAutoCommand() {
+    // get the selected Command
+    Command autoSelected = autoChooser.getSelected();
+
+    return autoSelected;
   }
 
-  public void logComponents(){
-    if(!Constants.LOG_MECHANISMS) return;
-    
+  public void logComponents() {
+    if (!Constants.LOG_MECHANISMS)
+      return;
+
     Logger.recordOutput(
-      "ComponentPoses", 
-      new Pose3d[] {
+        "ComponentPoses",
+        new Pose3d[] {
         // Subsystem Pose3ds
-      }
-    );
+        });
   }
 }
-
-

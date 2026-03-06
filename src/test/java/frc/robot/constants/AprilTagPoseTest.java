@@ -29,9 +29,9 @@ public class AprilTagPoseTest {
     //   makes the field layout
     Vision vision = new Vision(new ArrayList<Pair<String, Transform3d>>());
 
-    // we should have 22 tags
-    assertEquals(22, FieldConstants.APRIL_TAGS.size());
-    assertEquals(22, vision.getAprilTagFieldLayout().getTags().size());
+    // we should have 32 tags
+    assertEquals(32, FieldConstants.field.getTags().size());
+    assertEquals(32, vision.getAprilTagFieldLayout().getTags().size());
 
     // Check each tag in the field layout
     for (int i = 0; i < vision.getAprilTagFieldLayout().getTags().size(); i++) {
@@ -40,7 +40,7 @@ public class AprilTagPoseTest {
 
       // Get the poses from the two sources
       // From the ArrayList<AprilTag> source
-      AprilTag apriltag1 = FieldConstants.APRIL_TAGS.get(i);
+      AprilTag apriltag1 = FieldConstants.field.getTags().get(i);
       Pose3d p1 = apriltag1.pose;
       // From the vision source
       Pose3d p2 = vision.getTagPose(tagId);
@@ -58,19 +58,19 @@ public class AprilTagPoseTest {
       assertEquals(p1.getRotation().getY(), p2.getRotation().getY(), 0.0001);
       assertEquals(p1.getRotation().getZ(), p2.getRotation().getZ(), 0.0001);
 
-      // 1-11 should be on the right, and 12-22 should be on the left
-      if(tagId > 11){
-        assertTrue(p1.getX() < FieldConstants.FIELD_LENGTH/2);
+      // 1-16 should be on the right, and 17-36 should be on the left
+      if(tagId > 16){
+        assertTrue(p1.getX() < FieldConstants.field.getFieldLength()/2);
       }else{
-        assertTrue(p1.getX() > FieldConstants.FIELD_LENGTH/2);
+        assertTrue(p1.getX() > FieldConstants.field.getFieldLength()/2);
       }
     }
   }
 
   @Test
   public void testReefTags(){
-    List<Pose3d> redPoses = FieldConstants.APRIL_TAGS.subList(5, 11).stream().map(tag->tag.pose).toList();
-    List<Pose3d> bluePoses = FieldConstants.APRIL_TAGS.subList(16, 22).stream().map(tag->tag.pose).toList();
+    List<Pose3d> redPoses = FieldConstants.field.getTags().subList(1, 16).stream().map(tag->tag.pose).toList();
+    List<Pose3d> bluePoses = FieldConstants.field.getTags().subList(17, 32).stream().map(tag->tag.pose).toList();
     Pose3d redCenter = findCenter(redPoses);
     Pose3d blueCenter = findCenter(bluePoses);
     
@@ -80,24 +80,24 @@ public class AprilTagPoseTest {
     assertEquals(redCenter.getRotation().getY(), 0, 0.0001);
     assertEquals(blueCenter.getRotation().getY(), 0, 0.0001);
     assertEquals(MathUtil.angleModulus(redCenter.getRotation().getZ()), Math.PI, 0.0001);
-    assertEquals(MathUtil.angleModulus(blueCenter.getRotation().getZ()), Math.PI, 0.0001);
+    assertEquals(MathUtil.angleModulus(blueCenter.getRotation().getZ()), 0, 0.0001);
 
-    // Y and Z should be equal
-    assertEquals(redCenter.getY(), blueCenter.getY(), 0.0001);
+    // Y are symmetrical diagonally
+    assertEquals(redCenter.getY(), FieldConstants.field.getFieldWidth() - blueCenter.getY(), 0.01);
+    // Z should be equal
     assertEquals(redCenter.getZ(), blueCenter.getZ(), 0.0001);
 
     // X should be mirrored
-    assertEquals(redCenter.getX(), FieldConstants.FIELD_LENGTH-blueCenter.getX(), 0.01);
+    assertEquals(redCenter.getX(), FieldConstants.field.getFieldLength()-blueCenter.getX(), 0.01);
 
     // Compare each matching pair of tags
-    for(int i = 5; i < 11; i++){
-      Pose3d red = FieldConstants.APRIL_TAGS.get(i).pose;
-      Pose3d blue = FieldConstants.APRIL_TAGS.get(i+11).pose;
-      assertEquals(red.getY(), blue.getY(), 0.0001);
+    for(int i = 1; i < 17; i++){
+      Pose3d red = FieldConstants.field.getTagPose(i).get();
+      Pose3d blue = FieldConstants.field.getTagPose(i+16).get();
+      assertEquals(red.getY(), FieldConstants.field.getFieldWidth() - blue.getY(), 0.01);
       assertEquals(red.getZ(), blue.getZ(), 0.0001);
-      assertEquals(red.getZ(), redCenter.getZ(), 0.0001);
-      assertEquals(red.getX(), FieldConstants.FIELD_LENGTH-blue.getX(), 0.01);
-      assertEquals(MathUtil.angleModulus(red.getRotation().getZ()), MathUtil.angleModulus(Math.PI-blue.getRotation().getZ()), 0.0001);
+      assertEquals(red.getX(), FieldConstants.field.getFieldLength()-blue.getX(), 0.01);
+      assertEquals(MathUtil.angleModulus(red.getRotation().getZ()), MathUtil.angleModulus(blue.getRotation().getZ() + Math.PI), 0.0001);
     }
   }
 
