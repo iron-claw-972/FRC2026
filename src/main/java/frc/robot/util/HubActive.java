@@ -4,16 +4,15 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Robot;
 
 public class HubActive {
 
   static public boolean isHubActive() {
-    Alliance alliance = Robot.getAlliance();
+    Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
-    // if (alliance.isEmpty()) {
-    //   return false;
-    // }
+    if (alliance.isEmpty()) {
+      return false;
+    }
     // Hub is always enabled in autonomous.
     if (DriverStation.isAutonomousEnabled()) {
       return true;
@@ -42,7 +41,7 @@ public class HubActive {
     }
 
     // Shift was is active for blue if red won auto, or red if blue won auto.
-    boolean shift1Active = switch (alliance) {
+    boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
@@ -70,11 +69,11 @@ public class HubActive {
 
   static public Optional<Double> timeToActive() {
 
-    Alliance alliance = Robot.getAlliance();
+    Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
-    // if (alliance.isEmpty()) {
-    //   return Optional.empty();
-    // }
+    if (alliance.isEmpty()) {
+      return Optional.empty();
+    }
     // Hub is always enabled in autonomous.
     if (DriverStation.isAutonomousEnabled()) {
       return Optional.of(0.0);
@@ -103,7 +102,7 @@ public class HubActive {
     }
 
     // Shift was is active for blue if red won auto, or red if blue won auto.
-    boolean shift1Active = switch (alliance) {
+    boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
