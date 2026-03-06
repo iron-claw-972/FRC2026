@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.constants.swerve.DriveConstants;
@@ -40,6 +41,8 @@ public class DefaultDriveCommand extends Command {
         trenchAssistPid.setIZone(2);
         trenchAssistPid.setIntegratorRange(-1, 1);
 
+        SmartDashboard.putNumber("0 degrees snap location", 0);
+        SmartDashboard.putNumber("", 0);
     }
 
     @Override
@@ -76,8 +79,17 @@ public class DefaultDriveCommand extends Command {
                 swerve.setIsAlign(true);
 
                 double yawDegrees = swerve.getYaw().getDegrees();
-                double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
-                swerve.setAlignAngle(Units.degreesToRadians(snappedDeg));
+                Logger.recordOutput("yawdegs", yawDegrees);
+                // double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
+                if (Math.abs(yawDegrees) <= 90) {
+                    Logger.recordOutput("0degs", false);
+                    swerve.setAlignAngle(Units.degreesToRadians(0.0));
+                } else {
+                    swerve.setAlignAngle(Units.degreesToRadians(180.0));
+                    Logger.recordOutput("0degs", true);
+                }
+                // swerve.setAlignAngle(snappedDeg);
+                // Logger.recordOutput("snappy", snappedDeg);
             } else {
                 Logger.recordOutput("InAlignZone", false);
                 swerve.setIsAlign(false);
