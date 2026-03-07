@@ -141,17 +141,17 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          //String leftSideAuto = "Left(No SOTM) - Under Trench";
+          String leftSideAuto = "Left(No SOTM) - Under Trench";
           //String rightSideAuto = "Right(2) - Under Trench";
-          String testing = "Straight Test";
-          PathPlannerAuto.getPathGroupFromAutoFile(testing);
-          auto = new PathPlannerAuto(testing);
+          //String testing = "Straight Test";
+          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
+          auto = new PathPlannerAuto(leftSideAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
         
         if(turret != null){
-          //turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
