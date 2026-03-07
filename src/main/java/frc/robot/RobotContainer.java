@@ -11,7 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
@@ -33,17 +32,15 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
+import frc.robot.controls.GameControllerDriverConfig;
 import frc.robot.controls.Operator;
-import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
@@ -126,7 +123,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
+        driver = new GameControllerDriverConfig(drive);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
