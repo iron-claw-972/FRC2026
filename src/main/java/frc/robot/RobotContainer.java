@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
@@ -73,8 +74,6 @@ public class RobotContainer {
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
 
-
-
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -88,7 +87,7 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    //autoChooserInit();
+    // autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -116,7 +115,7 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        //linearClimb = new LinearClimb();
+        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -144,8 +143,8 @@ public class RobotContainer {
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
-        
-        if(turret != null && hood != null && shooter != null && drive != null){
+
+        if (turret != null && hood != null && shooter != null && drive != null) {
           turret.setDefaultCommand(new PhysicsAutoShoot(turret, hood, shooter, drive, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
@@ -161,7 +160,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    //autoChooserInit();
+    // autoChooserInit();
   }
 
   /**
@@ -190,38 +189,39 @@ public class RobotContainer {
   }
 
   public void registerCommands() {
-    if (intake != null){
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(()-> intake.extend()));
-      NamedCommands.registerCommand("Retract Intake", new InstantCommand(()-> intake.retract()));
+    if (intake != null) {
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> intake.extend()));
+      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
     }
 
-    if (intake != null && spindexer != null){ 
+    if (intake != null && spindexer != null) {
       NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-      ));
+          new InstantCommand(() -> intake.spin(IntakeConstants.SPEED))));
       NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spinStop())
-      ));
+          new InstantCommand(() -> intake.spinStop())));
       Command intakeMovement = new IntakeMovementCommand(intake);
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
+      NamedCommands.registerCommand("Start Intake Seizure",
+          new InstantCommand(() -> CommandScheduler.getInstance().schedule(intakeMovement)));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> intakeMovement.cancel()));
 
     }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       NamedCommands.registerCommand("Auto shoot", new PhysicsAutoShoot(turret, hood, shooter, drive, spindexer));
-      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
+      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(() -> spindexer.maxSpindexer(), spindexer));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> spindexer.stopSpindexer()));
     }
 
-    if (hood != null){
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hood.forceHoodDown(true);}));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hood.forceHoodDown(false);}));
+    if (hood != null) {
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(true);
+      }));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(false);
+      }));
     }
 
-
-    if (linearClimb != null && drive != null){
+    if (linearClimb != null && drive != null) {
       NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
     }
 
@@ -265,7 +265,7 @@ public class RobotContainer {
     }
   }
 
-  public Command getAutoCommand(){
+  public Command getAutoCommand() {
     return auto;
   }
 
