@@ -73,9 +73,6 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO{
      * @param setpoint in rotations
      */
     public void setSetpoint(double setpoint) {
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        motor.getConfigurator().apply(config);
         pid.setSetpoint(setpoint);
     }
 
