@@ -155,31 +155,35 @@ public class VisionConstants {
                 new Pair<String, Transform3d>(
                         "CameraFrontLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(10.485), Units.inchesToMeters(10.217),
-                                        Units.inchesToMeters(11.012)),
-                                new Rotation3d(0, Units.degreesToRadians(-11),
-                                        Math.PI/2 + Units.degreesToRadians(20)))),
+                                new Translation3d(Units.inchesToMeters(-8.47), 
+                                        Units.inchesToMeters(11.54),
+                                        Units.inchesToMeters(19.7)),
+                                new Rotation3d(0, Units.degreesToRadians(-22.0),
+                                        Units.degreesToRadians(55.0)))),
                 new Pair<String, Transform3d>(
                         "CameraFrontRight",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-9.538), Units.inchesToMeters(7.474),
-                                        Units.inchesToMeters(8.719)),
-                                new Rotation3d(0, Units.degreesToRadians(-19.5),
-                                        Math.PI/2-Units.degreesToRadians(25)))),
+                                new Translation3d(Units.inchesToMeters(-8.47), 
+                                        Units.inchesToMeters(-11.54),
+                                        Units.inchesToMeters(19.7)),
+                                new Rotation3d(0, Units.degreesToRadians(-22.0),
+                                        Units.degreesToRadians(-55.0)))),
                 new Pair<String, Transform3d>(
                         "CameraBackLeft",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-9.538), Units.inchesToMeters(7.474),
-                                        Units.inchesToMeters(8.719)),
-                                new Rotation3d(0, Units.degreesToRadians(-19.5),
-                                        Math.PI/2-Units.degreesToRadians(25)))),
+                                new Translation3d(Units.inchesToMeters(-10.91), 
+                                        Units.inchesToMeters(12),
+                                        Units.inchesToMeters(19.66)),
+                                new Rotation3d(0, Units.degreesToRadians(-22.0),
+                                        Units.degreesToRadians(145.0)))),
                 new Pair<String, Transform3d>(
                         "CameraBackRight",
                         new Transform3d(
-                                new Translation3d(Units.inchesToMeters(-9.538), Units.inchesToMeters(7.474),
-                                        Units.inchesToMeters(8.719)),
-                                new Rotation3d(0, Units.degreesToRadians(-19.5),
-                                        Math.PI/2-Units.degreesToRadians(25))))
+                                new Translation3d(Units.inchesToMeters(-10.91), 
+                                        Units.inchesToMeters(-12),
+                                        Units.inchesToMeters(19.66)),
+                                new Rotation3d(0, Units.degreesToRadians(-22.0),
+                                        Units.degreesToRadians(-145.0))))
                 ));
 
         /**
