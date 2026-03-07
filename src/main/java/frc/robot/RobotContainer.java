@@ -141,16 +141,17 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left(No SOTM) - Under Trench";
-          String rightSideAuto = "Right(2) - Under Trench";
-          PathPlannerAuto.getPathGroupFromAutoFile(rightSideAuto);
-          auto = new PathPlannerAuto(rightSideAuto);
+          //String leftSideAuto = "Left(No SOTM) - Under Trench";
+          //String rightSideAuto = "Right(2) - Under Trench";
+          String testing = "Straight Test";
+          PathPlannerAuto.getPathGroupFromAutoFile(testing);
+          auto = new PathPlannerAuto(testing);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
         
         if(turret != null){
-          turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
+          //turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
@@ -209,7 +210,6 @@ public class RobotContainer {
       Command intakeMovement = new IntakeMovementCommand(intake);
       NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
       NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
 
     }
 

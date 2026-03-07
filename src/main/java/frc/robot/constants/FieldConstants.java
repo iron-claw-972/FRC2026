@@ -24,8 +24,8 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.12;
-  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.88;
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.167;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.833;
 
   /**The coordinate of the climb position */
   public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
