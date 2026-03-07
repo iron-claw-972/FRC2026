@@ -84,7 +84,7 @@ public class ShooterPhysics {
 
 		// the only reason this is empty is if the highest posible trajectory is too low
 		// to intersect the goal
-		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.minPitch());
+		Optional<TurretState> withMaxPitchOpt = withAngle(robotVelocity, robotToTarget, constraints.maxPitch());
 		if (withMaxPitchOpt.isEmpty())
 			return Optional.empty();
 		TurretState withMaxPitch = withMaxPitchOpt.get();
@@ -245,7 +245,10 @@ public class ShooterPhysics {
 			guess += difference * 1.7; // experimentally determined value
 		}
 
-		throw new RuntimeException("Failed to compute a trajectory for a minimum speed.");
+		throw new RuntimeException(
+				"Solving for minimum velocity did not converge (velocity: " + initialVelocity + ", target: "
+						+ target + ", tolerance: " + tolerance + ").");
+
 	}
 
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
@@ -256,32 +259,52 @@ public class ShooterPhysics {
 	public static Optional<TurretState> withAngle(Translation2d initialVelocity, Translation3d target,
 			double pitch, double tolerance) {
 
-		// guess a peak height
-		double guess = target.getZ() + 2;
-		int maxIters = 20;
+		// System.out.println(
+		// "Solving for pitch=" + pitch + " with target=" + target + " and
+		// initialVelocity=" + initialVelocity);
+
+		// trying to calculate a shot for height=0 returns NaN
+		double effectiveMinHeight = Math.max(target.getZ(), 0.01);
+
+		TurretState first = getShotParams(initialVelocity, target, effectiveMinHeight);
+		TurretState second = getShotParams(initialVelocity, target, 1000.);
+
+		if (first.pitch() > pitch)
+			if (first.pitch() <= pitch + tolerance)
+				return Optional.of(first);
+			else
+				return Optional.empty();
+		else if (second.pitch() < pitch)
+			if (Math.abs(second.pitch() - pitch) <= tolerance)
+				return Optional.of(second); // it's close enough
+			else
+				return Optional.empty(); // give up
+
+		int maxIters = 50;
+		var range = new Pair<TurretState, TurretState>(first, second);
+
 		while (maxIters >= 0) {
 			maxIters--;
 
-			// this will throw an exception, so avoid it
-			// we still might have just overshot, so keep checking
-			if (guess < target.getZ())
-				guess = target.getZ();
+			// Binary search: use the midpoint height
+			double midHeight = (range.getFirst().height() + range.getSecond().height()) / 2;
 
-			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, guess);
+			Translation3d guessVelocity = getRequiredExitVelocity(initialVelocity, target, midHeight);
 			double guessT = (-guessVelocity.getZ() - Math.sqrt(Math.pow(guessVelocity.getZ(), 2) - 2 * Constants.GRAVITY_ACCELERATION * target.getZ())) / -Constants.GRAVITY_ACCELERATION;
-			TurretState polar = cvtShot(guessVelocity, guess, guessT);
-			double difference = pitch - polar.pitch();
+			TurretState mid = cvtShot(guessVelocity, midHeight, guessT);
+			
+			if (Math.abs(mid.pitch() - pitch) <= tolerance)
+				return Optional.of(mid);
 
-			// we've already hit minimum height and are trying to go lower
-			if (guess <= target.getZ() && difference < 0)
-				return Optional.empty();
-
-			if (Math.abs(difference) <= tolerance)
-				return Optional.of(polar);
-
-			guess += difference * 0.7; // TODO: find better value
+			if (mid.pitch() > pitch) {
+				// Pitch too high, need lower trajectory (higher height)
+				range = new Pair<TurretState, TurretState>(mid, range.getSecond());
+			} else {
+				// Pitch too low, need higher trajectory (lower height)
+				range = new Pair<TurretState, TurretState>(range.getFirst(), mid);
+			}
 		}
 
-		throw new RuntimeException("Solving for angle did not converge.");
+		return Optional.of(range.getFirst());
 	}
 }
