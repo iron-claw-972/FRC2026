@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
@@ -113,7 +111,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 }
             }, intake));
 
-            // Retract if hold for 3 seconds
+            // Retract if hold for 2 seconds
             controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
@@ -145,16 +143,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Spindexer
         if (spindexer != null) {
-            // Toggle spindexer
-            controller.get(PS5Button.LEFT_TRIGGER).onTrue(new InstantCommand(() -> {
-                if (spindexerBoolean) {
-                    spindexer.maxSpindexer();
-                    spindexerBoolean = false;
-                } else {
-                    spindexer.stopSpindexer();
-                    spindexerBoolean = true;
-                }
-            }));
+            // Will only run if we are not calling default shoot command
+            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer, turret));
         }
 
         // Auto shoot
@@ -177,12 +167,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.retract();
             }));
 
-            // Drive to climb position and rumble
-            controller.get(PS5Button.TRIANGLE).onTrue(new SequentialCommandGroup(
-                    new ClimbDriveCommand(climb, getDrivetrain()),
-                    new InstantCommand(() -> this.startRumble()),
-                    new WaitCommand(1),
-                    new InstantCommand(() -> this.endRumble())));
+            // Drive to climb position
+            controller.get(PS5Button.TRIANGLE).onTrue(new ClimbDriveCommand(climb, getDrivetrain()));
         }
 
         // Hood
@@ -236,13 +222,5 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     @Override
     public boolean getIsAlign() {
         return false;
-    }
-
-    public void startRumble() {
-        controller.rumbleOn();
-    }
-
-    public void endRumble() {
-        controller.rumbleOff();
     }
 }

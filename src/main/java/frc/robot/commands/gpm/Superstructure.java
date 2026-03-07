@@ -122,8 +122,7 @@ public class Superstructure extends Command {
             goalState = ShooterPhysics.getShotParams(
 					Translation2d.kZero,
 				target3d.minus(lookahead3d),
-                target == FieldConstants.getHubTranslation().toTranslation2d() ?
-				2.0 : 2.0);
+					            2.0);
 
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
