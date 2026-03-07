@@ -18,8 +18,13 @@ public class RunSpindexer extends Command {
     public RunSpindexer(Spindexer spindexer, Turret turret) {
         this.spindexer = spindexer;
         this.turret = turret;
-        addRequirements(spindexer, turret);
+        addRequirements(spindexer);
     }
+
+        // public RunSpindexer(Spindexer spindexer) {
+        // this.spindexer = spindexer;
+        // addRequirements(spindexer);
+    // }
 
     @Override
     public void execute() {
@@ -31,6 +36,7 @@ public class RunSpindexer extends Command {
         boolean jammed = spindexer.getStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
         if (jam_debouncer.calculate(jammed)) {
             reversing = true;
+            reversing_debouncer.calculate(reversing);
             System.out.println("Reversing the spindexer for Anti-Jam");
         }
         if (!reversing) {
@@ -39,11 +45,8 @@ public class RunSpindexer extends Command {
             spindexer.reverseSpindexer();
             if (reversing_debouncer.calculate(reversing)) {
                 reversing = false;
-                reversing_debouncer.calculate(false);
-                jam_debouncer.calculate(false);
             }
         }
-    }
 
     @Override
     public void end(boolean interrupted) {
@@ -51,8 +54,8 @@ public class RunSpindexer extends Command {
         reversing = false;
     }
 
-    @Override
-    public boolean isFinished() {
-        return false;  // never ends on its own
-    }
+    // @Override
+    // public boolean isFinished() {
+    //     return false;  // never ends on its own
+    // }
 }
