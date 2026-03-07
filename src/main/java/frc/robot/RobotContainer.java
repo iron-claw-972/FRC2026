@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
@@ -198,19 +199,11 @@ public class RobotContainer {
     if (intake != null){
       NamedCommands.registerCommand("Extend Intake", new InstantCommand(()-> intake.extend()));
       NamedCommands.registerCommand("Retract Intake", new InstantCommand(()-> intake.retract()));
-    }
-
-    if (intake != null && spindexer != null){ 
-      NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-      ));
-      NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spinStop())
-      ));
-      Command intakeMovement = new IntakeMovementCommand(intake);
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
+      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(()-> intake.intermediateExtend()));
+      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(()-> intake.spinStart()));
+      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(()-> intake.spinStop()));
+      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> new IntakeMovementCommand(intake).schedule()));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> CommandScheduler.getInstance().cancelAll()));
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
