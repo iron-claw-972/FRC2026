@@ -76,7 +76,13 @@ public class DefaultDriveCommand extends Command {
                 swerve.setIsAlign(true);
 
                 double yawDegrees = swerve.getYaw().getDegrees();
-                double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
+                // double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
+                double snappedDeg;
+                if (Math.abs(yawDegrees) < 90){
+                    snappedDeg = 0;
+                } else {
+                    snappedDeg = 180;
+                }
                 swerve.setAlignAngle(Units.degreesToRadians(snappedDeg));
             } else {
                 Logger.recordOutput("InAlignZone", false);
