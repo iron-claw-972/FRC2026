@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.0;
+    double powerModifier = 1.3;
 
     public Shooter(){
         updateInputs();
@@ -58,6 +58,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     @Override
     public void periodic(){
         updateInputs();
+
+        // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
+        // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
         powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
         SmartDashboard.putNumber("shooter power modifier", powerModifier);
