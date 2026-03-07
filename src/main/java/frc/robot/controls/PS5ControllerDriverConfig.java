@@ -143,6 +143,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
                 new RunSpindexer(spindexer, turret)
             );
+            // controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
+            //     new RunSpindexer(spindexer)
+            // );
         }
 
         // Auto shoot
