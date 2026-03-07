@@ -34,6 +34,7 @@ public class RunSpindexer extends Command {
             return; // this is so the balls don't fly out when unaligned
         }
         boolean jammed = spindexer.getStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        // jammed = false;
         if (jam_debouncer.calculate(jammed)) {
             reversing = true;
             reversing_debouncer.calculate(reversing);
@@ -43,12 +44,12 @@ public class RunSpindexer extends Command {
             spindexer.maxSpindexer();
         } else {
             spindexer.reverseSpindexer();
-            if (!reversing_debouncer.calculate(false)) {
+            if (reversing_debouncer.calculate(reversing)) {
                 reversing = false;
             }
         }
     }
-
+    
     @Override
     public void end(boolean interrupted) {
         spindexer.stopSpindexer();
