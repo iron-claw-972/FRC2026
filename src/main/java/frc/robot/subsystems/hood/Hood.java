@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Hood extends SubsystemBase implements HoodIO{
+public class Hood extends SubsystemBase implements HoodIO {
     private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.CANIVORE_SUB);
 
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);

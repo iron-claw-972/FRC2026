@@ -75,7 +75,9 @@ public class AutoShootCommand extends Command {
 				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
-        
+        // Jerry Debug
+        System.out.println("The current goal state (including the exit vel):" + goalState);
+
         addRequirements(turret);
     }
 
