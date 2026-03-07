@@ -48,8 +48,8 @@ public class RunSpindexer extends Command {
         reversing = false;
     }
 
-    @Override
-    public boolean isFinished() {
-        return false;  // never ends on its own
-    }
+    // @Override
+    // public boolean isFinished() {
+    //     return false;  // never ends on its own
+    // }
 }
