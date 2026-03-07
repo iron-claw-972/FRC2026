@@ -84,8 +84,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Intake",
-      "waypointRelativePos": 0,
+      "name": "Extend intake",
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
@@ -95,6 +95,12 @@
               "type": "named",
               "data": {
                 "name": "Spin Intake Rollers"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Extend Intake"
               }
             }
           ]
