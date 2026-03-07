@@ -47,7 +47,8 @@ public class RunSpindexer extends Command {
                 reversing = false;
             }
         }
-
+    }
+    
     @Override
     public void end(boolean interrupted) {
         spindexer.stopSpindexer();
