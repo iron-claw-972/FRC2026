@@ -162,7 +162,7 @@ public class FieldConstants {
         || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE) {
           return FieldZone.TRENCH_BUMP;
         }
-    if(((y < FIELD_WIDTH - ((48.75 / 2) + 0.158750) && y > FIELD_WIDTH - (48.75 / 2) - 0.736600)) && (x < 47.0 || x > FIELD_LENGTH - 47.0)) {
+    if(((y < FIELD_WIDTH - (Units.inchesToMeters(48.75 / 2) + 0.158750) && y > FIELD_WIDTH - Units.inchesToMeters(48.75 / 2) - 0.736600)) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0))) {
       return FieldZone.UNDER_LADDER;
     }
     // if(((y < FIELD_WIDTH - (46.75 / 2) && y > FIELD_WIDTH - (46.75 / 2))) && ((x > 207.42375 && x < 207.42375 + 36.0) || (x < FIELD_LENGTH - 207.42375 && x > FIELD_LENGTH - 207.42375 - 36.0))) {
