@@ -215,9 +215,9 @@ public class Module implements ModuleIO{
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
         odometryPositions = new SwerveModulePosition[sampleCount];
         for (int i = 0; i < sampleCount; i++) {
-        double positionMeters = inputs.odometryDrivePositionsRad[i]/DriveConstants.DRIVE_GEAR_RATIO * DriveConstants.WHEEL_RADIUS;
-        Rotation2d angle = inputs.odometryTurnPositions[i].div(DriveConstants.MODULE_CONSTANTS.angleGearRatio);
-        odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
+			double positionMeters = inputs.odometryDrivePositionsRad[i]/DriveConstants.DRIVE_GEAR_RATIO * DriveConstants.WHEEL_RADIUS;
+			Rotation2d angle = inputs.odometryTurnPositions[i].div(DriveConstants.MODULE_CONSTANTS.angleGearRatio);
+			odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
         }
         // Update alerts
         driveDisconnectedAlert.set(!inputs.driveConnected);

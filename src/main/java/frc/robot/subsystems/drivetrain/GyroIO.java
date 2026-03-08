@@ -13,8 +13,11 @@
 
 package frc.robot.subsystems.drivetrain;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
+
+import com.ctre.phoenix6.sim.Pigeon2SimState;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public interface GyroIO {
   @AutoLog
@@ -29,4 +32,6 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  public Pigeon2SimState getSimState();
 }

@@ -2,7 +2,6 @@ package frc.robot.controls;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -42,7 +41,8 @@ public class GameControllerDriverConfig extends BaseDriverConfig {
 
 		driver.get(Button.B).whileTrue(new GoToPosePID(FieldConstants.getClimbLocation(), getDrivetrain()));
 
-		driver.get(Button.A).onTrue(new InstantCommand(() -> getDrivetrain().resetOdometry(Pose2d.kZero)));
+		driver.get(Button.A)
+				.onTrue(new InstantCommand(() -> getDrivetrain().resetOdometry(FieldConstants.getClimbLocation())));
 	}
 
 	@Override

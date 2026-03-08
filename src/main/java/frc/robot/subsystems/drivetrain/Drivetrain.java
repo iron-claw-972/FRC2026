@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
@@ -208,6 +209,9 @@ public class Drivetrain extends SubsystemBase {
             // Apply update
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
+		Logger.recordOutput("ihatethis/times", sampleTimestamps);
+		Logger.recordOutput("ihatethis/rotations", gyroInputs.odometryYawPositions);
+		Logger.recordOutput("ihatethis/positions", positions);
         Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
         updateOdometryVision();
     }
@@ -331,12 +335,16 @@ public class Drivetrain extends SubsystemBase {
             prevPose = pose3;
         }
 
-        // if (Robot.isSimulation()) {
-        // pigeon.getSimState().addYaw(
-        // +Units.radiansToDegrees(currentSetpoint.chassisSpeeds().omegaRadiansPerSecond
-        // * Constants.LOOP_TIME));
-        // }
+		if (Robot.isSimulation()) {
+			gyroIO.getSimState().addYaw(
+					+Units.radiansToDegrees(currentSetpoint.chassisSpeeds().omegaRadiansPerSecond
+							* Constants.LOOP_TIME));
+		}
     }
+
+	public void resetThings() {
+		modulePoses.reset();
+	}
 
     /**
      * Stops all swerve modules.
@@ -389,7 +397,6 @@ public class Drivetrain extends SubsystemBase {
      *                      velocity
      */
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
-
         if (DriveConstants.USE_ACTUAL_SPEED) {
             SwerveSetpoint currentState = new SwerveSetpoint(getChassisSpeeds(), getModuleStates());
             currentSetpoint = setpointGenerator.generateSetpoint(
@@ -545,8 +552,8 @@ public class Drivetrain extends SubsystemBase {
     public void resetOdometry(Pose2d pose) {
         // NOTE: must use pigeon yaw for odometer!
         currentHeading = pose.getRotation().getRadians();
-        poseEstimator.resetPosition(gyroInputs.yawPosition, getModulePositions(), pose);
         modulePoses.reset();
+        poseEstimator.resetPosition(gyroInputs.yawPosition, getModulePositions(), pose);
     }
 
     /**
