@@ -213,17 +213,14 @@ public class RobotContainer {
       }));
     }
 
-    if (intake != null && spindexer != null){ 
-      NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-      ));
-      NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spinStop())
-      ));
-      Command intakeMovement = new IntakeMovementCommand(intake);
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-    }
+    // if (intake != null && spindexer != null){ 
+    //   NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
+    //     new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
+    //   ));
+    //   NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
+    //     new InstantCommand(()->intake.spinStop())
+    //   ));
+    // }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
       Command runSpindexer = new RunSpindexer(spindexer, turret);
