@@ -141,7 +141,7 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left(No SOTM) - Under Trench";
+          String leftSideAuto = "Left Week 2";
           // String rightSideAuto = "Right(2) - Under Trench";
           // String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
@@ -225,6 +225,8 @@ public class RobotContainer {
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
       Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+
       NamedCommands.registerCommand("Start Spindexer", new InstantCommand(() -> runSpindexer.schedule()));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
     }

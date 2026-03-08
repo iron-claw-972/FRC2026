@@ -4,9 +4,10 @@
   "holonomicMode": true,
   "pathFolders": [
     "Center Autos",
+    "Field Testing Autos",
     "Left Autos",
     "Miscellaneous",
-    "Field Testing Autos",
+    "week 2 autos",
     "Right Autos"
   ],
   "autoFolders": [],
