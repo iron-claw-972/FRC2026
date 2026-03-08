@@ -78,8 +78,6 @@ public class RobotContainer {
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
 
-
-
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -93,7 +91,7 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    //autoChooserInit();
+    // autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -121,7 +119,7 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        //linearClimb = new LinearClimb();
+        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -143,15 +141,15 @@ public class RobotContainer {
         // Load the auto command
         try {
           String leftSideAuto = "Left(No SOTM) - Under Trench";
-          //String rightSideAuto = "Right(2) - Under Trench";
-          //String testing = "Straight Test";
+          // String rightSideAuto = "Right(2) - Under Trench";
+          // String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
           auto = new PathPlannerAuto(leftSideAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
-        
-        if(turret != null){
+
+        if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
@@ -167,7 +165,7 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    //autoChooserInit();
+    // autoChooserInit();
   }
 
   /**
@@ -195,30 +193,41 @@ public class RobotContainer {
         drive);
   }
 
+  private boolean seizing;
+
   public void registerCommands() {
-    if (intake != null){
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(()-> intake.extend()));
-      NamedCommands.registerCommand("Retract Intake", new InstantCommand(()-> intake.retract()));
-      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(()-> intake.intermediateExtend()));
-      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(()-> intake.spinStart()));
-      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(()-> intake.spinStop()));
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> new IntakeMovementCommand(intake).schedule()));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> CommandScheduler.getInstance().cancelAll()));
+    if (intake != null) {
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> intake.extend()));
+      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
+      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
+      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
+      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
+
+      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
+        seizing = true;
+        CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
+      }));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
+        seizing = false;
+      }));
     }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
+      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(() -> spindexer.maxSpindexer(), spindexer));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> spindexer.stopSpindexer()));
     }
 
-    if (hood != null){
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hood.forceHoodDown(true);}));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hood.forceHoodDown(false);}));
+    if (hood != null) {
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(true);
+      }));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(false);
+      }));
     }
 
-
-    if (linearClimb != null && drive != null){
+    if (linearClimb != null && drive != null) {
       NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
     }
 
@@ -262,7 +271,7 @@ public class RobotContainer {
     }
   }
 
-  public Command getAutoCommand(){
+  public Command getAutoCommand() {
     return auto;
   }
 
