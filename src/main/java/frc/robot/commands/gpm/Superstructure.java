@@ -245,6 +245,8 @@ public class Superstructure extends Command {
         Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
         Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
         Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+        
+        Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
 
         SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }
