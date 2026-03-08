@@ -26,6 +26,7 @@ import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
@@ -209,14 +210,13 @@ public class RobotContainer {
       Command intakeMovement = new IntakeMovementCommand(intake);
       NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
       NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
-
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+      Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
+      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(() -> runSpindexer.schedule()));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
     }
 
     if (hood != null){
