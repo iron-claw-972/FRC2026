@@ -134,7 +134,21 @@
       "rotationDegrees": -89.50334218867351
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Depot",
+      "minWaypointRelativePos": 4.953880764904385,
+      "maxWaypointRelativePos": 6.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
@@ -171,6 +185,17 @@
       }
     },
     {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 0.3104611923509808,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Spindexer"
+        }
+      }
+    },
+    {
       "name": "Stop Hood Down",
       "waypointRelativePos": 0.39145106861638246,
       "endWaypointRelativePos": null,
@@ -182,19 +207,8 @@
       }
     },
     {
-      "name": "Start Spindexer",
-      "waypointRelativePos": 1.066366704161966,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Spindexer"
-        }
-      }
-    },
-    {
       "name": "Stop Spindexer",
-      "waypointRelativePos": 2.2812148481439465,
+      "waypointRelativePos": 2.9156355455568033,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
