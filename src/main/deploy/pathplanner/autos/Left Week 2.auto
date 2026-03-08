@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Step 1 Left Near Scoop"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Step 2 Left Return to Alliance Zone"
+            "pathName": "Full Left Path"
           }
         }
       ]

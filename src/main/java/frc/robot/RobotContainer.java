@@ -197,8 +197,14 @@ public class RobotContainer {
   private boolean seizing;
 
   public void registerCommands() {
+
     if (intake != null) {
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> intake.extend()));
+
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
+        intake.extend();
+        System.out.println(
+            "============================================================================================================================extending");
+      }));
       NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
       NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
       NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
@@ -213,16 +219,18 @@ public class RobotContainer {
       }));
     }
 
-    // if (intake != null && spindexer != null){ 
-    //   NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
-    //     new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-    //   ));
-    //   NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
-    //     new InstantCommand(()->intake.spinStop())
-    //   ));
+    // if (intake != null && spindexer != null){
+    // NamedCommands.registerCommand("Spin Intake Rollers", new
+    // ParallelCommandGroup(
+    // new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
+    // ));
+    // NamedCommands.registerCommand("Stop Intake Rollers", new
+    // ParallelCommandGroup(
+    // new InstantCommand(()->intake.spinStop())
+    // ));
     // }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
@@ -232,11 +240,13 @@ public class RobotContainer {
     }
 
     if (hood != null) {
+
       NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
         hood.forceHoodDown(true);
       }));
       NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
         hood.forceHoodDown(false);
+        Logger.recordOutput("hello", true);
       }));
     }
 
