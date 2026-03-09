@@ -197,8 +197,6 @@ public class RobotContainer {
 
       NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
         intake.extend();
-        System.out.println(
-            "============================================================================================================================extending");
       }));
       NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
       NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
@@ -228,9 +226,8 @@ public class RobotContainer {
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-
-      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
+      NamedCommands.registerCommand("Start Spindexer",
+          new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
     }
 
