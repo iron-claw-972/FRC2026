@@ -5,11 +5,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
     @AutoLog
     public static class IntakeIOInputs{
-        public static double leftPosition = 0.0;
-        public static double rightPosition = 0.0;
-        public static double leftCurrent = 0.0;
-        public static double rightCurrent = 0.0;
-        public static double rollerVelocity = 0.0;
+        public double leftPosition = 0.0;
+        public double rightPosition = 0.0;
+        public double leftCurrent = 0.0;
+        public double rightCurrent = 0.0;
+        public double rollerVelocity = 0.0;
     }
 
     public void updateInputs();

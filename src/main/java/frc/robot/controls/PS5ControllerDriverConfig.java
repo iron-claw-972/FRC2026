@@ -131,7 +131,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
-                intake.spinStop();
+                if(intakeBoolean){
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else{
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
             }));
         }
 
@@ -142,9 +148,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
                 new RunSpindexer(spindexer, turret)
             );
-            // controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-            //     new RunSpindexer(spindexer)
-            // );
         }
 
         // Auto shoot

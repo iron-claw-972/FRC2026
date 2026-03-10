@@ -37,7 +37,7 @@ public class RunSpindexer extends Command {
         if (jam_debouncer.calculate(jammed)) {
             reversing = true;
             reversing_debouncer.calculate(reversing);
-            System.out.println("Reversing the spindexer for Anti-Jam");
+            // System.out.println("Reversing the spindexer for Anti-Jam");
         }
         if (!reversing) {
             spindexer.maxSpindexer();

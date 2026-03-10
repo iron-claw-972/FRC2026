@@ -65,6 +65,8 @@ public class Superstructure extends Command {
 
     private double distanceFromTarget = 0.0;
 
+    private double TOFAdjustment = 0.85;
+
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
@@ -122,7 +124,6 @@ public class Superstructure extends Command {
 				target3d.minus(lookahead3d),
 					            2.0);
 
-            double TOFAdjustment = 0.85;
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
@@ -204,6 +205,9 @@ public class Superstructure extends Command {
 
     @Override
     public void execute() {
+        TOFAdjustment = SmartDashboard.getNumber("TOF Adjustment", TOFAdjustment);
+        SmartDashboard.putNumber("TOF Adjustment", TOFAdjustment);
+
         hoodOffset = SmartDashboard.getNumber("Hood Offset", hoodOffset);
         SmartDashboard.putNumber("Hood Offset", hoodOffset);
         turretOffset = SmartDashboard.getNumber("Turret Offset", turretOffset);
@@ -241,6 +245,8 @@ public class Superstructure extends Command {
         Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
         Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
         Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+        
+        Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
 
         SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
     }
