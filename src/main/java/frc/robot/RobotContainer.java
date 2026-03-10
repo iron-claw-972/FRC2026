@@ -226,7 +226,7 @@ public class RobotContainer {
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret);
-      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+      NamedCommands.registerCommand("Auto shoot", new Superstructure(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
