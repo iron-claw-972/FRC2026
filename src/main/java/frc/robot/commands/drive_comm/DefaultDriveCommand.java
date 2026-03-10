@@ -75,23 +75,17 @@ public class DefaultDriveCommand extends Command {
             }
 
             if (inZone) {
-                Logger.recordOutput("InAlignZone", true);
-                swerve.setIsAlign(true);
 
                 double yawDegrees = swerve.getYaw().getDegrees();
-                Logger.recordOutput("yawdegs", yawDegrees);
                 // double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
                 if (Math.abs(yawDegrees) <= 90) {
-                    Logger.recordOutput("0degs", false);
                     swerve.setAlignAngle(Units.degreesToRadians(0.0));
                 } else {
                     swerve.setAlignAngle(Units.degreesToRadians(180.0));
-                    Logger.recordOutput("0degs", true);
                 }
                 // swerve.setAlignAngle(snappedDeg);
                 // Logger.recordOutput("snappy", snappedDeg);
             } else {
-                Logger.recordOutput("InAlignZone", false);
                 swerve.setIsAlign(false);
             }
         } else {
