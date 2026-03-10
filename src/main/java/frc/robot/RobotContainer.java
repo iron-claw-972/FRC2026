@@ -102,6 +102,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
+        linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
