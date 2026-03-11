@@ -38,6 +38,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
     // logging information
     private LinearClimbIOInputsAutoLogged inputs = new LinearClimbIOInputsAutoLogged();
 
+    /** This PID controller uses motor rotations */
     private final PIDController pid = new PIDController(
             ClimbConstants.PID_P,
             ClimbConstants.PID_I,
@@ -55,9 +56,9 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
 
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
-        SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp()));
-        SmartDashboard.putData("Go Down", new InstantCommand(() -> retract()));
-        SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition()));
+        SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp())); // 0
+        SmartDashboard.putData("Go Down", new InstantCommand(() -> retract())); // 8
+        SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition())); // 6
 
         // starting position
         motor.setPosition(metersToRotations(ClimbConstants.BOTTOM_POSITION));
@@ -110,7 +111,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
     /**
      * goes to the up position
      */
-    public void goUp() {
+    public void goUp() { // 0
         MAX_POWER = 0.8;
         setSetpoint(metersToRotations(ClimbConstants.UP_POSITION));
     }
@@ -118,7 +119,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
     /**
      * goes to the down position
      */
-    public void retract() {
+    public void retract() { // 8
         MAX_POWER = 0.2;
         setSetpoint(metersToRotations(ClimbConstants.BOTTOM_POSITION));
     }
@@ -126,7 +127,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
     /**
      * goes to the climb position
      */
-    public void climbPosition() {
+    public void climbPosition() { // 6
         MAX_POWER = 0.8;
         setSetpoint(metersToRotations(ClimbConstants.CLIMB_POSITION));
     }
@@ -145,8 +146,9 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
                 stopCalibrating();
             }
         }
-        motor.set(power);
 
+        motor.set(power); // during calibration we have 20ms of high power before we stop calibration
+        SmartDashboard.putNumber("Climb Power from PID", power);
         SmartDashboard.putNumber("Climb PID_Setpoint_Rotations", pid.getSetpoint());
         SmartDashboard.putNumber("Climb Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Climb Motor_Actual_Meters", inputs.positionMeters);
@@ -222,5 +224,6 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
         inputs.positionMeters = Units.rotationsToRadians(motor.getPosition().getValueAsDouble())
                 * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO;
         inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
+        inputs.power = pid.calculate(motor.getPosition().getValueAsDouble());
     }
 }

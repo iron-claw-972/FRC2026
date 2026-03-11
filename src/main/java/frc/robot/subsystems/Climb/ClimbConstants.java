@@ -14,8 +14,8 @@ public class ClimbConstants {
     /** climber stowed ? position in meters */
     public final static double BOTTOM_POSITION = Units.inchesToMeters(8);
     /** Calibration position: lower than BOTTOM_POSITION to reduce motor strain */
-    public final static double CALIBRATION_POSITION = Units.inchesToMeters(8.5);
-    /** position that should put the robot off the ground? in meters. */
+    // public final static double CALIBRATION_POSITION = Units.inchesToMeters(8.5);
+    /** position that should put the robot off the ground? in meters. 6 inches */
     public final static double CLIMB_POSITION = Units.inchesToMeters(6);
     public final static double UP_POSITION = 0.0;
 
