@@ -24,8 +24,8 @@ public class HardstopWarning extends Command {
 	@Override
 	public void execute() {
 		double epsilon = 0.05;
-		SmartDashboard.putBoolean("Hood OK", hood.getPositionDeg() < HoodConstants.MIN_ANGLE - epsilon);
-		SmartDashboard.putBoolean("Intake OK", intake.getPosition() < IntakeConstants.STARTING_POINT - epsilon);
+		SmartDashboard.putBoolean("Hood OK", hood.getPositionDeg() >= HoodConstants.MIN_ANGLE - epsilon);
+		SmartDashboard.putBoolean("Intake OK", intake.getPosition() >= IntakeConstants.STARTING_POINT - epsilon);
 	}
 
 	@Override
