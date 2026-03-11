@@ -17,16 +17,16 @@ public class ModifiedCRT {
 
         // Adds all possible positons for encoder left
         for (int n=0; n < gearOne; n++) {
-            encoderLeft[n] = (n+encoderLeftRot) * (gearOne/turretGear);
+            encoderLeft[n] = (n + encoderLeftRot) * ((double) gearOne / turretGear);
         }
         // Gets all possible encoder two positions
         for (int n=0; n < gearTwo; n++) {
-            encoderRight[n] = (n+encoderRightRot) * (gearTwo/turretGear);
+            encoderRight[n] = (n + encoderRightRot) * ((double) gearTwo / turretGear);
         }
         
         for (double a: encoderLeft) {
             for (double b: encoderRight) {
-                if (a==b) {
+                if (Math.abs(a - b) < 1e-6) {
                     return a;
                 }
             }
@@ -50,7 +50,7 @@ public class ModifiedCRT {
         }
 
         if (x1 < 0) {
-            x1 =+ m0;
+            x1 += m0;
         }
         return x1;
     }
