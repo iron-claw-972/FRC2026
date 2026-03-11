@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.62,
-        "y": 0.65
+        "x": 3.332,
+        "y": 0.791
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.520041390728477,
-        "y": 1.4359437086129003
+        "x": 4.332,
+        "y": 0.7910000000000004
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.7650993377483442,
-        "y": 2.844370860930782
+        "x": 7.3,
+        "y": 0.791
       },
       "prevControl": {
-        "x": 1.6634602649006622,
-        "y": 2.1038576158976685
+        "x": 6.3,
+        "y": 0.7910000000000001
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,19 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Stop Spindexer",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Stop Spindexer"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 2.0,
     "maxAcceleration": 2.0,
@@ -57,10 +45,10 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Right Autos",
+  "folder": "Field Testing Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

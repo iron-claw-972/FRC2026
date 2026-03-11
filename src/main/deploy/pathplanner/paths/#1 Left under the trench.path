@@ -94,12 +94,6 @@
             {
               "type": "named",
               "data": {
-                "name": "Extend Intake"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
                 "name": "Spin Intake Rollers"
               }
             }
@@ -131,10 +125,10 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 300.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

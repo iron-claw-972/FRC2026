@@ -35,6 +35,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
+    private boolean spindexerBoolean = false;
     private Command autoShoot = null;
     private Shooter shooter;
     private Turret turret;
@@ -130,14 +131,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
-                intake.spinStop();
+                if(intakeBoolean){
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else{
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
             }));
         }
 
         // Spindexer
         if (spindexer != null) {
-            // Will only run if we are not calling default shoot command
-            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer));
+
+            // Toggle spindexer
+            controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
+                new RunSpindexer(spindexer, turret)
+            );
         }
 
         // Auto shoot

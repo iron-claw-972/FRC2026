@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.util.Zone;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
 
@@ -22,8 +23,8 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.12;
-  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.88;
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.167;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.833;
 
   /**The coordinate of the climb position */
   public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
@@ -57,7 +58,6 @@ public class FieldConstants {
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
     new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
 
-
   public static final Translation3d ALLIANCE_LEFT_RED =
     new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
@@ -73,6 +73,30 @@ public class FieldConstants {
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
   public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
 
+  // my zones
+  public static final double leftNeutralLine = FIELD_LENGTH * 0.25;
+  public static final double rightNeutralLine = FIELD_LENGTH * 0.75;
+  public static final double centerLengthLine = FIELD_LENGTH * 0.5;
+  public static final double centerWidthLine = FIELD_WIDTH * 0.5;
+  public static final double redLine = 179.111250;
+  public static final double blueLine = FIELD_LENGTH - 179.111250;
+
+  public static final double hubWidthLeft = FIELD_WIDTH / 2 - (47.0 / 2);
+  public static final double hubWidthRight = FIELD_WIDTH / 2 + (47.0 / 2);
+  public static final double hubBackRed = FIELD_LENGTH + 120.0; 
+  public static final double hubBackBlue = FIELD_LENGTH - 120.0; 
+
+  public static final double ladderRedLeft = FIELD_WIDTH + 13.0;
+  public static final double ladderBlueLeft = FIELD_WIDTH - 12.375;
+  public static final double ladderRedRight = FIELD_WIDTH - 35.75;
+  public static final double ladderBlueRight = FIELD_WIDTH + 35.75;
+
+  public static final Zone neutralStrip = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone neutralLeft = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone neutralRight = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+
 	public enum ShootingTarget {
 		HUB,
 		NEUTRAL,
@@ -84,7 +108,9 @@ public class FieldConstants {
 		ALLIANCE,
 		NEUTRAL,
 		OPPOSITION,
-		TRENCH_BUMP
+		TRENCH_BUMP,
+    UNDER_LADDER,
+    UNDER_MY_HUB,
 	}
 
   public static Translation3d getHubTranslation() {
@@ -129,11 +155,21 @@ public class FieldConstants {
 
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
+    double y = drivepose.getY();
     //double y = drivepose.getY();
     if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > BLUE_ALLIANCE_LINE)
-        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE){
+        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE) {
           return FieldZone.TRENCH_BUMP;
         }
+    if(((y < (FIELD_WIDTH / 2) + 0.158750) && y > (FIELD_WIDTH / 2) - 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Blue) {
+      return FieldZone.UNDER_LADDER;
+    }
+    if(((y < (FIELD_WIDTH / 2) - 0.158750) && y > (FIELD_WIDTH / 2) + 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Red) {
+      return FieldZone.UNDER_LADDER;
+    }
+    // if(((y < FIELD_WIDTH - (46.75 / 2) && y > FIELD_WIDTH - (46.75 / 2))) && ((x > 207.42375 && x < 207.42375 + 36.0) || (x < FIELD_LENGTH - 207.42375 && x > FIELD_LENGTH - 207.42375 - 36.0))) {
+    //   return FieldZone.UNDER_LADDER;
+    // }
     if(x > FieldConstants.RED_ALLIANCE_LINE) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
@@ -175,4 +211,5 @@ public class FieldConstants {
       }
     }
   }
+
 }
