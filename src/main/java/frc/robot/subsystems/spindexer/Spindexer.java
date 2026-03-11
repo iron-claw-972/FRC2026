@@ -16,8 +16,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private double power = 0.0;
     public int ballCount = 0;
     private boolean wasSpindexerSlow = false;
+    private SpindexerState state = SpindexerState.STOPPED;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
-
     public Spindexer() {
         updateInputs();
 
@@ -30,13 +30,28 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         motor.getConfigurator().apply(limitConfig);
     }
 
+    public enum SpindexerState {
+        MAX,
+        REVERSE,
+        STOPPED,
+        CUSTOM,
+    }
+
     @Override
     public void periodic() {
         updateInputs();
         Logger.processInputs("Spindexer", inputs);
 
-        motor.set(power);
-        
+        if (state == SpindexerState.MAX) {
+            motor.set(SpindexerConstants.spindexerMaxPower);
+        } else if (state == SpindexerState.REVERSE) {
+            motor.set(SpindexerConstants.spindexerReversePower);
+        } else if (state == SpindexerState.STOPPED) {
+            motor.set(0.0);
+        } else {
+            motor.set(power);
+        }
+
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
         SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
@@ -49,19 +64,24 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     }
 
     public void maxSpindexer() {
-        power = SpindexerConstants.spindexerMaxPower;
+        state = SpindexerState.MAX;
     }
 
     public void reverseSpindexer(){
-        power = SpindexerConstants.spindexerReversePower;
+        state = SpindexerState.REVERSE;
     }
 
     public void stopSpindexer() {
-        power = 0.0;
+        state = SpindexerState.STOPPED;
     }
 
     public void setSpindexer(double power) {
         this.power = power;
+        state = SpindexerState.CUSTOM;
+    }
+
+    public double getStatorCurrent() {
+        return inputs.spindexerCurrent;
     }
 
     @Override

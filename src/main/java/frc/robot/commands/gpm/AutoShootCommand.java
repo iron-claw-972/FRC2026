@@ -12,16 +12,15 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.constants.ShotInterpolation;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.ShooterPhysics;
@@ -70,9 +69,12 @@ public class AutoShootCommand extends Command {
         //drivepose  = new Pose2d(drivepose.getTranslation(), drivepose.getRotation().plus(new Rotation2d(Math.PI)));
 
         goalState = ShooterPhysics.getShotParams(
+				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
-        
+        // Jerry Debug
+        // System.out.println("The current goal state (including the exit vel):" + goalState);
+
         addRequirements(turret);
     }
 
@@ -108,6 +110,7 @@ public class AutoShootCommand extends Command {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
             goalState = ShooterPhysics.getShotParams(
+					Translation2d.kZero,
 				target3d.minus(lookahead3d),
 				2.0);
 
@@ -186,9 +189,9 @@ public class AutoShootCommand extends Command {
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
-        SmartDashboard.putNumber("Turret Calculated Setpoint", turretSetpoint);
-        SmartDashboard.putNumber("Hood Calculate Setpoint", hoodSetpoint);
-        SmartDashboard.putNumber("Shooter Calculate Velocity", goalState.exitVel());
+        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
