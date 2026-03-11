@@ -36,7 +36,11 @@ public class Turret extends SubsystemBase implements TurretIO{
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private boolean calibrating;
+	private boolean isCalibrated = false;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
+
+	// avoid readings within 5% of tooth boundary
+	private static final double ENCODER_RELIABILITY_THRESHOLD = 0.05;
 
 	/* ---------------- Hardware ---------------- */
 
@@ -105,24 +109,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
 		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-		
-		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
-
-		//Sets the initial motor position
-		inputs.positionDeg = turretRot;
-		motor.setPosition(motorRotations);
-
-		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
-
+		// don't calibrate immediately (sets as uncalibrated)
 		motor.setPosition(0.0);
 
 		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
@@ -169,6 +158,22 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void periodic() {
+		if (!isCalibrated) {
+			double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
+			double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
+
+			double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
+			double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
+
+			if (isEncoderReliable(leftAbs, TurretConstants.LEFT_ENCODER_TEETH) 
+				&& isEncoderReliable(rightAbs, TurretConstants.RIGHT_ENCODER_TEETH)) {
+				double turretRot = crt.solve(leftAbs, rightAbs);
+				motor.setPosition(turretRot * TurretConstants.GEAR_RATIO);
+				inputs.positionDeg = Units.rotationsToDegrees(turretRot);
+				isCalibrated = true;
+			}
+		}
+
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
 
@@ -249,9 +254,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
 
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
+		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(crt.solve(leftAbs, rightAbs)));
+		SmartDashboard.putBoolean("Turret Calibrated", isCalibrated);
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -308,6 +312,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private void calibrate(){
 		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
 		calibrating = true;
+		isCalibrated = false; // reset calibration state
 	}
 
 	private void stopCalibrating(){
@@ -315,5 +320,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
 		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
+		isCalibrated = true;
+	}
+
+	private boolean isEncoderReliable(double encoderValue, int numTeeth) {
+		double toothWidth = 1.0 / numTeeth;
+		double threshold = toothWidth * ENCODER_RELIABILITY_THRESHOLD;
+		return encoderValue > threshold && encoderValue < (1.0 - threshold);
 	}
 }
