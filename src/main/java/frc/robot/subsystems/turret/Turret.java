@@ -29,11 +29,11 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.ModifiedCRT;
 
-public class Turret extends SubsystemBase implements TurretIO{
+public class Turret extends SubsystemBase implements TurretIO {
 	// Super low magnitude filter for the position to make it less jittery
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
 
-    private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
+	private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
 	private boolean calibrating;
 	private boolean isCalibrated = false;
@@ -46,7 +46,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
 	private final CANcoder encoderLeft = new CANcoder(IdConstants.TURRET_ENCODER_LEFT_ID, Constants.CANIVORE_SUB);
-    private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.CANIVORE_SUB);
+	private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -76,17 +76,19 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		TalonFXConfiguration config = new TalonFXConfiguration();
 		config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    
-		config.Slot0.kP = 12.0; 
+
+		config.Slot0.kP = 12.0;
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
 		config.Slot0.kD = 0.2; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
-		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
-		mm.MotionMagicAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION) * TurretConstants.GEAR_RATIO; // Lowered for belt safety
+		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY)
+				* TurretConstants.GEAR_RATIO;
+		mm.MotionMagicAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION)
+				* TurretConstants.GEAR_RATIO; // Lowered for belt safety
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
-        motor.getConfigurator().apply(config);
+		motor.getConfigurator().apply(config);
 
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 
@@ -106,25 +108,38 @@ public class Turret extends SubsystemBase implements TurretIO{
 		}
 
 		SmartDashboard.putData("Turret Mech", mech);
-		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+		SmartDashboard.putData("Start turret calibration", new InstantCommand(() -> calibrate()));
+		SmartDashboard.putData("Stop turret calibration", new InstantCommand(() -> stopCalibrating()));
 
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
+		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH,
+				TurretConstants.TURRET_TEETH_COUNT);
 
 		// don't calibrate immediately (sets as uncalibrated)
 		motor.setPosition(0.0);
 
-		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
-		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
-		SmartDashboard.putData("Turn to 90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);}));
-		SmartDashboard.putData("Turn to 200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);}));
-		SmartDashboard.putData("Turn to -200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);}));
+		SmartDashboard.putData("Turn to 0", new InstantCommand(() -> {
+			setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);
+		}));
+		SmartDashboard.putData("Turn to -90", new InstantCommand(() -> {
+			setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);
+		}));
+		SmartDashboard.putData("Turn to 90", new InstantCommand(() -> {
+			setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);
+		}));
+		SmartDashboard.putData("Turn to 200", new InstantCommand(() -> {
+			setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);
+		}));
+		SmartDashboard.putData("Turn to -200", new InstantCommand(() -> {
+			setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);
+		}));
 	}
 
 	/* ---------------- Public API ---------------- */
 
 	/**
-	 * Sets the setpoint position and velocity of the turret. Call in command execute.
+	 * Sets the setpoint position and velocity of the turret. Call in command
+	 * execute.
+	 * 
 	 * @param angle
 	 * @param velocityRadPerSec
 	 */
@@ -165,8 +180,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 			double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
 			double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-			if (isEncoderReliable(leftAbs, TurretConstants.LEFT_ENCODER_TEETH) 
-				&& isEncoderReliable(rightAbs, TurretConstants.RIGHT_ENCODER_TEETH)) {
+			if (isEncoderReliable(leftAbs, TurretConstants.LEFT_ENCODER_TEETH)
+					&& isEncoderReliable(rightAbs, TurretConstants.RIGHT_ENCODER_TEETH)) {
 				double turretRot = crt.solve(leftAbs, rightAbs);
 				motor.setPosition(turretRot * TurretConstants.GEAR_RATIO);
 				inputs.positionDeg = Units.rotationsToDegrees(turretRot);
@@ -178,16 +193,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 		Logger.processInputs("Turret", inputs);
 
 		// Position extrapolation
-		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT; 
-    	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
+		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT;
+		double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
 
-		//Continuous wrap selection
+		// Continuous wrap selection
 		double best = lastGoalRad;
 		boolean found = false;
 
 		for (int i = -2; i <= 2; i++) {
 			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
-			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE) || candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
+			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE)
+					|| candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
 				continue;
 
 			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
@@ -201,10 +217,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
 		delta = MathUtil.angleModulus(delta);
-		
+
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
-		
+
 		// apply filtered range
 		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
 		lastRawSetpoint = best;
@@ -214,25 +230,28 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
 
 		// Clamp position setpoint to min and max angles
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
-			
+		motorGoalRotations = MathUtil.clamp(motorGoalRotations,
+				Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO,
+				Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
+
 		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
 
-		if(calibrating){
+		if (calibrating) {
 			motor.set(0.05);
-			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
-			if(calibrationDebouncer.calculate(calibrated)){
+			boolean calibrated = Math
+					.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
+			if (calibrationDebouncer.calculate(calibrated)) {
 				stopCalibrating();
 			}
-		} else{
+		} else {
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
-			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+					.withPosition(motorGoalRotations)
+					.withFeedForward(robotTurnCompensation));
 		}
 
-        Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+		Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
 
 		// --- Visualization ---
@@ -245,14 +264,14 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
 		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
 
-
 		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
 		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
 
 		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
 		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
 
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
+		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH,
+				TurretConstants.TURRET_TEETH_COUNT);
 
 		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(crt.solve(leftAbs, rightAbs)));
 		SmartDashboard.putBoolean("Turret Calibrated", isCalibrated);
@@ -274,48 +293,52 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	@Override
 	public void updateInputs() {
-		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
-		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
+		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble())
+				/ TurretConstants.GEAR_RATIO;
+		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble())
+				/ TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
-        inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
+		inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
+		inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
 	}
 
 	/**
-     * sets supply and stator current limits
-     * @param limit the current limit for stator and supply current
-     */
-    public void setCurrentLimits(double limit) {
-        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
-        .withStatorCurrentLimitEnable(true)
-        .withStatorCurrentLimit(limit)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(limit);
+	 * sets supply and stator current limits
+	 * 
+	 * @param limit the current limit for stator and supply current
+	 */
+	public void setCurrentLimits(double limit) {
+		CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+				.withStatorCurrentLimitEnable(true)
+				.withStatorCurrentLimit(limit)
+				.withSupplyCurrentLimitEnable(true)
+				.withSupplyCurrentLimit(limit);
 
-		if(limit == TurretConstants.NORMAL_CURRENT_LIMIT){
+		if (limit == TurretConstants.NORMAL_CURRENT_LIMIT) {
 			limits.SupplyCurrentLowerLimit = TurretConstants.CALIBRATION_CURRENT_LIMIT;
 			limits.SupplyCurrentLowerTime = 1.0; // Set to lower limit if over 1 second
 		}
 
-        motor.getConfigurator().apply(limits);
-    }
+		motor.getConfigurator().apply(limits);
+	}
 
 	// Also ignore this for now
 	private double wrapUnit(double value) {
 		value %= 1.0;
-		if (value < 0) value += 1.0;
+		if (value < 0)
+			value += 1.0;
 		return value;
 	}
 
-	private void calibrate(){
+	private void calibrate() {
 		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
 		calibrating = true;
 		isCalibrated = false; // reset calibration state
 	}
 
-	private void stopCalibrating(){
+	private void stopCalibrating() {
 		motor.set(Units.degreesToRotations(TurretConstants.CALIBRATION_OFFSET) * TurretConstants.GEAR_RATIO);
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
