@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.3;
+    double powerModifier = 1.25; // TESTED
 
     public Shooter(){
         updateInputs();

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Climb;
 
+
 import edu.wpi.first.math.util.Units;
 
 public class ClimbConstants {
@@ -11,11 +12,11 @@ public class ClimbConstants {
     /** Winch spool radius in meters */
     public final static double WHEEL_RADIUS = Units.inchesToMeters(0.334);
     /** climber stowed ? position in meters */
-    public final static double BOTTOM_POSITION = Units.inchesToMeters(-8);
+    public final static double BOTTOM_POSITION = Units.inchesToMeters(8);
     /** Calibration position: lower than BOTTOM_POSITION to reduce motor strain */
-    public final static double CALIBRATION_POSITION = Units.inchesToMeters(-8.5);
+    public final static double CALIBRATION_POSITION = Units.inchesToMeters(8.5);
     /** position that should put the robot off the ground? in meters. */
-    public final static double CLIMB_POSITION = Units.inchesToMeters(-6);
+    public final static double CLIMB_POSITION = Units.inchesToMeters(6);
     public final static double UP_POSITION = 0.0;
 
     // current limits (in amps)

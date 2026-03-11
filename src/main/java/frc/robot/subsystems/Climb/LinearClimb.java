@@ -50,7 +50,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
         motor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         motor.getConfigurator().apply(config);
 
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
@@ -147,11 +147,11 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
         }
         motor.set(power);
 
-        SmartDashboard.putNumber("Climb/PID_Setpoint_Rotations", pid.getSetpoint());
-        SmartDashboard.putNumber("Climb/Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Climb/Motor_Actual_Meters", inputs.positionMeters);
+        SmartDashboard.putNumber("Climb PID_Setpoint_Rotations", pid.getSetpoint());
+        SmartDashboard.putNumber("Climb Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Climb Motor_Actual_Meters", inputs.positionMeters);
 
-        Logger.recordOutput("LinearClimb/setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
+        Logger.recordOutput("LinearClimb setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
                 * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
         updateInputs();
         Logger.processInputs("LinearClimb", inputs);
