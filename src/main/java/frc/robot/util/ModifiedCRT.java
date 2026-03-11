@@ -16,16 +16,16 @@ public class ModifiedCRT {
         double[] encoderRight = new double[gearTwo];
 
         // Adds all possible positons for encoder left
-        for (int n=0; n < gearOne; n++) {
+        for (int n = 0; n < gearOne; n++) {
             encoderLeft[n] = (n + encoderLeftRot) * ((double) gearOne / turretGear);
         }
         // Gets all possible encoder two positions
-        for (int n=0; n < gearTwo; n++) {
+        for (int n = 0; n < gearTwo; n++) {
             encoderRight[n] = (n + encoderRightRot) * ((double) gearTwo / turretGear);
         }
-        
-        for (double a: encoderLeft) {
-            for (double b: encoderRight) {
+
+        for (double a : encoderLeft) {
+            for (double b : encoderRight) {
                 if (Math.abs(a - b) < 1e-6) {
                     return a;
                 }
@@ -37,7 +37,8 @@ public class ModifiedCRT {
     private long modInverse(long a, long m) {
         long m0 = m, t, q;
         long x0 = 0, x1 = 1;
-        if (m==1) return 0;
+        if (m == 1)
+            return 0;
         while (a > 1) {
             q = a / m;
             t = m;
@@ -64,7 +65,7 @@ public class ModifiedCRT {
 
         long inv = modInverse(m1 % m2, m2);
 
-        double x = r1 + m1 * (((r2-r1) * inv) % m2);
+        double x = r1 + m1 * (((r2 - r1) * inv) % m2);
         double combined = x % (m1 * m2);
 
         return combined / turretGear;
