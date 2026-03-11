@@ -1,7 +1,5 @@
 package frc.robot.commands.gpm;
 
-import static edu.wpi.first.units.Units.Gs;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -14,7 +12,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -75,7 +72,9 @@ public class AutoShootCommand extends Command {
 				Translation2d.kZero,
 				FieldConstants.getHubTranslation().minus(new Translation3d(drivepose.getTranslation())),
 				8.0); // Random initial goalState to prevent it being null
-        
+        // Jerry Debug
+        // System.out.println("The current goal state (including the exit vel):" + goalState);
+
         addRequirements(turret);
     }
 

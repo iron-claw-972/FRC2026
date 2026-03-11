@@ -72,6 +72,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
         shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
         
+        Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
         Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
     }
 

@@ -43,6 +43,7 @@ public class ShotInterpolation {
         exitVelocityMap.put(11.0, 26.0);
         exitVelocityMap.put(25.0, 25.0* 3.2);
 
+        shooterVelocityMap.put(1.00, 11.5);
         shooterVelocityMap.put(1.49, 11.5);
         shooterVelocityMap.put(2.09, 12.5);
         shooterVelocityMap.put(2.95, 13.5);
@@ -53,6 +54,7 @@ public class ShotInterpolation {
         shooterVelocityMap.put(0.0, 9.55);
         shooterVelocityMap.put(25.0, 43.44);
 
+        newHoodMap.put(1.00, 78.0);
         newHoodMap.put(1.49, 72.0);
         newHoodMap.put(2.09, 70.0);
         newHoodMap.put(2.95, 68.0);
