@@ -153,8 +153,8 @@ public class RobotContainer {
         break;
     }
 
-	if (intake != null && hood != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake));
+	if (intake != null && hood != null && turret != null)
+		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
