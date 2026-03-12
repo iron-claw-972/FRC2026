@@ -62,8 +62,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
-        SmartDashboard.putNumber("shooter power modifier", powerModifier);
+        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
