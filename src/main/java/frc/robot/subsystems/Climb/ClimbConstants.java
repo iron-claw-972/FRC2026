@@ -10,7 +10,7 @@ public class ClimbConstants {
     public final static double CLIMB_GEAR_RATIO = 45.0;
     // TODO: Get actual winch bobbin radius measurement
     /** Winch spool radius in meters */
-    public final static double WHEEL_RADIUS = Units.inchesToMeters(0.334);
+    public final static double WHEEL_RADIUS = Units.inchesToMeters(0.5);
     /** climber stowed ? position in meters */
     public final static double BOTTOM_POSITION = Units.inchesToMeters(8);
     /** Calibration position: lower than BOTTOM_POSITION to reduce motor strain */
