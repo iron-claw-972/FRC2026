@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.25; // TESTED
+    double powerModifier = 1.1; // TESTED
 
     public Shooter(){
         updateInputs();
@@ -67,6 +67,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+
+
+        SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
+        SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
 
         // Sets the motor control to target velocity
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
