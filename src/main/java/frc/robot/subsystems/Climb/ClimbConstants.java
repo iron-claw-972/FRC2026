@@ -23,9 +23,9 @@ public class ClimbConstants {
     // CALIBRATION: Low current while finding hardstop to prevent damage
     // NORMAL: Moderate current for PID-controlled movement
     // CLIMB: High current for full-power climbing
-    public final static double CALIBRATION_CURRENT = 7.0;
+    public final static double CALIBRATION_CURRENT = 20.0;
     public final static double CLIMB_CURRENT = 42.0;
-    public final static double CALIBRATION_CURRENT_THRESHOLD = 6.0;
+    public final static double CALIBRATION_CURRENT_THRESHOLD = 18.0;
 
     // PID Constants
     // TODO: what are the units? Inches? Meters?

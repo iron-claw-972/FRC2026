@@ -36,7 +36,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0.15; //tune p value
+        config.Slot0.kP = 1.0; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
@@ -93,6 +93,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
+        inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+
+
         Logger.processInputs("Shooter", inputs);
     }
 
