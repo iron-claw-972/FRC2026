@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.0,
+        "x": 3.8,
         "y": 7.623190984573506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.193921116983211,
+        "x": 6.993921116983211,
         "y": 7.623190984573506
       },
       "isLocked": false,
@@ -80,28 +80,12 @@
     },
     {
       "anchor": {
-        "x": 2.6967378410438916,
-        "y": 7.031435349940688
+        "x": 0.6955278766310802,
+        "y": 7.623190984573506
       },
       "prevControl": {
-        "x": 3.336191665489592,
-        "y": 7.488201938773801
-      },
-      "nextControl": {
-        "x": 2.4696060632890897,
-        "y": 6.869193443841226
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.8682799525504161,
-        "y": 5.084
-      },
-      "prevControl": {
-        "x": 1.8804205947396213,
-        "y": 5.5984071344829935
+        "x": -0.09030729073703303,
+        "y": 7.623190984573506
       },
       "nextControl": null,
       "isLocked": false,
@@ -130,15 +114,15 @@
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 4.95,
-      "rotationDegrees": -89.50334218867351
+      "waypointRelativePos": 5,
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [
     {
       "name": "Depot",
       "minWaypointRelativePos": 4.953880764904385,
-      "maxWaypointRelativePos": 6.0,
+      "maxWaypointRelativePos": 5.5,
       "constraints": {
         "maxVelocity": 0.5,
         "maxAcceleration": 2.0,
@@ -286,8 +270,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -90.37860096211433
+    "velocity": 0.0,
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "week 2 autos",
