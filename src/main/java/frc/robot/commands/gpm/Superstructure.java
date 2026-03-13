@@ -53,7 +53,7 @@ public class Superstructure extends Command {
 
     private TurretState goalState;
 
-    private final double phaseDelay = 0.03; // Extrapolation delay due to latency
+    private double phaseDelay = 0.03; // Extrapolation delay due to latency
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
@@ -203,13 +203,12 @@ public class Superstructure extends Command {
 
     @Override
     public void execute() {
-        TOFAdjustment = SmartDashboard.getNumber("TOF Adjustment", TOFAdjustment);
-        SmartDashboard.putNumber("TOF Adjustment", TOFAdjustment);
-
-        hoodOffset = SmartDashboard.getNumber("Hood Offset", hoodOffset);
-        SmartDashboard.putNumber("Hood Offset", hoodOffset);
-        turretOffset = SmartDashboard.getNumber("Turret Offset", turretOffset);
-        SmartDashboard.putNumber("Turret Offset", turretOffset);
+        TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+        SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+        hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
+        SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
+        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
@@ -247,6 +246,10 @@ public class Superstructure extends Command {
         Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
 
         SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
+
+        // for operator
+        phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
+        SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
     }
 
     @Override
