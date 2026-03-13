@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "Extend Intake",
-      "waypointRelativePos": 0.0944881889763795,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -45,7 +45,7 @@
     },
     {
       "name": "Spin Intake Rollers",
-      "waypointRelativePos": 0.17547806524185328,
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -56,7 +56,7 @@
     },
     {
       "name": "Start Spindexer",
-      "waypointRelativePos": 0.3104611923509808,
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -67,7 +67,7 @@
     },
     {
       "name": "Stop Hood Down",
-      "waypointRelativePos": 0.40494938132733566,
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -100,7 +100,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 1.0,
     "maxAcceleration": 0.5,
     "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 300.0,
