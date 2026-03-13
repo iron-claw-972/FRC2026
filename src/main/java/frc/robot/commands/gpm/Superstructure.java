@@ -93,17 +93,11 @@ public class Superstructure extends Command {
 
         // Rotational adjustment is not being used, since turret is in center of robot
         double turretVelocityX =
-            fieldRelVel.vxMetersPerSecond
-                + fieldRelVel.omegaRadiansPerSecond
-                    * (TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY() * Math.cos(drivepose.getRotation().getRadians())
-                        - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX() * Math.sin(drivepose.getRotation().getRadians()));
+            fieldRelVel.vxMetersPerSecond;
         double turretVelocityY =
-            fieldRelVel.vyMetersPerSecond
-                + fieldRelVel.omegaRadiansPerSecond
-                    * (TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getX() * Math.cos(drivepose.getRotation().getRadians())
-                        - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getY() * Math.sin(drivepose.getRotation().getRadians()));
+            fieldRelVel.vyMetersPerSecond;
 
-        double timeOfFlight;
+        double timeOfFlight = 0;
         Pose2d lookaheadPose = turretPosition;
 
         /*
@@ -146,6 +140,10 @@ public class Superstructure extends Command {
         lastTurretAngle = turretAngle;
 
         Logger.recordOutput("Turret/Target Pose", target);
+        SmartDashboard.putNumber("Time of flight", timeOfFlight);
+        SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
+        SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
+        
 
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
