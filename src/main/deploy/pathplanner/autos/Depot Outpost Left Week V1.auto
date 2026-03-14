@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Simple"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "Left Bump Edge Start"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
           }
         },
         {
@@ -44,6 +44,12 @@
           "type": "named",
           "data": {
             "name": "Hood Down"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Full Depot Outpost Left Path"
           }
         }
       ]
