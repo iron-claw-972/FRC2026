@@ -138,6 +138,8 @@ public class RobotContainer {
         // Load the auto command
         try {
           String leftSideAuto = "Right Week V1";
+          // String leftSideAuto = "Right Week V1";
+          // String leftSideAuto = "Right Week V1";
           // String rightSideAuto = "Right(2) - Under Trench";
           // String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
