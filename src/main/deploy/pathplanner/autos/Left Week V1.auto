@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "Left Trench Start"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 0.2

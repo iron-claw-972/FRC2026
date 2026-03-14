@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Trench Start"
+            "pathName": "Left Bump Edge Start"
           }
         },
         {
@@ -50,12 +50,6 @@
           "type": "named",
           "data": {
             "name": "Hood Down"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Full Right Path v3"
           }
         }
       ]
