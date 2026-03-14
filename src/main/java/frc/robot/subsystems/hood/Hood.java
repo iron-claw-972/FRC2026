@@ -94,6 +94,10 @@ public class Hood extends SubsystemBase implements HoodIO {
 		forceHoodDown = taranNathan;
 	}
 
+	public boolean getHoodForcedDown() {
+		return this.forceHoodDown;
+	}
+
     @Override
     public void periodic() {
 		updateInputs();

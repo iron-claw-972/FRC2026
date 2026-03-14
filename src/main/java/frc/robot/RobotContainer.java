@@ -137,10 +137,11 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Right Week V1";
+          String leftSideAuto = "Left Week V1";
           // String leftSideAuto = "Right Week V1";
-          // String leftSideAuto = "Right Week V1";
-          // String rightSideAuto = "Right(2) - Under Trench";
+          // String leftSideAuto = "Depot Outpost Left Week V1";
+          // String rightSideAuto = "Shoot Only Left Week V1";
+
           // String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
           auto = new PathPlannerAuto(leftSideAuto);
