@@ -56,6 +56,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
 
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
+        SmartDashboard.putData("Calibrate", new InstantCommand(() -> hardstopCalibration()));
         SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp())); // 0
         SmartDashboard.putData("Go Down", new InstantCommand(() -> retract())); // 8
         SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition())); // 6
