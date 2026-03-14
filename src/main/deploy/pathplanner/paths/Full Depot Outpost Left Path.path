@@ -32,32 +32,16 @@
     },
     {
       "anchor": {
-        "x": 0.49206821469358375,
-        "y": 6.05
+        "x": 0.4457471788194449,
+        "y": 6.314113064236111
       },
       "prevControl": {
-        "x": 0.43990784142969475,
-        "y": 7.58085561343008
+        "x": 0.5182848753058401,
+        "y": 7.712424199882634
       },
       "nextControl": {
-        "x": 0.5175963705867532,
-        "y": 5.300773752099814
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.8009626012676576,
-        "y": 1.8443955439856348
-      },
-      "prevControl": {
-        "x": 0.3486938056834013,
-        "y": 2.796745851831025
-      },
-      "nextControl": {
-        "x": 1.1035102974085251,
-        "y": 1.2073155721395767
+        "x": 0.4069057436342598,
+        "y": 5.565365668402778
       },
       "isLocked": false,
       "linkedName": null
@@ -65,11 +49,59 @@
     {
       "anchor": {
         "x": 1.3498603153880282,
-        "y": 0.6529082754671163
+        "y": 5.474232638888889
       },
       "prevControl": {
-        "x": 1.108155409599228,
-        "y": 0.7167732777580995
+        "x": 0.6358208912037042,
+        "y": 5.63668431712963
+      },
+      "nextControl": {
+        "x": 1.9579748272262023,
+        "y": 5.335880021841852
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.3516675347222225,
+        "y": 4.181836371527778
+      },
+      "prevControl": {
+        "x": 2.022761935763889,
+        "y": 5.547716435185186
+      },
+      "nextControl": {
+        "x": 2.5079680193043496,
+        "y": 3.5327512951202924
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.10549681712963,
+        "y": 2.418553313078704
+      },
+      "prevControl": {
+        "x": 2.526913266782408,
+        "y": 3.2032552806712964
+      },
+      "nextControl": {
+        "x": 1.6009065790249482,
+        "y": 1.4789769083251625
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.5986554542824076,
+        "y": 0.6042908709490746
+      },
+      "prevControl": {
+        "x": 1.6121712239583337,
+        "y": 1.1026028645833332
       },
       "nextControl": null,
       "isLocked": false,
@@ -82,15 +114,15 @@
       "rotationDegrees": -90.0
     },
     {
-      "waypointRelativePos": 2.7,
+      "waypointRelativePos": 3.8,
       "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Depot",
-      "minWaypointRelativePos": 4.0,
-      "maxWaypointRelativePos": 4.5,
+      "minWaypointRelativePos": 6.0,
+      "maxWaypointRelativePos": 6.5,
       "constraints": {
         "maxVelocity": 0.5,
         "maxAcceleration": 2.0,
@@ -116,7 +148,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 1.0,
-      "maxWaypointRelativePos": 3.0,
+      "maxWaypointRelativePos": 5.0,
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 1.0,
@@ -208,7 +240,7 @@
     },
     {
       "name": "Stop Hood Down",
-      "waypointRelativePos": 3.4,
+      "waypointRelativePos": 5.4,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -219,7 +251,7 @@
     },
     {
       "name": "Start Spindexer",
-      "waypointRelativePos": 3.6,
+      "waypointRelativePos": 5.6,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -230,8 +262,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 1.5,
+    "maxVelocity": 0.75,
+    "maxAcceleration": 0.75,
     "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 150.0,
     "nominalVoltage": 12.0,
