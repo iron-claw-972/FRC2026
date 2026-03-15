@@ -137,7 +137,7 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left Week V1";
+          String leftSideAuto = "Right Week V1";
           // String leftSideAuto = "Right Week V1";
           // String leftSideAuto = "Depot Outpost Left Week V1";
           // String rightSideAuto = "Shoot Only Left Week V1";
@@ -228,7 +228,7 @@ public class RobotContainer {
     // }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret);
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
