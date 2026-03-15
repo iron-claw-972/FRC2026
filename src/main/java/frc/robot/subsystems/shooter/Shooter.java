@@ -55,6 +55,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         );
 
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+
+        SmartDashboard.putData("OPERATOR: Increase Shooter Modifier by 0.05", new InstantCommand(()-> increaseShooterModifier(0.05)));
+        SmartDashboard.putData("OPERATOR: Decrease Shooter Modifier by 0.05", new InstantCommand(()-> decreaseShooterModifier(0.05)));
     }
 
     @Override
@@ -63,13 +66,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
-
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
 
+        SmartDashboard.putNumber("OPERATOR: Shooter Modifier", powerModifier);
 
         SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
         SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
@@ -95,6 +95,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     /**@return velocity in m/s */
     public double getShooterVelocity(){
         return inputs.shooterSpeedLeft;
+    }
+
+    public void increaseShooterModifier(double mod) {
+        powerModifier += mod;
+    }
+
+    public void decreaseShooterModifier(double mod) {
+        powerModifier -= mod;
     }
 
     @Override
