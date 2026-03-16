@@ -24,6 +24,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
+import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -154,6 +155,9 @@ public class RobotContainer {
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
+
+	if (intake != null && hood != null && turret != null)
+		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
