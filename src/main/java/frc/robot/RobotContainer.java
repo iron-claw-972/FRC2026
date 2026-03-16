@@ -147,7 +147,6 @@ public class RobotContainer {
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }
-
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
@@ -164,9 +163,19 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    SmartDashboard.putData("OPERATOR: Set new auto. Enter Path", auto);
     // autoChooserInit();
   }
 
+  public void setAutoPath(String pathName) {
+    try {
+      PathPlannerAuto.getPathGroupFromAutoFile(pathName);
+      auto = new PathPlannerAuto(pathName);
+    } catch (IOException | ParseException e) {
+      e.printStackTrace();
+    }
+
+  }
   /**
    * Sets whether the drivetrain uses vision toupdate odometry
    */
