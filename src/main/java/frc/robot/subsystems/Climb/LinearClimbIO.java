@@ -7,6 +7,7 @@ public interface LinearClimbIO {
     public static class LinearClimbIOInputs{
         public double positionMeters = 0.0;
         public double motorCurrent = 0.0;
+        public double power = 0.0;
     }
 
     public void updateInputs();

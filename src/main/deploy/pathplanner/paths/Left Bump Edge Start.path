@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.3,
-        "y": 0.791
+        "x": 3.6,
+        "y": 6.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.297168874172185,
-        "y": 1.8497599337748327
+        "x": 3.8500000000000227,
+        "y": 6.05
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.3,
-        "y": 7.389
+        "x": 3.495,
+        "y": 6.05
       },
       "prevControl": {
-        "x": 7.30442880794702,
-        "y": 6.481508278145696
+        "x": 3.245,
+        "y": 6.05
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Field Testing Autos",
+  "folder": "week 2 autos",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

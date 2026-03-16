@@ -103,6 +103,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
+        linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -137,7 +138,9 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Left Week 2";
+          String leftSideAuto = "Right Week V1";
+          // String leftSideAuto = "Right Week V1";
+          // String leftSideAuto = "Right Week V1";
           // String rightSideAuto = "Right(2) - Under Trench";
           // String testing = "Straight Test";
           PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
