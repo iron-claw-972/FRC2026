@@ -10,6 +10,7 @@ public interface IntakeIO {
         public double leftCurrent = 0.0;
         public double rightCurrent = 0.0;
         public double rollerVelocity = 0.0;
+        public double rollerCurrent = 0.0;
     }
 
     public void updateInputs();

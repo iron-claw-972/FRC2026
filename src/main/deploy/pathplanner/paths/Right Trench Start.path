@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.332,
-        "y": 0.791
+        "x": 3.6,
+        "y": 0.4481350154264931
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.332,
-        "y": 0.7910000000000004
+        "x": 3.8500000000000223,
+        "y": 0.4481350154264927
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.3,
-        "y": 0.791
+        "x": 3.7,
+        "y": 0.4481350154264931
       },
       "prevControl": {
-        "x": 6.3,
-        "y": 0.7910000000000001
+        "x": 3.449999999999994,
+        "y": 0.4481350154264927
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,7 +29,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 0.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -42,13 +56,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Field Testing Autos",
+  "folder": "week 2 autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

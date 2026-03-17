@@ -374,6 +374,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
         inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
+        inputs.rollerCurrent = rollerMotor.getStatorCurrent().getValueAsDouble();
     }
 
 }
