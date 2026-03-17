@@ -23,6 +23,7 @@ public class TurretConstants {
     public static int RIGHT_ENCODER_TEETH = 22; // read above
     public static int ENCODER_COUNT_TOTAL = 8192; // how many intervals it can have, like clicks on a clock chat gpt explained to me
 
+	// TODO: set these properly
     public static double LEFT_ENCODER_OFFSET = 0.364502; //  rot
     public static double RIGHT_ENCODER_OFFSET = 0.718506; //  rot
 

@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.util.Zone;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Robot;
+import frc.robot.constants.swerve.DriveConstants;
 
 public class FieldConstants {
 
@@ -157,26 +158,26 @@ public class FieldConstants {
     double x = drivepose.getX();
     double y = drivepose.getY();
     //double y = drivepose.getY();
-    if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > BLUE_ALLIANCE_LINE)
-        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < RED_ALLIANCE_LINE) {
+    if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > (BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) //blue alliance line
+        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < (RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) {
           return FieldZone.TRENCH_BUMP;
         }
-    if(((y < (FIELD_WIDTH / 2) + 0.158750) && y > (FIELD_WIDTH / 2) - 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Blue) {
-      return FieldZone.UNDER_LADDER;
-    }
-    if(((y < (FIELD_WIDTH / 2) - 0.158750) && y > (FIELD_WIDTH / 2) + 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Red) {
-      return FieldZone.UNDER_LADDER;
-    }
+    // if(((y < (FIELD_WIDTH / 2) + 0.158750) && y > (FIELD_WIDTH / 2) - 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Blue) {
+    //   return FieldZone.UNDER_LADDER;
+    // }
+    // if(((y < (FIELD_WIDTH / 2) - 0.158750) && y > (FIELD_WIDTH / 2) + 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Red) {
+    //   return FieldZone.UNDER_LADDER;
+    // }
     // if(((y < FIELD_WIDTH - (46.75 / 2) && y > FIELD_WIDTH - (46.75 / 2))) && ((x > 207.42375 && x < 207.42375 + 36.0) || (x < FIELD_LENGTH - 207.42375 && x > FIELD_LENGTH - 207.42375 - 36.0))) {
     //   return FieldZone.UNDER_LADDER;
     // }
-    if(x > FieldConstants.RED_ALLIANCE_LINE) { // inside red
+    if(x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2) { // inside red
       if (Robot.getAlliance() == Alliance.Red) {
         return FieldZone.ALLIANCE;
       } else {
         return FieldZone.OPPOSITION;
       }
-    } else if (x < FieldConstants.BLUE_ALLIANCE_LINE) {
+    } else if (x < FieldConstants.BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2) {
       if (Robot.getAlliance() == Alliance.Blue) {
         return FieldZone.ALLIANCE;
       } else {

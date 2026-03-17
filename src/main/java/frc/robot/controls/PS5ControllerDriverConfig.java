@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Robot;
-import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -170,8 +169,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.retract();
             }));
 
-            // Drive to climb position
-            controller.get(PS5Button.TRIANGLE).onTrue(new ClimbDriveCommand(climb, getDrivetrain()));
+            // Go to up position
+            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
+                climb.goUp();
+            }));
+
+            // Go to climb position
+            controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
+                climb.climbPosition();
+            }));
         }
 
         // Hood

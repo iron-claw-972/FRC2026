@@ -101,6 +101,7 @@ public class HubActive {
       }
     }
 
+
     // Shift was is active for blue if red won auto, or red if blue won auto.
     boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
@@ -146,4 +147,32 @@ public class HubActive {
       return Optional.of(0.0);
     }
   }
+  static public boolean wonAuto() {
+    String gameData = DriverStation.getGameSpecificMessage();
+    // If we have no game data, we cannot compute, assume hub is active, as its
+    // likely early in teleop.
+    if (gameData.isEmpty()) {
+      return false;
+    }
+    boolean redInactiveFirst = false;
+    switch (gameData.charAt(0)) {
+      case 'R' -> redInactiveFirst = true;
+      case 'B' -> redInactiveFirst = false;
+      default -> {
+        // If we have invalid game data, assume hub is active.
+        return false;
+      }
+    }
+
+    var alliance = DriverStation.getAlliance().get();
+    boolean x;
+    if (alliance == Alliance.Red) {
+      x = redInactiveFirst;
+    } else {
+      x = !redInactiveFirst;
+    }
+    return x;
+
+  }
+
 }
