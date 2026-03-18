@@ -134,14 +134,18 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-        initializeAutoBuilder();
+      
         registerCommands();
         PathGroupLoader.loadPathGroups();
         
         initializeAutoBuilder();
+        autoChooserInit();
 
         // put the Chooser on the SmartDashboard
+
         SmartDashboard.putData("Auto chooser", autoChooser);
+
+        
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -239,12 +243,12 @@ public class RobotContainer {
 
   public void addAuto(String name){
     try{
-      PathPlannerAuto.getPathGroupFromAutoFile(name);
+      //PathPlannerAuto.getPathGroupFromAutoFile(name);
       auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
-    catch (IOException | ParseException e) {
+    catch (AutoBuilderException e) {
           e.printStackTrace();
           System.out.println("HELLOOOO AUTO NOT FOUD");
         }
