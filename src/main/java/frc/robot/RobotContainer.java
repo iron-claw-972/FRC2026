@@ -7,6 +7,7 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -66,6 +67,7 @@ public class RobotContainer {
   private Spindexer spindexer = null;
   private Intake intake = null;
 
+  // this is inside addAuto()
   private Command auto = new DoNothing();
 
   // Controllers are defined here
@@ -88,7 +90,6 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    // autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -136,18 +137,11 @@ public class RobotContainer {
         initializeAutoBuilder();
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        // Load the auto command
-        try {
-          String leftSideAuto = "Right Week V1";
-          // String leftSideAuto = "Right Week V1";
-          // String leftSideAuto = "Right Week V1";
-          // String rightSideAuto = "Right(2) - Under Trench";
-          // String testing = "Straight Test";
-          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
-          auto = new PathPlannerAuto(leftSideAuto);
-        } catch (IOException | ParseException e) {
-          e.printStackTrace();
-        }
+        
+        initializeAutoBuilder();
+
+        // put the Chooser on the SmartDashboard
+        SmartDashboard.putData("Auto chooser", autoChooser);
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -168,7 +162,6 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    // autoChooserInit();
   }
 
   /**
@@ -219,17 +212,6 @@ public class RobotContainer {
       }));
     }
 
-    // if (intake != null && spindexer != null){
-    // NamedCommands.registerCommand("Spin Intake Rollers", new
-    // ParallelCommandGroup(
-    // new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-    // ));
-    // NamedCommands.registerCommand("Stop Intake Rollers", new
-    // ParallelCommandGroup(
-    // new InstantCommand(()->intake.spinStop())
-    // ));
-    // }
-
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
@@ -255,16 +237,37 @@ public class RobotContainer {
 
   }
 
+  public void addAuto(String name){
+    try{
+      PathPlannerAuto.getPathGroupFromAutoFile(name);
+      auto = new PathPlannerAuto(name);
+      autoChooser.addOption(name, auto);
+    }
+    // is this the right one??
+    catch (IOException | ParseException e) {
+          e.printStackTrace();
+          System.out.println("HELLOOOO AUTO NOT FOUD");
+        }
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+    // autoChooser.setDefaultOption("Do nothing", new DoNothing());
+    // autoChooser.addOption("Do nada", new DoNothing());
+    // autoChooser.addOption("Spin my wheels", new DoNothing());
+    // autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+
+    String leftSideAuto = "Left Week V1";
+    String rightSideAuto = "Right Week V1";      
+    String shootOnlyAuto = "Shoot Only Left Week V1";
+
+    addAuto(leftSideAuto);
+    addAuto(rightSideAuto);
+    addAuto(shootOnlyAuto);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
@@ -294,7 +297,7 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    return auto;
+    return autoChooser.getSelected();
   }
 
   public void logComponents() {
