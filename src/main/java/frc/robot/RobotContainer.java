@@ -87,6 +87,8 @@ public class RobotContainer {
     // display the current robot id on smartdashboard
     SmartDashboard.putString("RobotID", robotId.toString());
 
+    SmartDashboard.putNumber("Match Time", 0.0);
+
     // Filling the SendableChooser on SmartDashboard
     // autoChooserInit();
 
@@ -306,5 +308,15 @@ public class RobotContainer {
         new Pose3d[] {
         // Subsystem Pose3ds
         });
+  }
+
+  /** Updates SmartDashboard values that need to be refreshed every loop */
+  public void periodic() {
+    // update match timer
+    double matchTime = DriverStation.getMatchTime();
+    if (matchTime > 0) {
+      SmartDashboard.putNumber("Match Time", matchTime);
+    }
+    SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
   }
 }

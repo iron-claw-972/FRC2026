@@ -42,7 +42,6 @@ public class DefaultDriveCommand extends Command {
         trenchAssistPid.setIntegratorRange(-1, 1);
 
         SmartDashboard.putNumber("0 degrees snap location", 0);
-        SmartDashboard.putNumber("", 0);
     }
 
     @Override

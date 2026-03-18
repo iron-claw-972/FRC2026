@@ -182,6 +182,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
+        SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+        SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+
         if(calibrating){
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
