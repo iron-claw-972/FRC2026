@@ -109,12 +109,13 @@ public class AutoShootCommand extends Command {
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), FieldConstants.getHubTranslation().getZ());
-            goalState = ShooterPhysics.getShotParams(
+            var goalStateWithT = ShooterPhysics.getShotParamsWithT(
 					Translation2d.kZero,
 				target3d.minus(lookahead3d),
 				2.0);
+			goalState = goalStateWithT.getFirst();
 
-            timeOfFlight = goalState.timeOfFlight();
+            timeOfFlight = goalStateWithT.getSecond();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             lookaheadPose =
