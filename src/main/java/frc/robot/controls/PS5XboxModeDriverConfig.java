@@ -3,6 +3,7 @@ package frc.robot.controls;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -51,6 +52,12 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private Intake intake;
     private Spindexer spindexer;
     private LinearClimb climb;
+
+    private boolean wasZoneSwitchWarningActive = false;
+    private boolean wasEndgameActive = false;
+    private boolean wasShooterAtSpeed = false;
+    
+    private int rumbleCycle = 0;
 
     // PS5 button aliases
     private final Button CROSS = Button.A;
@@ -219,6 +226,78 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
                 new InstantCommand(() -> controller.setRumble(GameController.RumbleStatus.RUMBLE_ON)),
                 new WaitCommand(0.5),
                 new InstantCommand(() -> controller.setRumble(GameController.RumbleStatus.RUMBLE_OFF))));
+    }
+
+    public void periodic() {
+        // only process vibrations during match
+        if (!DriverStation.isEnabled()) {
+            controller.setRumble(GameController.RumbleStatus.RUMBLE_OFF);
+            return;
+        }
+
+        double matchTime = DriverStation.getMatchTime();
+
+        // zone switch warning: 5 seconds BEFORE shift
+        boolean zoneSwitchWarning = false;
+        if (matchTime <= 135 && matchTime > 0) {
+            zoneSwitchWarning = isWithin5SecondsOfShift(matchTime);
+        }
+        
+        if (zoneSwitchWarning && !wasZoneSwitchWarningActive) {
+            wasZoneSwitchWarningActive = true;
+        } else if (!zoneSwitchWarning) {
+            wasZoneSwitchWarningActive = false;
+        }
+
+        // endgame warning
+        boolean endgameActive = matchTime <= 30 && matchTime > 0;
+        
+        if (endgameActive && !wasEndgameActive) {
+            wasEndgameActive = true;
+        } else if (!endgameActive) {
+            wasEndgameActive = false;
+        }
+
+        boolean shooterAtSpeed = shooter != null && shooter.atTargetSpeed() && shooter.getTargetVelocity() > 0;
+        
+        if (shooterAtSpeed && !wasShooterAtSpeed) {
+            wasShooterAtSpeed = true;
+            rumbleCycle = 0;
+        } else if (!shooterAtSpeed) {
+            wasShooterAtSpeed = false;
+        }
+
+        // apply vibrations based on priority
+        if (endgameActive) {
+            controller.setRumbleLR(1.0, 1.0);
+        } else if (zoneSwitchWarning) {
+            rumbleCycle++;
+            if (rumbleCycle % 10 < 5) {
+                controller.setRumbleLR(0.8, 0.0);
+            } else {
+                controller.setRumbleLR(0.0, 0.0);
+            }
+        } else if (shooterAtSpeed) {
+            rumbleCycle++;
+            if (rumbleCycle % 20 < 10) {
+                controller.setRumbleLR(0.0, 0.4);
+            } else {
+                controller.setRumbleLR(0.0, 0.0);
+            }
+        } else {
+            controller.setRumbleLR(0.0, 0.0);
+        }
+    }
+
+    private boolean isWithin5SecondsOfShift(double matchTime) {
+        double[] shiftPoints = {130, 105, 80, 55, 30};
+        
+        for (double shiftPoint : shiftPoints) {
+            if (matchTime <= shiftPoint && matchTime > shiftPoint - 5) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

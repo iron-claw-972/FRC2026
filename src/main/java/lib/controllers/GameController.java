@@ -84,13 +84,38 @@ public class GameController extends Controller {
 
     public enum RumbleStatus {
         RUMBLE_ON(0.7),
-        RUMBLE_OFF(0);
+        RUMBLE_OFF(0),
+        RUMBLE_WEAK(0.3),
+        RUMBLE_MEDIUM(0.5),
+        RUMBLE_STRONG(1.0);
 
         public final double rumbleValue;
 
         RumbleStatus(final double rumbleValue) {
             this.rumbleValue = rumbleValue;
         }
+    }
+
+    /**
+     * Set rumble with specific intensity
+     * @param intensity 0.0 to 1.0
+     */
+    public void setRumbleIntensity(double intensity) {
+        double clampedIntensity = Math.max(0.0, Math.min(1.0, intensity));
+        controller.setRumble(RumbleType.kLeftRumble, clampedIntensity);
+        controller.setRumble(RumbleType.kRightRumble, clampedIntensity);
+    }
+
+    /**
+     * Set left and right rumble independently
+     * @param leftIntensity 0.0 to 1.0
+     * @param rightIntensity 0.0 to 1.0
+     */
+    public void setRumbleLR(double leftIntensity, double rightIntensity) {
+        double leftClamped = Math.max(0.0, Math.min(1.0, leftIntensity));
+        double rightClamped = Math.max(0.0, Math.min(1.0, rightIntensity));
+        controller.setRumble(RumbleType.kLeftRumble, leftClamped);
+        controller.setRumble(RumbleType.kRightRumble, rightClamped);
     }
 
     public Trigger get(Button button) {
