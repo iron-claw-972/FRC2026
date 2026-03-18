@@ -265,10 +265,12 @@ public class RobotContainer {
     // autoChooser.addOption("Spin my wheels", new DoNothing());
     // autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
 
+    String defaultAuto = "Test default auto";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";      
     String shootOnlyAuto = "Shoot Only Left Week V1";
 
+    autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
