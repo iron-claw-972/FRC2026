@@ -81,7 +81,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
         Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
 
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON" : "lost");
+        SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+        SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOON" : "lost");
     }
 
     /**
