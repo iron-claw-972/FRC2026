@@ -68,7 +68,7 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  private Command auto = new DoNothing();
+  //private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -244,7 +244,7 @@ public class RobotContainer {
   public void addAuto(String name){
     try{
       //PathPlannerAuto.getPathGroupFromAutoFile(name);
-      auto = new PathPlannerAuto(name);
+      Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
