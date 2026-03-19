@@ -53,11 +53,12 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private Spindexer spindexer;
     private LinearClimb climb;
 
-    private boolean wasZoneSwitchWarningActive = false;
-    private boolean wasEndgameActive = false;
-    private boolean wasShooterAtSpeed = false;
-    
+    private boolean wasAllianceZoneSwitchActive = false;
+
     private int rumbleCycle = 0;
+    
+    // rumble interval in seconds
+    private static final double ALLIANCE_SWITCH_RUMBLE_INTERVAL = 0.4;
 
     // PS5 button aliases
     private final Button CROSS = Button.A;
@@ -236,51 +237,20 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
         }
 
         double matchTime = DriverStation.getMatchTime();
+        boolean allianceZoneSwitchWarning = isWithin5SecondsOfZoneSwitch(matchTime);
 
-        // zone switch warning: 5 seconds BEFORE shift
-        boolean zoneSwitchWarning = false;
-        if (matchTime <= 135 && matchTime > 0) {
-            zoneSwitchWarning = isWithin5SecondsOfShift(matchTime);
-        }
-        
-        if (zoneSwitchWarning && !wasZoneSwitchWarningActive) {
-            wasZoneSwitchWarningActive = true;
-        } else if (!zoneSwitchWarning) {
-            wasZoneSwitchWarningActive = false;
-        }
-
-        // endgame warning
-        boolean endgameActive = matchTime <= 30 && matchTime > 0;
-        
-        if (endgameActive && !wasEndgameActive) {
-            wasEndgameActive = true;
-        } else if (!endgameActive) {
-            wasEndgameActive = false;
-        }
-
-        boolean shooterAtSpeed = shooter != null && shooter.atTargetSpeed() && shooter.getTargetVelocity() > 0;
-        
-        if (shooterAtSpeed && !wasShooterAtSpeed) {
-            wasShooterAtSpeed = true;
+        if (allianceZoneSwitchWarning && !wasAllianceZoneSwitchActive) {
+            wasAllianceZoneSwitchActive = true;
             rumbleCycle = 0;
-        } else if (!shooterAtSpeed) {
-            wasShooterAtSpeed = false;
+        } else if (!allianceZoneSwitchWarning) {
+            wasAllianceZoneSwitchActive = false;
         }
 
-        // apply vibrations based on priority
-        if (endgameActive) {
-            controller.setRumbleLR(1.0, 1.0);
-        } else if (zoneSwitchWarning) {
+        if (allianceZoneSwitchWarning) {
             rumbleCycle++;
-            if (rumbleCycle % 10 < 5) {
-                controller.setRumbleLR(0.8, 0.0);
-            } else {
-                controller.setRumbleLR(0.0, 0.0);
-            }
-        } else if (shooterAtSpeed) {
-            rumbleCycle++;
-            if (rumbleCycle % 20 < 10) {
-                controller.setRumbleLR(0.0, 0.4);
+            int cyclesPerHalfInterval = (int) (ALLIANCE_SWITCH_RUMBLE_INTERVAL / 0.02 / 2);
+            if (rumbleCycle % (cyclesPerHalfInterval * 2) < cyclesPerHalfInterval) {
+                controller.setRumbleLR(1.0, 1.0);
             } else {
                 controller.setRumbleLR(0.0, 0.0);
             }
@@ -289,11 +259,12 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
         }
     }
 
-    private boolean isWithin5SecondsOfShift(double matchTime) {
-        double[] shiftPoints = {130, 105, 80, 55, 30};
-        
-        for (double shiftPoint : shiftPoints) {
-            if (matchTime <= shiftPoint && matchTime > shiftPoint - 5) {
+    // alliance and endgame zone warning: 5 sec BEFORE shift
+    private boolean isWithin5SecondsOfZoneSwitch(double matchTime) {
+        double[] switchPoints = { 130, 105, 80, 55, 30 };
+
+        for (double switchPoint : switchPoints) {
+            if (matchTime <= switchPoint && matchTime > switchPoint - 5) {
                 return true;
             }
         }
