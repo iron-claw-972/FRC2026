@@ -52,6 +52,8 @@ public class Superstructure extends Command {
     private double hoodAngle;
     private double hoodVelocity;
 
+    private double exitVel;
+
     private TurretState goalState;
 
     private double phaseDelay = 0.03; // Extrapolation delay due to latency
@@ -171,6 +173,8 @@ public class Superstructure extends Command {
         lastHoodAngle = hoodAngle;
 
         distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
+
+        exitVel = goalState.exitVel();
     }
 
     public void updateDrivePose(){
@@ -220,21 +224,22 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
-            
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(hoodAngle), hoodVelocity);
+            shooter.setShooter(exitVel);
             // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
             //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
             // } else{
                 //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
             // }
 
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            Translation2d trans2d = new Translation2d(drivepose.getX(), drivepose.getY());
+            // hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            Translation2d trans2d = drivepose.getTranslation();
             if (FieldConstants.getZone(trans2d) == FieldZone.TRENCH_BUMP) {
                 hood.forceHoodDown(true);
             } else {
                 hood.forceHoodDown(false);
             }
-            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            // shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             Logger.recordOutput("Distance From Target", distanceFromTarget);
             //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
