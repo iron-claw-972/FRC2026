@@ -188,6 +188,16 @@ public class FieldConstants {
     }
   }
 
+  public static boolean underTrench(double x, double y) {
+    if (y > Units.inchesToMeters(50.0) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
+      return false;
+    }
+    if (!(x > Units.inchesToMeters(182.5) && x < Units.inchesToMeters(230.0)) || !(x < Units.inchesToMeters(FIELD_LENGTH - 182.5) && x > Units.inchesToMeters(FIELD_LENGTH - 230.0))) {
+      return false;
+    }
+    return true;
+  }
+  
   /**
    * 
    * @return Whether Y coordinate is in the upper half (left side on blue alliance)
