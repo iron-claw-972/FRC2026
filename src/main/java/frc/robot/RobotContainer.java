@@ -1,17 +1,15 @@
 package frc.robot;
 
-import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
@@ -19,18 +17,18 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
+import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
-import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
@@ -41,10 +39,8 @@ import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
@@ -69,7 +65,8 @@ public class RobotContainer {
   private Spindexer spindexer = null;
   private Intake intake = null;
 
-  private Command auto = new DoNothing();
+  // this is inside addAuto()
+  //private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -93,7 +90,6 @@ public class RobotContainer {
     SmartDashboard.putString("RobotID", robotId.toString());
 
     // Filling the SendableChooser on SmartDashboard
-    //autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -110,6 +106,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
+        linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -123,7 +120,7 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        //linearClimb = new LinearClimb();
+        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -139,25 +136,27 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-        initializeAutoBuilder();
+      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        // Load the auto command
-        try {
-          String leftSideAuto = "Left(No SOTM) - Under Trench";
-          String rightSideAuto = "Right(2) - Under Trench";
-          PathPlannerAuto.getPathGroupFromAutoFile(rightSideAuto);
-          auto = new PathPlannerAuto(rightSideAuto);
-        } catch (IOException | ParseException e) {
-          e.printStackTrace();
-        }
         
-        if(turret != null){
+        initializeAutoBuilder();
+        autoChooserInit();
+
+        // put the Chooser on the SmartDashboard
+        SmartDashboard.putData("Auto chooser", autoChooser);
+
+        
+
+        if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
+
+	if (intake != null && hood != null && turret != null)
+		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -168,7 +167,6 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    //autoChooserInit();
   }
 
   /**
@@ -196,42 +194,64 @@ public class RobotContainer {
         drive);
   }
 
+  private boolean seizing;
+
   public void registerCommands() {
-    if (intake != null){
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(()-> intake.extend()));
-      NamedCommands.registerCommand("Retract Intake", new InstantCommand(()-> intake.retract()));
+
+    if (intake != null) {
+
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
+        intake.extend();
+      }));
+      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
+      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
+      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
+      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
+
+      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
+        seizing = true;
+        CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
+      }));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
+        seizing = false;
+      }));
     }
 
-    if (intake != null && spindexer != null){ 
-      NamedCommands.registerCommand("Spin Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-      ));
-      NamedCommands.registerCommand("Stop Intake Rollers", new ParallelCommandGroup(
-        new InstantCommand(()->intake.spinStop())
-      ));
-      Command intakeMovement = new IntakeMovementCommand(intake);
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(()-> intakeMovement.schedule()));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(()-> intakeMovement.cancel()));
-
-
-    }
-
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null){
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
+      Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Start Spindexer", new InstantCommand(()-> spindexer.maxSpindexer(), spindexer));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(()-> spindexer.stopSpindexer()));
+      NamedCommands.registerCommand("Start Spindexer",
+          new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
     }
 
-    if (hood != null){
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(()->{hood.forceHoodDown(true);}));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(()-> {hood.forceHoodDown(false);}));
+    if (hood != null) {
+
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(true);
+      }));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(false);
+        Logger.recordOutput("hello", true);
+      }));
     }
 
-
-    if (linearClimb != null && drive != null){
+    if (linearClimb != null && drive != null) {
       NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
     }
 
+  }
+
+  public void addAuto(String name){
+    try{
+      Command auto = new PathPlannerAuto(name);
+      autoChooser.addOption(name, auto);
+    }
+    // is this the right one??
+    catch (AutoBuilderException e) {
+          e.printStackTrace();
+          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+        }
   }
 
   /**
@@ -240,13 +260,15 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+    String defaultAuto = "Test default auto";
+    String leftSideAuto = "Left Week V1";
+    String rightSideAuto = "Right Week V1";      
+    String shootOnlyAuto = "Shoot Only Left Week V1";
 
-    // put the Chooser on the SmartDashboard
-    SmartDashboard.putData("Auto chooser", autoChooser);
+    autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
+    addAuto(leftSideAuto);
+    addAuto(rightSideAuto);
+    addAuto(shootOnlyAuto);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -272,8 +294,8 @@ public class RobotContainer {
     }
   }
 
-  public Command getAutoCommand(){
-    return auto;
+  public Command getAutoCommand() {
+    return autoChooser.getSelected();
   }
 
   public void logComponents() {

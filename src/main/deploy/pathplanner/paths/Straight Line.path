@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.62,
-        "y": 0.65
+        "x": 3.5036773428232504,
+        "y": 7.612
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.520041390728477,
-        "y": 1.4359437086129003
+        "x": 3.514743377483444,
+        "y": 5.718872844539763
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.7650993377483442,
-        "y": 2.844370860930782
+        "x": 3.5036773428232504,
+        "y": 1.516
       },
       "prevControl": {
-        "x": 1.6634602649006622,
-        "y": 2.1038576158976685
+        "x": 3.5251957295373675,
+        "y": 2.4197722419928844
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,36 +31,24 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Stop Spindexer",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Stop Spindexer"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Right Autos",
+  "folder": "Field Testing Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

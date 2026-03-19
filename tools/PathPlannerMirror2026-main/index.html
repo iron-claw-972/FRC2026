@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="https://team2480.org/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playwrite+AU+QLD:wght@100..400&family=SUSE:ital,wght@0,100..900;1,100..900&display=swap">
+    <title>2026 Path Mirrorer</title>
+</head>
+
+<body>
+    <div id="centerDiv">
+        <p id="infoText">Preview (no curved lines) of path before mirroring it</p>
+        <canvas id="graph" width="1650" height="800"></canvas>
+        <span>
+            <input type="file" id="pathInput" accept=".path">
+            <button title="Finish loading in the .path file" id="visualizeBtn"
+                onclick="if (fileLoaded){visualizePath()}"
+                style="visibility: hidden; width:0vw; font-size: 0vw;">Process Path File</button>
+            <button id="toggleModeBtn" onclick="switchModes()">Mirror Autos Instead</button>
+        </span>
+        <label>
+            <input type="checkbox" id="vertical" onclick="if (fileVisualized){visualizePath()}">
+            Mirror Vertically</label>
+        <label>
+            <input type="checkbox" id="horizontal" onclick="if (fileVisualized){visualizePath()}">Mirror
+            Horizontally</label>
+        <span>
+            <button onclick="exportPath()" id="downloadBtn"
+                title="Downloads the currently displayed mirror of the path">Export Mirrored Path</button>
+            <button onclick="exportAllMirrors()" id="downloadAllBtn"
+                title="Downloads all possible mirrors of the current path.">Export All Mirrors</button>
+        </span>
+    </div>
+    <div id="centerDiv2" style="visibility: hidden; opacity: 0;">
+        <p id="infoText">(WARNING: The auto mirrorer is experimental and will not work with autos with paths in
+            different corners)</p>
+        <div id="autoList">
+            <pre>
+
+            </pre>
+            <pre>
+
+            </pre>
+        </div>
+        <span>
+            <input type="file" id="autoInput" accept=".auto"><button title="Finish loading in the .auto file"
+                id="visualizeBtn2" onclick="if (autoLoaded){visualizeAuto()}"
+                style="visibility: hidden; width:0vw; font-size: 0vw;">Process Auto File</button><button
+                id="toggleModeBtn" onclick="switchModes()">Mirror Paths Instead</button>
+        </span>
+        <p>(you must have already used the paths in this auto in the path mirrorer and have not renamed
+            them)<br />Select the area you are
+            converting to:</p>
+        <span id="selectArea">
+            <label>
+                <input name="area" type="radio" id="bottomR" onclick="if (autoVisualized){visualizeAuto()}">Bottom
+                Right</label>
+            <label>
+                <input name="area" type="radio" id="bottomL" onclick="if (autoVisualized){visualizeAuto()}">Bottom
+                Left</label>
+            <label>
+                <input name="area" type="radio" id="topR" onclick="if (autoVisualized){visualizeAuto()}">Top
+                Right</label>
+            <label>
+                <input name="area" type="radio" id="topL" onclick="if (autoVisualized){visualizeAuto()}">Top
+                Left</label>
+        </span>
+        <button onclick="exportAuto()" id="exportAuto"
+            title="Exports the auto with all path names modified as they were from the path mirrorer">Export Modified
+            Auto</button>
+    </div>
+    <p id="input"></p>
+    <br />
+    <div id="result"></div>
+    <a id="hiddenDownloader" style="display: none;"></a>
+</body>
+<script src="index.js"></script>
+
+</html>

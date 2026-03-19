@@ -1,0 +1,141 @@
+html {
+    color: white;
+    font-family: "SUSE" !important;
+}
+
+body {
+    background-color: #1e1f2a;
+}
+
+p {
+    font-size: 1vw;
+    text-align: center;
+}
+
+label {
+    font-size: 1vw;
+}
+
+pre {
+    font-size: 1vw;
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+button,
+#pathInput::file-selector-button,
+#autoInput::file-selector-button {
+    font-size: 1vw;
+    font-family: "SUSE";
+    border: 0.2vw solid #8089ff;
+    border-radius: 0.5vw;
+    background-color: #8089ff;
+    color: #181982;
+    transition-duration: 150ms;
+    transition-property: background-color, border;
+}
+
+button:hover,
+#pathInput::file-selector-button:hover,
+#autoInput::file-selector-button:hover {
+    cursor: pointer;
+    background-color: #6f76dc;
+    border: 0.2vw solid #6f76dc;
+}
+
+#toggleModeBtn {
+    border: 0.2vw solid #ff80f9;
+    background-color: #ff80f9;
+    color: #8c1a86;
+    margin-left: 0.7vw;
+}
+
+#toggleModeBtn:hover {
+    background-color: #cf6aca;
+    border: 0.2vw solid #cf6aca;
+}
+
+#infoText {
+    font-size: 1vw !important;
+    color: #3c3d4d;
+    transition-duration: 150ms;
+    transition-property: opacity;
+}
+
+#downloadBtn,
+#downloadAllBtn,
+#exportAuto {
+    /* transition-duration: 250ms; */
+    transition-property: opacity, background-color, border;
+    opacity: 0;
+    visibility: hidden;
+}
+
+#exportAuto {
+    transition-property: opacity, background-color, border;
+    /* opacity: 0; */
+    visibility: hidden;
+}
+
+#downloadAllBtn {
+    margin-left: 1vw;
+}
+
+#horizontal,
+#vertical {
+    width: 1vw;
+    height: auto;
+}
+
+
+#centerDiv,
+#centerDiv2 {
+    background-color: #12121d;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    width: 80vw;
+    height: 40vw;
+    border-radius: 2vw;
+    box-shadow: #0e0e17 0vw 0vw 3vw;
+    transition-duration: 200ms;
+    transition-property: opacity;
+}
+
+#centerDiv>*,
+#centerDiv2>* {
+    margin-bottom: 0.7vw;
+}
+
+#centerDiv2 {
+    overflow: scroll;
+}
+
+#graph,
+#autoList {
+    background-color: #08080d;
+    border-radius: 1vw;
+    width: 41.25vw;
+    height: 20vw;
+    display:  flex;
+    align-items: start;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#pathInput,
+#autoInput {
+    color: white;
+    font-size: 1vw;
+    font-style: italic;
+    /* margin-right: -5vw; */
+    margin-right: 0vw;
+    width: 14vw;
+    font-family: "SUSE"
+}
