@@ -139,7 +139,6 @@ public class RobotContainer {
         autoChooserInit();
 
         // put the Chooser on the SmartDashboard
-
         SmartDashboard.putData("Auto chooser", autoChooser);
 
         
@@ -240,7 +239,6 @@ public class RobotContainer {
 
   public void addAuto(String name){
     try{
-      //PathPlannerAuto.getPathGroupFromAutoFile(name);
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
@@ -266,9 +264,6 @@ public class RobotContainer {
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
-
-    // put the Chooser on the SmartDashboard
-    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
