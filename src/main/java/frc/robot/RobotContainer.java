@@ -1,9 +1,7 @@
 package frc.robot;
 
-import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -21,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
@@ -250,7 +247,7 @@ public class RobotContainer {
     // is this the right one??
     catch (AutoBuilderException e) {
           e.printStackTrace();
-          System.out.println("HELLOOOO AUTO NOT FOUD");
+          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
         }
   }
 
@@ -260,11 +257,6 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    // autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    // autoChooser.addOption("Do nada", new DoNothing());
-    // autoChooser.addOption("Spin my wheels", new DoNothing());
-    // autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
-
     String defaultAuto = "Test default auto";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";      
