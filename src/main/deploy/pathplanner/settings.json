@@ -7,10 +7,14 @@
     "Field Testing Autos",
     "Left Autos",
     "Miscellaneous",
-    "week 2 autos",
-    "Right Autos"
+    "week 5 (new stuff)",
+    "Right Autos",
+    "week 2 autos"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Week 2 autos",
+    "Testing"
+  ],
   "defaultMaxVel": 2.0,
   "defaultMaxAccel": 2.0,
   "defaultMaxAngVel": 200.0,
