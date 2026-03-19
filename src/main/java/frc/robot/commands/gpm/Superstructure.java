@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
+import frc.robot.constants.FieldConstants.FieldZone;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
@@ -143,7 +144,6 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Time of flight", timeOfFlight);
         SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
         SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-        
 
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
@@ -228,6 +228,12 @@ public class Superstructure extends Command {
             // }
 
             hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            Translation2d trans2d = new Translation2d(drivepose.getX(), drivepose.getY());
+            if (FieldConstants.getZone(trans2d) == FieldZone.TRENCH_BUMP) {
+                hood.forceHoodDown(true);
+            } else {
+                hood.forceHoodDown(false);
+            }
             shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             Logger.recordOutput("Distance From Target", distanceFromTarget);
             //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
