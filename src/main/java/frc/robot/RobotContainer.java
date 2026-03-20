@@ -26,6 +26,7 @@ import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
+import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
