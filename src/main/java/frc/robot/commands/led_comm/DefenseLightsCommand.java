@@ -17,30 +17,31 @@ public class DefenseLightsCommand extends Command {
         addRequirements(led);
     }
 
+    @Override
     public void initialize() {
         counter = 0;
     }
 
+    @Override
     public void execute() {
         counter++;
 
         if (counter == 1) {
-            // setLEDs(255, 0, 0);
             led.alternate(255, 0, 0, 0, 0, 255, 5, startOffset, length);
         } else if (counter == 20) {
-            // setLEDs(0, 0, 255);
             led.alternate(0, 0, 255, 255, 0, 0, 5, startOffset, length);
         }
         if (counter >= 40) {
             counter = 0;
         }
-
     }
 
+    @Override
     public boolean isFinished() {
         return false;
     }
 
+    @Override
     public void end(boolean interrupted) {
 
     }

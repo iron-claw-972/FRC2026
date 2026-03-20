@@ -29,4 +29,9 @@ public class LEDSensorCommand extends Command {
         }
     }
 
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
 }

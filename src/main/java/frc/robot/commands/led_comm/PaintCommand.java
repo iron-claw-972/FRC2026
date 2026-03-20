@@ -16,18 +16,22 @@ public class PaintCommand extends Command {
         addRequirements(led);
     }
 
+    @Override
     public void initialize() {
         led.setSection(0, 0, 255, start, end);
     }
 
+    @Override
     public void execute() {
         led.setTwoColorWave(30, 0, 80, 255, 255, 255);
     }
 
+    @Override
     public boolean isFinished() {
         return false;
     }
 
+    @Override
     public void end(boolean interrupted) {
 
     }

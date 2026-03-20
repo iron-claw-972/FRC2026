@@ -14,10 +14,12 @@ public class ChangeModeCommand extends Command {
         addRequirements(led);
     }
 
+    @Override
     public void initialize() {
         mode++;
     }
 
+    @Override
     public void execute() {
         if (mode == 0) {
             led.setLEDs(0, 0, 0);
@@ -30,11 +32,13 @@ public class ChangeModeCommand extends Command {
         }
     }
 
+    @Override
     public boolean isFinished() {
         return false;
     }
 
-    public void end() {
+    @Override
+    public void end(boolean interrupted) {
 
     }
 }
