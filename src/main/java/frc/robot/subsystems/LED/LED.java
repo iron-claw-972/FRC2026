@@ -5,7 +5,6 @@ import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.SolidColor;
-import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
@@ -25,8 +24,8 @@ public class LED extends SubsystemBase {
 	private double counter = 0;
 
 	private double waveOffset = 0;
-    private final double waveSpeed = 0.08;
-    private final double waveFrequency = 0.25;
+	private final double waveSpeed = 0.08;
+	private final double waveFrequency = 0.25;
 	private double period = 10;
 	private double midLine = 127.5;
 
@@ -129,38 +128,40 @@ public class LED extends SubsystemBase {
 
 	public void setTwoColorWave(int r1, int g1, int b1, int r2, int g2, int b2) {
 		for (int i = 0; i < stripLength; i++) {
-	
+
 			double wave = (Math.sin(i * waveFrequency + waveOffset) + 1) / 2.0;
-			double inverseBias = 5;     // higher = more color 2
+			double inverseBias = 5; // higher = more color 2
 			wave = 1 - Math.pow(1 - wave, inverseBias);
-	
-			int r = (int)(r1 * wave + r2 * (1 - wave));
-			int g = (int)(g1 * wave + g2 * (1 - wave));
-			int b = (int)(b1 * wave + b2 * (1 - wave));
+
+			int r = (int) (r1 * wave + r2 * (1 - wave));
+			int g = (int) (g1 * wave + g2 * (1 - wave));
+			int b = (int) (b1 * wave + b2 * (1 - wave));
 			setSection(r, g, b, i, i + 1);
 		}
-	
+
 		waveOffset += waveSpeed;
 	}
 	// public void setTwoColorWave(int r1, int g1, int b1, int r2, int g2, int b2) {
-	// 	for (int i = 0; i < stripLength; i++) {
-	
-	// 		double wave = 127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset)) + midLine;
-	// 		double inverseBias = 5;     // higher = more color 2
-	// 		wave = 1 - Math.pow(1 - wave, inverseBias);
-	
-	// 		//int r = (int)(r1 * wave + r2 * (1 - wave));
-	// 		//int g = (int)(g1 * wave + g2 * (1 - wave));
-	// 		//int b = (int)(b1 * wave + b2 * (1 - wave));
-	// 		// int b = (int)wave;
-	// 		int b = 255;
-	// 		int g = (int)(127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset + 5)) + midLine);
-	// 		//int g = r;
+	// for (int i = 0; i < stripLength; i++) {
 
-	// 		setSection(0, g, b, i, i + 1);
-	// 	}
-	
-	// 	waveOffset += waveSpeed;
+	// double wave = 127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset)) +
+	// midLine;
+	// double inverseBias = 5; // higher = more color 2
+	// wave = 1 - Math.pow(1 - wave, inverseBias);
+
+	// //int r = (int)(r1 * wave + r2 * (1 - wave));
+	// //int g = (int)(g1 * wave + g2 * (1 - wave));
+	// //int b = (int)(b1 * wave + b2 * (1 - wave));
+	// // int b = (int)wave;
+	// int b = 255;
+	// int g = (int)(127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset + 5))
+	// + midLine);
+	// //int g = r;
+
+	// setSection(0, g, b, i, i + 1);
+	// }
+
+	// waveOffset += waveSpeed;
 	// }
 
 	/**
