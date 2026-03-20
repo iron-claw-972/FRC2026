@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "#1 Left under the trench"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "#2 Left under the trench"
+            "pathName": "Random default auto"
           }
         }
       ]

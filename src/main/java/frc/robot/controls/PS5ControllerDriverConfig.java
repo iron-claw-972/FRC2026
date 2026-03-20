@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Robot;
-import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -35,6 +34,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
+    private boolean spindexerBoolean = false;
     private Command autoShoot = null;
     private Shooter shooter;
     private Turret turret;
@@ -130,14 +130,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
-                intake.spinStop();
+                if(intakeBoolean){
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else{
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
             }));
         }
 
         // Spindexer
         if (spindexer != null) {
-            // Will only run if we are not calling default shoot command
-            controller.get(PS5Button.LEFT_TRIGGER).whileTrue(new RunSpindexer(spindexer));
+
+            // Toggle spindexer
+            controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
+                new RunSpindexer(spindexer, turret)
+            );
         }
 
         // Auto shoot
@@ -160,8 +169,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 climb.retract();
             }));
 
-            // Drive to climb position
-            controller.get(PS5Button.TRIANGLE).onTrue(new ClimbDriveCommand(climb, getDrivetrain()));
+            // Go to up position
+            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
+                climb.goUp();
+            }));
+
+            // Go to climb position
+            controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
+                climb.climbPosition();
+            }));
         }
 
         // Hood
