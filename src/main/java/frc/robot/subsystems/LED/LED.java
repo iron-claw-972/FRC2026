@@ -1,6 +1,5 @@
 package frc.robot.subsystems.LED;
 
-import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
