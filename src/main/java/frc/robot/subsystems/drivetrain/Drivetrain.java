@@ -410,6 +410,8 @@ public class Drivetrain extends SubsystemBase {
                     centerOfMassHeight,
                     currentSetpoint, chassisSpeeds,
                     Constants.LOOP_TIME);
+            ChassisSpeeds retSpeeds = currentSetpoint.chassisSpeeds();
+            Logger.recordOutput("retSpeeds", ChassisSpeeds.fromRobotRelativeSpeeds(retSpeeds, getYaw()));
         }
 
         SwerveModuleState[] swerveModuleStates = currentSetpoint.moduleStates();

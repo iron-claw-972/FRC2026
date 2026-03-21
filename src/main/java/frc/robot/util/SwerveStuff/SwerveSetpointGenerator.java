@@ -10,6 +10,7 @@ package frc.robot.util.SwerveStuff;
 import static frc.robot.util.EqualsUtil.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,6 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.google.errorprone.annotations.RestrictedApi;
+
+import Jama.Matrix;
 import frc.robot.constants.Constants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.EqualsUtil;
@@ -462,11 +468,17 @@ public class SwerveSetpointGenerator {
       }
     }
 
+    double deltaTheta = prevSetpoint.chassisSpeeds().omegaRadiansPerSecond * dt;
+    var asTransform = new Translation2d(prevSetpoint.chassisSpeeds().vxMetersPerSecond, prevSetpoint.chassisSpeeds().vyMetersPerSecond);
+    asTransform = asTransform.rotateBy(new Rotation2d(-deltaTheta));
+    var transformedPrevSpeeds = new ChassisSpeeds(asTransform.getX(), asTransform.getY(), prevSetpoint.chassisSpeeds().omegaRadiansPerSecond);
+
     ChassisSpeeds retSpeeds =
         new ChassisSpeeds(
-            prevSetpoint.chassisSpeeds().vxMetersPerSecond + min_s * dx,
-            prevSetpoint.chassisSpeeds().vyMetersPerSecond + min_s * dy,
-            prevSetpoint.chassisSpeeds().omegaRadiansPerSecond + min_s * dtheta);
+            transformedPrevSpeeds.vxMetersPerSecond + min_s * dx,
+            transformedPrevSpeeds.vyMetersPerSecond + min_s * dy,
+            transformedPrevSpeeds.omegaRadiansPerSecond + min_s * dtheta);
+
     var retStates = kinematics.toSwerveModuleStates(retSpeeds);
     for (int i = 0; i < modules.length; ++i) {
       final var maybeOverride = overrideSteering.get(i);
