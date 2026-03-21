@@ -121,7 +121,7 @@
   "constraintZones": [
     {
       "name": "Depot",
-      "minWaypointRelativePos": 4.953880764904385,
+      "minWaypointRelativePos": 4.727915194346288,
       "maxWaypointRelativePos": 5.5,
       "constraints": {
         "maxVelocity": 0.5,
@@ -150,7 +150,7 @@
       "minWaypointRelativePos": 2.767154105736777,
       "maxWaypointRelativePos": 4.467941507311604,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 2.5,
         "maxAcceleration": 1.0,
         "maxAngularVelocity": 200.0,
         "maxAngularAcceleration": 300.0,
@@ -262,7 +262,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 2.5,
     "maxAcceleration": 1.5,
     "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 150.0,
