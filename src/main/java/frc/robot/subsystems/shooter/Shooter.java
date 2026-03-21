@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.util.HubActive;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
@@ -53,6 +55,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
+
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        shooterMotorLeft.getConfigurator().apply(limitConfig);
+        shooterMotorRight.getConfigurator().apply(limitConfig);
 
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
     }
@@ -95,6 +103,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     /**@return velocity in m/s */
     public double getShooterVelocity(){
         return inputs.shooterSpeedLeft;
+    }
+
+    public void setNewCurrentLimit(double newCurrentLimit) {
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = newCurrentLimit;
+        limitConfig.StatorCurrentLimitEnable = true;
+        shooterMotorLeft.getConfigurator().apply(limitConfig);
+        shooterMotorRight.getConfigurator().apply(limitConfig);
     }
 
     @Override

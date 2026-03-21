@@ -2,14 +2,31 @@ package frc.robot.util.BrownOut;
 
 public class BrownOutLevel {
     // in percentage values (0.0-1.0)
-    double shooterCurrent;
-    double hoodCurrent;
-    double spindexerCurrent;
-    double intakeCurrent;
-    double drivetrainCurrent;
+    public double shooterCurrent; // A  -> priority one
+    public double hoodCurrent; // A -> priority two
+    public double turretCurrent; // A -> priority two
+    public double spindexerCurrent; // A -> priority three
+    public double intakeCurrent; // A -> priority three
+    public double steerCurrent; // A -> priority four? (idk)
+    public double driveCurrent; // A -> priority four? (idk)
 
-    public BrownOutLevel() {
-        
+    public BrownOutLevel(
+        double shooterCurrent, 
+        double hoodCurrent,
+        double turretCurrent,
+        double spindexerCurrent,
+        double intakeCurrent,
+        double steerCurrent,
+        double driveCurrent
+    ) {
+        this.shooterCurrent = shooterCurrent;
+        this.hoodCurrent = hoodCurrent;
+        this.spindexerCurrent = spindexerCurrent;
+        this.intakeCurrent = intakeCurrent;
+        this.turretCurrent = turretCurrent;
+        this.steerCurrent = steerCurrent;
+        this.driveCurrent = driveCurrent;
     }
+
 }
 
