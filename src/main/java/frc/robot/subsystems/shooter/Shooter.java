@@ -88,6 +88,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         boolean autoWon = HubActive.wonAuto();
         SmartDashboard.putBoolean("Auto Won", autoWon);
         SmartDashboard.putString("Auto Result", autoWon ? "WON" : "LOST");
+        SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+        SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOON" : "lost");
     }
 
     /**

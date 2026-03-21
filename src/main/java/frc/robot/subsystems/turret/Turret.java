@@ -257,6 +257,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double turretRot = crt.solve(leftAbs, rightAbs); 
 
 		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
+
+		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 	}
 
 	/* ---------------- Simulation ---------------- */
