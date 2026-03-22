@@ -232,8 +232,10 @@ public class Superstructure extends Command {
             System.out.println("X: " + x + "Y: " + y);
             if (FieldConstants.underTrench(x, y)) {
                 hood.forceHoodDown(true);
+                System.out.println("Hood forced down");
             } else {
                 hood.forceHoodDown(false);
+                System.out.println("Hood forced down");
             }
             shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             Logger.recordOutput("Distance From Target", distanceFromTarget);
