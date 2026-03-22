@@ -24,8 +24,6 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  // public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.167;
-  // public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.833;
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.215;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.785;
 
