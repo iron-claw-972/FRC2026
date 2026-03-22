@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.util.HubActive;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     
@@ -29,6 +30,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     VelocityVoltage voltageRequest = new VelocityVoltage(0);
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
 
     double powerModifier = 1.05; // TESTED
 
@@ -78,6 +80,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         
         Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
         Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON" : "lost");
     }
 
     /**
