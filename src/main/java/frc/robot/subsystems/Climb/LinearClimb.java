@@ -148,7 +148,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
             }
         }
 
-        motor.set(power); // during calibration we have 20ms of high power before we stop calibration
+        // motor.set(power); // during calibration we have 20ms of high power before we stop calibration
         SmartDashboard.putNumber("Climb Power from PID", power);
         SmartDashboard.putNumber("Climb PID_Setpoint_Rotations", pid.getSetpoint());
         SmartDashboard.putNumber("Climb Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
