@@ -26,6 +26,7 @@ import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
+import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -35,6 +36,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -65,12 +67,14 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  //private Command auto = new DoNothing();
+  // private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
+  private LED led = null;
+
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
 
@@ -94,6 +98,8 @@ public class RobotContainer {
         break;
 
       case TestBed2:
+        led = new LED();
+        led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:
@@ -121,7 +127,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb, led);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
@@ -131,17 +137,14 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        
+
         initializeAutoBuilder();
         autoChooserInit();
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
-
-        
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -150,8 +153,8 @@ public class RobotContainer {
         break;
     }
 
-	if (intake != null && hood != null && turret != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
+    if (intake != null && hood != null && turret != null)
+      CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -237,16 +240,16 @@ public class RobotContainer {
 
   }
 
-  public void addAuto(String name){
-    try{
+  public void addAuto(String name) {
+    try {
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
     catch (AutoBuilderException e) {
-          e.printStackTrace();
-          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-        }
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
   }
 
   /**
@@ -257,7 +260,7 @@ public class RobotContainer {
     // add the options to the Chooser
     String defaultAuto = "Test default auto";
     String leftSideAuto = "Left Week V1";
-    String rightSideAuto = "Right Week V1";      
+    String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
