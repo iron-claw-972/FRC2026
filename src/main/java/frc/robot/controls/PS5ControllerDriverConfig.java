@@ -124,9 +124,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             // Calibration
             controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
                 intake.calibrate();
+                hood.calibrate();
             })).onFalse(new InstantCommand(() -> {
                 intake.stopCalibrating();
-            }, intake));
+                hood.stopCalibrating();
+            }, intake, hood));
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
