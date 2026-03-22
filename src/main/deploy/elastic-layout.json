@@ -9,8 +9,8 @@
         "containers": [
           {
             "title": "WON AUTO?",
-            "x": 1408.0,
-            "y": 0.0,
+            "x": 768.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Large Text Display",
@@ -52,7 +52,7 @@
           },
           {
             "title": "Intake Calibrated",
-            "x": 384.0,
+            "x": 256.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -69,7 +69,7 @@
           },
           {
             "title": "Hood Calibrated",
-            "x": 256.0,
+            "x": 128.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -86,7 +86,7 @@
           },
           {
             "title": "Turret Calibrated",
-            "x": 128.0,
+            "x": 0.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -103,7 +103,7 @@
           },
           {
             "title": "Climb Calibrated",
-            "x": 0.0,
+            "x": 384.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -141,7 +141,7 @@
           },
           {
             "title": "Hood At Setpoint",
-            "x": 256.0,
+            "x": 128.0,
             "y": 512.0,
             "width": 128.0,
             "height": 128.0,
@@ -158,7 +158,7 @@
           },
           {
             "title": "Turret At Setpoint",
-            "x": 128.0,
+            "x": 0.0,
             "y": 512.0,
             "width": 128.0,
             "height": 128.0,
@@ -175,7 +175,7 @@
           },
           {
             "title": "Intake At Setpoint",
-            "x": 384.0,
+            "x": 256.0,
             "y": 512.0,
             "width": 128.0,
             "height": 128.0,
@@ -206,6 +206,20 @@
               "divisions": 5,
               "inverted": false,
               "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "RobotID",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/RobotID",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
             }
           }
         ]
