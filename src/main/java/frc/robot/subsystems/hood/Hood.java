@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
-public class Hood extends SubsystemBase implements HoodIO{
+public class Hood extends SubsystemBase implements HoodIO {
     private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.CANIVORE_SUB);
 
 	private final LinearFilter setpointFilter = LinearFilter.singlePoleIIR(0.02, 0.02);
@@ -31,10 +31,12 @@ public class Hood extends SubsystemBase implements HoodIO{
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
 
-	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
+	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
 	private boolean calibrating = false;
 	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);
+
+	private boolean forceHoodDown = false;
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
@@ -88,10 +90,22 @@ public class Hood extends SubsystemBase implements HoodIO{
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
 	}
 
+	public void forceHoodDown(boolean taranNathan){
+		forceHoodDown = taranNathan;
+	}
+
     @Override
     public void periodic() {
 		updateInputs();
 		Logger.processInputs("Hood", inputs);
+
+		// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
+		// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());
+
+		if (forceHoodDown){
+			goalAngle = Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE);
+			goalVelocityRadPerSec = 0.0;
+		}
 
 		double setpointRad = goalAngle.getRadians();
 

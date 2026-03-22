@@ -19,6 +19,7 @@ public class PhaseManager {
         IDLE,
         STARTING_UP,
         TURNING_AROUND,
+        UNDER_TRENCH,
         SHOOTING,
         PASSING
     }
@@ -51,6 +52,8 @@ public class PhaseManager {
         FieldZone zone = FieldConstants.getZone(drivePose.getTranslation());
         if (zone == FieldConstants.FieldZone.ALLIANCE) {
             currentState = CurrentState.SHOOTING;
+        } else if (zone == FieldConstants.FieldZone.TRENCH_BUMP){
+            currentState = CurrentState.UNDER_TRENCH;
         } else {
             currentState = CurrentState.PASSING;
         }
@@ -78,12 +81,14 @@ public class PhaseManager {
     
     public boolean shouldFeed() {
         // TODO: I'm gonna comment out starting up until i find a solution
-        return !(currentState == CurrentState.TURNING_AROUND); //&& !(currentState == CurrentState.STARTING_UP);
+        return !(currentState == CurrentState.TURNING_AROUND) && !(currentState == CurrentState.UNDER_TRENCH); //&& !(currentState == CurrentState.STARTING_UP);
     }
 
-    public Translation2d getTarget() {
-        return wantedState == WantedState.SHOOTING ? 
-            FieldConstants.getHubTranslation().toTranslation2d() 
-            : FieldConstants.getOppositionTranslation(true).toTranslation2d();
+    public Translation2d getTarget(Pose2d drivePose) {
+        return wantedState == WantedState.SHOOTING ? FieldConstants.getHubTranslation().toTranslation2d()
+                : (FieldConstants.isOnLeftSideOfField(drivePose.getTranslation())
+                //TODO: reversed for sm reason
+                        ? FieldConstants.getAllianceSideTranslation(false).toTranslation2d()
+                        : FieldConstants.getAllianceSideTranslation(true).toTranslation2d());
     }
 }
