@@ -1,12 +1,11 @@
 package frc.robot;
 
-import java.io.IOException;
 import java.util.function.BooleanSupplier;
 
-import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.DoNothing;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
@@ -66,7 +64,8 @@ public class RobotContainer {
   private Spindexer spindexer = null;
   private Intake intake = null;
 
-  private Command auto = new DoNothing();
+  // this is inside addAuto()
+  //private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -90,7 +89,6 @@ public class RobotContainer {
     SmartDashboard.putNumber("Match Time", 0.0);
 
     // Filling the SendableChooser on SmartDashboard
-    // autoChooserInit();
 
     // dispatch on the robot
     switch (robotId) {
@@ -135,21 +133,17 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-        initializeAutoBuilder();
+      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        // Load the auto command
-        try {
-          String leftSideAuto = "Right Week V1";
-          // String leftSideAuto = "Right Week V1";
-          // String leftSideAuto = "Right Week V1";
-          // String rightSideAuto = "Right(2) - Under Trench";
-          // String testing = "Straight Test";
-          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
-          auto = new PathPlannerAuto(leftSideAuto);
-        } catch (IOException | ParseException e) {
-          e.printStackTrace();
-        }
+        
+        initializeAutoBuilder();
+        autoChooserInit();
+
+        // put the Chooser on the SmartDashboard
+        SmartDashboard.putData("Auto chooser", autoChooser);
+
+        
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -170,7 +164,6 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    // autoChooserInit();
   }
 
   /**
@@ -221,17 +214,6 @@ public class RobotContainer {
       }));
     }
 
-    // if (intake != null && spindexer != null){
-    // NamedCommands.registerCommand("Spin Intake Rollers", new
-    // ParallelCommandGroup(
-    // new InstantCommand(()->intake.spin(IntakeConstants.SPEED))
-    // ));
-    // NamedCommands.registerCommand("Stop Intake Rollers", new
-    // ParallelCommandGroup(
-    // new InstantCommand(()->intake.spinStop())
-    // ));
-    // }
-
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
@@ -257,19 +239,33 @@ public class RobotContainer {
 
   }
 
+  public void addAuto(String name){
+    try{
+      Command auto = new PathPlannerAuto(name);
+      autoChooser.addOption(name, auto);
+    }
+    // is this the right one??
+    catch (AutoBuilderException e) {
+          e.printStackTrace();
+          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+        }
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    autoChooser.setDefaultOption("Do nothing", new DoNothing());
-    autoChooser.addOption("Do nada", new DoNothing());
-    autoChooser.addOption("Spin my wheels", new DoNothing());
-    autoChooser.addOption("Hello world", new InstantCommand(() -> System.out.println("Hello world")));
+    String defaultAuto = "Test default auto";
+    String leftSideAuto = "Left Week V1";
+    String rightSideAuto = "Right Week V1";      
+    String shootOnlyAuto = "Shoot Only Left Week V1";
 
-    // put the Chooser on the SmartDashboard
-    SmartDashboard.putData("Auto chooser", autoChooser);
+    autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
+    addAuto(leftSideAuto);
+    addAuto(rightSideAuto);
+    addAuto(shootOnlyAuto);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -296,7 +292,7 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    return auto;
+    return autoChooser.getSelected();
   }
 
   public void logComponents() {
