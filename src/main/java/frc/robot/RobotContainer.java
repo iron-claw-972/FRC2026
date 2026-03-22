@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -67,7 +65,7 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  //private Command auto = new DoNothing();
+  // private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -133,10 +131,9 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        
+
         initializeAutoBuilder();
         autoChooserInit();
 
@@ -150,8 +147,8 @@ public class RobotContainer {
         break;
     }
 
-	if (intake != null && hood != null && turret != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
+    if (intake != null && hood != null && turret != null)
+      CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -162,18 +159,8 @@ public class RobotContainer {
     LiveWindow.setEnabled(false);
 
     SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
-    // autoChooserInit();
   }
 
-  public void setAutoPath(String pathName) {
-    try {
-      PathPlannerAuto.getPathGroupFromAutoFile(pathName);
-      Command auto = new PathPlannerAuto(pathName);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-  }
   /**
    * Sets whether the drivetrain uses vision toupdate odometry
    */
@@ -247,16 +234,16 @@ public class RobotContainer {
 
   }
 
-  public void addAuto(String name){
-    try{
+  public void addAuto(String name) {
+    try {
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
     catch (AutoBuilderException e) {
-          e.printStackTrace();
-          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-        }
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
   }
 
   /**
@@ -267,7 +254,7 @@ public class RobotContainer {
     // add the options to the Chooser
     String defaultAuto = "Test default auto";
     String leftSideAuto = "Left Week V1";
-    String rightSideAuto = "Right Week V1";      
+    String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
