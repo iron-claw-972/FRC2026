@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -107,6 +108,14 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 
+		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
+		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
+		turretTestChooser.addOption("Turn to -90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0)));
+		turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
+		turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
+		turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
+		SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+
 		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
 		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
 
@@ -126,12 +135,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
-
-		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
-		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
-		SmartDashboard.putData("Turn to 90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);}));
-		SmartDashboard.putData("Turn to 200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);}));
-		SmartDashboard.putData("Turn to -200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);}));
 	}
 
 	/* ---------------- Public API ---------------- */
@@ -254,6 +257,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double turretRot = crt.solve(leftAbs, rightAbs); 
 
 		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
+
+		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 	}
 
 	/* ---------------- Simulation ---------------- */
