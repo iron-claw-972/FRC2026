@@ -183,12 +183,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
         robotExtension.setLength(inchExtension);
 
         if(calibrating){
-            leftMotor.set(0.1);
+            leftMotor.set(-0.1);
             rightMotor.set(-0.1);
             boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            if(calibrationDebouncer.calculate(atHardStop)){
-                stopCalibrating();
-            }
+            // if(calibrationDebouncer.calculate(atHardStop)){
+            //     stopCalibrating();
+            // }
         }
 
         updateInputs();
@@ -374,6 +374,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
         inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
+        inputs.rollerCurrent = rollerMotor.getStatorCurrent().getValueAsDouble();
     }
 
 }
