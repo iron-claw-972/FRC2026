@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kousha S1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Spindexer"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Kousha S2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

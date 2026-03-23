@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.45853476821192,
-        "y": 7.664966887417217
+        "x": 4.436754966887417,
+        "y": 7.6431870860927145
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.458534768211921,
-        "y": 7.664966887417217
+        "x": 5.436754966887418,
+        "y": 7.6431870860927145
       },
       "isLocked": false,
       "linkedName": null
@@ -90,12 +90,38 @@
       "rotationDegrees": 90.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.446143154968738,
+      "maxWaypointRelativePos": 3.6302988186240435,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "Hood Down",
       "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0.005559416261295088,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0.01667824878387202,
       "endWaypointRelativePos": null,
       "command": null
     },

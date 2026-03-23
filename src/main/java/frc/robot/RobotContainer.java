@@ -138,7 +138,7 @@ public class RobotContainer {
         // Load the auto command
         try {
           String koushaAuto = "Kousha Double";
-          //String leftSideAuto = "Right Week V1";
+          //String leftSideAuto = "Left Week V1";
           // String leftSideAuto = "Right Week V1";
           // String leftSideAuto = "Right Week V1";
           // String rightSideAuto = "Right(2) - Under Trench";
