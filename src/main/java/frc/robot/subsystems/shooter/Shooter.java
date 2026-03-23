@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.util.HubActive;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
@@ -38,7 +39,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     double powerModifier = 1.05; // TESTED
 
-    public Shooter(){
+    public Shooter() {
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -46,6 +47,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
+
+        config.CurrentLimits
+        .withSupplyCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT)
+        .withSupplyCurrentLimitEnable(true);
+
         shooterMotorLeft.getConfigurator().apply(config);
         shooterMotorRight.getConfigurator().apply(config);
         
