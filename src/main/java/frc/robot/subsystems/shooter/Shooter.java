@@ -23,6 +23,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private TalonFX shooterMotorLeft = new TalonFX(IdConstants.SHOOTER_LEFT_ID, Constants.CANIVORE_SUB);
     private TalonFX shooterMotorRight = new TalonFX(IdConstants.SHOOTER_RIGHT_ID, Constants.CANIVORE_SUB);
 
+
+    //TODO Add current limits
+
+
     // Goal Velocity / Double theCircumfrence
     private double shooterTargetSpeed = 0;
 
@@ -38,7 +42,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 1.0; //tune p value
+        config.Slot0.kP = 0.5; // 0.5 Stable
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps

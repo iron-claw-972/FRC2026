@@ -137,13 +137,14 @@ public class RobotContainer {
         PathGroupLoader.loadPathGroups();
         // Load the auto command
         try {
-          String leftSideAuto = "Right Week V1";
+          String koushaAuto = "Kousha Double";
+          //String leftSideAuto = "Right Week V1";
           // String leftSideAuto = "Right Week V1";
           // String leftSideAuto = "Right Week V1";
           // String rightSideAuto = "Right(2) - Under Trench";
           // String testing = "Straight Test";
-          PathPlannerAuto.getPathGroupFromAutoFile(leftSideAuto);
-          auto = new PathPlannerAuto(leftSideAuto);
+          PathPlannerAuto.getPathGroupFromAutoFile(koushaAuto);
+          auto = new PathPlannerAuto(koushaAuto);
         } catch (IOException | ParseException e) {
           e.printStackTrace();
         }

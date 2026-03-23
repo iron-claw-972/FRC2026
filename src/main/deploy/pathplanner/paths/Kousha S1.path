@@ -1,0 +1,146 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.45853476821192,
+        "y": 7.664966887417217
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.458534768211921,
+        "y": 7.664966887417217
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.921523178807947,
+        "y": 6.750215231788079
+      },
+      "prevControl": {
+        "x": 7.9078401005687935,
+        "y": 7.287276052674142
+      },
+      "nextControl": {
+        "x": 7.9796026490066865,
+        "y": 4.4705960264905045
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.534875827814634,
+        "y": 4.819072847682557
+      },
+      "prevControl": {
+        "x": 7.224569536423906,
+        "y": 4.753733443709048
+      },
+      "nextControl": {
+        "x": 5.615154835282087,
+        "y": 4.906204310133009
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.213567880794766,
+        "y": 5.42890728476865
+      },
+      "prevControl": {
+        "x": 5.888741721854368,
+        "y": 5.153029801324941
+      },
+      "nextControl": {
+        "x": 4.393659545209185,
+        "y": 5.7639235939326525
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.3,
+        "y": 5.75
+      },
+      "prevControl": {
+        "x": 4.100683433038495,
+        "y": 5.703196560889764
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.002386634844876,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.6658711217183793,
+      "rotationDegrees": -171.29413327946216
+    },
+    {
+      "waypointRelativePos": 2.6348448687350827,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Extend Intake",
+      "waypointRelativePos": 0.41695621959694984,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Spin Intake Rollers",
+      "waypointRelativePos": 0.4447533009034007,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 0.9506601806810285,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Stop Spindexer",
+      "waypointRelativePos": 1.2119527449617822,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 300.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": "week 2 autos",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

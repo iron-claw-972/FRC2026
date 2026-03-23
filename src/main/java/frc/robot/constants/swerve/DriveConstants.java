@@ -53,7 +53,7 @@ public class DriveConstants {
         // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
         public static final double MAX_ANGULAR_SPEED = MAX_SPEED / ((TRACK_WIDTH / 2) * Math.sqrt(2));
     
-        public static final double COSF = 0.9;
+        public static final double COSF = 1.5;
         
         // The maximum acceleration of the robot, limited by friction
         public static final double MAX_LINEAR_ACCEL = COSF * Constants.GRAVITY_ACCELERATION;
@@ -129,8 +129,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 60;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
