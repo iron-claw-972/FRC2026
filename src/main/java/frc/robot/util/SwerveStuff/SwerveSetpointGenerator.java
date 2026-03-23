@@ -462,11 +462,17 @@ public class SwerveSetpointGenerator {
       }
     }
 
+    double deltaTheta = prevSetpoint.chassisSpeeds().omegaRadiansPerSecond * dt;
+    var asTransform = new Translation2d(prevSetpoint.chassisSpeeds().vxMetersPerSecond, prevSetpoint.chassisSpeeds().vyMetersPerSecond);
+    asTransform = asTransform.rotateBy(new Rotation2d(deltaTheta));
+    var transformedPrevSpeeds = new ChassisSpeeds(asTransform.getX(), asTransform.getY(), prevSetpoint.chassisSpeeds().omegaRadiansPerSecond);
+
     ChassisSpeeds retSpeeds =
         new ChassisSpeeds(
-            prevSetpoint.chassisSpeeds().vxMetersPerSecond + min_s * dx,
-            prevSetpoint.chassisSpeeds().vyMetersPerSecond + min_s * dy,
-            prevSetpoint.chassisSpeeds().omegaRadiansPerSecond + min_s * dtheta);
+            transformedPrevSpeeds.vxMetersPerSecond + min_s * dx,
+            transformedPrevSpeeds.vyMetersPerSecond + min_s * dy,
+            transformedPrevSpeeds.omegaRadiansPerSecond + min_s * dtheta);
+
     var retStates = kinematics.toSwerveModuleStates(retSpeeds);
     for (int i = 0; i < modules.length; ++i) {
       final var maybeOverride = overrideSteering.get(i);
