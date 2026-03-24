@@ -227,7 +227,10 @@ public class Superstructure extends Command {
             // }
 
             hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            if (FieldConstants.underTrench(drivepose.getX(), drivepose.getY())) {
+            double x = drivepose.getX();
+            double y = drivepose.getY();
+            System.out.println("X: " + x + "Y: " + y);
+            if (FieldConstants.underTrench(x, y)) {
                 hood.forceHoodDown(true);
             } else {
                 hood.forceHoodDown(false);
