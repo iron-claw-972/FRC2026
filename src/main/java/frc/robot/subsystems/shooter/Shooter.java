@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.util.HubActive;
 
 public class Shooter extends SubsystemBase implements ShooterIO {
     
@@ -30,13 +31,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.3;
+
+    double powerModifier = 1.05; // TESTED
 
     public Shooter(){
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0.15; //tune p value
+        config.Slot0.kP = 1.0; //tune p value
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
@@ -62,17 +64,24 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        powerModifier = SmartDashboard.getNumber("shooter power modifier", powerModifier);
-        SmartDashboard.putNumber("shooter power modifier", powerModifier);
+        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+
+
+        SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
+        SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
 
         // Sets the motor control to target velocity
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
         shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
         
+        Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
         Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON" : "lost");
     }
 
     /**
@@ -92,6 +101,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
+        inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+
+
         Logger.processInputs("Shooter", inputs);
     }
 
