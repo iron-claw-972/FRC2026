@@ -193,17 +193,14 @@ public class FieldConstants {
 
   public static boolean underTrench(double x, double y) {
     // ensures we aren't in center channel
-    if (y > Units.inchesToMeters(50.0
-    ) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
+    if (y > Units.inchesToMeters(50.0) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
       return false;
     }
     // if our location is to far away from right underneath trench in terms of x
-    if (x - Units.inchesToMeters(180.0) > 0.1 || y - FIELD_LENGTH - Units.inchesToMeters(180.0) > 0.1) {
+    // in between blue alliance trench
+    if (!(x > Units.inchesToMeters(152.5) && x < Units.inchesToMeters(187.5)) && !(x < FIELD_LENGTH - Units.inchesToMeters(152.5) && x > FIELD_LENGTH - Units.inchesToMeters(187.5))) {
       return false;
     }
-    // if (!(x > Units.inchesToMeters(182.5) && x < Units.inchesToMeters(230.0)) || !(x < Units.inchesToMeters(FIELD_LENGTH - 182.5) && x > Units.inchesToMeters(FIELD_LENGTH - 230.0))) {
-    //   return false;
-    // }
     return true;
   }
   
