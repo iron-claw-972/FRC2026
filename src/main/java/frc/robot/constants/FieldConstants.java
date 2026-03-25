@@ -47,6 +47,7 @@ public class FieldConstants {
   public static final Translation3d HUB_RED =
       new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
     
+  // shuttling locations
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
 
@@ -97,6 +98,8 @@ public class FieldConstants {
   public static final Zone neutralRight = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+
+  // trenches
 
 	public enum ShootingTarget {
 		HUB,
@@ -189,12 +192,17 @@ public class FieldConstants {
   }
 
   public static boolean underTrench(double x, double y) {
+    // ensures we aren't in center channel
     if (y > Units.inchesToMeters(50.0) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
       return false;
     }
-    if (!(x > Units.inchesToMeters(182.5) && x < Units.inchesToMeters(230.0)) && !(x < Units.inchesToMeters(FIELD_LENGTH - 182.5) && x > Units.inchesToMeters(FIELD_LENGTH - 230.0))) {
+    // if our location is to far away from right underneath trench in terms of x
+    if (x - Units.inchesToMeters(180.0) > 0.1 || y - FIELD_LENGTH - Units.inchesToMeters(180.0) > 0.1) {
       return false;
     }
+    // if (!(x > Units.inchesToMeters(182.5) && x < Units.inchesToMeters(230.0)) || !(x < Units.inchesToMeters(FIELD_LENGTH - 182.5) && x > Units.inchesToMeters(FIELD_LENGTH - 230.0))) {
+    //   return false;
+    // }
     return true;
   }
   
