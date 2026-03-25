@@ -108,7 +108,7 @@ public class RobotContainer {
         shooter = new Shooter();
         hood = new Hood();
       
-      case TwinTake:
+      case TwinBot:
         intake = new Intake();
 
       case SwerveCompetition: // AKA "Vantage"
