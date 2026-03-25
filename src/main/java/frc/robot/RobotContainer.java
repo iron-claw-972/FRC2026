@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -19,8 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
@@ -65,7 +68,7 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  //private Command auto = new DoNothing();
+  // private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -131,27 +134,29 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        
+
         initializeAutoBuilder();
         autoChooserInit();
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
 
-        
-
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
+
+        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
+          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
+        }
+        
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
 
-	if (intake != null && hood != null && turret != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
+    if (intake != null && hood != null && turret != null)
+      CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
 
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -237,16 +242,16 @@ public class RobotContainer {
 
   }
 
-  public void addAuto(String name){
-    try{
+  public void addAuto(String name) {
+    try {
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
     catch (AutoBuilderException e) {
-          e.printStackTrace();
-          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-        }
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
   }
 
   /**
@@ -257,7 +262,7 @@ public class RobotContainer {
     // add the options to the Chooser
     String defaultAuto = "Test default auto";
     String leftSideAuto = "Left Week V1";
-    String rightSideAuto = "Right Week V1";      
+    String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
