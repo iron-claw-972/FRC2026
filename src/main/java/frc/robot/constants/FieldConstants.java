@@ -193,7 +193,8 @@ public class FieldConstants {
 
   public static boolean underTrench(double x, double y) {
     // ensures we aren't in center channel
-    if (y > Units.inchesToMeters(50.0) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
+    if (y > Units.inchesToMeters(50.0
+    ) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
       return false;
     }
     // if our location is to far away from right underneath trench in terms of x
