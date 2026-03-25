@@ -35,46 +35,46 @@ public class BrownOutConstants {
 
     // should deplete drivetrain a bit and lower everything else slightly. Preserve Shooter.
     public static final BrownOutLevel BROWNOUT_LVL_TWO = new BrownOutLevel(
-        ShooterConstants.SHOOTER_CURRENT_LIMIT, 
-        HoodConstants.NORMAL_CURRENT_LIMIT, 
-        SpindexerConstants.currentLimit, 
-        TurretConstants.NORMAL_CURRENT_LIMIT, 
-        IntakeConstants.NORMAL_CURRENT_LIMIT, 
-        DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT
+        ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
+        HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
+        SpindexerConstants.currentLimit * 1.0, // preserve indexing speed
+        TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
+        IntakeConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve indexing speed
+        DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.8, // lower drive rotation
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.8  // lower drive movement
     );
 
     // lower bps systems: intake & spindexer. Preserve Shooter. Slight lower on evertthing else
     public static final BrownOutLevel BROWNOUT_LVL_THREE = new BrownOutLevel(
-        ShooterConstants.SHOOTER_CURRENT_LIMIT, 
-        HoodConstants.NORMAL_CURRENT_LIMIT, 
-        SpindexerConstants.currentLimit, 
-        TurretConstants.NORMAL_CURRENT_LIMIT, 
-        IntakeConstants.NORMAL_CURRENT_LIMIT, 
-        DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT
+        ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
+        HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
+        SpindexerConstants.currentLimit * 0.8, // preserve indexing speed
+        TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
+        IntakeConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve indexing speed
+        DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.7, // lower drive rotation
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.7  // lower drive movement
     );
 
     // lower aiming systems: turret & hood. Preserve Shooter. Slight lower on everything else
     public static final BrownOutLevel BROWNOUT_LVL_FOUR = new BrownOutLevel(
-        ShooterConstants.SHOOTER_CURRENT_LIMIT, 
-        HoodConstants.NORMAL_CURRENT_LIMIT, 
-        SpindexerConstants.currentLimit, 
-        TurretConstants.NORMAL_CURRENT_LIMIT, 
-        IntakeConstants.NORMAL_CURRENT_LIMIT, 
-        DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT
+        ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
+        HoodConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve aiming speed
+        SpindexerConstants.currentLimit * 0.6, // preserve indexing speed
+        TurretConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve aiming speed
+        IntakeConstants.NORMAL_CURRENT_LIMIT * 0.6, // preserve indexing speed
+        DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.5, // lower drive rotation
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.5  // lower drive movement
     );
 
     // now we have to deplete shooter... THIS IS REALLY BAD IS IT COMES TO THIS.
     public static final BrownOutLevel BROWNOUT_LVL_FIVE = new BrownOutLevel(
-        ShooterConstants.SHOOTER_CURRENT_LIMIT, 
-        HoodConstants.NORMAL_CURRENT_LIMIT, 
-        SpindexerConstants.currentLimit, 
-        TurretConstants.NORMAL_CURRENT_LIMIT, 
-        IntakeConstants.NORMAL_CURRENT_LIMIT, 
-        DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT
+        ShooterConstants.SHOOTER_CURRENT_LIMIT * 0.8, // keep as same 
+        HoodConstants.NORMAL_CURRENT_LIMIT * 0.7, // preserve aiming speed
+        SpindexerConstants.currentLimit * 0.5, // preserve indexing speed
+        TurretConstants.NORMAL_CURRENT_LIMIT * 0.7, // preserve aiming speed
+        IntakeConstants.NORMAL_CURRENT_LIMIT * 0.5, // preserve indexing speed
+        DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.45, // lower drive rotation
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.45  // lower drive movement
     );
 
 }

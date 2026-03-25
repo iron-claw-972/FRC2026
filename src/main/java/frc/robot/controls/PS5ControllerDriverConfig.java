@@ -198,6 +198,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
         }
 
+        // turns it on
         controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
             new BrownOutControl(shooter, spindexer, turret, intake, hood, getDrivetrain());
         }));
