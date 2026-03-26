@@ -5,7 +5,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.Elastic;
 import frc.robot.util.HubActive;
-import frc.robot.util.ShooterPhysics;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.NotificationLevel;
 
@@ -26,9 +25,6 @@ public class LogCommand extends Command {
         } else if (!current && hubActive) {
             Elastic.sendNotification(new Notification(NotificationLevel.INFO, "HUB DEACTIVATED", ""));
         }
-
-        int x = 1/0;
-
     }
 
     @Override
