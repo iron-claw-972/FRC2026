@@ -115,23 +115,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
 		turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
 		SmartDashboard.putData("Turret Test Positions", turretTestChooser);
-
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-		
-		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
-
-		//Sets the initial motor position
-		inputs.positionDeg = turretRot;
-		motor.setPosition(motorRotations);
-
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
@@ -245,19 +228,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
 		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
 
-
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
-
 		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 	}
@@ -323,12 +293,5 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
 		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
-	}
-
-	// in rotations
-	public Pair<Double, Double> getEncoderPositions() {
-		return new Pair<Double, Double>(
-				encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET,
-				encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
 	}
 }
