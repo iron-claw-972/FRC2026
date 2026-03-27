@@ -111,13 +111,12 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
-        //spindexer = new Spindexer();
-        //intake = new Intake();
-
+        spindexer = new Spindexer();
+        intake = new Intake();
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
-        //vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
+        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
       case Vivace:

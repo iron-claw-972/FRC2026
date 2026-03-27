@@ -5,7 +5,7 @@ public class IdConstants {
     public static final int DRIVE_FRONT_LEFT_ID = 1;
     public static final int STEER_FRONT_LEFT_ID = 2;
     public static final int ENCODER_FRONT_LEFT_ID = 3;
-    public static final int DRIVE_FRONT_RIGHT_ID = 31;
+    public static final int DRIVE_FRONT_RIGHT_ID = 10;
     public static final int STEER_FRONT_RIGHT_ID = 11;
     public static final int ENCODER_FRONT_RIGHT_ID = 12;
     public static final int DRIVE_BACK_LEFT_ID = 7;
