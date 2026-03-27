@@ -64,9 +64,6 @@ public class Hood extends SubsystemBase implements HoodIO {
 		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
 		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
 		SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
-
-		SmartDashboard.putData("Hood Calibrate", new InstantCommand(() -> calibrate()));
-		SmartDashboard.putData("Hood Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
     }
 
 	/**
@@ -95,6 +92,10 @@ public class Hood extends SubsystemBase implements HoodIO {
 
 	public void forceHoodDown(boolean taranNathan){
 		forceHoodDown = taranNathan;
+	}
+
+	public boolean getHoodForcedDown() {
+		return this.forceHoodDown;
 	}
 
     @Override
