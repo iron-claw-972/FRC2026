@@ -260,7 +260,7 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    String defaultAuto = "Test default auto";
+    String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";      
     String shootOnlyAuto = "Shoot Only Left Week V1";

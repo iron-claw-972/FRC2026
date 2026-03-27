@@ -143,7 +143,6 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Time of flight", timeOfFlight);
         SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
         SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-        
 
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
@@ -228,6 +227,16 @@ public class Superstructure extends Command {
             // }
 
             hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            double x = drivepose.getX(); // compared as meters
+            double y = drivepose.getY();
+            System.out.println("X: " + Units.metersToInches(x) + "Y: " + Units.metersToInches(y));
+            if (FieldConstants.underTrench(x, y)) {
+                hood.forceHoodDown(true);
+                System.out.println("Hood forced down");
+            } else {
+                hood.forceHoodDown(false);
+                System.out.println("Hood forced up");
+            }
             shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             Logger.recordOutput("Distance From Target", distanceFromTarget);
             //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
