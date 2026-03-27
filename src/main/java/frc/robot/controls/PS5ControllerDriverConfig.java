@@ -120,7 +120,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
                 .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
-            // Calibration
+            // Calibration: you can now calibrate easily using this button
             controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
                 intake.calibrate();
                 hood.calibrate();
