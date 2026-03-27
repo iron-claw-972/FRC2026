@@ -201,7 +201,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
 
 		if(calibrating){
-			motor.set(0.05);
+			// motor.set(0.05);
 			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
 			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
@@ -247,7 +247,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
+		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**
