@@ -38,7 +38,7 @@ public final class Elastic {
   }
 
   /**
-   * Sends an notification to the Elastic dashboard. The notification is serialized as a JSON string
+   * Sends a notification to the Elastic dashboard. The notification is serialized as a JSON string
    * before being published.
    *
    * @param notification the {@link Notification} object containing notification details
@@ -75,7 +75,7 @@ public final class Elastic {
   }
 
   /**
-   * Represents an notification object to be sent to the Elastic dashboard. This object holds
+   * Represents a notification object to be sent to the Elastic dashboard. This object holds
    * properties such as level, title, description, display time, and dimensions to control how the
    * notification is displayed on the dashboard.
    */
