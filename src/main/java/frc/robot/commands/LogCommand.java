@@ -25,6 +25,8 @@ public class LogCommand extends Command {
         } else if (!current && hubActive) {
             Elastic.sendNotification(new Notification(NotificationLevel.INFO, "HUB DEACTIVATED", ""));
         }
+
+        hubActive = current;
     }
 
     @Override
