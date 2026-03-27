@@ -111,6 +111,7 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
+        spindexer = new Spindexer();
         intake = new Intake();
 
       case SwerveCompetition: // AKA "Vantage"
