@@ -32,13 +32,13 @@ public class HardstopWarning extends Command {
 		SmartDashboard.putBoolean("Hood OK", hood.getPositionDeg() >= HoodConstants.MIN_ANGLE - epsilon);
 		SmartDashboard.putBoolean("Intake OK", intake.getPosition() >= IntakeConstants.STARTING_POINT - epsilon);
 
-		if (Math.abs(turret.getPositionRad()) <= epsilon) {
-			var encoderPositions = turret.getEncoderPositions();
-			if (Math.abs(encoderPositions.getFirst()) <= epsilon && Math.abs(encoderPositions.getSecond()) <= epsilon)
-				turretStatus = "Ok";
-			else
-				turretStatus = "Bad";
-		}
+		// if (Math.abs(turret.getPositionRad()) <= epsilon) {
+		// 	var encoderPositions = turret.getEncoderPositions();
+		// 	if (Math.abs(encoderPositions.getFirst()) <= epsilon && Math.abs(encoderPositions.getSecond()) <= epsilon)
+		// 		turretStatus = "Ok";
+		// 	else
+		// 		turretStatus = "Bad";
+		// }
 
 		SmartDashboard.putString("Turret Status", turretStatus);
 	}

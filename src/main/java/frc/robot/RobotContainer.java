@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-import frc.robot.commands.gpm.HardstopWarning;
+// import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -157,8 +157,7 @@ public class RobotContainer {
     }
 
 	if (intake != null && hood != null && turret != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
-
+		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
 

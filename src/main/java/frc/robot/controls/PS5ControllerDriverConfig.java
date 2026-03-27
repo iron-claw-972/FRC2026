@@ -155,40 +155,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
-        // Climb
-        if (climb != null) {
-            // Calibration
-            controller.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
-                climb.hardstopCalibration();
-            })).onFalse(new InstantCommand(() -> {
-                climb.stopCalibrating();
-            }));
-
-            // Climb retract
-            controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
-                climb.retract();
-            }));
-
-            // Go to up position
-            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
-                climb.goUp();
-            }));
-
-            // Go to climb position
-            controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
-                climb.climbPosition();
-            }));
-        }
-
         // Hood
         if (hood != null) {
-            // Calibration
-            // controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-            //     hood.calibrate();
-            // })).onFalse(new InstantCommand(() -> {
-            //     hood.stopCalibrating();
-            // }));
-
             // Set the hood down -- for safety measures under trench
             controller.get(DPad.LEFT).onTrue(new InstantCommand(()->{
                 hood.forceHoodDown(true);
