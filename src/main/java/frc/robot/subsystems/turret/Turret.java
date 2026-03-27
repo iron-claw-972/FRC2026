@@ -43,8 +43,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
-	private final CANcoder encoderLeft = new CANcoder(IdConstants.TURRET_ENCODER_LEFT_ID, Constants.CANIVORE_SUB);
-    private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -210,9 +208,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 			}
 		} else{
 			// Sets motor control with feedforward
-			motor.setControl(mmVoltageRequest
-			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			// motor.setControl(mmVoltageRequest
+			// .withPosition(motorGoalRotations)
+			// .withFeedForward(robotTurnCompensation));
 		}
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
@@ -225,9 +223,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		Logger.processInputs("Turret", inputs);
 
 		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
-		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
-
 		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 	}
@@ -251,8 +246,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
-        inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
 	}
