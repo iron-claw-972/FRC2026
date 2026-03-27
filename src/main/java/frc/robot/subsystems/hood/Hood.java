@@ -64,6 +64,9 @@ public class Hood extends SubsystemBase implements HoodIO {
 		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
 		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
 		SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
+
+		SmartDashboard.putData("Hood Calibrate", new InstantCommand(() -> calibrate()));
+		SmartDashboard.putData("Hood Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
     }
 
 	/**
@@ -147,6 +150,9 @@ public class Hood extends SubsystemBase implements HoodIO {
         Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
 		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
 		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
+
+		SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
+		SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
 
 	}
 
