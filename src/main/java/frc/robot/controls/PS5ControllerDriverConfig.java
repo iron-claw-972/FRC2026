@@ -34,7 +34,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
-    private boolean spindexerBoolean = false;
     private Command autoShoot = null;
     private Shooter shooter;
     private Turret turret;
