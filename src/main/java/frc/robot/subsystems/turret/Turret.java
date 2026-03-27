@@ -105,6 +105,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putData("Turret Mech", mech);
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+		SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
 		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
 		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
@@ -128,6 +129,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
+	}
+
+	public void resetTurretPosition() {
+		inputs.positionDeg = 0.0;
 	}
 
 	/**
@@ -201,16 +206,16 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
 
 		if(calibrating){
-			// motor.set(0.05);
+			motor.set(0.05);
 			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
 			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
 			}
 		} else {
 			// Sets motor control with feedforward
-			// motor.setControl(mmVoltageRequest
-			// .withPosition(motorGoalRotations)
-			// .withFeedForward(robotTurnCompensation));
+			motor.setControl(mmVoltageRequest
+			.withPosition(motorGoalRotations)
+			.withFeedForward(robotTurnCompensation));
 		}
 
         Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
