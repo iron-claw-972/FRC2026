@@ -196,7 +196,7 @@ public class FieldConstants {
     if (y > Units.inchesToMeters(50.0) && y < FIELD_WIDTH - Units.inchesToMeters(50)) {
       return false;
     }
-    // if our location is to far away from right underneath trench in terms of x
+    // if our location is too far away from right underneath trench in terms of x
     // in between blue alliance trench
     if (!(x > Units.inchesToMeters(152.5) && x < Units.inchesToMeters(187.5)) && !(x < FIELD_LENGTH - Units.inchesToMeters(152.5) && x > FIELD_LENGTH - Units.inchesToMeters(187.5))) {
       return false;
