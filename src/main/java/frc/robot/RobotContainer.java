@@ -30,6 +30,7 @@ import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.constants.swerve.ModuleConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
@@ -113,6 +114,7 @@ public class RobotContainer {
       case TwinBot:
         spindexer = new Spindexer();
         intake = new Intake();
+        // SmartDashboard.putNumber("Front Right",n);
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
