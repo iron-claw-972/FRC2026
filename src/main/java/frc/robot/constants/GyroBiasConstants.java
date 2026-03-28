@@ -8,10 +8,10 @@ public class GyroBiasConstants {
     public static final int MIN_SAMPLES = 10;
 
     /** maximum angle difference to accept in radians */
-    public static final double MAX_ANGLE_DIFF_RAD = 0.1; // 5.7 deg
+    public static final double MAX_ANGLE_DIFF_RAD = Math.toRadians(45);
 
     /** minimum correction to apply in radians */
-    public static final double MIN_CORRECTION_RAD = 0.02; // 1 deg
+    public static final double MIN_CORRECTION_RAD = Math.toRadians(1.0);
 
     /** fraction of the correction to apply (0.0 to 1.0) */
     public static final double CORRECTION_FRACTION = 0.2;

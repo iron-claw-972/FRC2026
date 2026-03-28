@@ -328,6 +328,8 @@ public class Drivetrain extends SubsystemBase {
 
                             if (!Double.isNaN(gyroYawAtTimestamp)) {
 
+                                Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
+                                Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
                                 // use weighted observation
                                 gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
                             }
@@ -338,10 +340,14 @@ public class Drivetrain extends SubsystemBase {
                     if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
                         double fullBias = gyroBiasEstimator.getAndResetBias();
                         double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
+                        System.out.println("bias: " + bias);
+                        System.out.println("FullBias"+ fullBias);
+
                         if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
                             gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
                             resetOdometry(
                                     new Pose2d(getPose().getTranslation(), new Rotation2d(currentGyroYaw + bias)));
+                                    System.out.print("reset");
                         }
                     }
                 }
@@ -581,59 +587,9 @@ public class Drivetrain extends SubsystemBase {
      * @param timestampSeconds the timestamp to get the gyro yaw at
      * @return the gyro yaw in radians, or Double.NaN if no valid data
      */
-    private double getGyroYawAtTimestamp(double timestampSeconds) {
-        double[] timestamps = gyroInputs.odometryYawTimestamps;
-        Rotation2d[] positions = gyroInputs.odometryYawPositions;
-
-        if (timestamps == null || positions == null || timestamps.length == 0) {
-            return Double.NaN;
-        }
-
-        // find closest timestamp
-        int closestIndex = 0;
-        double closestDiff = Double.MAX_VALUE;
-
-        for (int i = 0; i < timestamps.length; i++) {
-            double diff = Math.abs(timestamps[i] - timestampSeconds);
-            if (diff < closestDiff) {
-                closestDiff = diff;
-                closestIndex = i;
-            }
-        }
-
-        // only use if within 100ms
-        if (closestDiff > 0.1) {
-            return Double.NaN;
-        }
-
-        // try to interpolate if we have before/after samples
-        if (timestamps.length > 1) {
-            int beforeIndex = -1;
-            int afterIndex = -1;
-
-            for (int i = 0; i < timestamps.length; i++) {
-                if (timestamps[i] <= timestampSeconds) {
-                    beforeIndex = i;
-                } else {
-                    afterIndex = i;
-                    break;
-                }
-            }
-
-            // interpolate if we have both before and after samples
-            if (beforeIndex >= 0 && afterIndex >= 0) {
-                double beforeTime = timestamps[beforeIndex];
-                double afterTime = timestamps[afterIndex];
-                double beforeYaw = positions[beforeIndex].getRadians();
-                double afterYaw = positions[afterIndex].getRadians();
-
-                // linear interpolation
-                double t = (timestampSeconds - beforeTime) / (afterTime - beforeTime);
-                return beforeYaw + t * (afterYaw - beforeYaw);
-            }
-        }
-
-        return positions[closestIndex].getRadians();
+    private double 
+    getGyroYawAtTimestamp(double timestampSeconds) {
+        return getPose().getRotation().getRadians();
     }
 
     /**
