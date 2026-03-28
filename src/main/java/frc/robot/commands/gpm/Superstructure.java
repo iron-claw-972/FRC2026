@@ -201,6 +201,7 @@ public class Superstructure extends Command {
     }
 
     @Override
+
     public void execute() {
         TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
         SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
@@ -229,14 +230,11 @@ public class Superstructure extends Command {
             hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             double x = drivepose.getX(); // compared as meters
             double y = drivepose.getY();
-            System.out.println("X: " + Units.metersToInches(x) + "Y: " + Units.metersToInches(y));
-            // if (FieldConstants.underTrench(x, y)) {
-            //     hood.forceHoodDown(true);
-            //     System.out.println("Hood forced down");
-            // } else {
-            //     hood.forceHoodDown(false);
-            //     System.out.println("Hood forced up");
-            // }
+            if (FieldConstants.underTrench(x, y)) {
+                hood.forceHoodDown(true);
+            } else {
+                hood.forceHoodDown(false);
+            }
             shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             Logger.recordOutput("Distance From Target", distanceFromTarget);
             //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));

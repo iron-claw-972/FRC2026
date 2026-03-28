@@ -204,6 +204,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
     }
 
     public void simulationPeriodic(){

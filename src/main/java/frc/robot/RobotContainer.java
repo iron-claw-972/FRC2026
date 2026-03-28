@@ -114,7 +114,6 @@ public class RobotContainer {
       case TwinBot:
         spindexer = new Spindexer();
         intake = new Intake();
-
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
