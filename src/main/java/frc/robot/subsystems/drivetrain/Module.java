@@ -427,4 +427,7 @@ public class Module implements ModuleIO{
         return inputs.odometryTimestamps;
     }
 
+    public TalonFX[] getMotors() {
+        return new TalonFX[]{angleMotor, driveMotor};
+    }
 }

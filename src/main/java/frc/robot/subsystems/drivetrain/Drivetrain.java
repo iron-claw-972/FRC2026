@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drivetrain;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -9,6 +10,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.VecBuilder;
@@ -25,8 +27,10 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.Music;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
@@ -125,6 +129,7 @@ public class Drivetrain extends SubsystemBase {
         this.gyroIO = gyroIO;
         ModuleConstants[] constants = Arrays.copyOfRange(ModuleConstants.values(), 0, 4);
 
+
         if (RobotBase.isReal()) {
             Arrays.stream(constants).forEach(moduleConstants -> {
                 modules[moduleConstants.ordinal()] = new Module(moduleConstants);
@@ -134,6 +139,14 @@ public class Drivetrain extends SubsystemBase {
                 modules[moduleConstants.ordinal()] = new ModuleSim(moduleConstants);
             });
         }
+
+        ArrayList<TalonFX> motors = new ArrayList<TalonFX>();
+        for (Module module : modules) {
+            motors.add(module.getMotors()[0]);
+            motors.add(module.getMotors()[1]);
+        }
+
+        SmartDashboard.putData("Beep", new Music(motors.toArray(new TalonFX[0])));
 
         /*
          * By pausing init for a second before setting module offsets, we avoid a bug
