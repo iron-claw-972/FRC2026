@@ -205,10 +205,23 @@ public class DriveConstants {
         public static void update(RobotId robotId) {
 
             if (robotId == RobotId.TwinBot){
-                STEER_OFFSET_FRONT_LEFT = 0;
-                STEER_OFFSET_FRONT_RIGHT = 0;
-                STEER_OFFSET_BACK_LEFT = 0;
-                STEER_OFFSET_BACK_RIGHT = 0;
+                STEER_OFFSET_FRONT_LEFT = 301.113+180;
+                STEER_OFFSET_FRONT_RIGHT = 246.533; 
+                STEER_OFFSET_BACK_LEFT = 220.693+180;
+                STEER_OFFSET_BACK_RIGHT = 115.927+180;
+
+                // MK5n 
+                INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
+                // Gear ratios 
+                //DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
+                DRIVE_GEAR_RATIO = (54.0 / 12.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
+                STEER_GEAR_RATIO = 287.0 / 11.0;
+
+                // Gyro is mounted under the robot 
+                GYRO_MOUNT_POSE_ROLL = 180.0; 
+
+                MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
             }
 
            else if (robotId == RobotId.PrimeJr) {

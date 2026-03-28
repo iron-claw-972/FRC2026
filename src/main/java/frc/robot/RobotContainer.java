@@ -112,9 +112,9 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
-        spindexer = new Spindexer();
-        intake = new Intake();
-        // SmartDashboard.putNumber("Front Right",n);
+        // spindexer = new Spindexer();
+        // intake = new Intake();
+        
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"

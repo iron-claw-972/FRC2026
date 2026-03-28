@@ -226,6 +226,10 @@ public class Module implements ModuleIO{
         Logger.recordOutput("Angle "+ moduleConstants.ordinal(), MathUtil.inputModulus(getAngle().getDegrees(), 0, 360));
     }
 
+    public double getAbsolutePosition(){
+        return CANcoder.getAbsolutePosition().getValueAsDouble();
+    }
+
     public void setDesiredState(SwerveModuleState wantedState, boolean isOpenLoop) {
         // Separate if here and in setAngle() to avoid warning
         if(!DriveConstants.DISABLE_DEADBAND_AND_OPTIMIZATION){
