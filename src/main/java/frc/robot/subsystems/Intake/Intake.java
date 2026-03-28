@@ -150,7 +150,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         SmartDashboard.putData("Extension Mechanism", mechanism);
         SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
         SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        
         if (RobotBase.isSimulation()) {
             // Extender simulation
             // the supply voltage should change with load....

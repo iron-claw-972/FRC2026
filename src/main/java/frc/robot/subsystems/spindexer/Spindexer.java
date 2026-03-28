@@ -69,6 +69,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             ballCount++;
         }
         wasSpindexerSlow = isSpindexerSlow;
+
+        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
     }
 
     public void maxSpindexer() {

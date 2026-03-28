@@ -105,6 +105,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putData("Turret Mech", mech);
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+		SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
 		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
 		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
@@ -149,6 +150,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	 */
 	public double getPositionDeg() {
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
+	}
+
+	public void resetTurretPosition() {
+		inputs.positionDeg = 0.0;
 	}
 
 	/* ---------------- Periodic ---------------- */
