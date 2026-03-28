@@ -219,33 +219,36 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
-            
-            // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-            //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
-            // } else{
-                //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
-            // }
 
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            boolean shuttling = target.getZ() != FieldConstants.getHubTranslation().getZ(); // if we're aiming upward we are aiming at hub, thus not shuttling
+
+            // shuttling will move the hood so its angles very close to max (less arch)
+            if (shuttling) {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShuttleInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            } else {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            }
+            
+            
             double x = drivepose.getX(); // compared as meters
             double y = drivepose.getY();
-            System.out.println("X: " + Units.metersToInches(x) + "Y: " + Units.metersToInches(y));
             // if (FieldConstants.underTrench(x, y)) {
-            //     hood.forceHoodDown(true);
             //     System.out.println("Hood forced down");
             // } else {
             //     hood.forceHoodDown(false);
-            //     System.out.println("Hood forced up");
             // }
-            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
-            Logger.recordOutput("Distance From Target", distanceFromTarget);
-            //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
-            // if (phaseManager.shouldFeed()) {
-            //     spindexer.maxSpindexer();
-            // } else {
-            //     spindexer.stopSpindexer();
-            // }
+            // different maps for shuttling vs shooting. Less powerful when shuttling.
+            if (shuttling) {
+                shooter.setShooter(-ShuttleInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            } else {
+                shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            }
+
+            // record when shuttling
+            Logger.recordOutput("Shuttling", shuttling);
+            // record distance for tuning if needed
+            Logger.recordOutput("Distance From Target", distanceFromTarget);
         }
 
         Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
