@@ -221,7 +221,7 @@ public class Superstructure extends Command {
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
 
-            boolean shuttling = target.getZ() != FieldConstants.getHubTranslation().getZ(); // if we're aiming upward we are aiming at hub, thus not shuttling
+            boolean shuttling = target != FieldConstants.getHubTranslation().toTranslation2d(); // if we're aiming at the hub, we're not shuttling
 
             // shuttling will move the hood so its angles very close to max (less arch)
             if (shuttling) {
