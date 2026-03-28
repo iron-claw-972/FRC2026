@@ -601,14 +601,13 @@ public class Drivetrain extends SubsystemBase {
             }
         }
 
-        // only use if within
+        // only use if within 100ms
         if (closestDiff > 0.1) {
             return Double.NaN;
         }
 
-        // if we have adjacent samples, interpolate
-        if (timestamps.length > 1 && closestDiff < 0.05) {
-            // find sample before/after target timestamp
+        // try to interpolate if we have before/after samples
+        if (timestamps.length > 1) {
             int beforeIndex = -1;
             int afterIndex = -1;
 
@@ -621,8 +620,8 @@ public class Drivetrain extends SubsystemBase {
                 }
             }
 
-            // interpolate if we have both before/after
-            if (beforeIndex >= 0 && afterIndex >= 0 && beforeIndex != afterIndex) {
+            // interpolate if we have both before and after samples
+            if (beforeIndex >= 0 && afterIndex >= 0) {
                 double beforeTime = timestamps[beforeIndex];
                 double afterTime = timestamps[afterIndex];
                 double beforeYaw = positions[beforeIndex].getRadians();
@@ -630,9 +629,7 @@ public class Drivetrain extends SubsystemBase {
 
                 // linear interpolation
                 double t = (timestampSeconds - beforeTime) / (afterTime - beforeTime);
-                double interpolatedYaw = beforeYaw + t * (afterYaw - beforeYaw);
-
-                return interpolatedYaw;
+                return beforeYaw + t * (afterYaw - beforeYaw);
             }
         }
 
