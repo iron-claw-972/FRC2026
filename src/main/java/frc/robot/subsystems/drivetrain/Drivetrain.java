@@ -27,6 +27,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.Music;
@@ -116,6 +117,8 @@ public class Drivetrain extends SubsystemBase {
 
     private Rotation2d rawGyroRotation = new Rotation2d();
 
+    private final Field2d field = new Field2d();
+
     /**
      * Creates a new Swerve Style Drivetrain.
      */
@@ -185,6 +188,8 @@ public class Drivetrain extends SubsystemBase {
                 });
 
         // PPLibTelemetry.enableCompetitionMode();
+
+        SmartDashboard.putData("Field", field);
     }
 
     public void close() {
@@ -224,6 +229,8 @@ public class Drivetrain extends SubsystemBase {
         }
         Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
         updateOdometryVision();
+
+        field.setRobotPose(getPose());
     }
 
     // DRIVE
