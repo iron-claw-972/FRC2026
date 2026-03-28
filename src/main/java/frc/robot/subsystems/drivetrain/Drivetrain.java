@@ -310,15 +310,11 @@ public class Drivetrain extends SubsystemBase {
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
                 vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
-                double currentGyroYaw = gyroInputs.yawPosition.getRadians();
-                Logger.recordOutput("GyroBias/CurrentGyroYaw", currentGyroYaw);
-                Logger.recordOutput("GyroBias/SampleCount", gyroBiasEstimator.getSampleCount());
-                Logger.recordOutput("GyroBias/CanSeeTag", vision.canSeeTag());
-
-
                 if (vision.canSeeTag()) {
                     slipped = false;
                     modulePoses.reset();
+
+                    double currentGyroYaw = gyroInputs.yawPosition.getRadians();
 
                     // to compare bias
                     ArrayList<EstimatedRobotPose> visionPoses = vision.getEstimatedPoses(getPose());
@@ -332,10 +328,6 @@ public class Drivetrain extends SubsystemBase {
 
                             if (!Double.isNaN(gyroYawAtTimestamp)) {
 
-                                // Log gyro and vision yaw data for debugging
-                                Logger.recordOutput("GyroBias GyroYaw", gyroYawAtTimestamp);
-                                Logger.recordOutput("GyroBias VisionYaw", visionYaw);
-
                                 // use weighted observation
                                 gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
                             }
@@ -346,9 +338,6 @@ public class Drivetrain extends SubsystemBase {
                     if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
                         double fullBias = gyroBiasEstimator.getAndResetBias();
                         double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
-                        
-                        Logger.recordOutput("GyroBias CalculatedBias", bias);
-                        
                         if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
                             gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
                             resetOdometry(
