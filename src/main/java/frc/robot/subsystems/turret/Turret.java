@@ -129,6 +129,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		goalVelocityRadPerSec = velocityRadPerSec;
 	}
 
+	public void resetTurretPosition() {
+		inputs.positionDeg = 0.0;
+	}
+
 	/**
 	 * @return If the turret is at setpoint with tolerance of 10 degrees
 	 */
@@ -204,12 +208,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
 
 		if(calibrating){
-			// motor.set(0.05);
+			motor.set(0.05);
 			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
 			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
 			}
-		} else{
+		} else {
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
