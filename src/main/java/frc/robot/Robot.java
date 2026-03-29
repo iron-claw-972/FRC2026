@@ -121,6 +121,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         robotContainer.logComponents();
+        robotContainer.periodic();
     }
 
     /**

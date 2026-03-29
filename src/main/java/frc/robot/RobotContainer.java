@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -90,6 +90,8 @@ public class RobotContainer {
     // display the current robot id on smartdashboard
     SmartDashboard.putString("RobotID", robotId.toString());
 
+    SmartDashboard.putNumber("Match Time", 0.0);
+
     // Filling the SendableChooser on SmartDashboard
 
     // dispatch on the robot
@@ -113,6 +115,8 @@ public class RobotContainer {
         turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
+      
+      case TwinBot:
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -149,15 +153,17 @@ public class RobotContainer {
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
+
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
 
-    if (intake != null && hood != null && turret != null)
-      CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
-
+	if (intake != null && hood != null && turret != null)
+		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    CommandScheduler.getInstance().schedule(new LogCommand());
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
@@ -216,7 +222,7 @@ public class RobotContainer {
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret);
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
@@ -258,15 +264,17 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    String defaultAuto = "Test default auto";
+    String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
+    String koushaDouble = "Kousha Double";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
+    addAuto(koushaDouble);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -305,5 +313,15 @@ public class RobotContainer {
         new Pose3d[] {
         // Subsystem Pose3ds
         });
+  }
+
+  /** Updates SmartDashboard values that need to be refreshed every loop */
+  public void periodic() {
+    // update match timer
+    double matchTime = DriverStation.getMatchTime();
+    if (matchTime > 0) {
+      SmartDashboard.putNumber("Match Time", matchTime);
+    }
+    SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
   }
 }
