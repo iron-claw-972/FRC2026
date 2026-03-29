@@ -345,9 +345,6 @@ public class Drivetrain extends SubsystemBase {
 
                         if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
                             gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
-                            resetOdometry(
-                                    new Pose2d(getPose().getTranslation(), new Rotation2d(currentGyroYaw + bias)));
-                                    System.out.print("reset");
                         }
                     }
                 }
