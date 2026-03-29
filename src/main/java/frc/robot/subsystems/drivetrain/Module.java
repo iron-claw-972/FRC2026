@@ -252,10 +252,11 @@ public class Module implements ModuleIO{
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
             Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
             
+            double feedforward = velocity * moduleConstants.getDriveV();
             driveMotor.setControl(
                 velocityRequest
-                    .withVelocity(velocity));
-                    ///.withFeedForward(feedforward));
+                    .withVelocity(velocity)
+                    .withFeedForward(feedforward));
         }     
     }
 
@@ -365,7 +366,7 @@ public class Module implements ModuleIO{
         driveMotor.getConfigurator().apply(config);
         driveMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(DriveConstants.INVERT_DRIVE_MOTOR));
         driveMotor.getConfigurator().apply(new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(DriveConstants.OPEN_LOOP_RAMP));
-        driveMotor.getConfigurator().apply(new ClosedLoopRampsConfigs().withDutyCycleClosedLoopRampPeriod(DriveConstants.OPEN_LOOP_RAMP));
+        driveMotor.getConfigurator().apply(new ClosedLoopRampsConfigs().withDutyCycleClosedLoopRampPeriod(DriveConstants.CLOSE_LOOP_RAMP));
         driveMotor.setNeutralMode(DriveConstants.DRIVE_NEUTRAL_MODE);
         
     }
