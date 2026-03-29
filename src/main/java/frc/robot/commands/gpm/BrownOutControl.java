@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import java.lang.System.Logger;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -51,22 +53,22 @@ public class BrownOutControl extends Command {
         int level = 1;
         double batteryVoltage = RobotController.getBatteryVoltage();
         if (batteryVoltage > BrownOutConstants.LEVEL_ONE_LIMIT) { // normal
-            return levels[0];
             level = 1;
+            return levels[0];
         } else if (batteryVoltage > BrownOutConstants.LEVEL_TWO_LIMIT) { // if 7.5 to 6.75
-            return levels[1]; // lower drivetrain
             level = 2;
+            return levels[1]; // lower drivetrain
         } else if (batteryVoltage > BrownOutConstants.LEVEL_THREE_LIMIT) { // if 6.75 to 6.0 (browning out)
-            return levels[2];
             level = 3;
+            return levels[2];
         } else if (batteryVoltage > BrownOutConstants.LEVEL_FOUR_LIMIT) { // if 6.0 to 5.0 (mayday)
-            return levels[3];
             level = 4;
+            return levels[3];
         } else { // were are on life support at this point 5.25 to 4.75
-            return levels[4];
             level = 5;
+            return levels[4]; 
         }
-        Logger.recordOutput("BrownoutProtection/Level", level);
+        // Logger.recordOutput("BrownoutProtection/Level", level);
     }
 
     public void applyLevel(BrownOutLevel level) {
