@@ -23,7 +23,6 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -110,6 +109,8 @@ public class RobotContainer {
         turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
+      
+      case TwinBot:
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -151,9 +152,8 @@ public class RobotContainer {
         break;
     }
 
-    if (intake != null && hood != null && turret != null)
-      CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
-
+	if (intake != null && hood != null && turret != null)
+		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -216,7 +216,7 @@ public class RobotContainer {
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret);
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
@@ -262,11 +262,13 @@ public class RobotContainer {
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
+    String koushaDouble = "Kousha Double";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
+    addAuto(koushaDouble);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {

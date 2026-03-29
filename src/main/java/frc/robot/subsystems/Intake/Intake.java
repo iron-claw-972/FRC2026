@@ -126,12 +126,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
         );
 
         leftMotor.setPosition(0.0);
@@ -150,7 +151,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         SmartDashboard.putData("Extension Mechanism", mechanism);
         SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
         SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        
         if (RobotBase.isSimulation()) {
             // Extender simulation
             // the supply voltage should change with load....
@@ -202,6 +205,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
     }
 
     public void simulationPeriodic(){
@@ -304,7 +309,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     /**
      * Reverses the intake roller
      */
-    public void spinReverse(){
+    public void spinReverse() {
         spin(-IntakeConstants.SPEED);
     }
 
