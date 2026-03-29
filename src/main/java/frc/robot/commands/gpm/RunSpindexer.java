@@ -17,6 +17,8 @@ public class RunSpindexer extends Command {
     private Debouncer reversing_debouncer = new Debouncer(SpindexerConstants.REVERSE_DEBOUNCE_TIME, DebounceType.kFalling); // if there is a release in time Idk what it would be (kfalling vs krising)
 
     private boolean reversing = false;
+    private boolean wasHoodForcedDown = false;
+
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -32,7 +34,14 @@ public class RunSpindexer extends Command {
 
     @Override
     public void execute() {
-        if (!turret.atSetpoint() || hood.getHoodForcedDown()) {
+        boolean hoodForcedDown = hood.getHoodForcedDown();
+        
+        if (wasHoodForcedDown && !hoodForcedDown) {
+            spindexer.maxSpindexer();
+        }
+        wasHoodForcedDown = hoodForcedDown;
+        
+        if (!turret.atSetpoint() || hoodForcedDown) {
             spindexer.stopSpindexer();
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
