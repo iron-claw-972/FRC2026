@@ -114,7 +114,6 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
-        break;
 
       case SwerveCompetition: // AKA "Vantage"
 
