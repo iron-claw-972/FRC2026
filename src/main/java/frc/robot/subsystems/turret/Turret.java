@@ -5,14 +5,12 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -43,8 +41,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
-	private final CANcoder encoderLeft = new CANcoder(IdConstants.TURRET_ENCODER_LEFT_ID, Constants.CANIVORE_SUB);
-    private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -107,6 +103,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		SmartDashboard.putData("Turret Mech", mech);
 		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
 		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+		SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
 		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
 		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
@@ -115,23 +112,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
 		turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
 		SmartDashboard.putData("Turret Test Positions", turretTestChooser);
-
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-		
-		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
-
-		//Sets the initial motor position
-		inputs.positionDeg = turretRot;
-		motor.setPosition(motorRotations);
-
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
@@ -147,6 +127,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 	public void setFieldRelativeTarget(Rotation2d angle, double velocityRadPerSec) {
 		goalAngle = angle;
 		goalVelocityRadPerSec = velocityRadPerSec;
+	}
+
+	public void resetTurretPosition() {
+		inputs.positionDeg = 0.0;
 	}
 
 	/**
@@ -225,7 +209,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
 			}
-		} else{
+		} else {
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
@@ -242,22 +226,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		Logger.processInputs("Turret", inputs);
 
 		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
-		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
-
-
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
-
 		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 	}
@@ -281,10 +249,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
-        inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
+		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**
@@ -323,12 +289,5 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
 		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
-	}
-
-	// in rotations
-	public Pair<Double, Double> getEncoderPositions() {
-		return new Pair<Double, Double>(
-				encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET,
-				encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
 	}
 }

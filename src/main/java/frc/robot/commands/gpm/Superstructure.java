@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
+import frc.robot.constants.ShuttleInterpolation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
@@ -143,7 +144,6 @@ public class Superstructure extends Command {
         SmartDashboard.putNumber("Time of flight", timeOfFlight);
         SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
         SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-        
 
         Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
@@ -220,23 +220,36 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
+
+            boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
+
+            // shuttling will move the hood so its angles very close to max (less arch)
+            if (shuttling) {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShuttleInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            } else {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            }
             
-            // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-            //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
-            // } else{
-                //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
-            // }
+            double x = drivepose.getX(); // compared as meters
+            double y = drivepose.getY();
 
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
-            Logger.recordOutput("Distance From Target", distanceFromTarget);
-            //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
-
-            // if (phaseManager.shouldFeed()) {
-            //     spindexer.maxSpindexer();
+            // if (FieldConstants.underTrench(x, y)) {
+            //     System.out.println("Hood forced down");
             // } else {
-            //     spindexer.stopSpindexer();
+            //     hood.forceHoodDown(false);
             // }
+
+            // different maps for shuttling vs shooting. Less powerful when shuttling.
+            if (shuttling) {
+                shooter.setShooter(-ShuttleInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            } else {
+                shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            }
+
+            // record when shuttling
+            Logger.recordOutput("Shuttling", shuttling);
+            // record distance for tuning if needed
+            Logger.recordOutput("Distance From Target", distanceFromTarget);
         }
 
         Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
