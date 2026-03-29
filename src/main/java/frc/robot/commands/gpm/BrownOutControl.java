@@ -48,18 +48,25 @@ public class BrownOutControl extends Command {
     public BrownOutLevel monitor() {
         // pretty sure this is where you get it. Need to check if this is same as logs. 
         // voltage 6.3 is brownout where issues occur, but 4.75 is dead robot
+        int level = 1;
         double batteryVoltage = RobotController.getBatteryVoltage();
-        if (batteryVoltage > 7.5) { // normal
+        if (batteryVoltage > BrownOutConstants.LEVEL_ONE_LIMIT) { // normal
             return levels[0];
-        } else if (batteryVoltage > 6.75) { // if 7.5 to 6.75
+            level = 1;
+        } else if (batteryVoltage > BrownOutConstants.LEVEL_TWO_LIMIT) { // if 7.5 to 6.75
             return levels[1]; // lower drivetrain
-        } else if (batteryVoltage > 6.0) { // if 6.75 to 6.0 (browning out)
+            level = 2;
+        } else if (batteryVoltage > BrownOutConstants.LEVEL_THREE_LIMIT) { // if 6.75 to 6.0 (browning out)
             return levels[2];
-        } else if (batteryVoltage > 5.25) { // if 6.0 to 5.0 (mayday)
+            level = 3;
+        } else if (batteryVoltage > BrownOutConstants.LEVEL_FOUR_LIMIT) { // if 6.0 to 5.0 (mayday)
             return levels[3];
+            level = 4;
         } else { // were are on life support at this point 5.25 to 4.75
             return levels[4];
+            level = 5;
         }
+        Logger.recordOutput("BrownoutProtection/Level", level);
     }
 
     public void applyLevel(BrownOutLevel level) {
@@ -78,6 +85,7 @@ public class BrownOutControl extends Command {
         spindexer.setNewCurrentLimit(spindexerCurrent);
         intake.setCurrentLimits(intakeCurrent);
         drivetrain.applyNewModuleCurrents(steerCurrent, driveCurrent);
+
     }
 
     @Override
