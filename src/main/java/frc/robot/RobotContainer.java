@@ -23,7 +23,6 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-// import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -266,12 +265,19 @@ public class RobotContainer {
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
     String koushaDouble = "Kousha Double";
+    String velocityTest = "Velocity TEST";
+    String jame = "Jame's Square path";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
     addAuto(koushaDouble);
+    addAuto(velocityTest);
+    addAuto(jame);
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {

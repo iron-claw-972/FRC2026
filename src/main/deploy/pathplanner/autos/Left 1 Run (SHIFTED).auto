@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Random default auto"
+            "pathName": "Left Trench Start Shifted"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Full Left Path v3 (SHIFTED)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": null,
   "choreoAuto": false
 }

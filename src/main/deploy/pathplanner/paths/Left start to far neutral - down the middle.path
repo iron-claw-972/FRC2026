@@ -1,0 +1,140 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.7,
+        "y": 7.623190984573506
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.545950170981925,
+        "y": 7.578131411822177
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.3085588666341,
+        "y": 6.3956595017040465
+      },
+      "prevControl": {
+        "x": 8.306438697921738,
+        "y": 6.65349981559871
+      },
+      "nextControl": {
+        "x": 8.325361878950407,
+        "y": 4.352192892299856
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.3085588666341,
+        "y": 4.664794821684507
+      },
+      "prevControl": {
+        "x": 8.308558866629966,
+        "y": 5.461678065455878
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.4005891016200316,
+      "rotationDegrees": -39.35848731500887
+    },
+    {
+      "waypointRelativePos": 1.05,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Get out of trench",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.3996431757359485,
+      "constraints": {
+        "maxVelocity": 5.4,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 150.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Balls in neutral zone",
+      "minWaypointRelativePos": 0.7100802854594145,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 150.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Hood Down",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Hood Down"
+        }
+      }
+    },
+    {
+      "name": "Extend Intake",
+      "waypointRelativePos": 0.0944881889763795,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend Intake"
+        }
+      }
+    },
+    {
+      "name": "Spin Intake Rollers",
+      "waypointRelativePos": 0.17547806524185328,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Spin Intake Rollers"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 150.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -90.95484125387222
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

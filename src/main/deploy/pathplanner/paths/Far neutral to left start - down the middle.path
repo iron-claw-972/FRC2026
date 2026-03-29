@@ -1,0 +1,89 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.3085588666341,
+        "y": 4.665
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 8.313036773428234,
+        "y": 5.998552787663108
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.3085588666341,
+        "y": 6.3956595017040465
+      },
+      "prevControl": {
+        "x": 8.302277580071175,
+        "y": 5.977034400948992
+      },
+      "nextControl": {
+        "x": 8.322326911855162,
+        "y": 7.313250071745635
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.7,
+        "y": 7.623
+      },
+      "prevControl": {
+        "x": 5.031482799530884,
+        "y": 7.59091340451309
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.4067495559502714,
+      "rotationDegrees": -24.634740281575162
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Go back to trench",
+      "minWaypointRelativePos": 0.7100802854594145,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 150.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 150.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -0.6883662028604366
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": false
+}
