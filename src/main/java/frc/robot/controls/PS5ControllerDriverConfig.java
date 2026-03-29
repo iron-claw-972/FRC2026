@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Robot;
-import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -166,11 +165,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 hood.forceHoodDown(false);
             }));
         }
-
-        // turns it on
-    //     controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
-    //         new BrownOutControl(shooter, spindexer, turret, intake, hood, getDrivetrain());
-    //     }));
     }
 
     @Override

@@ -15,13 +15,11 @@ public class IntakeConstants {
     public static final double CALIBRATING_CURRENT_LIMITS = 10.0;
     public static final double CALIBRATING_CURRENT_THRESHOLD = 9.0;
 
-    /**Current */
-    public static final double NORMAL_CURRENT_LIMIT = 100.0;
-
     public static final double ROLLER_MOI_KG_M_SQ = 0.5 * 0.020 * 0.020; // 0.5kg roller, 20mm radius for now
     public static final double ROLLER_GEARING = 2.0;
     public static final double CARRIAGE_MASS_KG = 3.0;
     public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1.0);
+
 
     /** max extension in inches */
     public static final double MAX_EXTENSION = 10.5; // inches

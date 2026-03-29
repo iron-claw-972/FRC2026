@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
@@ -134,12 +133,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         rightMotor.getConfigurator().apply(
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
-
-        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
-        limitConfig.StatorCurrentLimitEnable = true;
-        leftMotor.getConfigurator().apply(limitConfig);
-        rightMotor.getConfigurator().apply(limitConfig);
 
         leftMotor.setPosition(0.0);
         rightMotor.setPosition(0.0);
