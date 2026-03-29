@@ -22,7 +22,7 @@ public class RunSpindexer extends Command {
         this.turret = turret;
         this.hood = hood;
 
-        addRequirements(spindexer, hood);
+        addRequirements(spindexer);
     }
 
         // public RunSpindexer(Spindexer spindexer) {
