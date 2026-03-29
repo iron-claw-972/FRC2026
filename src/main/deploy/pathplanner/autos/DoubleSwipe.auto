@@ -5,9 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Left Trench Start"
+            "name": "Hood Down"
           }
         },
         {
@@ -17,21 +17,33 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.1
+            "pathName": "W5 Left Trench Start"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Start Spindexer"
+            "name": "Spin Intake Rollers"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "W5 Full Left Path v3"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Spindexer"
           }
         },
         {
@@ -43,13 +55,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Full Left Path v3"
+            "pathName": "Swipe2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Week 2 autos",
+  "folder": null,
   "choreoAuto": false
 }

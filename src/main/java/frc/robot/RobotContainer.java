@@ -269,17 +269,13 @@ public class RobotContainer {
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
-    String koushaDouble = "Kousha Double";
-    String velocityTest = "Velocity TEST";
-    String jame = "Jame's Square path";
+    String doubleSwipe = "DoubleSwipe";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
-    addAuto(koushaDouble);
-    addAuto(velocityTest);
-    addAuto(jame);
+    addAuto(doubleSwipe);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

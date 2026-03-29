@@ -162,28 +162,6 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Hood Down",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Hood Down"
-        }
-      }
-    },
-    {
-      "name": "Extend Intake",
-      "waypointRelativePos": 0.0944881889763795,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Extend Intake"
-        }
-      }
-    },
-    {
       "name": "Spin Intake Rollers",
       "waypointRelativePos": 0.17547806524185328,
       "endWaypointRelativePos": null,
@@ -191,17 +169,6 @@
         "type": "named",
         "data": {
           "name": "Spin Intake Rollers"
-        }
-      }
-    },
-    {
-      "name": "Start Spindexer",
-      "waypointRelativePos": 0.3104611923509808,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Spindexer"
         }
       }
     },
@@ -276,7 +243,7 @@
   "reversed": false,
   "folder": "week 2 autos",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.5,
     "rotation": 0.0
   },
   "useDefaultConstraints": false
