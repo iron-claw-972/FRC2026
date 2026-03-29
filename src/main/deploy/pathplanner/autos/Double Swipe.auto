@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Random default auto"
+            "pathName": "Swipe 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Swipe 2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": null,
   "choreoAuto": false
 }

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.696241721854304,
+        "x": 3.0,
         "y": 7.623190984573506
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.785884183141178,
-        "y": 7.490581532356668
+        "x": 6.19392111698321,
+        "y": 7.623190984573506
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 6.428920521945433
       },
       "prevControl": {
-        "x": 7.642160343339249,
-        "y": 6.6776345204518766
+        "x": 7.665365003292386,
+        "y": 6.686760835840097
       },
       "nextControl": {
-        "x": 7.9046446321955335,
-        "y": 4.099788174920342
+        "x": 7.684288184321054,
+        "y": 4.385453912541243
       },
       "isLocked": false,
       "linkedName": null
@@ -36,12 +36,12 @@
         "y": 4.6644128113879
       },
       "prevControl": {
-        "x": 7.6169594963016465,
-        "y": 5.113190381183536
+        "x": 7.722519349903317,
+        "y": 4.908280068851933
       },
       "nextControl": {
-        "x": 7.696238889728087,
-        "y": 4.409017442936094
+        "x": 7.611361211994106,
+        "y": 4.415716515223697
       },
       "isLocked": false,
       "linkedName": null
@@ -52,12 +52,12 @@
         "y": 5.084021352313167
       },
       "prevControl": {
-        "x": 6.581262461023123,
-        "y": 4.633009890316522
+        "x": 7.118832485314941,
+        "y": 4.554066742084302
       },
       "nextControl": {
-        "x": 5.730020148249949,
-        "y": 5.746628552722371
+        "x": 5.563661514586408,
+        "y": 5.488160945770811
       },
       "isLocked": false,
       "linkedName": null
@@ -65,15 +65,15 @@
     {
       "anchor": {
         "x": 6.236512455516015,
-        "y": 6.808294701986754
+        "y": 7.031435349940688
       },
       "prevControl": {
-        "x": 6.825847617882709,
-        "y": 6.047265328866834
+        "x": 6.607692290036552,
+        "y": 6.097932084737065
       },
       "nextControl": {
-        "x": 5.336986754966887,
-        "y": 7.969884105960265
+        "x": 5.905339551755663,
+        "y": 7.864322695252948
       },
       "isLocked": false,
       "linkedName": null
@@ -84,8 +84,8 @@
         "y": 7.623190984573506
       },
       "prevControl": {
-        "x": 0.05365961489070481,
-        "y": 7.556400025312338
+        "x": -0.09030729073703303,
+        "y": 7.623190984573506
       },
       "nextControl": null,
       "isLocked": false,
@@ -120,6 +120,19 @@
   ],
   "constraintZones": [
     {
+      "name": "Depot",
+      "minWaypointRelativePos": 4.953880764904385,
+      "maxWaypointRelativePos": 5.5,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.9718785151856066,
       "maxWaypointRelativePos": 2.4701912260967447,
@@ -137,21 +150,8 @@
       "minWaypointRelativePos": 2.767154105736777,
       "maxWaypointRelativePos": 4.467941507311604,
       "constraints": {
-        "maxVelocity": 3.5,
-        "maxAcceleration": 1.0,
-        "maxAngularVelocity": 200.0,
-        "maxAngularAcceleration": 300.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    },
-    {
-      "name": "Depot",
-      "minWaypointRelativePos": 4.727915194346288,
-      "maxWaypointRelativePos": 5.5,
-      "constraints": {
         "maxVelocity": 2.0,
-        "maxAcceleration": 2.0,
+        "maxAcceleration": 1.0,
         "maxAngularVelocity": 200.0,
         "maxAngularAcceleration": 300.0,
         "nominalVoltage": 12.0,
@@ -262,7 +262,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 1.5,
     "maxAcceleration": 1.5,
     "maxAngularVelocity": 200.0,
     "maxAngularAcceleration": 150.0,
@@ -274,7 +274,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "week 2 autos",
+  "folder": "week 5 (new stuff)",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

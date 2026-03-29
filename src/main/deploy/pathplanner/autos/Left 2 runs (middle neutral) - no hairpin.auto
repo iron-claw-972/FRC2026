@@ -7,49 +7,43 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left Bump Edge Start"
+            "pathName": "Left Trench Start"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Extend Intake"
+            "pathName": "Left start to far neutral - down the middle"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Start Spindexer"
+            "pathName": "Far neutral to left start - down the middle"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 0.0
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Stop Spindexer"
+            "pathName": "Left start to near neutral - straight back"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Hood Down"
+            "waitTime": 0
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Week 2 autos",
+  "folder": null,
   "choreoAuto": false
 }
