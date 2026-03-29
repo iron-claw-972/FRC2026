@@ -18,6 +18,8 @@ public class RunSpindexer extends Command {
 
     private boolean reversing = false;
     private Timer reverseTimer = new Timer();
+    private boolean wasHoodForcedDown = false;
+
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -33,7 +35,14 @@ public class RunSpindexer extends Command {
 
     @Override
     public void execute() {
-        if (!turret.atSetpoint() || hood.getHoodForcedDown()) {
+        boolean hoodForcedDown = hood.getHoodForcedDown();
+        
+        if (wasHoodForcedDown && !hoodForcedDown) {
+            spindexer.maxSpindexer();
+        }
+        wasHoodForcedDown = hoodForcedDown;
+        
+        if (!turret.atSetpoint() || hoodForcedDown) {
             spindexer.stopSpindexer();
             reversing = false;
             return; // this is so the balls don't fly out when unaligned

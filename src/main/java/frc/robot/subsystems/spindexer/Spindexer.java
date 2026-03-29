@@ -75,7 +75,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         }
         wasSpindexerSlow = isSpindexerSlow;
 
-        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        SmartDashboard.putBoolean("Spindexer Jamming", state == SpindexerState.REVERSE);
     }
 
     public void maxSpindexer() {

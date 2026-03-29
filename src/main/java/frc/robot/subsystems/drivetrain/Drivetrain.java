@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.GyroBiasConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.constants.swerve.ModuleConstants;
@@ -38,6 +40,8 @@ import frc.robot.util.SwerveModulePose;
 import frc.robot.util.SwerveStuff.SwerveSetpoint;
 import frc.robot.util.SwerveStuff.SwerveSetpointGenerator;
 import frc.robot.util.Vision.Vision;
+import frc.robot.util.Vision.GyroBiasEstimator;
+import org.photonvision.EstimatedRobotPose;
 
 /**
  * Represents a swerve drive style drivetrain.
@@ -112,6 +116,9 @@ public class Drivetrain extends SubsystemBase {
     private double centerOfMassHeight = 0;
 
     private Rotation2d rawGyroRotation = new Rotation2d();
+
+    // for vision yaw correction
+    private GyroBiasEstimator gyroBiasEstimator = new GyroBiasEstimator();
 
     private final Field2d field = new Field2d();
 
@@ -306,6 +313,40 @@ public class Drivetrain extends SubsystemBase {
                 if (vision.canSeeTag()) {
                     slipped = false;
                     modulePoses.reset();
+
+                    double currentGyroYaw = gyroInputs.yawPosition.getRadians();
+
+                    // to compare bias
+                    ArrayList<EstimatedRobotPose> visionPoses = vision.getEstimatedPoses(getPose());
+
+                    for (EstimatedRobotPose visionPose : visionPoses) {
+                        if (visionPose.estimatedPose != null && visionPose.timestampSeconds > 0) {
+                            double visionYaw = visionPose.estimatedPose.getRotation().getZ();
+
+                            // gets at vision timestamp, not current gyro yaw
+                            double gyroYawAtTimestamp = getGyroYawAtTimestamp(visionPose.timestampSeconds);
+
+                            if (!Double.isNaN(gyroYawAtTimestamp)) {
+
+                                Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
+                                Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
+                                // use weighted observation
+                                gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
+                            }
+                        }
+                    }
+
+                    // check if we have enough samples
+                    if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
+                        double fullBias = gyroBiasEstimator.getAndResetBias();
+                        double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
+                        System.out.println("bias: " + bias);
+                        System.out.println("FullBias"+ fullBias);
+
+                        if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
+                            gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
+                        }
+                    }
                 }
             }
         }
@@ -541,6 +582,18 @@ public class Drivetrain extends SubsystemBase {
      */
     public Module[] getModules() {
         return modules;
+    }
+
+    /**
+     * gets gyro yaw at a specific timestamp with interpolation
+     * this is used for timestamp-synchronized gyro/vision comparison.
+     * 
+     * @param timestampSeconds the timestamp to get the gyro yaw at
+     * @return the gyro yaw in radians, or Double.NaN if no valid data
+     */
+    private double 
+    getGyroYawAtTimestamp(double timestampSeconds) {
+        return getPose().getRotation().getRadians();
     }
 
     /**
