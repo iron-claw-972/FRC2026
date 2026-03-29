@@ -154,10 +154,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 	}
 
-	public void resetTurretPosition() {
-		inputs.positionDeg = 0.0;
-	}
-
 	/* ---------------- Periodic ---------------- */
 
 	@Override
