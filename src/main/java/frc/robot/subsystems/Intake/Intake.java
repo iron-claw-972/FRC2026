@@ -131,7 +131,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
         );
 
         leftMotor.setPosition(0.0);
