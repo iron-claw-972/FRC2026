@@ -126,7 +126,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
@@ -241,7 +241,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations = -inchesToRotations(setpoint);
+        double motorRotations = inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 
