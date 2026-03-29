@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-// import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -66,7 +66,7 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  //private Command auto = new DoNothing();
+  // private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -112,9 +112,6 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
-        // spindexer = new Spindexer();
-        // intake = new Intake();
-        
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -138,21 +135,19 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        
+
         initializeAutoBuilder();
         autoChooserInit();
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
 
-        
-
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
+
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
@@ -161,6 +156,8 @@ public class RobotContainer {
 		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    CommandScheduler.getInstance().schedule(new LogCommand());
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
@@ -243,16 +240,16 @@ public class RobotContainer {
 
   }
 
-  public void addAuto(String name){
-    try{
+  public void addAuto(String name) {
+    try {
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
     catch (AutoBuilderException e) {
-          e.printStackTrace();
-          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-        }
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
   }
 
   /**
@@ -263,7 +260,7 @@ public class RobotContainer {
     // add the options to the Chooser
     String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
-    String rightSideAuto = "Right Week V1";      
+    String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
     String koushaDouble = "Kousha Double";
 

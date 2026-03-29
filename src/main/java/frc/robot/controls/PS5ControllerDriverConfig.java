@@ -40,7 +40,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private LinearClimb climb;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -56,7 +55,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
-        this.climb = climb;
     }
 
     public void configureControls() {
@@ -121,7 +119,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
             // Calibration: you can now calibrate easily using this button
-            // controller.get(PS5;
+            if (hood != null && intake != null) {
+                controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+                    intake.calibrate();
+                    hood.calibrate();
+                }, intake, hood)).onFalse(new InstantCommand(() -> {
+                    intake.stopCalibrating();
+                    hood.stopCalibrating();
+                }, intake, hood));
+            }
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
@@ -136,7 +142,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Spindexer
-        if (spindexer != null) {
+        if (spindexer != null && turret != null && hood != null) {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
@@ -145,7 +151,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Auto shoot
-        if (turret != null && hood != null && shooter != null) {
+        if (turret != null && hood != null && shooter != null && spindexer != null) {
             autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
