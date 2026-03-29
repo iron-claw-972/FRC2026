@@ -53,7 +53,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         Logger.processInputs("Spindexer", inputs);
 
         if (resetPos == null) {
-            resetPos = motor.getPosition().getValueAsDouble();
+            resetPos = (motor.getPosition().getValueAsDouble() % gearRatio);
             resetPID.reset();
         }
 
@@ -67,7 +67,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             motor.set(0.0);
             reversing = false;
         } else if (state == SpindexerState.RESET && resetPos != null) {
-            motor.set(resetPID.calculate(motor.getPosition().getValueAsDouble(), resetPos));
+            motor.set(resetPID.calculate((motor.getPosition().getValueAsDouble() % gearRatio), resetPos));
         } else {
             motor.set(power);
             reversing = false;
@@ -136,6 +136,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     private Double resetPos;
     private PIDController resetPID = new PIDController(0.5, 0.1, 0);
+
+    private final double gearRatio = 27.0 / 1.0; //spindexer spins once for every 27 motor spins
 
     
 
