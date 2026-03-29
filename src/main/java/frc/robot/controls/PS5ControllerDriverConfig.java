@@ -14,9 +14,12 @@ import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
+import frc.robot.commands.led_comm.DefenseLightsCommand;
+import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
@@ -40,6 +43,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
+    private LinearClimb climb;
+    private LED led;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -48,13 +53,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Hood hood,
             Intake intake,
             Spindexer spindexer,
-            LinearClimb climb) {
+            LinearClimb climb,
+            LED led) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
+        this.climb = climb;
+        this.led = led;
     }
 
     public void configureControls() {

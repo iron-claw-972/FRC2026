@@ -14,16 +14,24 @@ import com.ctre.phoenix6.signals.StripTypeValue;
 import com.ctre.phoenix6.signals.VBatOutputModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class LED extends SubsystemBase {
 
 	private CANdle candle;
 	public static final int stripLength = 67;
+	private double counter = 0;
+
+	private double waveOffset = 0;
+	private final double waveSpeed = 0.08;
+	private final double waveFrequency = 0.25;
+	private double period = 10;
+	private double midLine = 127.5;
 
 	// Constructor
 	public LED() {
-		candle = new CANdle(IdConstants.CANDLE_ID);
+		candle = new CANdle(IdConstants.CANDLE_ID, Constants.CANIVORE_SUB);
 		CANdleConfigurator configurator = candle.getConfigurator();
 
 		LEDConfigs ledConf = new LEDConfigs()
@@ -103,6 +111,74 @@ public class LED extends SubsystemBase {
 			} else {
 				setSection(r1, g1, b1, i, i + size - 1);
 			}
+		}
+	}
+
+	/**
+	 * Creates a two-color wave pattern across the LEDs.
+	 * TODO: Implement actual wave animation
+	 *
+	 * @param r1 Red value of the first color (0-255)
+	 * @param g1 Green value of the first color (0-255)
+	 * @param b1 Blue value of the first color (0-255)
+	 * @param r2 Red value of the second color (0-255)
+	 * @param g2 Green value of the second color (0-255)
+	 * @param b2 Blue value of the second color (0-255)
+	 */
+
+	public void setTwoColorWave(int r1, int g1, int b1, int r2, int g2, int b2) {
+		for (int i = 0; i < stripLength; i++) {
+
+			double wave = (Math.sin(i * waveFrequency + waveOffset) + 1) / 2.0;
+			double inverseBias = 5; // higher = more color 2
+			wave = 1 - Math.pow(1 - wave, inverseBias);
+
+			int r = (int) (r1 * wave + r2 * (1 - wave));
+			int g = (int) (g1 * wave + g2 * (1 - wave));
+			int b = (int) (b1 * wave + b2 * (1 - wave));
+			setSection(r, g, b, i, i + 1);
+		}
+
+		waveOffset += waveSpeed;
+	}
+	// public void setTwoColorWave(int r1, int g1, int b1, int r2, int g2, int b2) {
+	// for (int i = 0; i < stripLength; i++) {
+
+	// double wave = 127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset)) +
+	// midLine;
+	// double inverseBias = 5; // higher = more color 2
+	// wave = 1 - Math.pow(1 - wave, inverseBias);
+
+	// //int r = (int)(r1 * wave + r2 * (1 - wave));
+	// //int g = (int)(g1 * wave + g2 * (1 - wave));
+	// //int b = (int)(b1 * wave + b2 * (1 - wave));
+	// // int b = (int)wave;
+	// int b = 255;
+	// int g = (int)(127.5 * Math.sin( ((2*Math.PI)/period) * (i + waveOffset + 5))
+	// + midLine);
+	// //int g = r;
+
+	// setSection(0, g, b, i, i + 1);
+	// }
+
+	// waveOffset += waveSpeed;
+	// }
+
+	/**
+	 * Sets strobe lights effect.
+	 *
+	 * @param red   Red value (0-255)
+	 * @param green Green value (0-255)
+	 * @param blue  Blue value (0-255)
+	 */
+	public void setStrobeLights(int red, int green, int blue) {
+		counter++;
+		if (counter == 1) {
+			setLEDs(red, green, blue);
+		} else if (counter == 20) {
+			setLEDs(0, 0, 0);
+		} else if (counter >= 40) {
+			counter = 0;
 		}
 	}
 }
