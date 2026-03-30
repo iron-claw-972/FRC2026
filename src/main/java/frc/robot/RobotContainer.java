@@ -228,6 +228,8 @@ public class RobotContainer {
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
+      NamedCommands.registerCommand("Reset Spindexer", new InstantCommand(() -> spindexer.resetSpindexer()));
+      NamedCommands.registerCommand("Reset Reset Angle", new InstantCommand(() -> spindexer.resetResetAngle()));
     }
 
     if (hood != null) {
@@ -269,13 +271,15 @@ public class RobotContainer {
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
-    String doubleSwipe = "DoubleSwipe";
+    String leftLiberalSwipe = "LeftLiberalDoubleSwipe";
+    String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
-    addAuto(doubleSwipe);
+    addAuto(leftConservativeSwipe);
+    addAuto(leftLiberalSwipe);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
