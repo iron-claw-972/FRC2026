@@ -23,7 +23,6 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-// import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
@@ -112,8 +111,6 @@ public class RobotContainer {
         hood = new Hood();
       
       case TwinBot:
-        spindexer = new Spindexer();
-        intake = new Intake();
 
       case SwerveCompetition: // AKA "Vantage"
 

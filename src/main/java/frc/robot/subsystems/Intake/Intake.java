@@ -126,12 +126,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
         );
 
         leftMotor.setPosition(0.0);
@@ -204,6 +205,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
     }
 
     public void simulationPeriodic(){
@@ -241,7 +244,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations = -inchesToRotations(setpoint);
+        double motorRotations = inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 

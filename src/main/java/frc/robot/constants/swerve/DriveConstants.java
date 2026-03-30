@@ -189,6 +189,9 @@ public class DriveConstants {
         // It will limit it to time given (in seconds) to go from zero to full throttle.
         // A small open loop ramp (0.25) helps with tread wear, tipping, etc
         public static final double OPEN_LOOP_RAMP = 0.1;
+
+        // limits maximum rate of change for motor
+        public static final double CLOSE_LOOP_RAMP = 0.0;
     
         public static final double WHEEL_CIRCUMFERENCE = 2*Math.PI*WHEEL_RADIUS;
     

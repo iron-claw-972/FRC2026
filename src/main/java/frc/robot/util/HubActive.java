@@ -3,15 +3,11 @@ package frc.robot.util;
 
 import java.util.Optional;
 
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
 public class HubActive {
-
-
   static public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
@@ -164,9 +160,7 @@ public class HubActive {
     }
   }
 
-
   static public Optional<Double> timeToInactive() {
-
 
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     if (alliance == Alliance.Blue) {
@@ -174,7 +168,6 @@ public class HubActive {
     } else {
       alliance = Alliance.Blue;
     }
-
 
     // Hub is always enabled in autonomous.
     if (DriverStation.isAutonomousEnabled()) {
@@ -184,7 +177,6 @@ public class HubActive {
     if (!DriverStation.isTeleopEnabled()) {
       return Optional.empty();
     }
-
 
     // We're teleop enabled, compute.
     double matchTime = DriverStation.getMatchTime();
@@ -204,15 +196,11 @@ public class HubActive {
       }
     }
 
-
-
-
     // Shift was is active for blue if red won auto, or red if blue won auto.
     boolean shift1Active = switch (alliance) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
-
 
     if (matchTime > 130) {
       // Transition shift, hub is active.
@@ -227,7 +215,6 @@ public class HubActive {
     } else if (matchTime > 80) {
       // Shift 2
 
-
       if (!shift1Active) {
         return Optional.of(matchTime - 80.0);
       } else {
@@ -236,7 +223,6 @@ public class HubActive {
     } else if (matchTime > 55) {
       // Shift 3
 
-
       if (shift1Active) {
         return Optional.of(matchTime - 55.0);
       } else {
@@ -244,7 +230,6 @@ public class HubActive {
       }
     } else if (matchTime > 30) {
       // Shift 4
-
 
       if (!shift1Active) {
         return Optional.of(matchTime - 30.0);
@@ -256,7 +241,6 @@ public class HubActive {
       return Optional.of(0.0);
     }
   }
-
 
   static public boolean wonAuto() {
     String gameData = DriverStation.getGameSpecificMessage();
@@ -284,7 +268,6 @@ public class HubActive {
       x = !redInactiveFirst;
     }
     return x;
-
 
   }
 }
