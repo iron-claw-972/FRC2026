@@ -6,7 +6,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

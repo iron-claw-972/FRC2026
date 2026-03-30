@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
