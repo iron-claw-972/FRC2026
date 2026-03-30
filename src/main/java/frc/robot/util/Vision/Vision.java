@@ -383,24 +383,6 @@ public class Vision {
   }
 
   /**
-   * returns visible tag IDs from all cameras.
-   */
-  public int[] getVisibleTagIds() {
-    ArrayList<Integer> tagIds = new ArrayList<>();
-    for(VisionCamera c : cameras) {
-      for(PhotonPipelineResult result : c.getResults()) {
-        for(PhotonTrackedTarget target : result.getTargets()) {
-          int id = target.getFiducialId();
-          if(id > 0 && !tagIds.contains(id)) {
-            tagIds.add(id);
-          }
-        }
-      }
-    }
-    return tagIds.stream().mapToInt(Integer::intValue).toArray();
-  }
-
-  /**
    * Enable or disable a single camera
    * @param index The camera index
    * @param enabled If it should be enabled or disabled
@@ -715,10 +697,6 @@ public class Vision {
      */
     public void enable(boolean enable){
       enabled = enable;
-    }
-
-    public List<PhotonPipelineResult> getResults() {
-      return inputs.results;
     }
   }
 }

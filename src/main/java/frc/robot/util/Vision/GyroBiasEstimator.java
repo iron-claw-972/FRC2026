@@ -137,21 +137,6 @@ public class GyroBiasEstimator {
     }
 
     /**
-     * check if correction should be applied.
-     *
-     * @param gyroYaw current gyro reading
-     * @param visionYaw vision-derived yaw
-     * @return true if we should call setYaw(), false otherwise
-     */
-    public boolean shouldCorrect(double gyroYaw, double visionYaw) {
-        if (addObservation(visionYaw, gyroYaw)) {
-            double bias = getAndResetBias();
-            return Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD;
-        }
-        return false;
-    }
-
-    /**
      * normalize angle to [-PI, PI]
      */
     private double normalizeAngle(double angle) {
