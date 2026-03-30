@@ -339,6 +339,13 @@ public class Drivetrain extends SubsystemBase {
                             double gyroYawAtTimestamp = getGyroYawAtTimestamp(visionPose.timestampSeconds);
 
                             if (!Double.isNaN(gyroYawAtTimestamp)) {
+                                // wrap gyro yaw
+                                while (gyroYawAtTimestamp > Math.PI) {
+                                    gyroYawAtTimestamp -= 2 * Math.PI;
+                                }
+                                while (gyroYawAtTimestamp < -Math.PI) {
+                                    gyroYawAtTimestamp += 2 * Math.PI;
+                                }
 
                                 Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
                                 Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
