@@ -119,6 +119,13 @@ public class Drivetrain extends SubsystemBase {
 
     // for vision yaw correction
     private GyroBiasEstimator gyroBiasEstimator = new GyroBiasEstimator();
+    
+    // gyro history for timestamp interpolation
+    private static final int GYRO_HISTORY_SIZE = 50;
+    private double[] gyroTimestampsHistory = new double[GYRO_HISTORY_SIZE];
+    private double[] gyroYawsHistory = new double[GYRO_HISTORY_SIZE];
+    private int gyroHistoryHead = 0;
+    private int gyroHistoryCount = 0;
 
     private final Field2d field = new Field2d();
 
@@ -314,35 +321,41 @@ public class Drivetrain extends SubsystemBase {
                     slipped = false;
                     modulePoses.reset();
 
+                    // record reading for timestamp interpolation
+                    recordGyroReading(gyroInputs.yawPosition.getRadians());
+
                     double currentGyroYaw = gyroInputs.yawPosition.getRadians();
 
-                    // to compare bias
+                    // calculate bias between vision-derived and gyro yaw
+                    // this compensates for gyro drift over time
                     ArrayList<EstimatedRobotPose> visionPoses = vision.getEstimatedPoses(getPose());
 
                     for (EstimatedRobotPose visionPose : visionPoses) {
                         if (visionPose.estimatedPose != null && visionPose.timestampSeconds > 0) {
+                            // get yaw from the vision pose estimate
                             double visionYaw = visionPose.estimatedPose.getRotation().getZ();
 
-                            // gets at vision timestamp, not current gyro yaw
+                            // interpolate gyro yaw to vision timestamp for accurate comparison
                             double gyroYawAtTimestamp = getGyroYawAtTimestamp(visionPose.timestampSeconds);
 
                             if (!Double.isNaN(gyroYawAtTimestamp)) {
 
                                 Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
                                 Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
-                                // use weighted observation
+                                // add observation to estimator with default weight
                                 gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
                             }
                         }
                     }
 
-                    // check if we have enough samples
+                    // apply correction when we have enough samples
                     if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
                         double fullBias = gyroBiasEstimator.getAndResetBias();
                         double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
-                        System.out.println("bias: " + bias);
-                        System.out.println("FullBias"+ fullBias);
+                        Logger.recordOutput("FullBias", fullBias);
+                        Logger.recordOutput("CorrectedBias", bias);
 
+                        // only apply if bias exceeds min threshold
                         if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
                             gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
                         }
@@ -578,15 +591,50 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
+     * records a gyro reading with timestamp for later interpolation.
+     * uses a circular buffer to store recent gyro readings.
+     *
+     * @param yaw the gyro yaw in radians
+     */
+    private void recordGyroReading(double yaw) {
+        gyroTimestampsHistory[gyroHistoryHead] = Timer.getFPGATimestamp();
+        gyroYawsHistory[gyroHistoryHead] = yaw;
+        gyroHistoryHead = (gyroHistoryHead + 1) % GYRO_HISTORY_SIZE;
+        if (gyroHistoryCount < GYRO_HISTORY_SIZE) {
+            gyroHistoryCount++;
+        }
+    }
+
+    /**
      * gets gyro yaw at a specific timestamp with interpolation
      * this is used for timestamp-synchronized gyro/vision comparison.
      * 
      * @param timestampSeconds the timestamp to get the gyro yaw at
      * @return the gyro yaw in radians, or Double.NaN if no valid data
      */
-    private double 
-    getGyroYawAtTimestamp(double timestampSeconds) {
-        return getPose().getRotation().getRadians();
+    private double getGyroYawAtTimestamp(double timestampSeconds) {
+        if (gyroHistoryCount < 2) {
+            return Double.NaN;
+        }
+        
+        // find two closest timestamps and interpolate
+        int oldestIndex = (gyroHistoryHead - gyroHistoryCount + GYRO_HISTORY_SIZE) % GYRO_HISTORY_SIZE;
+        int newestIndex = (gyroHistoryHead - 1 + GYRO_HISTORY_SIZE) % GYRO_HISTORY_SIZE;
+        
+        double oldestTs = gyroTimestampsHistory[oldestIndex];
+        double newestTs = gyroTimestampsHistory[newestIndex];
+        
+        // if timestamp is outside our range, use nearest
+        if (timestampSeconds <= oldestTs) {
+            return gyroYawsHistory[oldestIndex];
+        }
+        if (timestampSeconds >= newestTs) {
+            return gyroYawsHistory[newestIndex];
+        }
+        
+        // linear interpolation between closest readings
+        double alpha = (timestampSeconds - oldestTs) / (newestTs - oldestTs);
+        return gyroYawsHistory[oldestIndex] + alpha * (gyroYawsHistory[newestIndex] - gyroYawsHistory[oldestIndex]);
     }
 
     /**
