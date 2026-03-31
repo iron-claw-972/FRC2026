@@ -32,7 +32,7 @@ import java.util.function.DoubleSupplier;
  *
  * <p>This version is intended for Phoenix 6 devices on both the RIO and CANivore buses. When using
  * a CANivore, the thread uses the "waitForAll" blocking method to enable more consistent sampling.
- * This also allows Phoenix Pro users to benefit from lower latency between devices using CANivore
+ * This also allows Phoenix Pro users to benefit from lower latency between devices using d
  * time synchronization.
  */
 public class PhoenixOdometryThread extends Thread {
