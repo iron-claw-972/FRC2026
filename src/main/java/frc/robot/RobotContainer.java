@@ -67,6 +67,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
+  private BrownOutControl brownOutControl = null;
 
   // this is inside addAuto()
   // private Command auto = new DoNothing();
@@ -107,6 +108,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
+        brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
         linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
@@ -150,10 +152,6 @@ public class RobotContainer {
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
-        }
-
-        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
-          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
         }
         
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
