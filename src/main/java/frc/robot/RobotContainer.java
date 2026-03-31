@@ -107,7 +107,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
+        // brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
         linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
