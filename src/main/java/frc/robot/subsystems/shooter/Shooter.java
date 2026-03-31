@@ -55,6 +55,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        shooterMotorLeft.getConfigurator().apply(limitConfig);
+        shooterMotorRight.getConfigurator().apply(limitConfig);
+
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
         
         SmartDashboard.putData("Shoot Harder", new InstantCommand(() -> bumpUpShooterModifier()));
