@@ -107,7 +107,6 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
         linearClimb = new LinearClimb();
 
       case WaffleHouse: // AKA Betabot
@@ -132,6 +131,7 @@ public class RobotContainer {
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
+        brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
