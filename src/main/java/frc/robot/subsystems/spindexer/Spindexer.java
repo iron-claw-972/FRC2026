@@ -103,6 +103,15 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         return motor.getSupplyCurrent().getValueAsDouble();
     }
 
+    public void setNewCurrentLimit(double newCurrentLimit) {
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_SPIKE_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        limitConfig.SupplyCurrentLowerLimit = newCurrentLimit;
+        limitConfig.SupplyCurrentLowerTime = 1.5;
+        motor.getConfigurator().apply(limitConfig);
+    }
+
     @Override
     public void updateInputs() {
         inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble(); //SpindexerConstants.gearRatio;
