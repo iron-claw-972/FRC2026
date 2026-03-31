@@ -63,6 +63,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(limitConfig);
 
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+        
+        SmartDashboard.putData("Shoot Harder", new InstantCommand(() -> bumpUpShooterModifier()));
+        SmartDashboard.putData("Shoot Softer", new InstantCommand(() -> bumpDownShooterModifier()));
     }
 
     @Override
@@ -133,6 +136,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     public double getRightSupplyCurrent() {
         return shooterMotorRight.getSupplyCurrent().getValueAsDouble();
+    }
+
+    private void bumpUpShooterModifier() {
+        powerModifier += 0.5;
+    }
+
+    private void bumpDownShooterModifier() {
+        powerModifier += 0.5;
     }
 
     @Override
