@@ -143,7 +143,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     private void bumpDownShooterModifier() {
-        powerModifier += 0.5;
+        powerModifier -= 0.5;
     }
 
     @Override

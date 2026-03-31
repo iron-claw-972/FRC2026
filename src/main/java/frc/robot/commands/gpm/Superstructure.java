@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
@@ -201,14 +202,41 @@ public class Superstructure extends Command {
         //spindexer.stopSpindexer();
     }
 
+    // shoot higher
+    public void bumpUpHoodOffset() {
+        hoodOffset += 1.0;
+    }
+
+    // shoot lower
+    public void bumpDownHoodOffset() {
+        hoodOffset -= 1.0;
+    }
+
+    // aim more left
+    public void bumpLeftTurretOffset() {
+        turretOffset += 2.5;
+    }
+
+    // aim more right
+    public void bumpRightTurretOffset() {
+        turretOffset -= 2.5;
+    }
+
+
     @Override
     public void execute() {
         TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
         SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
         hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
         SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
+        SmartDashboard.putData("Aim Hood Higher", new InstantCommand(() -> bumpUpHoodOffset()));
+        SmartDashboard.putData("Aim Hood Lower", new InstantCommand(() -> bumpDownHoodOffset()));
+        
         turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
         SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putData("Aim Turret Left", new InstantCommand(() -> bumpLeftTurretOffset()));
+        SmartDashboard.putData("Aim Turret Right", new InstantCommand(() -> bumpRightTurretOffset()));
+
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
