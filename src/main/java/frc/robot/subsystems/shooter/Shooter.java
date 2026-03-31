@@ -101,8 +101,13 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // run in shooter just cus: This is for elastic
         SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
         SmartDashboard.putBoolean("Hub Active", HubActive.isHubActive());
-        SmartDashboard.putNumber("Time till active", HubActive.timeToActive().orElse(0.0));
-        SmartDashboard.putNumber("Time till Unactive", HubActive.timeToInactive().orElse(0.0));
+        double timeToActive = HubActive.timeToActive().orElse(0.0);
+        double timeTillInactive = HubActive.timeToInactive().orElse(0.0);
+        SmartDashboard.putNumber("Time till active", timeToActive);
+        SmartDashboard.putNumber("Time till Unactive", timeTillInactive);
+        // for aditiya
+        Logger.recordOutput("Timing/", timeToActive);
+        Logger.recordOutput("Timing/", timeTillInactive);
     }
 
     /**
