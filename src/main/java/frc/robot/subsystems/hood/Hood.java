@@ -40,6 +40,8 @@ public class Hood extends SubsystemBase implements HoodIO {
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
+    private int periodicCounter = 0;
+
     public Hood(){
 		motor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -155,8 +157,10 @@ public class Hood extends SubsystemBase implements HoodIO {
 		Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
 		Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
 
-		SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
-		SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+		if (periodicCounter++ % 5 == 0) {
+			SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+		}
 
 	}
 

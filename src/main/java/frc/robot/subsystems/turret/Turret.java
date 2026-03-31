@@ -35,6 +35,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
+    private int periodicCounter = 0;
+
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
@@ -225,9 +227,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
 
-		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
-		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		if (periodicCounter++ % 5 == 0) {
+			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		}
 	}
 
 	/* ---------------- Simulation ---------------- */

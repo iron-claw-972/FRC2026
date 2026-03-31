@@ -20,6 +20,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private SpindexerState state = SpindexerState.STOPPED;
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
+    private int periodicCounter = 0;
+
     public Spindexer() {
         updateInputs();
 
@@ -64,18 +66,18 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
-        SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
-
-        SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
-        SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
+        if (periodicCounter++ % 5 == 0) {
+            SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
+            SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
+            SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
+            SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        }
 
         boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
         if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
             ballCount++;
         }
         wasSpindexerSlow = isSpindexerSlow;
-
-        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
     }
 
     public void maxSpindexer() {

@@ -70,6 +70,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
+    private int periodicCounter = 0;
+
     public Intake() {
      
         // get the maximum free speed
@@ -188,23 +190,23 @@ public class Intake extends SubsystemBase implements IntakeIO{
         Logger.recordOutput("Intake/Setpoint", setpointInches);
         robotExtension.setLength(inchExtension);
 
-        SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
-        SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        // PutNumber/Boolean throttled to reduce NetworkTables traffic
+        if (periodicCounter++ % 5 == 0) {
+            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
+            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        }
 
         if(calibrating){
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
             boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
         }
 
         updateInputs();
         Logger.processInputs("Intake", inputs);
 
-        SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
-        SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
         SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
         SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
     }

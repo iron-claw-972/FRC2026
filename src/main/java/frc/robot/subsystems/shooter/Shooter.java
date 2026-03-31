@@ -31,6 +31,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
+    private int periodicCounter = 0;
 
     double powerModifier = 1.05; // TESTED
 
@@ -64,15 +65,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        if (periodicCounter % 5 == 0) {
+            powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        }
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
 
-
-        SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
-        SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
 
         // Sets the motor control to target velocity
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
@@ -83,10 +83,16 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
-        SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "lost");
-        SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
-        SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+        if (periodicCounter % 5 == 0) {
+            SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
+            SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
+            SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
+            SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "lost");
+            SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+            SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+        }
+
+        periodicCounter++;
 
     }
 
