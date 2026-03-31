@@ -95,6 +95,9 @@ public class Drivetrain extends SubsystemBase {
 
     private SwerveSetpointGenerator setpointGenerator = new SwerveSetpointGenerator();
 
+    private int visionUpdateCounter = 0;
+    private static final int VISION_UPDATE_INTERVAL = 2;
+
     // The pose supplier to drive to
     private Supplier<Pose2d> desiredPoSupplier = () -> null;
 
@@ -301,11 +304,15 @@ public class Drivetrain extends SubsystemBase {
 
         if (VisionConstants.ENABLED) {
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
-                vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
+                visionUpdateCounter++;
+                if (visionUpdateCounter >= VISION_UPDATE_INTERVAL) {
+                    visionUpdateCounter = 0;
+                    vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
-                if (vision.canSeeTag()) {
-                    slipped = false;
-                    modulePoses.reset();
+                    if (vision.canSeeTag()) {
+                        slipped = false;
+                        modulePoses.reset();
+                    }
                 }
             }
         }

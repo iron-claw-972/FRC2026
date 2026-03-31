@@ -188,10 +188,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // Report position to SmartDashboard
         double inchExtension = getPosition();
         Logger.recordOutput("Intake/Setpoint", setpointInches);
-        robotExtension.setLength(inchExtension);
 
-        // PutNumber/Boolean throttled to reduce NetworkTables traffic
         if (periodicCounter++ % 5 == 0) {
+            robotExtension.setLength(inchExtension);
             SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
             SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
             SmartDashboard.putBoolean("Intake Calibrated", !calibrating);

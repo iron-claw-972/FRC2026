@@ -102,12 +102,12 @@ public class Superstructure extends Command {
         Pose2d lookaheadPose = turretPosition;
 
         /*
-         * Loop (20) until lookaheadPose converges BECAUSE -->
+         * Loop (10) until lookaheadPose converges BECAUSE -->
          * If you're 8m away (t = 1.0s) and moving at 2m/s towards target, you calculate for 6m (t = 0.8s)
          * At 6m, we run assuming t = 0.8 but then the 6m isn't correct since it was derived using t = 1.0s
          * So we make a bunch of guesses until it converges
          */
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(), 
