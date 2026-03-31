@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.VecBuilder;
@@ -189,6 +190,21 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         odometryLock.lock(); // Prevents odometry updates while reading data
+        
+        java.util.List<BaseStatusSignal> signals = new java.util.ArrayList<>();
+        var gyroYawSignal = gyroIO.getYawSignal();
+        if (gyroYawSignal != null) {
+            signals.add(gyroYawSignal);
+        }
+        for (var module : modules) {
+            signals.add(module.getDrivePositionSignal());
+            signals.add(module.getTurnPositionSignal());
+            signals.add(module.getTurnAbsolutePositionSignal());
+        }
+        if (!signals.isEmpty()) {
+            BaseStatusSignal.waitForAll(0.1, signals.toArray(new BaseStatusSignal[0]));
+        }
+        
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {

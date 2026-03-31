@@ -16,6 +16,8 @@ package frc.robot.subsystems.drivetrain;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+import com.ctre.phoenix6.StatusSignal;
+
 public interface GyroIO {
   @AutoLog
   public static class GyroIOInputs {
@@ -29,4 +31,7 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  /** returns the yaw status signal for time-synced odometry. */
+  public default StatusSignal<?> getYawSignal() { return null; }
 }

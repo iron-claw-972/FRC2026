@@ -71,4 +71,9 @@ public class GyroIOPigeon2 implements GyroIO {
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
   }
+
+  @Override
+  public StatusSignal<Angle> getYawSignal() {
+    return yaw;
+  }
 }

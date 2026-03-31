@@ -9,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
@@ -19,8 +20,8 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.MathUtil;
@@ -153,7 +154,6 @@ public class Module implements ModuleIO{
             turnVelocity,
             turnAppliedVolts,
             turnCurrent);
-        ParentDevice.optimizeBusUtilizationForAll(driveMotor, angleMotor);
         
         setDesiredState(new SwerveModuleState(0, getAngle()), false);
     }
@@ -314,6 +314,13 @@ public class Module implements ModuleIO{
 
     private void configAngleMotor() {
         angleMotor.getConfigurator().apply(new TalonFXConfiguration());
+        
+        // configure FusedCANcoder feedback
+        FeedbackConfigs feedbackConfigs = new FeedbackConfigs();
+        feedbackConfigs.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        feedbackConfigs.FeedbackRemoteSensorID = moduleConstants.getEncoderPort();
+        angleMotor.getConfigurator().apply(feedbackConfigs);
+        
         CurrentLimitsConfigs config = new CurrentLimitsConfigs();
         config.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
         config.SupplyCurrentLimit = DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT;
@@ -327,6 +334,9 @@ public class Module implements ModuleIO{
         angleMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(DriveConstants.INVERT_STEER_MOTOR));
         angleMotor.setNeutralMode(DriveConstants.STEER_NEUTRAL_MODE);
         angleMotor.setPosition(0);
+        
+        // optimize bus utilization for angle motor
+        angleMotor.optimizeBusUtilization();
         
         resetToAbsolute();
     }
@@ -371,6 +381,9 @@ public class Module implements ModuleIO{
         driveMotor.getConfigurator().apply(new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(DriveConstants.OPEN_LOOP_RAMP));
         driveMotor.getConfigurator().apply(new ClosedLoopRampsConfigs().withDutyCycleClosedLoopRampPeriod(DriveConstants.CLOSE_LOOP_RAMP));
         driveMotor.setNeutralMode(DriveConstants.DRIVE_NEUTRAL_MODE);
+        
+        // optimize bus utilization for drive motor
+        driveMotor.optimizeBusUtilization();
         
     }
 
@@ -424,6 +437,21 @@ public class Module implements ModuleIO{
     /** Returns the timestamps of the samples received this cycle. */
     public double[] getOdometryTimestamps() {
         return inputs.odometryTimestamps;
+    }
+
+    /** returns the drive position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getDrivePositionSignal() {
+        return drivePosition;
+    }
+
+    /** returns the turn position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getTurnPositionSignal() {
+        return turnPosition;
+    }
+
+    /** returns the turn absolute position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getTurnAbsolutePositionSignal() {
+        return turnAbsolutePosition;
     }
 
 }
