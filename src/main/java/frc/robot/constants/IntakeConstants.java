@@ -20,6 +20,7 @@ public class IntakeConstants {
     public static final double CARRIAGE_MASS_KG = 3.0;
     public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1.0);
 
+    public static final double NORMAL_CURRENT_LIMIT = 100;
 
     /** max extension in inches */
     public static final double MAX_EXTENSION = 10.5; // inches

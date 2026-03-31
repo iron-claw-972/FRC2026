@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
@@ -131,9 +132,14 @@ public class Intake extends SubsystemBase implements IntakeIO{
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
+
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        leftMotor.getConfigurator().apply(limitConfig);
+        rightMotor.getConfigurator().apply(limitConfig);
 
         leftMotor.setPosition(0.0);
         rightMotor.setPosition(0.0);
@@ -205,8 +211,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
-        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
         SmartDashboard.putData("Calibrate Intake", new InstantCommand(() -> calibrate()));
     }
 
