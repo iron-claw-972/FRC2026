@@ -166,6 +166,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 
 		SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
 		SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+		SmartDashboard.putData("Calibrate Hood", new InstantCommand(() -> calibrate()));
 
 	}
 
