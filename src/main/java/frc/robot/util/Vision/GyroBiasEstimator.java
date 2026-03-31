@@ -1,5 +1,6 @@
 package frc.robot.util.Vision;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.constants.GyroBiasConstants;
 
@@ -140,13 +141,7 @@ public class GyroBiasEstimator {
      * normalize angle to [-PI, PI]
      */
     private double normalizeAngle(double angle) {
-        while (angle > Math.PI) {
-            angle -= 2 * Math.PI;
-        }
-        while (angle < -Math.PI) {
-            angle += 2 * Math.PI;
-        }
-        return angle;
+        return MathUtil.angleModulus(angle);
     }
 
     /**

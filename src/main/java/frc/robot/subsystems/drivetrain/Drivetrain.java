@@ -122,10 +122,10 @@ public class Drivetrain extends SubsystemBase {
     
     // gyro history for timestamp interpolation
     private static final int GYRO_HISTORY_SIZE = 50;
-    private double[] gyroTimestampsHistory = new double[GYRO_HISTORY_SIZE];
-    private double[] gyroYawsHistory = new double[GYRO_HISTORY_SIZE];
-    private int gyroHistoryHead = 0;
-    private int gyroHistoryCount = 0;
+    private double[] gyroTimestampsHistory = new double[GYRO_HISTORY_SIZE]; // circular buffer of gyro timestamps for interpolation
+    private double[] gyroYawsHistory = new double[GYRO_HISTORY_SIZE]; // circular buffer of gyro yaw angles corresponding to timestamps
+    private int gyroHistoryHead = 0; // index of the most recent entry in the circular buffer
+    private int gyroHistoryCount = 0; // number of valid entries in the history buffer
 
     private final Field2d field = new Field2d();
 
