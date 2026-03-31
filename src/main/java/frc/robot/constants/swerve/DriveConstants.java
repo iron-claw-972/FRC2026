@@ -108,10 +108,10 @@ public class DriveConstants {
         public static final double TRANSLATIONAL_D = 0.001;
     
         //The PIDs for PathPlanner Command
-        public static final double PATH_PLANNER_HEADING_P = 3.5;
+        public static final double PATH_PLANNER_HEADING_P = 3.5/2;
         public static final double PATH_PLANNER_HEADING_D = 0;
     
-        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6;
+        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6/2;
         public static final double PATH_PLANNER_TRANSLATIONAL_D = 0;
     
         // CAN
