@@ -1,0 +1,127 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Hood Down"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomRight W5 Right Trench Start"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Spin Intake Rollers"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomRight Swipe1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Intake Seizure"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake Seizure"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Spindexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Reset Spindexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Hood Down"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomRight Swipe2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Hood Down"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Spindexer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Intake Seizure"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
