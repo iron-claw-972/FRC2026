@@ -435,6 +435,30 @@ public class Drivetrain extends SubsystemBase {
         trenchAlign = target;
     }
 
+    // for current limit setting (brownout protection)
+    public void applyNewModuleCurrents(double steerCurrent, double driveCurren) {
+        for (Module module : modules) { // iterate over our modules
+            module.setNewCurrentLimit(steerCurrent, driveCurren);
+        }
+    }
+
+    // for fetching module currents
+    public double[] getStatorCurrents() {
+        double[] currents = new double[4];
+        for (int i=0; i<currents.length;i++) {
+            currents[i]=modules[i].getDriveStatorCurrent();
+        }
+        return currents;
+    }
+
+    public double[] getSupplyCurrents() {
+        double[] currents = new double[4];
+        for (int i=0; i<currents.length;i++) {
+            currents[i]=modules[i].getDriveSupplyCurrent();
+        }
+        return currents;
+    }
+
     /**
      * Sets the desired states for all swerve modules.
      *

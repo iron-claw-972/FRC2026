@@ -101,6 +101,14 @@ public class Hood extends SubsystemBase implements HoodIO {
 		return this.forceHoodDown;
 	}
 
+	public double getStatorCurrent() {
+        return inputs.motorCurrent;
+    }
+
+    public double getSupplyCurrent() {
+        return motor.getSupplyCurrent().getValueAsDouble();
+    }
+
     @Override
     public void periodic() {
 		updateInputs();
@@ -157,6 +165,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 
 		SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
 		SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+		SmartDashboard.putData("Calibrate Hood", new InstantCommand(() -> calibrate()));
 
 	}
 

@@ -48,7 +48,8 @@ public class HubActive {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
-    SmartDashboard.putNumber("Time till active", timeToActive().orElse(timeToInactive().orElse(0.0)));
+    // 67 is a clear indication of an error
+    SmartDashboard.putNumber("Time till active", timeToActive().orElse(timeToInactive().orElse(67.0)));
     if (matchTime > 130) {
       // Transition shift, hub is active.
       return true;
@@ -72,8 +73,6 @@ public class HubActive {
 
 
   static public Optional<Double> timeToActive() {
-
-
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
@@ -107,15 +106,11 @@ public class HubActive {
       }
     }
 
-
-
-
     // Shift was is active for blue if red won auto, or red if blue won auto.
     boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
-
 
     if (matchTime > 130) {
       // Transition shift, hub is active.

@@ -7,6 +7,7 @@ public interface SpindexerIO {
     public static class SpindexerIOInputs {
         public double spindexerVelocity = 0.0;
         public double spindexerCurrent = 0.0;
+        public double spindexerJamming = 0.0;
     }
 
     public void updateInputs();

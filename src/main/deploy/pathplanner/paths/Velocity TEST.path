@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.9,
-        "y": 7.623
+        "x": 0.4682559843673668,
+        "y": 7.603837322911579
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.150000000000022,
-        "y": 7.623
+        "x": 2.6361211529066964,
+        "y": 7.775210063507574
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 7.623
+        "x": 2.764650708353688,
+        "y": 4.064990229604298
       },
       "prevControl": {
-        "x": 2.749999999999994,
-        "y": 7.623
+        "x": 2.953160723009282,
+        "y": 4.973265754763068
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,11 +32,11 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
+      "minWaypointRelativePos": 0.1427297056199817,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 0.5,
-        "maxAcceleration": 0.5,
+        "maxVelocity": 5.2,
+        "maxAcceleration": 3.5,
         "maxAngularVelocity": 200.0,
         "maxAngularAcceleration": 300.0,
         "nominalVoltage": 12.0,
@@ -59,7 +59,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Field Testing Autos",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -9,10 +9,10 @@
         "containers": [
           {
             "title": "WON AUTO?",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
+            "x": 256.0,
+            "y": 512.0,
+            "width": 384.0,
+            "height": 256.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/WON AUTO?",
@@ -22,9 +22,9 @@
           },
           {
             "title": "Turret position",
-            "x": 1024.0,
+            "x": 1152.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 512.0,
             "height": 256.0,
             "type": "Graph",
             "properties": {
@@ -32,15 +32,17 @@
               "period": 0.033,
               "data_type": "double",
               "time_displayed": 5.0,
+              "min_value": -300.0,
+              "max_value": 250.0,
               "color": 4278238420,
               "line_width": 2.0
             }
           },
           {
             "title": "Target Velocity RPS",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 128.0,
+            "x": 640.0,
+            "y": 512.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -52,9 +54,9 @@
           },
           {
             "title": "Intake Calibrated",
-            "x": 256.0,
-            "y": 0.0,
-            "width": 128.0,
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -69,9 +71,9 @@
           },
           {
             "title": "Hood Calibrated",
-            "x": 128.0,
-            "y": 0.0,
-            "width": 128.0,
+            "x": 0.0,
+            "y": 640.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -87,8 +89,8 @@
           {
             "title": "Turret Calibrated",
             "x": 0.0,
-            "y": 0.0,
-            "width": 128.0,
+            "y": 768.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -102,28 +104,11 @@
             }
           },
           {
-            "title": "Climb Calibrated",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Climb Calibrated",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Field",
             "x": 0.0,
-            "y": 128.0,
-            "width": 768.0,
-            "height": 384.0,
+            "y": 0.0,
+            "width": 896.0,
+            "height": 512.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -140,61 +125,10 @@
             }
           },
           {
-            "title": "Hood At Setpoint",
-            "x": 128.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Hood At Setpoint",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Turret At Setpoint",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Turret At Setpoint",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Intake At Setpoint",
-            "x": 256.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Intake At Setpoint",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "Voltage",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 384.0,
+            "x": 896.0,
+            "y": 768.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "Voltage View",
             "properties": {
@@ -210,8 +144,8 @@
           },
           {
             "title": "RobotID",
-            "x": 768.0,
-            "y": 256.0,
+            "x": 1408.0,
+            "y": 768.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -220,6 +154,92 @@
               "period": 0.06,
               "data_type": "string",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "Spindexer Jamming",
+            "x": 256.0,
+            "y": 768.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Spindexer Run Reverse/running",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Shooter Power Modifier",
+            "x": 1408.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/OPERATOR: Shooter Power Modifier",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "OPERATOR: Hood Offset",
+            "x": 1408.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/OPERATOR: Hood Offset",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "OPERATOR: Phase Delay",
+            "x": 1408.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/OPERATOR: Phase Delay",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "OPERATOR: Turret Offset",
+            "x": 1408.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/OPERATOR: Turret Offset",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Auto chooser",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]
@@ -230,6 +250,57 @@
       "grid_layout": {
         "layouts": [],
         "containers": []
+      }
+    },
+    {
+      "name": "Field",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Field",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 1664.0,
+            "height": 896.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Rebuilt",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295,
+              "show_robot_outside_widget": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pit Setup",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "min",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/min",
+              "period": 0.06,
+              "show_type": true,
+              "maximize_button_space": false
+            }
+          }
+        ]
       }
     }
   ]

@@ -126,7 +126,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
@@ -195,9 +195,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
             boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
+            if(calibrationDebouncer.calculate(atHardStop)){
+                stopCalibrating();
+            }
         }
 
         updateInputs();
@@ -207,6 +207,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
         SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
         SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        SmartDashboard.putData("Calibrate Intake", new InstantCommand(() -> calibrate()));
     }
 
     public void simulationPeriodic(){
@@ -244,7 +245,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations = inchesToRotations(setpoint);
+        double motorRotations = -inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 
@@ -379,6 +380,30 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         leftMotor.getConfigurator().apply(limits);
         rightMotor.getConfigurator().apply(limits);
+    }
+
+    public double getLeftStatorCurrent() {
+        return inputs.leftCurrent;
+    }
+
+    public double getLeftSupplyCurrent() {
+        return leftMotor.getSupplyCurrent().getValueAsDouble();
+    }
+
+    public double getRightStatorCurrent() {
+        return inputs.rightCurrent;
+    }
+
+    public double getRightSupplyCurrent() {
+        return rightMotor.getSupplyCurrent().getValueAsDouble();
+    }
+
+    public double getRollerStatorCurrent() {
+        return inputs.rollerCurrent;
+    }
+
+    public double getRollerSupplyCurrent() {
+        return rollerMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     @Override

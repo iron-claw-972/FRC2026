@@ -208,6 +208,7 @@ public class Module implements ModuleIO{
     }
     
     public void periodic() {
+        
         updateInputs();
         Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
 
@@ -342,6 +343,32 @@ public class Module implements ModuleIO{
     public double getDriveStatorCurrent(){
         return inputs.driveCurrentAmps;
     }
+
+    public double getDriveSupplyCurrent() {
+        return driveMotor.getSupplyCurrent().getValueAsDouble();
+    }
+
+    // I took the config things straight from this file
+    public void setNewCurrentLimit(double currentSteer, double currentDrive) {
+        CurrentLimitsConfigs steerConfig = new CurrentLimitsConfigs();
+        // steer
+        steerConfig.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
+        steerConfig.SupplyCurrentLimit = currentSteer;
+        steerConfig.SupplyCurrentLowerLimit = currentSteer;
+        steerConfig.SupplyCurrentLowerTime = DriveConstants.STEER_PEAK_CURRENT_DURATION;
+        angleMotor.getConfigurator().apply(steerConfig); // apply
+
+        // drive
+        CurrentLimitsConfigs dirveConfig = new CurrentLimitsConfigs();
+        dirveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        dirveConfig.SupplyCurrentLimit = currentDrive;
+        dirveConfig.SupplyCurrentLowerLimit = currentDrive;
+        dirveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        dirveConfig.StatorCurrentLimit = currentDrive;
+        dirveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveMotor.getConfigurator().apply(dirveConfig); // apply
+    }
+
     private void configDriveMotor() {
         var talonFXConfigs = new TalonFXConfiguration();
         // set Motion Magic settings
