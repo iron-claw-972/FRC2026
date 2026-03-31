@@ -124,14 +124,14 @@ public class DriveConstants {
         public static COTSFalconSwerveConstants MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
     
         /* Swerve Current Limiting */
-        public static final int STEER_CONTINUOUS_CURRENT_LIMIT = 15;
-        public static final int STEER_PEAK_CURRENT_LIMIT = 15;
-        public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
+        public static final int STEER_CONTINUOUS_CURRENT_LIMIT = 20;
+        public static final int STEER_PEAK_CURRENT_LIMIT = 30;
+        public static final double STEER_PEAK_CURRENT_DURATION = 0.1;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 60;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
         public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
-        public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
+        public static final double DRIVE_PEAK_CURRENT_DURATION = 0.1;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
         /* Motor inversions */
