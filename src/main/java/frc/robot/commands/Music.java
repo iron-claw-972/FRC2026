@@ -29,4 +29,9 @@ public class Music extends Command {
     public void end(boolean interrupted) {
         orchestra.stop();
     }
+
+    @Override
+    public boolean runsWhenDisabled() {
+      return true;
+    }
 }
