@@ -15,6 +15,8 @@ import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -247,7 +249,7 @@ public class Module implements ModuleIO{
         }
         if (isOpenLoop) {
             double percentOutput = desiredState.speedMetersPerSecond / DriveConstants.MAX_SPEED;
-            driveMotor.set(percentOutput);
+            driveMotor.setControl(new DutyCycleOut(percentOutput).withEnableFOC(true));
         } else {
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
             Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
@@ -256,7 +258,8 @@ public class Module implements ModuleIO{
             driveMotor.setControl(
                 velocityRequest
                     .withVelocity(velocity)
-                    .withFeedForward(feedforward));
+                    .withFeedForward(feedforward)
+                    .withEnableFOC(true));
         }     
     }
 
@@ -271,14 +274,14 @@ public class Module implements ModuleIO{
         if(desiredState == null){
             return;
         }
-        angleMotor.setControl(new PositionDutyCycle(desiredState.angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio));
+        angleMotor.setControl(new PositionDutyCycle(desiredState.angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio).withEnableFOC(true));
     }
 
     public void setDriveVoltage(Voltage voltage){
-        driveMotor.setVoltage(voltage.baseUnitMagnitude());
+        driveMotor.setControl(new VoltageOut(voltage.baseUnitMagnitude()).withEnableFOC(true));
     }
     public void setAngle(Rotation2d angle){
-        angleMotor.setControl(new PositionDutyCycle(angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio));
+        angleMotor.setControl(new PositionDutyCycle(angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio).withEnableFOC(true));
     }
 
     public void setOptimize(boolean enable) {
