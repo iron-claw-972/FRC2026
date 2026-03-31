@@ -95,10 +95,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
         SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "lost");
         SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
         SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
 
+        // run in shooter just cus: This is for elastic
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        SmartDashboard.putBoolean("Hub Active", HubActive.isHubActive());
+        SmartDashboard.putNumber("Time till active", HubActive.timeToActive().orElse(0.0));
+        SmartDashboard.putNumber("Time till Unactive", HubActive.timeToInactive().orElse(0.0));
     }
 
     /**
