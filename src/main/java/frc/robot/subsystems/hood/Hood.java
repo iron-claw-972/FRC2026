@@ -101,6 +101,14 @@ public class Hood extends SubsystemBase implements HoodIO {
 		return this.forceHoodDown;
 	}
 
+	public double getStatorCurrent() {
+        return inputs.motorCurrent;
+    }
+
+    public double getSupplyCurrent() {
+        return motor.getSupplyCurrent().getValueAsDouble();
+    }
+
     @Override
     public void periodic() {
 		updateInputs();

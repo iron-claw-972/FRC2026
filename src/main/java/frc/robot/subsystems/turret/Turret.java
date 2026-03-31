@@ -272,6 +272,14 @@ public class Turret extends SubsystemBase implements TurretIO{
         motor.getConfigurator().apply(limits);
     }
 
+	public double getStatorCurrent() {
+        return inputs.motorCurrent;
+    }
+
+    public double getSupplyCurrent() {
+        return motor.getSupplyCurrent().getValueAsDouble();
+    }
+
 	// Also ignore this for now
 	private double wrapUnit(double value) {
 		value %= 1.0;

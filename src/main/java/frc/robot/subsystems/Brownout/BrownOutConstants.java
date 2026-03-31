@@ -1,4 +1,4 @@
-package frc.robot.util.BrownOut;
+package frc.robot.subsystems.Brownout;
 
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.swerve.DriveConstants;
@@ -28,6 +28,8 @@ public class BrownOutConstants {
     public static final double LEVEL_THREE_LIMIT = 6.0;
     public static final double LEVEL_FOUR_LIMIT = 5.25;
 
+    public static final double RECOVER_TIME = 10.0;
+
     // normal
     public static final BrownOutLevel BROWNOUT_LVL_ONE = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT, 
@@ -36,7 +38,8 @@ public class BrownOutConstants {
         TurretConstants.NORMAL_CURRENT_LIMIT, 
         IntakeConstants.NORMAL_CURRENT_LIMIT, 
         DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT,
+        1
     );
 
     // should deplete drivetrain a bit and lower everything else slightly. Preserve Shooter.
@@ -47,7 +50,8 @@ public class BrownOutConstants {
         TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.8, // lower drive rotation
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.8  // lower drive movement
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.8,  // lower drive movement
+        2
     );
 
     // lower bps systems: intake & spindexer. Preserve Shooter. Slight lower on evertthing else
@@ -58,7 +62,8 @@ public class BrownOutConstants {
         TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.7, // lower drive rotation
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.7  // lower drive movement
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.7,  // lower drive movement
+        3
     );
 
     // lower aiming systems: turret & hood. Preserve Shooter. Slight lower on everything else
@@ -69,7 +74,8 @@ public class BrownOutConstants {
         TurretConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.6, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.5, // lower drive rotation
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.5  // lower drive movement
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.5,  // lower drive movement
+        4
     );
 
     // now we have to deplete shooter... THIS IS REALLY BAD IS IT COMES TO THIS.
@@ -80,7 +86,8 @@ public class BrownOutConstants {
         TurretConstants.NORMAL_CURRENT_LIMIT * 0.7, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.5, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.45, // lower drive rotation
-        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.45  // lower drive movement
+        DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.45,  // lower drive movement
+        5
     );
 
 }
