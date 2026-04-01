@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "W5 Right Trench Start"
+            "pathName": "Right W5 Right Trench Start"
           }
         },
         {
@@ -122,6 +122,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Week 5 autos",
+  "folder": null,
   "choreoAuto": false
 }

@@ -122,6 +122,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Week 5 autos",
+  "folder": null,
   "choreoAuto": false
 }
