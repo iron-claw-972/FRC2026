@@ -79,9 +79,17 @@ public class RobotContainer {
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-  // custom match timer
+  // Custom match timer that counts down each phase
   private final Timer matchTimer = new Timer();
-  private boolean hasBeenEnabled = false;
+  private double currentPhaseDuration = 20.0; // Default auto duration
+  private boolean timerActive = false;
+  private String currentPhase = "none";
+  
+  // Phase durations (in seconds) - based on match clock (0:00 to 2:40 = 150s)
+  private static final double AUTO_DURATION = 20.0;
+  private static final double TRANSITION_SHIFT_DURATION = 10.0;
+  private static final double SHIFT_DURATION = 25.0;
+  private static final double ENDGAME_DURATION = 30.0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -330,21 +338,66 @@ public class RobotContainer {
 
   /** Updates SmartDashboard values that need to be refreshed every loop */
   public void periodic() {
-    // update custom timer (counts before phase change)
-    if (!hasBeenEnabled) {
-      if (DriverStation.isAutonomousEnabled() || DriverStation.isTeleopEnabled()) {
-        matchTimer.reset();
-        matchTimer.start();
-        hasBeenEnabled = true;
+    double matchTime = DriverStation.getMatchTime();
+    String newPhase;
+    
+    if (matchTime > 130) {
+      newPhase = "auto";
+    } else if (matchTime > 120) {
+      newPhase = "transition_shift";
+    } else if (matchTime > 95) {
+      newPhase = "shift1";
+    } else if (matchTime > 70) {
+      newPhase = "shift2";
+    } else if (matchTime > 45) {
+      newPhase = "shift3";
+    } else if (matchTime > 20) {
+      newPhase = "shift4";
+    } else if (matchTime > 0) {
+      newPhase = "endgame";
+    } else {
+      newPhase = "disabled";
+    }
+    
+    if (!newPhase.equals(currentPhase)) {
+      currentPhase = newPhase;
+      matchTimer.reset();
+      matchTimer.start();
+      timerActive = true;
+      
+      switch (currentPhase) {
+        case "auto":
+          currentPhaseDuration = AUTO_DURATION;
+          break;
+        case "transition_shift":
+          currentPhaseDuration = TRANSITION_SHIFT_DURATION;
+          break;
+        case "shift1":
+        case "shift2":
+        case "shift3":
+        case "shift4":
+          currentPhaseDuration = SHIFT_DURATION;
+          break;
+        case "endgame":
+          currentPhaseDuration = ENDGAME_DURATION;
+          break;
+        default:
+          currentPhaseDuration = 0.0;
+          timerActive = false;
       }
     }
     
-    // update match timer
-    double matchTime = DriverStation.getMatchTime();
+    double countdownTime = 0.0;
+    if (timerActive && currentPhaseDuration > 0) {
+      double elapsed = matchTimer.get();
+      countdownTime = Math.max(0, currentPhaseDuration - elapsed);
+    }
+    SmartDashboard.putNumber("Phase Countdown", countdownTime);
+    SmartDashboard.putString("Current Phase", currentPhase);
+    
     if (matchTime > 0) {
       SmartDashboard.putNumber("Match Time", matchTime);
     }
-    SmartDashboard.putNumber("Phase Change Time", matchTimer.get());
     SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
   }
 }
