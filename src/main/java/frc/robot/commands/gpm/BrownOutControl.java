@@ -2,14 +2,14 @@ package frc.robot.commands.gpm;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Brownout.BrownOutConstants;
+import frc.robot.subsystems.Brownout.BrownOutLevel;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.util.BrownOut.BrownOutConstants;
-import frc.robot.util.BrownOut.BrownOutLevel;
 
 public class BrownOutControl extends Command {
     private Shooter shooter;

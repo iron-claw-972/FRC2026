@@ -23,10 +23,10 @@ public class BrownOutConstants {
     // I don't see a world where you would decrease shooter current, but we need to do some testing to see how much current we are at when shooting
     
     // level numbers
-    public static final double LEVEL_ONE_LIMIT = 7.5;
-    public static final double LEVEL_TWO_LIMIT = 6.75;
-    public static final double LEVEL_THREE_LIMIT = 6.0;
-    public static final double LEVEL_FOUR_LIMIT = 5.25;
+    public static final double LEVEL_ONE_LIMIT = 7.75;
+    public static final double LEVEL_TWO_LIMIT = 7.25;
+    public static final double LEVEL_THREE_LIMIT = 6.75;
+    public static final double LEVEL_FOUR_LIMIT = 6.5;
 
     public static final double RECOVER_TIME = 10.0;
 

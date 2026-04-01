@@ -49,7 +49,6 @@ public class HubActive {
       case Blue -> redInactiveFirst;
     };
     // 67 is a clear indication of an error
-    SmartDashboard.putNumber("Time till active", timeToActive().orElse(timeToInactive().orElse(67.0)));
     if (matchTime > 130) {
       // Transition shift, hub is active.
       return true;
