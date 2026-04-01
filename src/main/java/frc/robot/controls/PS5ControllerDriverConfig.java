@@ -70,24 +70,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             CommandScheduler.getInstance().cancelAll();
         }));
 
-        // Align wheels
-        controller.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-                () -> getDrivetrain().setStateDeadband(false),
-                getDrivetrain()::alignWheels,
-                interrupted -> getDrivetrain().setStateDeadband(true),
-                () -> false, getDrivetrain()).withTimeout(2));
-
-        // Trench align
-        controller.get(PS5Button.CIRCLE).whileTrue(new StartEndCommand(
-                () -> {
-                    getDrivetrain().setTrenchAssist(true);
-                    getDrivetrain().setTrenchAlign(true);
-                },
-                () -> {
-                    getDrivetrain().setTrenchAssist(false);
-                    getDrivetrain().setTrenchAlign(false);
-                }));
-
         // Reverse motors
         if (intake != null && spindexer != null) {
             controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
@@ -164,23 +146,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 hood.forceHoodDown(true);
             }, hood)).onFalse(new InstantCommand(()->{
                 hood.forceHoodDown(false);
-            }));
-        }
-
-        // turns it on
-    //     controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
-    //         new BrownOutControl(shooter, spindexer, turret, intake, hood, getDrivetrain());
-    //     }));
-
-        // shooter power modifier
-        if (shooter != null) {
-            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
-                double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
-                SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", current + 0.05);
-            }));
-            controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
-                double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
-                SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", Math.max(0.5, current - 0.05));
             }));
         }
     }
