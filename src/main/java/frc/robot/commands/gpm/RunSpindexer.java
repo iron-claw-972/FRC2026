@@ -3,6 +3,7 @@ package frc.robot.commands.gpm;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
@@ -61,6 +62,7 @@ public class RunSpindexer extends Command {
                 reversing = false;
             }
         }
+        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
     }
 
     @Override
