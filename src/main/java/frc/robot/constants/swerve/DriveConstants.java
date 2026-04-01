@@ -53,7 +53,7 @@ public class DriveConstants {
         // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
         public static final double MAX_ANGULAR_SPEED = MAX_SPEED / ((TRACK_WIDTH / 2) * Math.sqrt(2));
     
-        public static final double COSF = 0.9;
+        public static final double COSF = 1.5;
         
         // The maximum acceleration of the robot, limited by friction
         public static final double MAX_LINEAR_ACCEL = COSF * Constants.GRAVITY_ACCELERATION;
@@ -108,10 +108,10 @@ public class DriveConstants {
         public static final double TRANSLATIONAL_D = 0.001;
     
         //The PIDs for PathPlanner Command
-        public static final double PATH_PLANNER_HEADING_P = 3.5;
+        public static final double PATH_PLANNER_HEADING_P = 3.5/2;
         public static final double PATH_PLANNER_HEADING_D = 0;
     
-        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6;
+        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6/2;
         public static final double PATH_PLANNER_TRANSLATIONAL_D = 0;
     
         // CAN
@@ -129,8 +129,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 60;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
@@ -206,7 +206,26 @@ public class DriveConstants {
          * Updates the constants if the RobotId is not the default SwerveCompetition robot.
          */
         public static void update(RobotId robotId) {
-            if (robotId == RobotId.PrimeJr) {
+            if (robotId == RobotId.TwinBot){
+                STEER_OFFSET_FRONT_LEFT = 301.113+180;
+                STEER_OFFSET_FRONT_RIGHT = 246.533; 
+                STEER_OFFSET_BACK_LEFT = 220.693+180;
+                STEER_OFFSET_BACK_RIGHT = 115.927+180;
+
+                // MK5n 
+                INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
+
+                // Gear ratios 
+                //DRIVE_GEAR_RATIO = (54.0 / 14.0) * (25.0 / 32.0) * (30.0 / 15.0); //R2 Ratio
+                DRIVE_GEAR_RATIO = (54.0 / 12.0) * (25.0 / 32.0) * (30.0 / 15.0); //R1 Ratio
+                STEER_GEAR_RATIO = 287.0 / 11.0;
+
+                // Gyro is mounted under the robot 
+                GYRO_MOUNT_POSE_ROLL = 180.0; 
+
+                MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
+            }
+            else if (robotId == RobotId.PrimeJr) {
                 STEER_OFFSET_FRONT_LEFT = 187.03125+180;
                 STEER_OFFSET_FRONT_RIGHT = 161.982421+180+180;
                 STEER_OFFSET_BACK_LEFT = 196.69921875+180;
