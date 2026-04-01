@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6,
-        "y": 7.623
+        "x": 4.4,
+        "y": 0.4483259999999985
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.6,
-        "y": 7.623
+        "x": 4.650000000000023,
+        "y": 0.4483259999999985
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 7.623
+        "x": 4.5,
+        "y": 0.4483259999999985
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 7.623
+        "x": 4.249999999999994,
+        "y": 0.44832599999999856
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,19 +33,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 3,
     "maxAcceleration": 2.5,
-    "maxAngularVelocity": 200.0,
-    "maxAngularAcceleration": 300.0,
-    "nominalVoltage": 12.0,
+    "maxAngularVelocity": 200,
+    "maxAngularAcceleration": 300,
+    "nominalVoltage": 12,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 3,
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Field Testing Autos",
+  "folder": "week 5 (new stuff)",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -37,12 +37,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Stop Spindexer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Hood Down"
           }
         },
@@ -56,6 +50,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Week 2 autos",
   "choreoAuto": false
 }

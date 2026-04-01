@@ -138,12 +138,6 @@
       "command": null
     },
     {
-      "name": "Stop Hood Down",
-      "waypointRelativePos": 0.8005559416261216,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
       "name": "Start Spindexer",
       "waypointRelativePos": 0.9506601806810285,
       "endWaypointRelativePos": null,
