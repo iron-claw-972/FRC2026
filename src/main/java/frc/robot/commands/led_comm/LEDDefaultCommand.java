@@ -32,11 +32,11 @@ public class LEDDefaultCommand extends Command {
         if (fiveSecondsBeforeChange() && allianceIsRed) {
             // blink alliance color and rumble if red alliance 5 seconds before hub shifts
             led.setStrobeLights(255, 0, 0);
-            counter = 0;
+            //counter = 0;
         } else if (fiveSecondsBeforeChange()) {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
-            counter = 0;
+            //counter = 0;
         // } else if(controller.get(PS5Button.LB).getAsBoolean()){
         //     counter++;
 
@@ -51,20 +51,20 @@ public class LEDDefaultCommand extends Command {
         }else if (DriverStation.isAutonomous() && allianceIsRed) {
             // Dimmer light for auto in red alliance
             led.setLEDs(50, 0, 0);
-            counter = 0;
+            //counter = 0;
         } else if (DriverStation.isAutonomous()) {
             // Dimmer light for auto in blue alliance
             led.setLEDs(0, 0, 50);
-            counter = 0;
+            //counter = 0;
         } else if (allianceIsRed && HubActive.isHubActive()){
             led.setTwoColorWave(255, 0, 0, 255, 255, 255);
-            counter = 0;
+            //counter = 0;
         } else if (!allianceIsRed && HubActive.isHubActive()) {
             led.setTwoColorWave(0, 0, 255, 255, 255, 255);
-            counter = 0;
+            //counter = 0;
         } else if (!HubActive.isHubActive()){
             led.setLEDs(0, 0, 0);
-            counter = 0;
+            //counter = 0;
         }
 
         // previous LED Hub code
