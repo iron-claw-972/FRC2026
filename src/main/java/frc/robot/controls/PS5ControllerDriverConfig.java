@@ -4,6 +4,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -170,6 +171,18 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     //     controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
     //         new BrownOutControl(shooter, spindexer, turret, intake, hood, getDrivetrain());
     //     }));
+
+        // shooter power modifier
+        if (shooter != null) {
+            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+                double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
+                SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", current + 0.05);
+            }));
+            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
+                double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
+                SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", Math.max(0.5, current - 0.05));
+            }));
+        }
     }
 
     @Override

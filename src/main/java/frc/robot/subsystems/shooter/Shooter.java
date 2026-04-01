@@ -61,6 +61,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
 
+        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
     }
 
