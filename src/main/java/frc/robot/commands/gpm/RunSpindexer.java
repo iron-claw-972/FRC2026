@@ -18,6 +18,8 @@ public class RunSpindexer extends Command {
     private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
 
     private boolean reversing = false;
+    private boolean wasHoodForcedDown = false;
+
     private Timer reverseTimer = new Timer();
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
         this.spindexer = spindexer;
@@ -33,8 +35,20 @@ public class RunSpindexer extends Command {
     // }
 
     @Override
+    public void initialize() {
+        wasHoodForcedDown = hood.getHoodForcedDown();
+    }
+
+    @Override
     public void execute() {
-        if (!turret.atSetpoint() || hood.getHoodForcedDown()) {
+        boolean hoodForcedDown = hood.getHoodForcedDown();
+        
+        if (wasHoodForcedDown && !hoodForcedDown) {
+            spindexer.maxSpindexer();
+        }
+        wasHoodForcedDown = hoodForcedDown;
+        
+        if (!turret.atSetpoint() || hoodForcedDown) {
             spindexer.stopSpindexer();
             reversing = false;
             return; // this is so the balls don't fly out when unaligned

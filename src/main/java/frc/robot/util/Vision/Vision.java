@@ -336,8 +336,9 @@ public class Vision {
    * @param poseEstimator The pose estimator to update
    * @param yawFunction A function that returns the yaw as a double given the timestamp
    * @param slipped True if the wheels have slipped, false otherwise
+   * @return The list of estimated robot poses from vision
    */
-  public void updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
+  public ArrayList<EstimatedRobotPose> updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
     // Simulate vision
     // 2 ifs to avoid warning
     if(VisionConstants.ENABLED_SIM){
@@ -363,6 +364,7 @@ public class Vision {
       );
       sawTag = true;
     }
+    return estimatedPoses;
   }
 
   /**
