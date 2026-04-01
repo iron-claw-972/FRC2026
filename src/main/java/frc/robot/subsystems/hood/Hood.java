@@ -109,10 +109,9 @@ public class Hood extends SubsystemBase implements HoodIO {
 		// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
 		// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());
 
-		if (forceHoodDown){
+		if (forceHoodDown) {
 			goalAngle = Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE);
 			goalVelocityRadPerSec = 0.0;
-		} else {
 		}
 
 		double setpointRad = goalAngle.getRadians();

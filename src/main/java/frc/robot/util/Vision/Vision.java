@@ -336,8 +336,9 @@ public class Vision {
    * @param poseEstimator The pose estimator to update
    * @param yawFunction A function that returns the yaw as a double given the timestamp
    * @param slipped True if the wheels have slipped, false otherwise
+   * @return The list of estimated robot poses from vision
    */
-  public void updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
+  public ArrayList<EstimatedRobotPose> updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
     // Simulate vision
     // 2 ifs to avoid warning
     if(VisionConstants.ENABLED_SIM){
@@ -363,6 +364,7 @@ public class Vision {
       );
       sawTag = true;
     }
+    return estimatedPoses;
   }
 
   /**
@@ -380,24 +382,6 @@ public class Vision {
    */
   public boolean canSeeTag(){
     return sawTag;
-  }
-
-  /**
-   * returns visible tag IDs from all cameras.
-   */
-  public int[] getVisibleTagIds() {
-    ArrayList<Integer> tagIds = new ArrayList<>();
-    for(VisionCamera c : cameras) {
-      for(PhotonPipelineResult result : c.getResults()) {
-        for(PhotonTrackedTarget target : result.getTargets()) {
-          int id = target.getFiducialId();
-          if(id > 0 && !tagIds.contains(id)) {
-            tagIds.add(id);
-          }
-        }
-      }
-    }
-    return tagIds.stream().mapToInt(Integer::intValue).toArray();
   }
 
   /**
@@ -715,10 +699,6 @@ public class Vision {
      */
     public void enable(boolean enable){
       enabled = enable;
-    }
-
-    public List<PhotonPipelineResult> getResults() {
-      return inputs.results;
     }
   }
 }

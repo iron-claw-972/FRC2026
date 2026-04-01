@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "W5 Left Trench Start"
+            "pathName": "W5 Right Trench Start"
           }
         },
         {
@@ -31,13 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DirectSwipe1"
+            "pathName": "Right Swipe1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 2.0
           }
         },
         {
@@ -73,13 +73,19 @@
         {
           "type": "named",
           "data": {
+            "name": "Reset Spindexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Hood Down"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left Swipe2"
+            "pathName": "Right Swipe2"
           }
         },
         {
@@ -97,7 +103,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 1.5
           }
         },
         {
@@ -109,7 +115,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         }
       ]

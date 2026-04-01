@@ -67,7 +67,7 @@ public class VisionConstants {
          */
         public static final double MAX_DISTANCE = 6;
 
-        /** If vision should use manual calculations */
+        /** If vision should use manual calculations (yawFunction-based vs referencePose-based). Changed to false to support gyro bias correction. */
         public static final boolean USE_MANUAL_CALCULATIONS = false;
 
         // <ol start="0"> did not work
