@@ -22,13 +22,22 @@ public class BrownOutConstants {
     // currently for show. I would imagine u would decrease movement: drivetrain, then bps impacters: intake/indexing speed, and then a bit on aiming: turret/hood. 
     // I don't see a world where you would decrease shooter current, but we need to do some testing to see how much current we are at when shooting
     
-    // level numbers
+    // level numbers limits
+    // -- voltage
     public static final double LEVEL_ONE_LIMIT = 7.75;
     public static final double LEVEL_TWO_LIMIT = 7.25;
     public static final double LEVEL_THREE_LIMIT = 6.75;
     public static final double LEVEL_FOUR_LIMIT = 6.5;
-
-    public static final double RECOVER_TIME = 10.0;
+    // -- current
+    // if we have been at a certain threshold average for too long (40 seconds) then lower currents
+    public static final double CURRENT_THRESHOLD_AMP = 120; // A <-- double check
+    public static final double CURRENT_TWENTY_LIMIT = 20.0; // sec
+    public static final double CURRENT_TWENTY_FIVE_LIMIT = 25.0; // sec
+    public static final double CURRENT_THIRTY_LIMIT = 30.0; // sec
+    public static final double CURRENT_THIRTY_FIVE_LIMIT = 35.0; // sec
+    
+    public static final double RECOVER_TIME = 10.0; // sec
+    public static final double DEBOUNCE_CURRENT_TIME = 2.0; //sec
 
     // normal
     public static final BrownOutLevel BROWNOUT_LVL_ONE = new BrownOutLevel(

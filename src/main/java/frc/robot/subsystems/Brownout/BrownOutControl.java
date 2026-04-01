@@ -1,20 +1,19 @@
 package frc.robot.subsystems.Brownout;
 
 import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 
 public class BrownOutControl extends SubsystemBase {
@@ -36,7 +35,11 @@ public class BrownOutControl extends SubsystemBase {
     };
 
     public BrownOutLevel level = levels[0];
-    public Timer recoverLevelTimer = new Timer();
+    public Timer recoverLevelTimer = new Timer(); // for moving back to calmer levels
+
+    public Timer currentThresholdTimer = new Timer();
+    public Debouncer currentThresholdDebouncer = new Debouncer(2.0, DebounceType.kRising);
+    public boolean aboveBreakThreshold = false; // for storing if we currently are above breaker threshold
 
     public BrownOutControl(Shooter shooter, Spindexer spindexer, Turret turret, Intake intake, Hood hood, Drivetrain drivetrain) {
         this.shooter = shooter;
@@ -98,18 +101,25 @@ public class BrownOutControl extends SubsystemBase {
         // voltage 6.3 is brownout where issues occur, but 4.75 is dead robot
         int level = 1;
         
-        // used to make sure we don't change levels instantly when returning to higher allowance
+        // set global
+        aboveBreakThreshold = currentTotal > BrownOutConstants.CURRENT_THRESHOLD_AMP;
+        // if its been below for a while
+        boolean beenBelowThreshold = (currentThresholdDebouncer.calculate(!aboveBreakThreshold));
+        // restart
+        if (beenBelowThreshold) {currentThresholdTimer.reset(); currentThresholdTimer.start();}
 
-        if (batteryVoltage > BrownOutConstants.LEVEL_ONE_LIMIT) { // normal
-            level = 1;
-        } else if (batteryVoltage > BrownOutConstants.LEVEL_TWO_LIMIT) { // if 7.5 to 6.75
-            level = 2;
-        } else if (batteryVoltage > BrownOutConstants.LEVEL_THREE_LIMIT) { // if 6.75 to 6.0 (browning out)
-            level = 3;
-        } else if (batteryVoltage > BrownOutConstants.LEVEL_FOUR_LIMIT) { // if 6.0 to 5.0 (mayday)
-            level = 4;
-        } else { // were are on life support at this point 5.25 to 4.75
+        // but if not restarting we can compare to see if its been elapsed for too long
+        // if we are below a certain voltage or our current is maxing out we skip to that highest level
+        if (batteryVoltage < BrownOutConstants.LEVEL_FOUR_LIMIT || currentThresholdTimer.hasElapsed(BrownOutConstants.CURRENT_THIRTY_FIVE_LIMIT)) {
             level = 5;
+        } else if (batteryVoltage < BrownOutConstants.LEVEL_THREE_LIMIT || currentThresholdTimer.hasElapsed(BrownOutConstants.CURRENT_THIRTY_LIMIT)) {
+            level = 4;
+        } else if (batteryVoltage < BrownOutConstants.LEVEL_TWO_LIMIT || currentThresholdTimer.hasElapsed(BrownOutConstants.CURRENT_TWENTY_FIVE_LIMIT)) {
+            level = 3;
+        } else if (batteryVoltage < BrownOutConstants.LEVEL_ONE_LIMIT || currentThresholdTimer.hasElapsed(BrownOutConstants.CURRENT_TWENTY_LIMIT)) {
+            level = 2;
+        } else {
+            level = 1;
         }
         return level;
     }
