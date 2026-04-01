@@ -79,7 +79,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Swipe2"
+            "pathName": "Left Swipe2"
           }
         },
         {
@@ -116,6 +116,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Week 5 autos",
   "choreoAuto": false
 }
