@@ -326,21 +326,16 @@ public class Drivetrain extends SubsystemBase {
         }
 
         if (VisionConstants.ENABLED) {
+            recordGyroReading(gyroInputs.yawPosition.getRadians());
+
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
-                vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
+                ArrayList<EstimatedRobotPose> visionPoses = vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
                 if (vision.canSeeTag()) {
                     slipped = false;
                     modulePoses.reset();
 
-                    // record reading for timestamp interpolation
-                    recordGyroReading(gyroInputs.yawPosition.getRadians());
-
                     double currentGyroYaw = gyroInputs.yawPosition.getRadians();
-
-                    // calculate bias between vision-derived and gyro yaw
-                    // this compensates for gyro drift over time
-                    ArrayList<EstimatedRobotPose> visionPoses = vision.getEstimatedPoses(getPose());
 
                     for (EstimatedRobotPose visionPose : visionPoses) {
                         if (visionPose.estimatedPose != null && visionPose.timestampSeconds > 0) {

@@ -103,13 +103,8 @@ public class GyroBiasEstimator {
             return 0.0;
         }
 
-        // use weighted average if we have enough weight, otherwise use EMA
-        double avgBias;
-        if (totalWeight >= GyroBiasConstants.MIN_TOTAL_WEIGHT) {
-            avgBias = weightedBiasSum / totalWeight;
-        } else {
-            avgBias = emaBias;
-        }
+        // use weighted average
+        double avgBias = weightedBiasSum / totalWeight;
 
         // reset
         weightedBiasSum = 0.0;
