@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomRight W5 Right Trench Start"
+            "pathName": "W5 Right Trench Start"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomRight Swipe1"
+            "pathName": "Right Swipe1"
           }
         },
         {
@@ -85,7 +85,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BottomRight Swipe2"
+            "pathName": "Right Swipe2"
           }
         },
         {
@@ -122,6 +122,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Week 5 autos",
   "choreoAuto": false
 }
