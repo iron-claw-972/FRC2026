@@ -119,6 +119,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public double getStatorCurrent() {
         return inputs.spindexerCurrent;
     }
+    
+    public double getSupplyCurrent() {
+        return motor.getSupplyCurrent().getValueAsDouble();
+    }
 
     public void setNewCurrentLimit(double newCurrentLimit) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
@@ -133,6 +137,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public void updateInputs() {
         inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble(); //SpindexerConstants.gearRatio;
         inputs.spindexerCurrent = motor.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerJamming = (state == SpindexerState.REVERSE ? 1 : 0);
         Logger.processInputs("Spindexer", inputs);
     }
 

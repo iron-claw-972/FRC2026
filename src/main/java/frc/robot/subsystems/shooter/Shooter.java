@@ -70,6 +70,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+        
+        SmartDashboard.putData("Shoot Harder", new InstantCommand(() -> bumpUpShooterModifier()));
+        SmartDashboard.putData("Shoot Softer", new InstantCommand(() -> bumpDownShooterModifier()));
     }
 
     @Override
@@ -99,10 +102,19 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
         SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
         SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
         SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
 
+        // run in shooter just cus: This is for elastic
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        SmartDashboard.putBoolean("Hub Active", HubActive.isHubActive());
+        double timeToActive = HubActive.timeToActive().orElse(0.0);
+        double timeTillInactive = HubActive.timeToInactive().orElse(0.0);
+        SmartDashboard.putNumber("Time till active", timeToActive);
+        SmartDashboard.putNumber("Time till Unactive", timeTillInactive);
+        // for aditiya
+        Logger.recordOutput("Timing/", timeToActive);
+        Logger.recordOutput("Timing/", timeTillInactive);
     }
 
     /**
@@ -124,6 +136,30 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         limitConfig.StatorCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
+    }
+
+    public double getLeftStatorCurrent() {
+        return inputs.shooterCurrentLeft;
+    }
+
+    public double getLeftSupplyCurrent() {
+        return shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
+    }
+
+    public double getRightStatorCurrent() {
+        return inputs.shooterCurrentRight;
+    }
+
+    public double getRightSupplyCurrent() {
+        return shooterMotorRight.getSupplyCurrent().getValueAsDouble();
+    }
+
+    private void bumpUpShooterModifier() {
+        powerModifier += 0.5;
+    }
+
+    private void bumpDownShooterModifier() {
+        powerModifier -= 0.5;
     }
 
     @Override
