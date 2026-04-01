@@ -37,17 +37,17 @@ public class LEDDefaultCommand extends Command {
             // blink alliance color and rumble if blue alliance 5 seconds before hub shifts
             led.setStrobeLights(0, 0, 255);
             counter = 0;
-        } else if(controller.get(PS5Button.LB).getAsBoolean()){
-            counter++;
+        // } else if(controller.get(PS5Button.LB).getAsBoolean()){
+        //     counter++;
 
-            if (counter == 1) {
-                led.alternate(255, 0, 0, 0, 0, 255, 5, 0, 67);
-            } else if (counter == 20) {
-                led.alternate(0, 0, 255, 255, 0, 0, 5, 0, 67);
-            }
-            if (counter >= 40) {
-                counter = 0;
-        }
+        //     if (counter == 1) {
+        //         led.alternate(255, 0, 0, 0, 0, 255, 5, 0, 67);
+        //     } else if (counter == 20) {
+        //         led.alternate(0, 0, 255, 255, 0, 0, 5, 0, 67);
+        //     }
+        //     if (counter >= 40) {
+        //         counter = 0;
+        // }
         }else if (DriverStation.isAutonomous() && allianceIsRed) {
             // Dimmer light for auto in red alliance
             led.setLEDs(50, 0, 0);
