@@ -23,12 +23,13 @@ public class DriveConstants {
      * <p>
      * The frame width is 26.5 inches, and each bumper is 3.25 inches.
      */
-    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.832;
+    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.83185; // 32.75 inches
 
-    public static double ROBOT_MASS = Units.lbsToKilograms(108.3 + 13 + 13.4 + 5.0);
+    public static double ROBOT_MASS = Units.lbsToKilograms(110.0 + 13.9 + 13.4 + 5.0);
 
     /** Radius of the drive wheels [meters]. */
-    public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
+    // I think its middle of wheel to middle of wheel
+    public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
 
     public static double WHEEL_MOI = 0.000326 * ROBOT_MASS;
 
