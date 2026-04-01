@@ -18,9 +18,10 @@ public class RunSpindexer extends Command {
     private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
 
     private boolean reversing = false;
-    private Timer reverseTimer = new Timer();
     private boolean wasHoodForcedDown = false;
 
+    private Timer reverseTimer = new Timer();
+    
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -33,6 +34,11 @@ public class RunSpindexer extends Command {
         // this.spindexer = spindexer;
         // addRequirements(spindexer);
     // }
+
+    @Override
+    public void initialize() {
+        wasHoodForcedDown = hood.getHoodForcedDown();
+    }
 
     @Override
     public void execute() {

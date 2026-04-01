@@ -1,5 +1,6 @@
 package frc.robot.util.Vision;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.constants.GyroBiasConstants;
 
@@ -98,17 +99,12 @@ public class GyroBiasEstimator {
      * @return average bias in radians to apply, or 0 if not enough samples
      */
     public double getAndResetBias() {
-        if (sampleCount < GyroBiasConstants.MIN_SAMPLES || totalWeight < GyroBiasConstants.MIN_TOTAL_WEIGHT) {
+        if (sampleCount < GyroBiasConstants.MIN_SAMPLES) {
             return 0.0;
         }
 
-        // use weighted average if we have enough weight, otherwise use EMA
-        double avgBias;
-        if (totalWeight >= GyroBiasConstants.MIN_TOTAL_WEIGHT) {
-            avgBias = weightedBiasSum / totalWeight;
-        } else {
-            avgBias = emaBias;
-        }
+        // use weighted average
+        double avgBias = weightedBiasSum / totalWeight;
 
         // reset
         weightedBiasSum = 0.0;
@@ -137,31 +133,10 @@ public class GyroBiasEstimator {
     }
 
     /**
-     * check if correction should be applied.
-     *
-     * @param gyroYaw current gyro reading
-     * @param visionYaw vision-derived yaw
-     * @return true if we should call setYaw(), false otherwise
-     */
-    public boolean shouldCorrect(double gyroYaw, double visionYaw) {
-        if (addObservation(visionYaw, gyroYaw)) {
-            double bias = getAndResetBias();
-            return Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD;
-        }
-        return false;
-    }
-
-    /**
      * normalize angle to [-PI, PI]
      */
     private double normalizeAngle(double angle) {
-        while (angle > Math.PI) {
-            angle -= 2 * Math.PI;
-        }
-        while (angle < -Math.PI) {
-            angle += 2 * Math.PI;
-        }
-        return angle;
+        return MathUtil.angleModulus(angle);
     }
 
     /**
