@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -77,6 +78,10 @@ public class RobotContainer {
 
   // Auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+  // custom match timer
+  private final Timer matchTimer = new Timer();
+  private boolean hasBeenEnabled = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -325,11 +330,21 @@ public class RobotContainer {
 
   /** Updates SmartDashboard values that need to be refreshed every loop */
   public void periodic() {
+    // update custom timer (counts before phase change)
+    if (!hasBeenEnabled) {
+      if (DriverStation.isAutonomousEnabled() || DriverStation.isTeleopEnabled()) {
+        matchTimer.reset();
+        matchTimer.start();
+        hasBeenEnabled = true;
+      }
+    }
+    
     // update match timer
     double matchTime = DriverStation.getMatchTime();
     if (matchTime > 0) {
       SmartDashboard.putNumber("Match Time", matchTime);
     }
+    SmartDashboard.putNumber("Phase Change Time", matchTimer.get());
     SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
   }
 }
