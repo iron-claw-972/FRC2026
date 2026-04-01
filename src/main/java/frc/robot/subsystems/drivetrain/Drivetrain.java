@@ -2,7 +2,6 @@ package frc.robot.subsystems.drivetrain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,12 +22,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.Music;
@@ -640,7 +639,6 @@ public class Drivetrain extends SubsystemBase {
         // find two closest timestamps and interpolate
         int oldestIndex = (gyroHistoryHead - gyroHistoryCount + GYRO_HISTORY_SIZE) % GYRO_HISTORY_SIZE;
         int newestIndex = (gyroHistoryHead - 1 + GYRO_HISTORY_SIZE) % GYRO_HISTORY_SIZE;
-        
         double oldestTs = gyroTimestampsHistory[oldestIndex];
         double newestTs = gyroTimestampsHistory[newestIndex];
         
@@ -652,9 +650,41 @@ public class Drivetrain extends SubsystemBase {
             return gyroYawsHistory[newestIndex];
         }
         
-        // linear interpolation between closest readings
-        double alpha = (timestampSeconds - oldestTs) / (newestTs - oldestTs);
-        return gyroYawsHistory[oldestIndex] + alpha * (gyroYawsHistory[newestIndex] - gyroYawsHistory[oldestIndex]);
+        int prevIndex = -1;
+        int nextIndex = -1;
+        int idx = oldestIndex;
+        for (int i = 0; i < gyroHistoryCount; i++) {
+            double ts = gyroTimestampsHistory[idx];
+            if (ts <= timestampSeconds) {
+                prevIndex = idx;
+            }
+            if (ts >= timestampSeconds) {
+                nextIndex = idx;
+                break;
+            }
+            idx = (idx + 1) % GYRO_HISTORY_SIZE;
+        }
+        
+        if (prevIndex == -1) {
+            return gyroYawsHistory[oldestIndex];
+        }
+        if (nextIndex == -1) {
+            return gyroYawsHistory[newestIndex];
+        }
+        
+        double t0 = gyroTimestampsHistory[prevIndex];
+        double t1 = gyroTimestampsHistory[nextIndex];
+        if (prevIndex == nextIndex || t1 == t0) {
+            return gyroYawsHistory[prevIndex];
+        }
+        
+        double y0 = gyroYawsHistory[prevIndex];
+        double y1 = gyroYawsHistory[nextIndex];
+        
+        double alpha = (timestampSeconds - t0) / (t1 - t0);
+
+        double delta = MathUtil.angleModulus(y1 - y0);
+        return y0 + alpha * delta;
     }
 
     /**

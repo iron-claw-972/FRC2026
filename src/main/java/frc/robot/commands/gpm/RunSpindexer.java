@@ -35,6 +35,11 @@ public class RunSpindexer extends Command {
     // }
 
     @Override
+    public void initialize() {
+        wasHoodForcedDown = hood.getHoodForcedDown();
+    }
+
+    @Override
     public void execute() {
         boolean hoodForcedDown = hood.getHoodForcedDown();
         

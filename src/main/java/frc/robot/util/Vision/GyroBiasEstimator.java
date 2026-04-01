@@ -99,7 +99,7 @@ public class GyroBiasEstimator {
      * @return average bias in radians to apply, or 0 if not enough samples
      */
     public double getAndResetBias() {
-        if (sampleCount < GyroBiasConstants.MIN_SAMPLES || totalWeight < GyroBiasConstants.MIN_TOTAL_WEIGHT) {
+        if (sampleCount < GyroBiasConstants.MIN_SAMPLES) {
             return 0.0;
         }
 
