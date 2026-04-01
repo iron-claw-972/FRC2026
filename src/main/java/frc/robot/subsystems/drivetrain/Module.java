@@ -454,4 +454,7 @@ public class Module implements ModuleIO{
         return turnAbsolutePosition;
     }
 
+    public TalonFX[] getMotors() {
+        return new TalonFX[]{angleMotor, driveMotor};
+    }
 }
