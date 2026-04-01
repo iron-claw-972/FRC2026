@@ -76,16 +76,16 @@ public class RobotContainer {
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
 
-  // Auto Command selection
+  // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-  // Custom match timer that counts down each phase
+  // custom match timer that counts down each phase
   private final Timer matchTimer = new Timer();
-  private double currentPhaseDuration = 20.0; // Default auto duration
+  private double currentPhaseDuration = 20.0; // default auto duration
   private boolean timerActive = false;
   private String currentPhase = "none";
   
-  // Phase durations (in seconds) - based on match clock (0:00 to 2:40 = 150s)
+  // phase durations
   private static final double AUTO_DURATION = 20.0;
   private static final double TRANSITION_SHIFT_DURATION = 10.0;
   private static final double SHIFT_DURATION = 25.0;
