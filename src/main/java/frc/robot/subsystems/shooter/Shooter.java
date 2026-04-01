@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         updateInputs();
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 1.0; //tune p value
+        config.Slot0.kP = 0.5; //0.5 to stop fighting
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.0;
         config.Slot0.kV = 0.125; //Maximum rps = 100 --> 12V/100rps
@@ -81,7 +81,13 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
         Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
 
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON" : "lost");
+        double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+        
+        SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "lost");
+        SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+        SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+
     }
 
     /**

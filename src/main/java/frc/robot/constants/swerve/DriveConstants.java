@@ -147,10 +147,10 @@ public class DriveConstants {
     
         /* Drive Motor PID Values */
         public static final double[] P_VALUES = {
-            0.1,
-            0.1,
-            0.1,
-            0.1
+            0.3,
+            0.3,
+            0.3,
+            0.3
         };
         public static final double[] I_VALUES = {
             0,
@@ -188,7 +188,10 @@ public class DriveConstants {
         // Open loop prevents throttle from changing too quickly.
         // It will limit it to time given (in seconds) to go from zero to full throttle.
         // A small open loop ramp (0.25) helps with tread wear, tipping, etc
-        public static final double OPEN_LOOP_RAMP = 0.25;
+        public static final double OPEN_LOOP_RAMP = 0.1;
+
+        // limits maximum rate of change for motor
+        public static final double CLOSE_LOOP_RAMP = 0.0;
     
         public static final double WHEEL_CIRCUMFERENCE = 2*Math.PI*WHEEL_RADIUS;
     
