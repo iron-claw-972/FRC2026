@@ -283,6 +283,7 @@ public class RobotContainer {
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
     String leftLiberalSwipe = "LeftLiberalDoubleSwipe";
+    String rightLiberalSwipe = "RightLiberalDoubleSwipe";
     String leftLiberalSwipeTranslation = "LeftLiberalDoubleSwipeTranslation";
     String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
 
@@ -292,7 +293,9 @@ public class RobotContainer {
     addAuto(shootOnlyAuto);
     addAuto(leftConservativeSwipe);
     addAuto(leftLiberalSwipe);
+    addAuto(rightLiberalSwipe);
     addAuto(leftLiberalSwipeTranslation);
+
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

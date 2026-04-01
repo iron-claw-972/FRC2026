@@ -174,11 +174,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // shooter power modifier
         if (shooter != null) {
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
                 double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
                 SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", current + 0.05);
             }));
-            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
+            controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
                 double current = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", 1.05);
                 SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", Math.max(0.5, current - 0.05));
             }));
