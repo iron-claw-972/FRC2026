@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.LED.LED;
+import frc.robot.util.HubActive;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.PS5Button;
 
@@ -55,35 +56,43 @@ public class LEDDefaultCommand extends Command {
             // Dimmer light for auto in blue alliance
             led.setLEDs(0, 0, 50);
             counter = 0;
-        } else if (gameData != null && ((allianceIsRed && gameData.equals("B") && matchTime <= 105 && matchTime >= 80)
-                || (allianceIsRed && gameData.equals("B") && matchTime <= 55 && matchTime >= 30))) {
-            // turn light off for inactive hub if red alliance and blue inactive first
-            led.setLEDs(0, 0, 0);
-            counter = 0;
-        } else if (gameData != null && ((allianceIsRed && gameData.equals("R") && matchTime <= 130 && matchTime >= 105)
-                || (allianceIsRed && gameData.equals("R") && matchTime <= 80 && matchTime >= 55))) {
-            // turn light off for inactive hub if red alliance and red inactive first
-            led.setLEDs(0, 0, 0);
-            counter = 0;
-        } else if (gameData != null && ((!allianceIsRed && gameData.equals("B") && matchTime <= 130 && matchTime >= 105)
-                || (!allianceIsRed && gameData.equals("B") && matchTime <= 80 && matchTime >= 55))) {
-            // turn off lights for inactive hub if blue alliance and blue inactive first
-            led.setLEDs(0, 0, 0);
-            counter = 0;
-        } else if (gameData != null && ((!allianceIsRed && gameData.equals("R") && matchTime <= 105 && matchTime >= 80)
-                || (!allianceIsRed && gameData.equals("R") && matchTime <= 55 && matchTime >= 30))) {
-            // turn light off for inactive hub if blue alliance and red inactive first
-            led.setLEDs(0, 0, 0);
-            counter = 0;
-        } else if (allianceIsRed) {
-            // Red alliance
+        } else if (allianceIsRed && HubActive.isHubActive()){
             led.setTwoColorWave(255, 0, 0, 255, 255, 255);
             counter = 0;
-        } else {
-            // Blue alliance
+        } else if (!allianceIsRed && HubActive.isHubActive()) {
             led.setTwoColorWave(0, 0, 255, 255, 255, 255);
             counter = 0;
+        } else if (!HubActive.isHubActive()){
+            led.setLEDs(0, 0, 0);
+            counter = 0;
         }
+
+        // previous LED Hub code
+
+        // } else if (gameData != null && ((allianceIsRed && gameData.equals("B") && matchTime <= 105 && matchTime >= 80)
+        //         || (allianceIsRed && gameData.equals("B") && matchTime <= 55 && matchTime >= 30))) {
+        //     // turn light off for inactive hub if red alliance and blue inactive first
+        //     led.setLEDs(0, 0, 0);
+        //     counter = 0;
+        // } else if (gameData != null && ((allianceIsRed && gameData.equals("R") && matchTime <= 130 && matchTime >= 105)
+        //         || (allianceIsRed && gameData.equals("R") && matchTime <= 80 && matchTime >= 55))) {
+        //     // turn light off for inactive hub if red alliance and red inactive first
+        //     led.setLEDs(0, 0, 0);
+        //     counter = 0;
+        // } else if (gameData != null && ((!allianceIsRed && gameData.equals("B") && matchTime <= 130 && matchTime >= 105)
+        //         || (!allianceIsRed && gameData.equals("B") && matchTime <= 80 && matchTime >= 55))) {
+        //     // turn off lights for inactive hub if blue alliance and blue inactive first
+        //     led.setLEDs(0, 0, 0);
+        //     counter = 0;
+        // } else if (gameData != null && ((!allianceIsRed && gameData.equals("R") && matchTime <= 105 && matchTime >= 80)
+        //         || (!allianceIsRed && gameData.equals("R") && matchTime <= 55 && matchTime >= 30))) {
+        //     // turn light off for inactive hub if blue alliance and red inactive first
+        //     led.setLEDs(0, 0, 0);
+        //     counter = 0;
+        // } else if (allianceIsRed) {
+        //     // Red alliance
+        //     led.setTwoColorWave(255, 0, 0, 255, 255, 255);
+        //     counter = 0;
     }
 
     @Override
