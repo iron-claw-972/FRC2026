@@ -124,6 +124,8 @@ public class RobotContainer {
         spindexer = new Spindexer();
         intake = new Intake();
         linearClimb = new LinearClimb();
+        led = new LED();
+        led.setDefaultCommand(new LEDDefaultCommand(led));
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
