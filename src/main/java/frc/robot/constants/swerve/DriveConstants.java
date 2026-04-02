@@ -23,9 +23,9 @@ public class DriveConstants {
      * <p>
      * The frame width is 26.5 inches, and each bumper is 3.25 inches.
      */
-    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.832;
+    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.83185; // 32.75 inches in meters
 
-    public static double ROBOT_MASS = Units.lbsToKilograms(110);
+    public static double ROBOT_MASS = Units.lbsToKilograms(110 + 13 + 13.4 + 5.0);
 
     /** Radius of the drive wheels [meters]. */
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
@@ -34,6 +34,7 @@ public class DriveConstants {
 
     
     /** Distance between the left and right wheels [meters]. */
+    // from center of wheels btw
     public static double TRACK_WIDTH = Units.inchesToMeters(20.75);//22.75 swerve bot, 20.75 comp bot
 
     // Mk4i gear ratios
@@ -129,8 +130,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 60;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
