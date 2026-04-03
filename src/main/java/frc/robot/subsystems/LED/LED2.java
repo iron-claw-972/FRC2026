@@ -66,8 +66,21 @@ public class LED2 extends SubsystemBase {
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
+		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()));
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()));
+		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> {
+			var allianceeee = DriverStation.getAlliance();
+			if (allianceeee.isEmpty()) {
+				color = Color.kWhite;
+			} else if (allianceeee.get() == Alliance.Red) {
+				color = Color.kRed;
+			} else if (allianceeee.get() == Alliance.Blue) {
+				color = Color.kBlue;
+			} else {
+				color = Color.kWhite;
+			}
+		}));
 	}
 
 	private boolean flippy = true;
@@ -83,13 +96,18 @@ public class LED2 extends SubsystemBase {
 		}
 	}
 
-	private void setStrobe() {
+	public void setStrobe() {
 		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
 	}
 
-	private void setStatic() {
+	public void setStatic() {
 		candle.setControl(new SolidColor(8, 8 + stripLength).withColor(new RGBWColor(color)));
 	}
+
+	public void lightsOff() {
+		candle.setControl(new SolidColor(8 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
+	}
+	
 
 	private boolean underSecsToFlip(double secs) {
 		Optional<Double> timeToActive = HubActive.timeToActive();
