@@ -107,10 +107,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-            SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
+        
+        // keep this
+        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
 
     /**

@@ -87,19 +87,6 @@ public class LED2 extends SubsystemBase {
 
 	private boolean flippy = true;
 
-	public void setColor() {
-		var alliance = DriverStation.getAlliance();
-		if (alliance.isEmpty()) {
-			color = Color.kWhite;
-		} else if (alliance.get() == Alliance.Red) {
-			color = Color.kRed;
-		} else if (alliance.get() == Alliance.Blue) {
-			color = Color.kBlue;
-		} else {
-			color = Color.kWhite;
-		}
-	}
-
 	@Override
 	public void periodic() {
 		if (underSecsToFlip(5.0) && flippy) {
