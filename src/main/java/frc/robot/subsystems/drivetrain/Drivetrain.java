@@ -210,6 +210,13 @@ public class Drivetrain extends SubsystemBase {
             positions[i] = modules[i].getOdometryPositions();
             sampleCount = Math.min(sampleCount, positions[i].length);
         }
+
+        // cap samples per cycle, more gives little benefit
+        final int MAX_SAMPLES_PER_CYCLE = 10;
+        if (sampleCount > MAX_SAMPLES_PER_CYCLE) {
+            sampleCount = MAX_SAMPLES_PER_CYCLE;
+        }
+
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
