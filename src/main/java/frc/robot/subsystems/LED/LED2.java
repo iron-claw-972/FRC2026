@@ -17,7 +17,9 @@ import com.ctre.phoenix6.signals.VBatOutputModeValue;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
@@ -63,6 +65,9 @@ public class LED2 extends SubsystemBase {
 		setStatic();
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
+
+		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()));
+		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()));
 	}
 
 	private boolean flippy = true;
