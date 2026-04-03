@@ -27,7 +27,8 @@ public class LED2 extends SubsystemBase {
 	private CANdle candle;
 	public static final int stripLength = 67;
 
-	public static final double FLASH_INTERVAL = .25;
+	/// Hz
+	public static final int FLASH_RATE = 4;
 
 	private Color color;
 	
@@ -78,7 +79,7 @@ public class LED2 extends SubsystemBase {
 	}
 
 	private void setStrobe() {
-		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(4).withColor(new RGBWColor(color)));
+		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
 	}
 
 	private void setStatic() {
@@ -92,10 +93,10 @@ public class LED2 extends SubsystemBase {
 		if (timeToActive.isEmpty() && timeToInactive.isEmpty()) {
 			return false;
 		} else if (timeToActive.isPresent()) {
-			return (timeToActive.get() <= secs) ? true : false;
+			return (timeToActive.get() <= secs);
 
 		} else if (timeToInactive.isPresent()) {
-			return (timeToInactive.get() <= secs) ? true : false;
+			return (timeToInactive.get() <= secs);
 		} else {
 			return false;
 		}
