@@ -33,9 +33,11 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.SupplyCurrentLowerTime = 1.5;
         motor.getConfigurator().apply(limitConfig);
 
-        SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
-        SmartDashboard.putData("Spindexer Run Reverse", new InstantCommand(() -> reverseSpindexer()));
-        SmartDashboard.putData("Spindexer Stop", new InstantCommand(() -> stopSpindexer()));
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
+            SmartDashboard.putData("Spindexer Run Reverse", new InstantCommand(() -> reverseSpindexer()));
+            SmartDashboard.putData("Spindexer Stop", new InstantCommand(() -> stopSpindexer()));
+        }
 
         resetPID.setTolerance(0.05);
     }
@@ -79,10 +81,12 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
-        SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
 
-        SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
-        SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
+            SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
+            SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
+        }
 
         boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
         if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
@@ -90,7 +94,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         }
         wasSpindexerSlow = isSpindexerSlow;
 
-        SmartDashboard.putBoolean("Spindexer Jamming", state == SpindexerState.REVERSE);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Spindexer Jamming", state == SpindexerState.REVERSE);
+        }
     }
 
     public void maxSpindexer() {

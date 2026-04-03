@@ -153,11 +153,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
 
         // add some test commands.
-        SmartDashboard.putData("Extension Mechanism", mechanism);
-        SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
-        SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Extension Mechanism", mechanism);
+            SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
+            SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
+            SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+            SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        }
         
         if (RobotBase.isSimulation()) {
             // Extender simulation
@@ -194,9 +196,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
             Logger.recordOutput("Intake/Setpoint", setpointInches);
             robotExtension.setLength(inchExtension);
         }
-
-        SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
-        SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        }
 
         if(calibrating){
             leftMotor.set(-0.1);
@@ -212,8 +215,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
             Logger.processInputs("Intake", inputs);
         }
 
-        SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
-        SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
+            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        }
     }
 
     public void simulationPeriodic(){

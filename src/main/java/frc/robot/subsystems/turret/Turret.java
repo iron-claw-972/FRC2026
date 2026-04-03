@@ -100,10 +100,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
-		SmartDashboard.putData("Turret Mech", mech);
-		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
-		SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("Turret Mech", mech);
+			SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
+			SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+			SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
+		}
 
 		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
 		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
@@ -111,7 +113,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 		turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
 		turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
 		turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
-		SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+		
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+		}
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
@@ -231,9 +236,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 			Logger.processInputs("Turret", inputs);
 		}
 
-		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
-		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		}
 	}
 
 	/* ---------------- Simulation ---------------- */

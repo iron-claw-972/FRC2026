@@ -5,6 +5,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
@@ -68,7 +69,9 @@ public class RunSpindexer extends Command {
                 reversing = false;
             }
         }
-        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        }
     }
 
     @Override

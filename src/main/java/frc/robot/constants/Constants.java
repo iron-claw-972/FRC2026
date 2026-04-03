@@ -22,6 +22,7 @@ public class Constants {
 
     // this would disable all logger calls
     public static final boolean DISABLE_LOGGING = false;
+    public static final boolean DISABLE_SMART_DASHBOARD = false; // wont disable auto picker
 
     public static enum Mode {
         /** Running on a real robot. */

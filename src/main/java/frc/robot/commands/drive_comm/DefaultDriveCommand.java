@@ -42,7 +42,9 @@ public class DefaultDriveCommand extends Command {
         trenchAssistPid.setIZone(2);
         trenchAssistPid.setIntegratorRange(-1, 1);
 
-        SmartDashboard.putNumber("0 degrees snap location", 0);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("0 degrees snap location", 0);
+        }
     }
 
     @Override
@@ -96,7 +98,7 @@ public class DefaultDriveCommand extends Command {
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         }
-        
+
         if (swerve.getTrenchAssist()) {
             drive(TrenchAssist.calculate(swerve, corrected, trenchAssistPid));
         } else {

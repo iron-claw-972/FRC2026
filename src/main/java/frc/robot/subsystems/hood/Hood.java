@@ -61,12 +61,14 @@ public class Hood extends SubsystemBase implements HoodIO {
 
 		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
-		SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
-		SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
-		SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
-    		
-		SmartDashboard.putData("force hood down", new InstantCommand(() -> forceHoodDown(true)));
-		SmartDashboard.putData("unforce hood", new InstantCommand(() -> forceHoodDown(false)));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("max", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE)), 0)));
+			SmartDashboard.putData("medium", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians((HoodConstants.MAX_ANGLE + HoodConstants.MIN_ANGLE) / 2)), 0)));
+			SmartDashboard.putData("min", new InstantCommand(() -> setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(HoodConstants.MIN_ANGLE)), 0)));
+				
+			SmartDashboard.putData("force hood down", new InstantCommand(() -> forceHoodDown(true)));
+			SmartDashboard.putData("unforce hood", new InstantCommand(() -> forceHoodDown(false)));
+		}
 	}
 
 	/**
@@ -158,10 +160,11 @@ public class Hood extends SubsystemBase implements HoodIO {
             Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
             Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
         }
-
-		SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
-		SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
-
+		
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+		}
 	}
 
 	public void calibrate(){

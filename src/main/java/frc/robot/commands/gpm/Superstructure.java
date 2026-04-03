@@ -152,9 +152,11 @@ public class Superstructure extends Command {
             Logger.recordOutput("Turret/Target Pose", target);
             Logger.recordOutput("Lookahead Pose", lookaheadPose);
         }
-        SmartDashboard.putNumber("Time of flight", timeOfFlight);
-        SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
-        SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Time of flight", timeOfFlight);
+            SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
+            SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
+        }
 
         // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
@@ -231,12 +233,19 @@ public class Superstructure extends Command {
 
     @Override
     public void execute() {
-        TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-        SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-        hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
-        SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+            SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+            hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
+            SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
+            turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+            SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        } else {
+            TOFAdjustment = 0.0;
+            hoodOffset = 0.0;
+            turretOffset = 0.0;
+        }
+        
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
@@ -289,13 +298,16 @@ public class Superstructure extends Command {
             
             Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
         }
-        
-
-        SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
 
         // for operator
-        phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-        SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
+            
+            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
+            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
+        } else {
+            phaseDelay = 0.03;
+        }
     }
 
     @Override

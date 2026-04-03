@@ -186,8 +186,9 @@ public class Drivetrain extends SubsystemBase {
                 });
 
         // PPLibTelemetry.enableCompetitionMode();
-
-        SmartDashboard.putData("Field", field);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Field", field);
+        }
     }
 
     public void close() {

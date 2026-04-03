@@ -102,9 +102,11 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     // display the current robot id on smartdashboard
-    SmartDashboard.putString("RobotID", robotId.toString());
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putString("RobotID", robotId.toString());
 
-    SmartDashboard.putNumber("Match Time", 0.0);
+      SmartDashboard.putNumber("Match Time", 0.0);
+    }
 
     // Filling the SendableChooser on SmartDashboard
 
@@ -190,7 +192,9 @@ public class RobotContainer {
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
 
-    SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    }
   }
 
   /**
@@ -404,12 +408,18 @@ public class RobotContainer {
       double elapsed = matchTimer.get();
       countdownTime = Math.max(0, currentPhaseDuration - elapsed);
     }
-    SmartDashboard.putNumber("Phase Countdown", countdownTime);
-    SmartDashboard.putString("Current Phase", currentPhase);
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putNumber("Phase Countdown", countdownTime);
+      SmartDashboard.putString("Current Phase", currentPhase);
+    }
     
     if (matchTime > 0) {
-      SmartDashboard.putNumber("Match Time", matchTime);
+      if (!Constants.DISABLE_SMART_DASHBOARD) {
+        SmartDashboard.putNumber("Match Time", matchTime);
+      }
     }
-    SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
+    }
   }
 }

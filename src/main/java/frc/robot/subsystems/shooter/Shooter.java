@@ -68,8 +68,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
 
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+            SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+        }
     }
 
     @Override
@@ -79,15 +81,18 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        if (!Constants.DISABLE_SMART_DASHBOARD) { // yes I could put this in one, but more lines for me
+            powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        }
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
 
-
-        SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
-        SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
+            SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
+        }
 
         // Sets the motor control to target velocity
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
@@ -100,11 +105,12 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
-        SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
-        SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
-        SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
-
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
+            SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+            SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+            SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+        }
     }
 
     /**
