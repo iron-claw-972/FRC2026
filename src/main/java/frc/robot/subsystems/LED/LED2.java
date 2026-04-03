@@ -52,16 +52,7 @@ public class LED2 extends SubsystemBase {
 		configurator.apply(featureConf);
 		configurator.apply(ledConf);
 
-		var alliance = DriverStation.getAlliance();
-		if (alliance.isEmpty()) {
-			color = Color.kOrange;
-		} else if (alliance.get() == Alliance.Red) {
-			color = Color.kRed;
-		} else if (alliance.get() == Alliance.Blue) {
-			color = Color.kOrange;
-		} else {
-			color = Color.kWhite;
-		}
+		setColor();
 
 		candle.clearAllAnimations();
 		setStatic();
@@ -71,24 +62,35 @@ public class LED2 extends SubsystemBase {
 		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()).ignoringDisable(true));
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
-		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> {
-			var allianceeee = DriverStation.getAlliance();
-			if (allianceeee.isEmpty()) {
-				color = Color.kWhite;
-			} else if (allianceeee.get() == Alliance.Red) {
-				color = Color.kRed;
-			} else if (allianceeee.get() == Alliance.Blue) {
-				color = Color.kBlue;
-			} else {
-				color = Color.kWhite;
-			}
-		}).ignoringDisable(true));
+		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
+	}
+
+
+	public void setColor() {
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isEmpty()) {
+			color = Color.kOrangeRed;
+		} else if (alliance.get() == Alliance.Red) {
+			color = Color.kRed;
+		} else if (alliance.get() == Alliance.Blue) {
+			color = Color.kBlue;
+		} else {
+			color = Color.kOrangeRed;
+		}
 	}
 
 	private boolean flippy = true;
+	private boolean fastFlippy = true;
 
 	@Override
 	public void periodic() {
+		if (underSecsToFlip(1.0) && fastFlippy) {
+			setFastStrobe();
+			fastFlippy = false;
+		} else if (!underSecsToFlip(1.0) && !flippy) {
+			fastFlippy = true;
+		}
+
 		if (underSecsToFlip(5.0) && flippy) {
 			setStrobe();
 			flippy = false;
@@ -96,11 +98,17 @@ public class LED2 extends SubsystemBase {
 			setStatic();
 			flippy = true;
 		}
+
 	}
 
 	public void setStrobe() {
 		candle.clearAllAnimations();
 		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
+	}
+
+	public void setFastStrobe() {
+		candle.clearAllAnimations();
+		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE * 4).withColor(new RGBWColor(color)));
 	}
 
 	public void setStatic() {
