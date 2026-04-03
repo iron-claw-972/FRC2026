@@ -28,7 +28,6 @@ import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
-import frc.robot.commands.led_comm.LEDDefaultCommand;
 import frc.robot.commands.vision.ShutdownAllPis;
 import frc.robot.constants.AutoConstants;
 import frc.robot.constants.Constants;
@@ -39,6 +38,7 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
+import frc.robot.subsystems.LED.LED2;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -75,7 +75,7 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
-  private LED led = null;
+  private LED2 led = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -114,8 +114,8 @@ public class RobotContainer {
         break;
 
       case TestBed2:
-        led = new LED();
-        led.setDefaultCommand(new LEDDefaultCommand(led));
+        // led = new LED();
+        // led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:
@@ -123,8 +123,9 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        led = new LED();
-        led.setDefaultCommand(new LEDDefaultCommand(led));
+        // led = new LED();
+        // led.setDefaultCommand(new LEDDefaultCommand(led));
+        led = new LED2();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -146,7 +147,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb, led);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
