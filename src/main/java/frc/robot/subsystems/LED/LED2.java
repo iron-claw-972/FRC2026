@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
 
@@ -35,7 +36,7 @@ public class LED2 extends SubsystemBase {
 	private Color color;
 	
 	public LED2() {
-		candle = new CANdle(IdConstants.CANDLE_ID);
+		candle = new CANdle(IdConstants.CANDLE_ID, Constants.RIO_CAN);
 		CANdleConfigurator configurator = candle.getConfigurator();
 
 		LEDConfigs ledConf = new LEDConfigs()
@@ -62,15 +63,29 @@ public class LED2 extends SubsystemBase {
 			color = Color.kWhite;
 		}
 
-		setStatic();
+		// setStatic();
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
-		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()));
-		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()));
+		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
+		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
+		SmartDashboard.putData("Set LED color", new InstantCommand(() -> setColor()));
 	}
 
 	private boolean flippy = true;
+
+	public void setColor() {
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isEmpty()) {
+			color = Color.kWhite;
+		} else if (alliance.get() == Alliance.Red) {
+			color = Color.kRed;
+		} else if (alliance.get() == Alliance.Blue) {
+			color = Color.kBlue;
+		} else {
+			color = Color.kWhite;
+		}
+	}
 
 	@Override
 	public void periodic() {
