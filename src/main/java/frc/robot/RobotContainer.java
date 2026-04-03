@@ -209,8 +209,10 @@ public class RobotContainer {
         },
         () -> drive.getChassisSpeeds(),
         (chassisSpeeds) -> {
-          Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
-          drive.setChassisSpeeds(chassisSpeeds, false); // problem??
+          if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
+            drive.setChassisSpeeds(chassisSpeeds, false); // problem??
+          }
         },
         AutoConstants.AUTO_CONTROLLER,
         AutoConstants.CONFIG,
@@ -258,7 +260,6 @@ public class RobotContainer {
       }));
       NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
         hood.forceHoodDown(false);
-        Logger.recordOutput("hello", true);
       }));
     }
 

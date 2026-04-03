@@ -147,13 +147,14 @@ public class Superstructure extends Command {
         turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         
         lastTurretAngle = turretAngle;
-
-        Logger.recordOutput("Turret/Target Pose", target);
+        
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret/Target Pose", target);
+            Logger.recordOutput("Lookahead Pose", lookaheadPose);
+        }
         SmartDashboard.putNumber("Time of flight", timeOfFlight);
         SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
         SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-
-        Logger.recordOutput("Lookahead Pose", lookaheadPose);
 
         // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
@@ -273,17 +274,22 @@ public class Superstructure extends Command {
                 shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             }
 
+            if (!Constants.DISABLE_LOGGING) {
             // record when shuttling
             Logger.recordOutput("Shuttling", shuttling);
             // record distance for tuning if needed
             Logger.recordOutput("Distance From Target", distanceFromTarget);
+            }
         }
 
-        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
-        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
-        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+            Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+            Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+            
+            Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
+        }
         
-        Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
 
         SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
 

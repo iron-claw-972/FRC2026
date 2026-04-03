@@ -173,12 +173,16 @@ public class Drivetrain extends SubsystemBase {
 
         PathPlannerLogging.setLogActivePathCallback(
                 (activePath) -> {
-                    Logger.recordOutput(
-                            "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+                    if (!Constants.DISABLE_LOGGING) {
+                        Logger.recordOutput(
+                                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+                    }
                 });
         PathPlannerLogging.setLogTargetPoseCallback(
                 (targetPose) -> {
-                    Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+                    if (!Constants.DISABLE_LOGGING) {
+                        Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+                    }
                 });
 
         // PPLibTelemetry.enableCompetitionMode();
@@ -338,9 +342,10 @@ public class Drivetrain extends SubsystemBase {
                             double gyroYawAtTimestamp = getGyroYawAtTimestamp(visionPose.timestampSeconds);
 
                             if (!Double.isNaN(gyroYawAtTimestamp)) {
-
-                                Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
-                                Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
+                                if (!Constants.DISABLE_LOGGING) {
+                                    Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
+                                    Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
+                                }
                                 // use weighted observation
                                 gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
                             }

@@ -101,7 +101,9 @@ public class Vision {
     for (int i = 0; i < FieldConstants.field.getTags().size(); i++) {
       tags[i] = (FieldConstants.field.getTagPose(i+1).get());
     }
-    Logger.recordOutput("AprilTags", tags);
+    if (!Constants.DISABLE_LOGGING) {
+      Logger.recordOutput("AprilTags", tags);
+    }
   }
 
 
