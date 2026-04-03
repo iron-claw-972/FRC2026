@@ -202,9 +202,7 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Drive/Gyro", gyroInputs);
-        }
+        Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
             module.periodic();
         }

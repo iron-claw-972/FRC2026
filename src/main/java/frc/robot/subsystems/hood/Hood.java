@@ -106,9 +106,7 @@ public class Hood extends SubsystemBase implements HoodIO {
     @Override
     public void periodic() {
 		updateInputs();
-		if (!Constants.DISABLE_LOGGING) {
-			Logger.processInputs("Hood", inputs);
-		}
+		Logger.processInputs("Hood", inputs);
 
 		// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
 		// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());

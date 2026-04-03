@@ -549,9 +549,7 @@ public class Vision {
       inputs.connected = camera.isConnected();
       inputs.results = camera.getAllUnreadResults();
 
-      if (!Constants.DISABLE_LOGGING) {
-        Logger.processInputs("Vision/"+camera.getName(), inputs);
-      }
+      Logger.processInputs("Vision/"+camera.getName(), inputs);
 
       // Mechanical Advantage's vision logging
       // // Read new camera observations

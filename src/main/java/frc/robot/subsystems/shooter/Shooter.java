@@ -142,9 +142,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
 
 
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Shooter", inputs);
-        }
+        Logger.processInputs("Shooter", inputs);
     }
 
     public void bumpUpShooterModifier() {

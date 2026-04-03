@@ -165,9 +165,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
                     * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
         }
         updateInputs();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("LinearClimb", inputs);
-        }
+        Logger.processInputs("LinearClimb", inputs);
     }
 
     /**

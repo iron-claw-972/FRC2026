@@ -53,9 +53,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     @Override
     public void periodic() {
         updateInputs();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Spindexer", inputs);
-        }
+        Logger.processInputs("Spindexer", inputs);
 
         if (resetPos == null) {
             motor.setPosition(0.1 * gearRatio);

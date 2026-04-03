@@ -211,9 +211,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         }
 
         updateInputs();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Intake", inputs);
-        }
+        Logger.processInputs("Intake", inputs);
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Intake Calibrated", !calibrating);

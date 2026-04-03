@@ -210,9 +210,7 @@ public class Module implements ModuleIO{
     
     public void periodic() {
         updateInputs();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
-        }
+        Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
 
          // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together

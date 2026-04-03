@@ -162,9 +162,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	@Override
 	public void periodic() {
 		updateInputs();
-		if (!Constants.DISABLE_LOGGING) {
-			Logger.processInputs("Turret", inputs);
-		}
+		Logger.processInputs("Turret", inputs);
 
 		// Position extrapolation
 		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT; 
@@ -230,9 +228,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
 		updateInputs();
-		if (!Constants.DISABLE_LOGGING) {
-			Logger.processInputs("Turret", inputs);
-		}
+		Logger.processInputs("Turret", inputs);
 
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
