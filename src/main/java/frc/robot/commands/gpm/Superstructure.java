@@ -240,11 +240,11 @@ public class Superstructure extends Command {
             SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
             turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
             SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-        } else {
-            TOFAdjustment = 0.0;
-            hoodOffset = 0.0;
-            turretOffset = 0.0;
-        }
+        }// else {
+        //     TOFAdjustment = 0.0;
+        //     hoodOffset = 0.0;
+        //     turretOffset = 0.0;
+        // }
         
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
