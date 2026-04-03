@@ -123,7 +123,6 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        linearClimb = new LinearClimb();
         led = new LED();
         led.setDefaultCommand(new LEDDefaultCommand(led));
 
