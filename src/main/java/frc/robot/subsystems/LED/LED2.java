@@ -53,11 +53,11 @@ public class LED2 extends SubsystemBase {
 
 		var alliance = DriverStation.getAlliance();
 		if (alliance.isEmpty()) {
-			color = Color.kWhite;
+			color = Color.kOrange;
 		} else if (alliance.get() == Alliance.Red) {
 			color = Color.kRed;
 		} else if (alliance.get() == Alliance.Blue) {
-			color = Color.kBlue;
+			color = Color.kOrange;
 		} else {
 			color = Color.kWhite;
 		}
@@ -66,9 +66,9 @@ public class LED2 extends SubsystemBase {
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
-		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()));
-		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()));
-		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()));
+		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()).ignoringDisable(true));
+		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
+		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
 		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> {
 			var allianceeee = DriverStation.getAlliance();
 			if (allianceeee.isEmpty()) {
@@ -80,7 +80,7 @@ public class LED2 extends SubsystemBase {
 			} else {
 				color = Color.kWhite;
 			}
-		}));
+		}).ignoringDisable(true));
 	}
 
 	private boolean flippy = true;
