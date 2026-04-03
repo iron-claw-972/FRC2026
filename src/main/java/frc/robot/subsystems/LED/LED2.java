@@ -62,6 +62,7 @@ public class LED2 extends SubsystemBase {
 			color = Color.kWhite;
 		}
 
+		candle.clearAllAnimations();
 		setStatic();
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
@@ -97,14 +98,17 @@ public class LED2 extends SubsystemBase {
 	}
 
 	public void setStrobe() {
+		candle.clearAllAnimations();
 		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
 	}
 
 	public void setStatic() {
+		candle.clearAllAnimations();
 		candle.setControl(new SolidColor(8, 8 + stripLength).withColor(new RGBWColor(color)));
 	}
 
 	public void lightsOff() {
+		candle.clearAllAnimations();
 		candle.setControl(new SolidColor(8 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
 	}
 	
