@@ -215,8 +215,8 @@ public class RobotContainer {
         (chassisSpeeds) -> {
           if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
-            drive.setChassisSpeeds(chassisSpeeds, false); // problem??
           }
+          drive.setChassisSpeeds(chassisSpeeds, false); // problem??
         },
         AutoConstants.AUTO_CONTROLLER,
         AutoConstants.CONFIG,

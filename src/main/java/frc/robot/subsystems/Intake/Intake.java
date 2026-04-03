@@ -193,9 +193,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         double inchExtension = getPosition();
         
         if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Intake/Setpoint", setpointInches);
-            robotExtension.setLength(inchExtension);
+            Logger.recordOutput("Intake/Setpoint", setpointInches);     
         }
+        robotExtension.setLength(inchExtension);
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
             SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
