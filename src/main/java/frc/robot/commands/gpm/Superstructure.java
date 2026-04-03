@@ -102,30 +102,38 @@ public class Superstructure extends Command {
         Pose2d lookaheadPose = turretPosition;
 
         /*
-         * Loop (20) until lookaheadPose converges BECAUSE -->
+         * Loop (max 20) until lookaheadPose converges BECAUSE -->
          * If you're 8m away (t = 1.0s) and moving at 2m/s towards target, you calculate for 6m (t = 0.8s)
          * At 6m, we run assuming t = 0.8 but then the 6m isn't correct since it was derived using t = 1.0s
          * So we make a bunch of guesses until it converges
+         * Early exit when change < 1mm to avoid unnecessary iterations
          */
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
-            Translation3d target3d = new Translation3d(target.getX(), target.getY(), 
+            Translation3d target3d = new Translation3d(target.getX(), target.getY(),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
-					Translation2d.kZero,
-				target3d.minus(lookahead3d),
-					            2.0);
+            Translation2d.kZero,
+            target3d.minus(lookahead3d),
+            2.0);
 
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
-            lookaheadPose =
+            Pose2d newLookaheadPose =
                 new Pose2d(
                     turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
                     turretPosition.getRotation());
+            
+            // early exit if converged (change < 1mm)
+            if (i > 0 && lookaheadPose.getTranslation().getDistance(newLookaheadPose.getTranslation()) < 0.001) {
+                lookaheadPose = newLookaheadPose;
+                break;
+            }
+            lookaheadPose = newLookaheadPose;
         }
 
         // Get the field angle relative to the target pose
