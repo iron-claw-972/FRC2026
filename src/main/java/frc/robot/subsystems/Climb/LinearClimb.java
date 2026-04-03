@@ -156,10 +156,14 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
         SmartDashboard.putBoolean("Climb Calibrated", !calibrating);
         SmartDashboard.putBoolean("Climb At Setpoint", atSetPoint());
 
-        Logger.recordOutput("LinearClimb setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
-                * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("LinearClimb setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
+                    * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+        }
         updateInputs();
-        Logger.processInputs("LinearClimb", inputs);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.processInputs("LinearClimb", inputs);
+        }
     }
 
     /**

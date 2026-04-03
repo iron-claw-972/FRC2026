@@ -188,10 +188,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void periodic() {
-        // Report position to SmartDashboard
         double inchExtension = getPosition();
-        Logger.recordOutput("Intake/Setpoint", setpointInches);
-        robotExtension.setLength(inchExtension);
+        
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Intake/Setpoint", setpointInches);
+            robotExtension.setLength(inchExtension);
+        }
 
         SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
         SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
@@ -206,7 +208,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         }
 
         updateInputs();
-        Logger.processInputs("Intake", inputs);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.processInputs("Intake", inputs);
+        }
 
         SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
         SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);

@@ -28,6 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.constants.Constants;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -209,7 +210,9 @@ public class Module implements ModuleIO{
     
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
+        }
 
          // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
@@ -223,7 +226,9 @@ public class Module implements ModuleIO{
         driveDisconnectedAlert.set(!inputs.driveConnected);
         turnDisconnectedAlert.set(!inputs.turnConnected);
         turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
-        Logger.recordOutput("Angle "+ moduleConstants.ordinal(), MathUtil.inputModulus(getAngle().getDegrees(), 0, 360));
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Angle "+ moduleConstants.ordinal(), MathUtil.inputModulus(getAngle().getDegrees(), 0, 360));
+        }
     }
 
     public void setDesiredState(SwerveModuleState wantedState, boolean isOpenLoop) {
@@ -250,7 +255,9 @@ public class Module implements ModuleIO{
             driveMotor.set(percentOutput);
         } else {
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
-            Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
+            if (!Constants.DISABLE_LOGGING) {
+                Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
+            }
             
             double feedforward = velocity * moduleConstants.getDriveV();
             driveMotor.setControl(

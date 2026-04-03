@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constants.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -159,7 +160,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 	@Override
 	public void periodic() {
 		updateInputs();
-		Logger.processInputs("Turret", inputs);
+		if (!Constants.DISABLE_LOGGING) {
+			Logger.processInputs("Turret", inputs);
+		}
 
 		// Position extrapolation
 		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT; 
@@ -216,14 +219,18 @@ public class Turret extends SubsystemBase implements TurretIO{
 			.withFeedForward(robotTurnCompensation));
 		}
 
-        Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+			Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        }
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
 		updateInputs();
-		Logger.processInputs("Turret", inputs);
+		if (!Constants.DISABLE_LOGGING) {
+			Logger.processInputs("Turret", inputs);
+		}
 
 		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
 		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);

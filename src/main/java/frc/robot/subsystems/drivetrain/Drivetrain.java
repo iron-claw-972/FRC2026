@@ -197,7 +197,9 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
-        Logger.processInputs("Drive/Gyro", gyroInputs);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.processInputs("Drive/Gyro", gyroInputs);
+        }
         for (var module : modules) {
             module.periodic();
         }
@@ -228,7 +230,9 @@ public class Drivetrain extends SubsystemBase {
             // Apply update
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
-        Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+        }
         updateOdometryVision();
 
         field.setRobotPose(getPose());

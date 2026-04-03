@@ -20,6 +20,9 @@ public class Constants {
     // Logging 
     public static final boolean USE_TELEMETRY = true;
 
+    // this would disable all logger calls
+    public static final boolean DISABLE_LOGGING = true;
+
     public static enum Mode {
         /** Running on a real robot. */
         REAL,

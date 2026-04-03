@@ -32,6 +32,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
@@ -546,7 +547,9 @@ public class Vision {
       inputs.connected = camera.isConnected();
       inputs.results = camera.getAllUnreadResults();
 
-      Logger.processInputs("Vision/"+camera.getName(), inputs);
+      if (!Constants.DISABLE_LOGGING) {
+        Logger.processInputs("Vision/"+camera.getName(), inputs);
+      }
 
       // Mechanical Advantage's vision logging
       // // Read new camera observations

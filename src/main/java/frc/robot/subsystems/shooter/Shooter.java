@@ -93,8 +93,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
         shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
         
-        Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
-        Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
+            Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+        }
 
         double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
@@ -134,7 +136,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
 
 
-        Logger.processInputs("Shooter", inputs);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.processInputs("Shooter", inputs);
+        }
     }
 
     /**
