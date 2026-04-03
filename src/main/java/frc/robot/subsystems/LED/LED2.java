@@ -54,22 +54,35 @@ public class LED2 extends SubsystemBase {
 
 		var alliance = DriverStation.getAlliance();
 		if (alliance.isEmpty()) {
-			color = Color.kWhite;
+			color = Color.kOrange;
 		} else if (alliance.get() == Alliance.Red) {
 			color = Color.kRed;
 		} else if (alliance.get() == Alliance.Blue) {
-			color = Color.kBlue;
+			color = Color.kOrange;
 		} else {
 			color = Color.kWhite;
 		}
 
-		// setStatic();
+		candle.clearAllAnimations();
+		setStatic();
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
+		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()).ignoringDisable(true));
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
-		SmartDashboard.putData("Set LED color", new InstantCommand(() -> setColor()));
+		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> {
+			var allianceeee = DriverStation.getAlliance();
+			if (allianceeee.isEmpty()) {
+				color = Color.kWhite;
+			} else if (allianceeee.get() == Alliance.Red) {
+				color = Color.kRed;
+			} else if (allianceeee.get() == Alliance.Blue) {
+				color = Color.kBlue;
+			} else {
+				color = Color.kWhite;
+			}
+		}).ignoringDisable(true));
 	}
 
 	private boolean flippy = true;
@@ -98,13 +111,21 @@ public class LED2 extends SubsystemBase {
 		}
 	}
 
-	private void setStrobe() {
+	public void setStrobe() {
+		candle.clearAllAnimations();
 		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
 	}
 
-	private void setStatic() {
+	public void setStatic() {
+		candle.clearAllAnimations();
 		candle.setControl(new SolidColor(8, 8 + stripLength).withColor(new RGBWColor(color)));
 	}
+
+	public void lightsOff() {
+		candle.clearAllAnimations();
+		candle.setControl(new SolidColor(8 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
+	}
+	
 
 	private boolean underSecsToFlip(double secs) {
 		Optional<Double> timeToActive = HubActive.timeToActive();
