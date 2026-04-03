@@ -110,7 +110,7 @@ public class LED2 extends SubsystemBase {
 		if (underSecsToFlip(1.0) && fastFlippy) {
 			setFastStrobe();
 			fastFlippy = false;
-		} else if (!underSecsToFlip(1.0) && !flippy) {
+		} else if (!underSecsToFlip(1.0) && !fastFlippy) {
 			fastFlippy = true;
 		}
 
