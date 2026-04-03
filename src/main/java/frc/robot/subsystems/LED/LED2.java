@@ -1,14 +1,18 @@
 package frc.robot.subsystems.LED;
 
 import java.util.Optional;
+import java.util.zip.GZIPInputStream;
 
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.FireAnimation;
 import com.ctre.phoenix6.controls.LarsonAnimation;
+import com.ctre.phoenix6.controls.RainbowAnimation;
+import com.ctre.phoenix6.controls.RgbFadeAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
+import com.ctre.phoenix6.controls.TwinkleAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
@@ -66,6 +70,10 @@ public class LED2 extends SubsystemBase {
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
 		SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
+		SmartDashboard.putData("LED Rainbow", new InstantCommand(() -> setRainbow()).ignoringDisable(true));
+		SmartDashboard.putData("LED Fade", new InstantCommand(() -> setRgbFadeAnimation()).ignoringDisable(true));
+		SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
+
 		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
 	}
 
@@ -102,7 +110,6 @@ public class LED2 extends SubsystemBase {
 		if (underSecsToFlip(1.0) && fastFlippy) {
 			setFastStrobe();
 			fastFlippy = false;
-			return;
 		} else if (!underSecsToFlip(1.0) && !flippy) {
 			fastFlippy = true;
 		}
@@ -120,6 +127,21 @@ public class LED2 extends SubsystemBase {
 	public void setFire() {
 		candle.clearAllAnimations();
 		candle.setControl(new FireAnimation(8, 8 + stripLength));
+	}
+
+	public void setRainbow() {
+		candle.clearAllAnimations();
+		candle.setControl(new RainbowAnimation(8, 8 + stripLength));
+	}
+
+	public void setRgbFadeAnimation() {
+		candle.clearAllAnimations();
+		candle.setControl(new RgbFadeAnimation(8, 8 + stripLength));
+	}
+
+	public void setTwinkle() {
+		candle.clearAllAnimations();
+		candle.setControl(new TwinkleAnimation(8, 8 + stripLength));
 	}
 
 	public void setStrobe() {
