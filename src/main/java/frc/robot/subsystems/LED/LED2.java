@@ -59,7 +59,7 @@ public class LED2 extends SubsystemBase {
 		setColor();
 
 		candle.clearAllAnimations();
-		setStatic();
+		lightsOff();
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
@@ -75,7 +75,6 @@ public class LED2 extends SubsystemBase {
 		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
 	}
 
-
 	public void setColor() {
 		var alliance = DriverStation.getAlliance();
 		if (alliance.isEmpty()) {
@@ -89,7 +88,6 @@ public class LED2 extends SubsystemBase {
 		}
 	}
 
-
 	private enum State { OFF, ON, AUTO, SLOW, FAST };
 
 	private State lastState = State.OFF;
@@ -100,7 +98,7 @@ public class LED2 extends SubsystemBase {
 		State targetState = State.ON;
 		if (underSecsToFlip(5)) targetState = State.SLOW;
 		if (underSecsToFlip(1)) targetState = State.FAST;
-		if (DriverStation.isAutonomousEnabled()) targetState = State.AUTO;
+		if (DriverStation.isAutonomous()) targetState = State.AUTO;
 		if (forceOff) targetState = State.OFF;
 
 		if (targetState != lastState) {
