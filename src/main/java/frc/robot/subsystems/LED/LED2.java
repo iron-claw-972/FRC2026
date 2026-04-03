@@ -5,6 +5,8 @@ import java.util.Optional;
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
+import com.ctre.phoenix6.controls.FireAnimation;
+import com.ctre.phoenix6.controls.LarsonAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
@@ -62,7 +65,8 @@ public class LED2 extends SubsystemBase {
 		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()).ignoringDisable(true));
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
-		SmartDashboard.putData("LED Color/Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
+		SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
+		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
 	}
 
 
@@ -81,12 +85,24 @@ public class LED2 extends SubsystemBase {
 
 	private boolean flippy = true;
 	private boolean fastFlippy = true;
+	private boolean autoFlippy = true;
 
 	@Override
 	public void periodic() {
+
+		if (DriverStation.isAutonomous() && autoFlippy) {
+			setFire();
+			autoFlippy = false;
+			return;
+		} else if (!DriverStation.isAutonomous() && !autoFlippy) {
+			setStatic();
+			autoFlippy = true;
+		}
+
 		if (underSecsToFlip(1.0) && fastFlippy) {
 			setFastStrobe();
 			fastFlippy = false;
+			return;
 		} else if (!underSecsToFlip(1.0) && !flippy) {
 			fastFlippy = true;
 		}
@@ -99,6 +115,11 @@ public class LED2 extends SubsystemBase {
 			flippy = true;
 		}
 
+	}
+
+	public void setFire() {
+		candle.clearAllAnimations();
+		candle.setControl(new FireAnimation(8, 8 + stripLength));
 	}
 
 	public void setStrobe() {
@@ -137,4 +158,5 @@ public class LED2 extends SubsystemBase {
 			return false;
 		}
 	}
+
 }
