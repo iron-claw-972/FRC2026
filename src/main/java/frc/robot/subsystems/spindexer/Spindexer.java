@@ -50,8 +50,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     @Override
     public void periodic() {
+        updateInputs();
         if (!Constants.DISABLE_LOGGING) {
-            updateInputs();
             Logger.processInputs("Spindexer", inputs);
         }
 
@@ -135,9 +135,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public void updateInputs() {
         inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble(); //SpindexerConstants.gearRatio;
         inputs.spindexerCurrent = motor.getStatorCurrent().getValueAsDouble();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.processInputs("Spindexer", inputs);
-        }
     }
 
     private Double resetPos;

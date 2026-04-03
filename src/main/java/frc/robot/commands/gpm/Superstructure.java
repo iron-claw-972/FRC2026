@@ -226,7 +226,7 @@ public class Superstructure extends Command {
     }
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset -= 2.5shoo; // 2.5 degree
+        turretOffset -= 2.5; // 2.5 degree
     }
 
     @Override
