@@ -42,13 +42,11 @@ public class HubActive {
       }
     }
 
-
     // Shift was is active for blue if red won auto, or red if blue won auto.
     boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
-    SmartDashboard.putNumber("Time till active", timeToActive().orElse(timeToInactive().orElse(0.0)));
     if (matchTime > 130) {
       // Transition shift, hub is active.
       return true;

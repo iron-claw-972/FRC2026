@@ -139,6 +139,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
+    
         // Hood
         if (hood != null) {
             // Set the hood down -- for safety measures under trench

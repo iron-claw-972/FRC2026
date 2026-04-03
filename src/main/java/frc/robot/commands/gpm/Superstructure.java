@@ -209,6 +209,25 @@ public class Superstructure extends Command {
         //spindexer.stopSpindexer();
     }
 
+    // shoot higher
+    public void bumpUpHoodOffset() {
+        hoodOffset += 1.0; // 1 degree
+    }
+
+    // shoot lower
+    public void bumpDownHoodOffset() {
+        hoodOffset -= 1.0; // 1 degree
+    }
+
+    // aim more left
+    public void bumpUpTurretOffset() {
+        turretOffset += 2.5; // 2.5 degree
+    }
+    // aim more right
+    public void bumpDownTurretOffset() {
+        turretOffset -= 2.5shoo; // 2.5 degree
+    }
+
     @Override
     public void execute() {
         TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);

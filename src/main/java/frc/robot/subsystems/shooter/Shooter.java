@@ -141,6 +141,14 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         }
     }
 
+    public void bumpUpShooterModifier() {
+        powerModifier += 0.025;
+    }
+
+    public void bumpDownShooterModifier() {
+        powerModifier -= 0.025;
+    }
+
     /**
      * @return Whether the shooter is at the target speed with tolerance of 1 m/s
      */
