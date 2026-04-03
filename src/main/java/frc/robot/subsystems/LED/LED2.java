@@ -1,13 +1,11 @@
 package frc.robot.subsystems.LED;
 
 import java.util.Optional;
-import java.util.zip.GZIPInputStream;
 
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.FireAnimation;
-import com.ctre.phoenix6.controls.LarsonAnimation;
 import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.RgbFadeAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
@@ -27,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
@@ -66,7 +63,8 @@ public class LED2 extends SubsystemBase {
 
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
-		SmartDashboard.putData("LED Off", new InstantCommand(() -> lightsOff()).ignoringDisable(true));
+		SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
+		SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));
 		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
 		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
 		SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
@@ -91,37 +89,30 @@ public class LED2 extends SubsystemBase {
 		}
 	}
 
-	private boolean flippy = true;
-	private boolean fastFlippy = true;
-	private boolean autoFlippy = true;
+
+	private enum State { OFF, ON, AUTO, SLOW, FAST };
+
+	private State lastState = State.OFF;
+	private boolean forceOff = false;
 
 	@Override
 	public void periodic() {
+		State targetState = State.ON;
+		if (underSecsToFlip(5)) targetState = State.SLOW;
+		if (underSecsToFlip(1)) targetState = State.FAST;
+		if (DriverStation.isAutonomousEnabled()) targetState = State.AUTO;
+		if (forceOff) targetState = State.OFF;
 
-		if (DriverStation.isAutonomous() && autoFlippy) {
-			setFire();
-			autoFlippy = false;
-			return;
-		} else if (!DriverStation.isAutonomous() && !autoFlippy) {
-			setStatic();
-			autoFlippy = true;
+		if (targetState != lastState) {
+			switch (targetState) {
+				case OFF: lightsOff(); break;
+				case ON: setStatic(); break;
+				case AUTO: setFire(); break;
+				case SLOW: setStrobe(); break;
+				case FAST: setFastStrobe(); break;
+			}
+			lastState = targetState;
 		}
-
-		if (underSecsToFlip(1.0) && fastFlippy) {
-			setFastStrobe();
-			fastFlippy = false;
-		} else if (!underSecsToFlip(1.0) && !fastFlippy) {
-			fastFlippy = true;
-		}
-
-		if (underSecsToFlip(5.0) && flippy) {
-			setStrobe();
-			flippy = false;
-		} else if (!underSecsToFlip(5.0) && !flippy) {
-			setStatic();
-			flippy = true;
-		}
-
 	}
 
 	public void setFire() {
