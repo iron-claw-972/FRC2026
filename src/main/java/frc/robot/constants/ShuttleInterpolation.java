@@ -21,7 +21,8 @@ public class ShuttleInterpolation {
         shooterVelocityMap.put(0.0, 9.0);
         shooterVelocityMap.put(4.0, 12.8);
         shooterVelocityMap.put(7.6, 19.0);
-        shooterVelocityMap.put(11.2, 25.2);
+        shooterVelocityMap.put(11.4, 30.1);
+        
 
 
         // always shoot at low angle to ground.
