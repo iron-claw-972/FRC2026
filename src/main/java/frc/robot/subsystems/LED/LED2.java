@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.RgbFadeAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TwinkleAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
@@ -130,7 +131,7 @@ public class LED2 extends SubsystemBase {
 
 	public void setTwinkle() {
 		candle.clearAllAnimations();
-		candle.setControl(new TwinkleAnimation(8, 8 + stripLength));
+		candle.setControl(new TwinkleAnimation(8, 8 + stripLength).withColor(new RGBWColor(Color.kViolet)));
 	}
 
 	public void setStrobe() {
@@ -160,10 +161,10 @@ public class LED2 extends SubsystemBase {
 
 		if (timeToActive.isEmpty() && timeToInactive.isEmpty()) {
 			return false;
-		} else if (timeToActive.isPresent()) {
+		} else if (timeToActive.isPresent() && timeToActive.get() != 0) {
 			return (timeToActive.get() <= secs);
 
-		} else if (timeToInactive.isPresent()) {
+		} else if (timeToInactive.isPresent() && timeToInactive.get() != 0) {
 			return (timeToInactive.get() <= secs);
 		} else {
 			return false;
