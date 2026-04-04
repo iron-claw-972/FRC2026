@@ -106,7 +106,7 @@ public class LED2 extends SubsystemBase {
 			switch (targetState) {
 				case OFF: lightsOff(); break;
 				case ON: setStatic(); break;
-				case AUTO: setFire(); break;
+				case AUTO: setTwinkle(); break;
 				case SLOW: setStrobe(); break;
 				case FAST: setFastStrobe(); break;
 			}
@@ -116,7 +116,7 @@ public class LED2 extends SubsystemBase {
 
 	public void setFire() {
 		candle.clearAllAnimations();
-		candle.setControl(new FireAnimation(8, 8 + stripLength));
+		candle.setControl(new FireAnimation(8, 8 + stripLength).withSparking(0.5));
 	}
 
 	public void setRainbow() {
