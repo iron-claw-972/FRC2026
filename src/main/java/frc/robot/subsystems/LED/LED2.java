@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
+import com.ctre.phoenix6.controls.ColorFlowAnimation;
 import com.ctre.phoenix6.controls.FireAnimation;
 import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.RgbFadeAnimation;
@@ -72,7 +73,7 @@ public class LED2 extends SubsystemBase {
 		SmartDashboard.putData("LED Rainbow", new InstantCommand(() -> setRainbow()).ignoringDisable(true));
 		SmartDashboard.putData("LED Fade", new InstantCommand(() -> setRgbFadeAnimation()).ignoringDisable(true));
 		SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
-
+		SmartDashboard.putData("LED Color Flow", new InstantCommand(() -> setColorFlow()).ignoringDisable(true));
 		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
 	}
 
@@ -89,7 +90,7 @@ public class LED2 extends SubsystemBase {
 		}
 	}
 
-	private enum State { OFF, ON, AUTO, SLOW, FAST };
+	private enum State { OFF, ON, AUTO, SLOW, FAST, ENDGAME };
 
 	private State lastState = State.OFF;
 	private boolean forceOff = false;
@@ -100,6 +101,7 @@ public class LED2 extends SubsystemBase {
 		if (underSecsToFlip(5)) targetState = State.SLOW;
 		if (underSecsToFlip(1)) targetState = State.FAST;
 		if (DriverStation.isAutonomous()) targetState = State.AUTO;
+		if (DriverStation.getMatchTime() < 30) targetState = State.ENDGAME;
 		if (forceOff) targetState = State.OFF;
 
 		if (targetState != lastState) {
@@ -109,6 +111,7 @@ public class LED2 extends SubsystemBase {
 				case AUTO: setFire(); break;
 				case SLOW: setStrobe(); break;
 				case FAST: setFastStrobe(); break;
+				case ENDGAME: setRainbow(); break;
 			}
 			lastState = targetState;
 		}
@@ -132,6 +135,11 @@ public class LED2 extends SubsystemBase {
 	public void setTwinkle() {
 		candle.clearAllAnimations();
 		candle.setControl(new TwinkleAnimation(8, 8 + stripLength).withColor(new RGBWColor(Color.kViolet)));
+	}
+
+	public void setColorFlow() {
+		candle.clearAllAnimations();
+		candle.setControl(new ColorFlowAnimation(8, 8 + stripLength).withColor(new RGBWColor(Color.kAzure)));
 	}
 
 	public void setStrobe() {
