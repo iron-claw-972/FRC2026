@@ -4,8 +4,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public class TurretConstants {
-    public static double MAX_ANGLE = 220; // Deg
-    public static double MIN_ANGLE = -220; // Deg
+    public static double MAX_ANGLE = 180; // Deg
+    public static double MIN_ANGLE = -200; // Deg
 
     public static double CALIBRATION_OFFSET = 0.0; // TODO: find this at hardstop
 
@@ -26,7 +26,7 @@ public class TurretConstants {
 
 	public static final double FEEDFORWARD_KV = 0.06;
 
-    public static final double NORMAL_CURRENT_LIMIT = 40.0; // A
+    public static final double NORMAL_CURRENT_LIMIT = 60.0; // A
     public static final double CALIBRATION_CURRENT_LIMIT = 10.0; // A
     public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
 
