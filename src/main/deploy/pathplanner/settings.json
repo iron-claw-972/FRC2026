@@ -7,17 +7,22 @@
     "Field Testing Autos",
     "Left Autos",
     "Miscellaneous",
-    "week 2 autos",
-    "Right Autos"
+    "week 5 (new stuff)",
+    "Right Autos",
+    "week 2 autos"
   ],
-  "autoFolders": [],
-  "defaultMaxVel": 2.0,
-  "defaultMaxAccel": 2.0,
+  "autoFolders": [
+    "Week 5 autos",
+    "Testing",
+    "Week 2 autos"
+  ],
+  "defaultMaxVel": 3.0,
+  "defaultMaxAccel": 2.5,
   "defaultMaxAngVel": 200.0,
   "defaultMaxAngAccel": 300.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 63.37,
-  "robotMOI": 4.183,
+  "robotMOI": 6.6,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.05,
   "driveGearing": 7.03,

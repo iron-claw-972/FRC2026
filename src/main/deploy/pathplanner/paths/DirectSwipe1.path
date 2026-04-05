@@ -1,0 +1,152 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.5,
+        "y": 7.623190984573506
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.05559305204347,
+        "y": 7.1393105448289385
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.678244365361804,
+        "y": 6.364365361803084
+      },
+      "prevControl": {
+        "x": 7.555116359470672,
+        "y": 6.629895424661244
+      },
+      "nextControl": {
+        "x": 7.804590465430033,
+        "y": 6.091895360764787
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.699157769869515,
+        "y": 6.536512455516014
+      },
+      "prevControl": {
+        "x": 6.8860851430626155,
+        "y": 6.1598703844515175
+      },
+      "nextControl": {
+        "x": 6.2963922199408735,
+        "y": 7.34804930155004
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.6124792408066435,
+        "y": 7.408007117437722
+      },
+      "prevControl": {
+        "x": 5.93853054547692,
+        "y": 7.303899970283091
+      },
+      "nextControl": {
+        "x": 5.324138304321591,
+        "y": 7.500073463670289
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.0,
+        "y": 7.5
+      },
+      "prevControl": {
+        "x": 4.5311698343686535,
+        "y": 7.430992876119471
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.1,
+      "rotationDegrees": -56.57915082012972
+    },
+    {
+      "waypointRelativePos": 2.0994671403197227,
+      "rotationDegrees": -74.10500133422103
+    },
+    {
+      "waypointRelativePos": 2.86,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.7761529808773961,
+      "maxWaypointRelativePos": 1.3,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 150.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 3.9685039370078883,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
+    },
+    {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 4.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Spindexer"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 200.0,
+    "maxAngularAcceleration": 300.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "week 5 (new stuff)",
+  "idealStartingState": {
+    "velocity": 0.5,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

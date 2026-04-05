@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.util.Vision.DetectedObject;
 
 public class LogVision extends Command {
@@ -17,8 +18,10 @@ public class LogVision extends Command {
     public void execute() {
         DetectedObject object = this.objectSupplier.get();
         if (object != null) {
-            Logger.recordOutput("Vision/object_angle", object.getAngle());
-            Logger.recordOutput("Vision/object_distance", object.getDistance());
+            if (!Constants.DISABLE_LOGGING) {
+                Logger.recordOutput("Vision/object_angle", object.getAngle());
+                Logger.recordOutput("Vision/object_distance", object.getDistance());
+            }
         }
     }
 

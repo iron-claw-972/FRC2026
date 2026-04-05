@@ -5,6 +5,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
@@ -18,7 +19,10 @@ public class RunSpindexer extends Command {
     private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
 
     private boolean reversing = false;
+    private boolean wasHoodForcedDown = false;
+
     private Timer reverseTimer = new Timer();
+    
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -33,8 +37,20 @@ public class RunSpindexer extends Command {
     // }
 
     @Override
+    public void initialize() {
+        wasHoodForcedDown = hood.getHoodForcedDown();
+    }
+
+    @Override
     public void execute() {
-        if (!turret.atSetpoint() || hood.getHoodForcedDown()) {
+        boolean hoodForcedDown = hood.getHoodForcedDown();
+        
+        if (wasHoodForcedDown && !hoodForcedDown) {
+            spindexer.maxSpindexer();
+        }
+        wasHoodForcedDown = hoodForcedDown;
+        
+        if (!turret.atSetpoint() || hoodForcedDown) {
             spindexer.stopSpindexer();
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
@@ -53,7 +69,9 @@ public class RunSpindexer extends Command {
                 reversing = false;
             }
         }
-        SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Spindexer Jamming", reversing);
+        }
     }
 
     @Override

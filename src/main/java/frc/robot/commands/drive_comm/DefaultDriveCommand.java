@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
+import frc.robot.constants.Constants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -41,7 +42,9 @@ public class DefaultDriveCommand extends Command {
         trenchAssistPid.setIZone(2);
         trenchAssistPid.setIntegratorRange(-1, 1);
 
-        SmartDashboard.putNumber("0 degrees snap location", 0);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("0 degrees snap location", 0);
+        }
     }
 
     @Override
@@ -63,8 +66,10 @@ public class DefaultDriveCommand extends Command {
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
         ChassisSpeeds corrected = DriverAssist.calculate(swerve, driverInput, swerve.getDesiredPose(), true);
 
-        Logger.recordOutput("TrenchAlign", swerve.getTrenchAlign());
-        Logger.recordOutput("AlignZones", TrenchAssistConstants.ALIGN_ZONES);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("TrenchAlign", swerve.getTrenchAlign());
+            Logger.recordOutput("AlignZones", TrenchAssistConstants.ALIGN_ZONES);
+        }
         if (swerve.getTrenchAlign()) {
             boolean inZone = false;
             for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
@@ -90,8 +95,10 @@ public class DefaultDriveCommand extends Command {
         } else {
             swerve.setIsAlign(false);
         }
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
+        }
 
-        Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
         if (swerve.getTrenchAssist()) {
             drive(TrenchAssist.calculate(swerve, corrected, trenchAssistPid));
         } else {

@@ -126,14 +126,19 @@ public class Intake extends SubsystemBase implements IntakeIO{
         leftMotor.getConfigurator().apply(config);
 
         leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive)
+            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
         );
 
         rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
+            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
+
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        leftMotor.getConfigurator().apply(limitConfig);
+        rightMotor.getConfigurator().apply(limitConfig);
 
         leftMotor.setPosition(0.0);
         rightMotor.setPosition(0.0);
@@ -148,11 +153,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
 
         // add some test commands.
-        SmartDashboard.putData("Extension Mechanism", mechanism);
-        SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
-        SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Extension Mechanism", mechanism);
+            SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
+            SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
+            SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+            SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        }
         
         if (RobotBase.isSimulation()) {
             // Extender simulation
@@ -183,13 +190,16 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void periodic() {
-        // Report position to SmartDashboard
         double inchExtension = getPosition();
-        Logger.recordOutput("Intake/Setpoint", setpointInches);
+        
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Intake/Setpoint", setpointInches);     
+        }
         robotExtension.setLength(inchExtension);
-
-        SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
-        SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        }
 
         if(calibrating){
             leftMotor.set(-0.1);
@@ -203,10 +213,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
         updateInputs();
         Logger.processInputs("Intake", inputs);
 
-        SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
-        SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
-        SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-        SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
+            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        }
     }
 
     public void simulationPeriodic(){
@@ -244,7 +254,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations = inchesToRotations(setpoint);
+        double motorRotations = -inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 
