@@ -302,6 +302,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
         rollerMotor.set(speed);
     }
 
+    public double getSpeed() {
+        return rollerMotor.get();
+    }
+
     /**
      * Start the intake roller spinning.
      */
