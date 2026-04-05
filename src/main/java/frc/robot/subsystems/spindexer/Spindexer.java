@@ -77,6 +77,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             reversing = false;
         }
 
+
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
         if (!Constants.DISABLE_SMART_DASHBOARD) {
