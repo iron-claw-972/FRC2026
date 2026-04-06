@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.constants.FieldConstants;
@@ -78,6 +80,7 @@ public class PhaseManager {
     }
     
     public boolean isIdle() { 
+
         return wantedState == WantedState.IDLE; 
     }
     
@@ -87,10 +90,22 @@ public class PhaseManager {
     }
 
     public Translation2d getTarget(Pose2d drivePose) {
-        return wantedState == WantedState.SHOOTING ? FieldConstants.getHubTranslation().toTranslation2d()
-                : (FieldConstants.isOnLeftSideOfField(drivePose.getTranslation())
-                //TODO: reversed for sm reason
-                        ? FieldConstants.getAllianceSideTranslation(false).toTranslation2d()
-                        : FieldConstants.getAllianceSideTranslation(true).toTranslation2d());
+        // return wantedState == WantedState.SHOOTING ? FieldConstants.getHubTranslation().toTranslation2d()
+        //         : (FieldConstants.isOnLeftSideOfField(drivePose.getTranslation())
+        //         //TODO: reversed for sm reason
+        //                 ? FieldConstants.getAllianceSideTranslation(false).toTranslation2d()
+        //                 : FieldConstants.getAllianceSideTranslation(true).toTranslation2d());
+        if (wantedState == WantedState.SHOOTING) {
+            return FieldConstants.getHubTranslation().toTranslation2d();
+        } else  {
+            double targetY;
+
+            if (drivePose.getY() > 4.0) {
+                targetY = (FieldConstants.FIELD_WIDTH * 1.5) - drivePose.getY();
+            } else {
+                targetY = (FieldConstants.FIELD_WIDTH * 0.5) - drivePose.getY();
+            }
+            return new Translation2d(FieldConstants.getAllianceSideTranslation(true).getX(), targetY);
+        }
     }
 }
