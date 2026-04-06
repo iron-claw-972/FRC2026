@@ -21,7 +21,7 @@ public class RunSpindexer extends Command {
     private Hood hood;
     private Intake intake;
 
-    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
+    private Debouncer jamDebouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
 
     private boolean reversing = false;
     private boolean wasHoodForcedDown = false;
@@ -65,7 +65,7 @@ public class RunSpindexer extends Command {
             return; // this is so the balls don't fly out when unaligned
         }
         boolean jammed = spindexer.getStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
-        if (jam_debouncer.calculate(jammed)) {
+        if (jamDebouncer.calculate(jammed)) {
             reversing = true;
             reverseTimer.reset();
             reverseTimer.start();

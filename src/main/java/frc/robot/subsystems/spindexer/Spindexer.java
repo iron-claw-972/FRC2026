@@ -6,6 +6,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +23,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private SpindexerState state = SpindexerState.STOPPED;
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
+
+        private Debouncer noBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
 
     public Spindexer() {
         updateInputs();
@@ -96,6 +100,14 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
+    }
+
+    public boolean spinningAir() {
+        // TODO: tune the threshold of course
+        double vel = motor.getVelocity().getValueAsDouble();
+        boolean velWithinRange = vel < SpindexerConstants.NO_BALLS_THRESHOLD_VELOCITY_UPPER && vel > SpindexerConstants.NO_BALLS_THRESHOLD_VELOCITY_LOWER;
+        boolean noBalls = noBallsDebouncer.calculate(velWithinRange);
+        return (noBalls);
     }
 
     public void maxSpindexer() {
