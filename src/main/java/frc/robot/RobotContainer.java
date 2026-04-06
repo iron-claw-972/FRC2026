@@ -291,14 +291,7 @@ public class RobotContainer {
   }
 
   public void addAuto(String name, Command auto) {
-    try {
-      autoChooser.addOption(name, auto);
-    }
-    // is this the right one??
-    catch (AutoBuilderException e) {
-      e.printStackTrace();
-      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-    }
+    autoChooser.addOption(name, auto);
   }
 
   /**
@@ -326,12 +319,14 @@ public class RobotContainer {
     addAuto(leftLiberalSwipeTranslation);
 
     // dynamic autos built here
-    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
-    
-    String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
-    String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
-    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
-    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
+    if (spindexer != null && turret != null && hood != null && intake != null) {
+        DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+        
+        String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
+        String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
+        addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
+        addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
+    }
 
 
     // put the Chooser on the SmartDashboard

@@ -294,12 +294,13 @@ public class Superstructure extends Command {
                 double x = drivepose.getX(); // compared as meters
                 double y = drivepose.getY();
 
-                if (FieldConstants.underTrench(x, y)) {
-                    System.out.println("Hood forced down");
-                } else {
-                    hood.forceHoodDown(false);
-                }
-            }
+            //     if (FieldConstants.underTrench(x, y)) {
+            //         System.out.println("Hood forced down");
+            //         hood.forceHoodDown(true);
+            //     } else {
+            //         hood.forceHoodDown(false);
+            //     }
+            // }
 
             // different maps for shuttling vs shooting. Less powerful when shuttling.
             if (shuttling) {
