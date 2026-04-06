@@ -80,7 +80,7 @@ public class RunSpindexer extends Command {
                 intake.extend();
             }
 
-            if (reverseTimer.hasElapsed(SpindexerConstants.REVERSE_DEBOUNCE_TIME)) {
+            if (reverseTimer.hasElapsed(SpindexerConstants.REVERSE_TIME)) {
                 reversing = false;
                 intake.spin(storedIntakeSpeed);
             }
