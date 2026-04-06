@@ -322,7 +322,7 @@ public class Module implements ModuleIO{
         
         // configure FusedCANcoder feedback
         FeedbackConfigs feedbackConfigs = new FeedbackConfigs();
-        feedbackConfigs.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        feedbackConfigs.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         feedbackConfigs.FeedbackRemoteSensorID = moduleConstants.getEncoderPort();
         angleMotor.getConfigurator().apply(feedbackConfigs);
         
