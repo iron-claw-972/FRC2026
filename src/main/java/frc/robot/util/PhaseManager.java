@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.constants.FieldConstants;
@@ -76,6 +78,7 @@ public class PhaseManager {
     }
     
     public boolean isIdle() { 
+
         return wantedState == WantedState.IDLE; 
     }
     
@@ -94,10 +97,11 @@ public class PhaseManager {
             return FieldConstants.getHubTranslation().toTranslation2d();
         } else  {
             double targetY;
+
             if (drivePose.getY() > 4.0) {
-                targetY = FieldConstants.FIELD_WIDTH * 1.5 - drivePose.getY();
-            } {
-                targetY = FieldConstants.FIELD_WIDTH * 0.5 - drivePose.getY();
+                targetY = (FieldConstants.FIELD_WIDTH * 1.5) - drivePose.getY();
+            } else {
+                targetY = (FieldConstants.FIELD_WIDTH * 0.5) - drivePose.getY();
             }
             return new Translation2d(FieldConstants.getAllianceSideTranslation(true).getX(), targetY);
         }
