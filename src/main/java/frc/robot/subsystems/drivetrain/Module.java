@@ -359,14 +359,14 @@ public class Module implements ModuleIO{
         angleMotor.getConfigurator().apply(steerConfig); // apply
 
         // drive
-        CurrentLimitsConfigs dirveConfig = new CurrentLimitsConfigs();
-        dirveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-        dirveConfig.SupplyCurrentLimit = currentDrive;
-        dirveConfig.SupplyCurrentLowerLimit = currentDrive;
-        dirveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
-        dirveConfig.StatorCurrentLimit = currentDrive;
-        dirveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-        driveMotor.getConfigurator().apply(dirveConfig); // apply
+        CurrentLimitsConfigs driveConfig = new CurrentLimitsConfigs();
+        driveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveConfig.SupplyCurrentLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        driveConfig.StatorCurrentLimit = currentDrive;
+        driveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveMotor.getConfigurator().apply(driveConfig); // apply
     }
 
     private void configDriveMotor() {

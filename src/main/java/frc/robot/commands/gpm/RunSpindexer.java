@@ -5,7 +5,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Intake.Intake;
