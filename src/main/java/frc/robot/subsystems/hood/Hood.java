@@ -40,6 +40,8 @@ public class Hood extends SubsystemBase implements HoodIO {
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
+	public boolean enabled = true;
+
     public Hood(){
 		motor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -68,7 +70,18 @@ public class Hood extends SubsystemBase implements HoodIO {
 				
 			SmartDashboard.putData("force hood down", new InstantCommand(() -> forceHoodDown(true)));
 			SmartDashboard.putData("unforce hood", new InstantCommand(() -> forceHoodDown(false)));
+
+			SmartDashboard.putData("Enable Hood", new InstantCommand(() -> enableSubsystem()));
+			SmartDashboard.putData("Disable Hood", new InstantCommand(() -> disableSubsystem()));
 		}
+	}
+
+	public void disableSubsystem() {
+		enabled = false;
+	}
+
+	public void enableSubsystem() {
+		enabled = true;
 	}
 
 	/**
@@ -105,63 +118,67 @@ public class Hood extends SubsystemBase implements HoodIO {
 
     @Override
     public void periodic() {
-		updateInputs();
-		Logger.processInputs("Hood", inputs);
+		if (enabled) {
+			updateInputs();
+			Logger.processInputs("Hood", inputs);
 
-		// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
-		// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());
+			// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
+			// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());
 
-		if (forceHoodDown) {
-			goalAngle = Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE);
-			goalVelocityRadPerSec = 0.0;
-		}
-
-		double setpointRad = goalAngle.getRadians();
-
-        // calculate shortest angular delta
-		double delta = setpointRad - lastRawSetpoint;
-		delta = MathUtil.angleModulus(delta);
-		
-		// filter delta
-		double filteredDelta = setpointFilter.calculate(delta);
-		
-		// apply filtered range
-		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
-		lastRawSetpoint = setpointRad;
-		setpointRad = lastFilteredRad;
-
-		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(setpointRad) * HoodConstants.HOOD_GEAR_RATIO;
-
-		//Clamp the setpoint rotations
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MIN_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MAX_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO);
-		
-		// Multiply goal velocity by kV
-		double velocityCompensation = goalVelocityRadPerSec * HoodConstants.FEEDFORWARD_KV;
-
-		if (calibrating){
-			motor.set(0.1);
-			boolean atZero = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
-			boolean calibrated = calibrateDebouncer.calculate(atZero);
-			if (calibrated){
-				stopCalibrating();
+			if (forceHoodDown) {
+				goalAngle = Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE);
+				goalVelocityRadPerSec = 0.0;
 			}
-		} else{
-			// Set control with feedforward
-			motor.setControl(mmVoltageRequest
-			.withPosition(motorGoalRotations)
-			.withFeedForward(velocityCompensation));
-		}
 
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
-            Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
-            Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
-        }
-		
-		if (!Constants.DISABLE_SMART_DASHBOARD) {
-			SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
-			SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+			double setpointRad = goalAngle.getRadians();
+
+			// calculate shortest angular delta
+			double delta = setpointRad - lastRawSetpoint;
+			delta = MathUtil.angleModulus(delta);
+			
+			// filter delta
+			double filteredDelta = setpointFilter.calculate(delta);
+			
+			// apply filtered range
+			lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+			lastRawSetpoint = setpointRad;
+			setpointRad = lastFilteredRad;
+
+			// Tells the Kraken to get to this position using 1000Hz profile
+			double motorGoalRotations = Units.radiansToRotations(setpointRad) * HoodConstants.HOOD_GEAR_RATIO;
+
+			//Clamp the setpoint rotations
+			motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MIN_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO, Units.radiansToRotations(Units.degreesToRadians(HoodConstants.MAX_ANGLE)) * HoodConstants.HOOD_GEAR_RATIO);
+			
+			// Multiply goal velocity by kV
+			double velocityCompensation = goalVelocityRadPerSec * HoodConstants.FEEDFORWARD_KV;
+
+			if (calibrating){
+				motor.set(0.1);
+				boolean atZero = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
+				boolean calibrated = calibrateDebouncer.calculate(atZero);
+				if (calibrated){
+					stopCalibrating();
+				}
+			} else{
+				// Set control with feedforward
+				motor.setControl(mmVoltageRequest
+				.withPosition(motorGoalRotations)
+				.withFeedForward(velocityCompensation));
+			}
+
+			if (!Constants.DISABLE_LOGGING) {
+				Logger.recordOutput("Hood/Voltage", motor.getMotorVoltage().getValue());
+				Logger.recordOutput("Hood/velocitySetpoint", goalVelocityRadPerSec / HoodConstants.HOOD_GEAR_RATIO);
+				Logger.recordOutput("Hood/SetpointDeg", Units.radiansToDegrees(goalAngle.getRadians()));
+			}
+			
+			if (!Constants.DISABLE_SMART_DASHBOARD) {
+				SmartDashboard.putBoolean("Hood Calibrated", !calibrating);
+				SmartDashboard.putBoolean("Hood At Setpoint", Math.abs(getPositionDeg() - goalAngle.getDegrees()) < 2.0);
+			}
+		} else {
+			motor.stopMotor();
 		}
 	}
 

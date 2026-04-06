@@ -37,6 +37,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
             SmartDashboard.putData("Spindexer Run Reverse", new InstantCommand(() -> reverseSpindexer()));
             SmartDashboard.putData("Spindexer Stop", new InstantCommand(() -> stopSpindexer()));
+
+            SmartDashboard.putData("Enable Turret", new InstantCommand(() -> enableSubsystem()));
+			SmartDashboard.putData("Disable Turret", new InstantCommand(() -> disableSubsystem()));
         }
 
         resetPID.setTolerance(0.05);

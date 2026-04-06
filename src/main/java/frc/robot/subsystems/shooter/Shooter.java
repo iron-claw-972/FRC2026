@@ -35,7 +35,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
 
-    double powerModifier = 1.05; // TESTED
+    public double powerModifier = 1.05;
+
+    public boolean enabled = true;
 
     public Shooter() {
         updateInputs();
@@ -71,47 +73,59 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
             SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
+            SmartDashboard.putData("Enable Shooter", new InstantCommand(() -> enableSubsystem()));
+			SmartDashboard.putData("Disable Shooter", new InstantCommand(() -> disableSubsystem()));
         }
     }
 
     @Override
     public void periodic(){
-        updateInputs();
+        if (enabled) {
+            updateInputs();
 
-        // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
-        // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
+            powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+            
+            // Convert to RPS
+            double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
 
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        
-        // Convert to RPS
-        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+            if (!Constants.DISABLE_SMART_DASHBOARD) {
+                SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
+                SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
+            }
 
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
-            SmartDashboard.putNumber("Shooter Motor RPS", shooterMotorLeft.getVelocity().getValueAsDouble());
+            // Sets the motor control to target velocity
+            shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
+            shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
+            
+            if (!Constants.DISABLE_LOGGING) {
+                Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
+                Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
+            }
+
+            double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
+            
+            if (!Constants.DISABLE_SMART_DASHBOARD) {
+                SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
+                SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
+                SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
+            }
+            
+            // keep this
+            SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        } else {
+            shooterMotorLeft.stopMotor();
+            shooterMotorRight.stopMotor();
         }
-
-        // Sets the motor control to target velocity
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
-        
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
-            Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
-        }
-
-        double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
-        
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
-            SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
-            SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
-        }
-        
-        // keep this
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
+
+    public void disableSubsystem() {
+		enabled = false;
+	}
+
+	public void enableSubsystem() {
+		enabled = true;
+	}
 
     /**
      * Sets the target speed of the shooter

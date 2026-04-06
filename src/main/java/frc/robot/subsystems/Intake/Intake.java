@@ -70,6 +70,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
+    public boolean enabled = true;
+    
     public Intake() {
      
         // get the maximum free speed
@@ -189,33 +191,47 @@ public class Intake extends SubsystemBase implements IntakeIO{
         }
     }
 
+    public void disableSubsystem() {
+		enabled = false;
+	}
+
+	public void enableSubsystem() {
+		enabled = true;
+	}
+
     public void periodic() {
-        double inchExtension = getPosition();
-        
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Intake/Setpoint", setpointInches);     
-        }
-        robotExtension.setLength(inchExtension);
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
-            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
-        }
+        if  (enabled) {
+            double inchExtension = getPosition();
+            
+            if (!Constants.DISABLE_LOGGING) {
+                Logger.recordOutput("Intake/Setpoint", setpointInches);     
+            }
+            robotExtension.setLength(inchExtension);
+            if (!Constants.DISABLE_SMART_DASHBOARD) {
+                SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+                SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+            }
 
-        if(calibrating){
-            leftMotor.set(-0.1);
-            rightMotor.set(-0.1);
-            boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
-        }
+            if(calibrating){
+                leftMotor.set(-0.1);
+                rightMotor.set(-0.1);
+                boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
+                // if(calibrationDebouncer.calculate(atHardStop)){
+                //     stopCalibrating();
+                // }
+            }
 
-        updateInputs();
-        Logger.processInputs("Intake", inputs);
+            updateInputs();
+            Logger.processInputs("Intake", inputs);
 
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
-            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+            if (!Constants.DISABLE_SMART_DASHBOARD) {
+                SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
+                SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+            }
+        } else {
+            leftMotor.stopMotor();
+            rightMotor.stopMotor();
+            rollerMotor.stopMotor();
         }
     }
 
