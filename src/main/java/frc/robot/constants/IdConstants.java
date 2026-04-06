@@ -32,7 +32,8 @@ public class IdConstants {
     public static final int HOOD_ID = 11;
 
     // Spindexer
-    public static final int SPINDEXER_ID = 4;
+    public static final int SPINDEXER_ONE_ID = 4;
+    public static final int SPINDEXER_TWO_ID = 14; // check
     
     // Climb
     public static final int CLIMB_MOTOR_ID = 8;
