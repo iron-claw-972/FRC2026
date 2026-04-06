@@ -209,7 +209,11 @@ public class Superstructure extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
-        //spindexer.stopSpindexer();
+        spindexer.noIndexing = true;
+    }
+
+    public void underLadder(){
+        spindexer.noIndexing = true;
     }
 
     // shoot higher
@@ -255,8 +259,11 @@ public class Superstructure extends Command {
         updateSetpoints(drivepose);
 
         if (phaseManager.isIdle()) {
-            stowEverything();
+            underLadder();
         } else {
+            if (spindexer.noIndexing) {
+                spindexer.noIndexing = false;
+            }
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
 
             boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
