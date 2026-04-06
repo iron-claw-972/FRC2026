@@ -35,6 +35,9 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
+  public boolean locked = false;
+
+
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
@@ -52,6 +55,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double lastGoalRad = 0.0;
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
+
 
 
 	/* ---------------- Visualization ---------------- */
@@ -140,6 +144,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	 * @return If the turret is at setpoint with tolerance of 10 degrees
 	 */
 	public boolean atSetpoint() {
+		if (locked) return true;
 		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(10.0);
 	}
 
