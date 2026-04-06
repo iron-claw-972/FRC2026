@@ -22,6 +22,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
+    public boolean noIndexing = false;
+
+
     public Spindexer() {
         updateInputs();
 
