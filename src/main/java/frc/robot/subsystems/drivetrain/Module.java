@@ -9,7 +9,6 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
@@ -21,7 +20,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.MathUtil;
@@ -319,12 +317,6 @@ public class Module implements ModuleIO{
 
     private void configAngleMotor() {
         angleMotor.getConfigurator().apply(new TalonFXConfiguration());
-        
-        // configure FusedCANcoder feedback
-        FeedbackConfigs feedbackConfigs = new FeedbackConfigs();
-        feedbackConfigs.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        feedbackConfigs.FeedbackRemoteSensorID = moduleConstants.getEncoderPort();
-        angleMotor.getConfigurator().apply(feedbackConfigs);
         
         CurrentLimitsConfigs config = new CurrentLimitsConfigs();
         config.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
