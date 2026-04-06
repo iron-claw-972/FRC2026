@@ -27,9 +27,21 @@ public class FieldConstants {
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.225;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.775;
 
-  /**The coordinate of the climb position */
-  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
-  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(0, 0, new Rotation2d());
+  /** Location of hub target */
+  public static final Translation3d HUB_BLUE =
+      new Translation3d(Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
+  
+  public static final Translation3d HUB_RED =
+      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
+    
+  // shuttle safety constants
+  public static final double LADDER_ZONE_WIDTH = 1.251; // meters
+  public static final double LADDER_ZONE_DEPTH = 1.143; // meters
+  
+  // tower positions (center of the zone)
+  public static final double LADDER_Y_OFFSET = 1.7526 * 2; // two driver stations
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(LADDER_ZONE_DEPTH/2, FIELD_WIDTH - LADDER_Y_OFFSET - LADDER_ZONE_WIDTH/2, new Rotation2d());
+  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(FIELD_LENGTH - LADDER_ZONE_DEPTH/2, LADDER_Y_OFFSET + LADDER_ZONE_WIDTH/2, new Rotation2d());
 
   public static final Pose2d getClimbLocation(){
     if (Robot.getAlliance() == Alliance.Blue){
@@ -40,14 +52,6 @@ public class FieldConstants {
     }
   }
 
-  /** Location of hub target */
-  public static final Translation3d HUB_BLUE =
-      new Translation3d(Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
-  
-  public static final Translation3d HUB_RED =
-      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
-    
-  // shuttling locations
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
 
@@ -73,7 +77,7 @@ public class FieldConstants {
     new Translation3d(RED_BORDER + 2, FIELD_WIDTH/2, 0);
 
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
-  public static final double RED_ALLIANCE_LINE = RED_BORDER; // 
+  public static final double RED_ALLIANCE_LINE = RED_BORDER; // That's the distance from one side to the red bump
 
   // my zones
   public static final double leftNeutralLine = FIELD_LENGTH * 0.25;
@@ -103,8 +107,6 @@ public class FieldConstants {
   public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
 
-  // trenches
-
 	public enum ShootingTarget {
 		HUB,
 		NEUTRAL,
@@ -118,7 +120,15 @@ public class FieldConstants {
 		OPPOSITION,
 		TRENCH_BUMP,
     UNDER_LADDER,
-    UNDER_MY_HUB,
+    UNDER_MY_HUB
+	}
+
+	/** checks if robot is under climb structure */
+	public static boolean underLadder(Translation2d drivepose) {
+		Pose2d ladderPos = getClimbLocation();
+		double dx = Math.abs(drivepose.getX() - ladderPos.getX());
+		double dy = Math.abs(drivepose.getY() - ladderPos.getY());
+		return (dx < LADDER_ZONE_DEPTH / 2.0) && (dy < LADDER_ZONE_WIDTH / 2.0);
 	}
 
   public static Translation3d getHubTranslation() {
@@ -164,36 +174,28 @@ public class FieldConstants {
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
     double y = drivepose.getY();
-    //double y = drivepose.getY();
+
     if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > (BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) //blue alliance line
         || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < (RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) {
           return FieldZone.TRENCH_BUMP;
         }
-    // if(((y < (FIELD_WIDTH / 2) + 0.158750) && y > (FIELD_WIDTH / 2) - 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Blue) {
-    //   return FieldZone.UNDER_LADDER;
-    // }
-    // if(((y < (FIELD_WIDTH / 2) - 0.158750) && y > (FIELD_WIDTH / 2) + 0.736600) && (x < Units.inchesToMeters(47.0) || x > FIELD_LENGTH - Units.inchesToMeters(47.0)) && Robot.getAlliance() == Alliance.Red) {
-    //   return FieldZone.UNDER_LADDER;
-    // }
-    // if(((y < FIELD_WIDTH - (46.75 / 2) && y > FIELD_WIDTH - (46.75 / 2))) && ((x > 207.42375 && x < 207.42375 + 36.0) || (x < FIELD_LENGTH - 207.42375 && x > FIELD_LENGTH - 207.42375 - 36.0))) {
-    //   return FieldZone.UNDER_LADDER;
-    // }
-    if(x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2) { // inside red
-      if (Robot.getAlliance() == Alliance.Red) {
-        return FieldZone.ALLIANCE;
-      } else {
-        return FieldZone.OPPOSITION;
-      }
-    } else if (x < FieldConstants.BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2) {
-      if (Robot.getAlliance() == Alliance.Blue) {
-        return FieldZone.ALLIANCE;
-      } else {
-        return FieldZone.OPPOSITION;
-      }
+
+    if (underLadder(drivepose)) {
+      return FieldZone.UNDER_LADDER;
+    }
+    if (x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
+      return (Robot.getAlliance() == Alliance.Red) ? FieldZone.ALLIANCE : FieldZone.OPPOSITION;
+    } else if (x < FieldConstants.BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
+      return (Robot.getAlliance() == Alliance.Blue) ? FieldZone.ALLIANCE : FieldZone.OPPOSITION;
     } else {
       return FieldZone.NEUTRAL;
     }
   }
+
+    /** returns true if robot is currently underneath or touching the climbing ladder */
+    public static boolean isUnderLadder(Translation2d drivepose) {
+        return getZone(drivepose) == FieldZone.UNDER_LADDER;
+    }
 
   public static boolean underTrench(double x, double y) {
     // ensures we aren't in center channel

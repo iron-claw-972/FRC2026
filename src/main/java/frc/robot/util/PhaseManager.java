@@ -61,7 +61,9 @@ public class PhaseManager {
 
     private void updateWantedState(Pose2d drivePose) {
         FieldZone zone = FieldConstants.getZone(drivePose.getTranslation());
-        if (zone == FieldConstants.FieldZone.ALLIANCE) {
+        if (zone == FieldConstants.FieldZone.UNDER_LADDER) {
+            wantedState = WantedState.IDLE;
+        } else if (zone == FieldConstants.FieldZone.ALLIANCE) {
             wantedState = WantedState.SHOOTING;
         } else {
             wantedState = WantedState.PASSING;
