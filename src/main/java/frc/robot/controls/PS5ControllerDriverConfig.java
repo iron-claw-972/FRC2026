@@ -6,9 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
@@ -40,6 +38,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
+    private LinearClimb climb;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -55,6 +54,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
+        this.climb = climb;
     }
 
     public void configureControls() {
@@ -69,27 +69,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             CommandScheduler.getInstance().cancelAll();
         }));
 
-        // Align wheels
-        controller.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-                () -> getDrivetrain().setStateDeadband(false),
-                getDrivetrain()::alignWheels,
-                interrupted -> getDrivetrain().setStateDeadband(true),
-                () -> false, getDrivetrain()).withTimeout(2));
-
-        // Trench align
-        controller.get(PS5Button.CIRCLE).whileTrue(new StartEndCommand(
-                () -> {
-                    getDrivetrain().setTrenchAssist(true);
-                    getDrivetrain().setTrenchAlign(true);
-                },
-                () -> {
-                    getDrivetrain().setTrenchAssist(false);
-                    getDrivetrain().setTrenchAlign(false);
-                }));
-
         // Reverse motors
         if (intake != null && spindexer != null) {
-            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
+            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake));
         }
 
         // Intake
@@ -142,11 +124,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Spindexer
-        if (spindexer != null && turret != null && hood != null) {
+        if (spindexer != null && turret != null && hood != null && intake != null) {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-                new RunSpindexer(spindexer, turret, hood)
+                new RunSpindexer(spindexer, turret, hood, intake)
             );
         }
 
@@ -156,6 +138,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
+    
         // Hood
         if (hood != null) {
             // Set the hood down -- for safety measures under trench

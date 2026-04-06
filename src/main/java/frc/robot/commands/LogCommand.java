@@ -3,6 +3,7 @@ package frc.robot.commands;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.util.Elastic;
 import frc.robot.util.HubActive;
 import frc.robot.util.Elastic.Notification;
@@ -18,8 +19,10 @@ public class LogCommand extends Command {
     @Override
     public void execute() {
         boolean current = HubActive.isHubActive();
-        Logger.recordOutput("HubActive", current);
-
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("HubActive", current);
+        }
+        
         if (current && !hubActive) {
             Elastic.sendNotification(new Notification(NotificationLevel.INFO, "HUB ACTIVE", ""));
         } else if (!current && hubActive) {

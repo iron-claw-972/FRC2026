@@ -32,6 +32,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
@@ -100,7 +101,9 @@ public class Vision {
     for (int i = 0; i < FieldConstants.field.getTags().size(); i++) {
       tags[i] = (FieldConstants.field.getTagPose(i+1).get());
     }
-    Logger.recordOutput("AprilTags", tags);
+    if (!Constants.DISABLE_LOGGING) {
+      Logger.recordOutput("AprilTags", tags);
+    }
   }
 
 
@@ -336,8 +339,9 @@ public class Vision {
    * @param poseEstimator The pose estimator to update
    * @param yawFunction A function that returns the yaw as a double given the timestamp
    * @param slipped True if the wheels have slipped, false otherwise
+   * @return The list of estimated robot poses from vision
    */
-  public void updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
+  public ArrayList<EstimatedRobotPose> updateOdometry(SwerveDrivePoseEstimator poseEstimator, DoubleUnaryOperator yawFunction, boolean slipped){
     // Simulate vision
     // 2 ifs to avoid warning
     if(VisionConstants.ENABLED_SIM){
@@ -363,6 +367,7 @@ public class Vision {
       );
       sawTag = true;
     }
+    return estimatedPoses;
   }
 
   /**
@@ -400,6 +405,19 @@ public class Vision {
    */
   public void onlyUse(int[] ids){
     onlyUse = ids;
+  }
+
+  /**
+   * Checks if one or more cameras are disconnected
+   * @return true if at least one camera is disconnected, false otherwise
+   */
+  public boolean oneCameraDisconnected(){
+    for(VisionCamera camera : cameras){
+      if(!camera.inputs.connected){
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
