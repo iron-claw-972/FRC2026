@@ -15,6 +15,9 @@ public class IntakeConstants {
     public static final double CALIBRATING_CURRENT_LIMITS = 10.0;
     public static final double CALIBRATING_CURRENT_THRESHOLD = 9.0;
 
+    /** Current limit for normal operation */
+    public static final double NORMAL_CURRENT_LIMIT = 100.0;
+
     public static final double ROLLER_MOI_KG_M_SQ = 0.5 * 0.020 * 0.020; // 0.5kg roller, 20mm radius for now
     public static final double ROLLER_GEARING = 2.0;
     public static final double CARRIAGE_MASS_KG = 3.0;

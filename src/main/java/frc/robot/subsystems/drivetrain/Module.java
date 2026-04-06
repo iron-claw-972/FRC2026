@@ -31,6 +31,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.constants.Constants;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -225,7 +226,9 @@ public class Module implements ModuleIO{
         driveDisconnectedAlert.set(!inputs.driveConnected);
         turnDisconnectedAlert.set(!inputs.turnConnected);
         turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
-        Logger.recordOutput("Angle "+ moduleConstants.ordinal(), MathUtil.inputModulus(getAngle().getDegrees(), 0, 360));
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Angle "+ moduleConstants.ordinal(), MathUtil.inputModulus(getAngle().getDegrees(), 0, 360));
+        }
     }
 
     public void setDesiredState(SwerveModuleState wantedState, boolean isOpenLoop) {
@@ -252,7 +255,9 @@ public class Module implements ModuleIO{
             driveMotor.setControl(new DutyCycleOut(percentOutput).withEnableFOC(true));
         } else {
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
-            Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
+            if (!Constants.DISABLE_LOGGING) {
+                Logger.recordOutput("desired vel" + moduleConstants.ordinal(), velocity);
+            }
             
             double feedforward = velocity * moduleConstants.getDriveV();
             driveMotor.setControl(
@@ -355,6 +360,28 @@ public class Module implements ModuleIO{
     public double getDriveStatorCurrent(){
         return inputs.driveCurrentAmps;
     }
+
+    // I took the config things straight from this file
+    public void setNewCurrentLimit(double currentSteer, double currentDrive) {
+        CurrentLimitsConfigs steerConfig = new CurrentLimitsConfigs();
+        // steer
+        steerConfig.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
+        steerConfig.SupplyCurrentLimit = currentSteer;
+        steerConfig.SupplyCurrentLowerLimit = currentSteer;
+        steerConfig.SupplyCurrentLowerTime = DriveConstants.STEER_PEAK_CURRENT_DURATION;
+        angleMotor.getConfigurator().apply(steerConfig); // apply
+
+        // drive
+        CurrentLimitsConfigs driveConfig = new CurrentLimitsConfigs();
+        driveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveConfig.SupplyCurrentLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        driveConfig.StatorCurrentLimit = currentDrive;
+        driveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveMotor.getConfigurator().apply(driveConfig); // apply
+    }
+
     private void configDriveMotor() {
         var talonFXConfigs = new TalonFXConfiguration();
         // set Motion Magic settings

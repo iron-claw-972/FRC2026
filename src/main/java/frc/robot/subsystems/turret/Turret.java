@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constants.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.ModifiedCRT;
 
@@ -75,7 +75,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
-		config.Slot0.kD = 0.2; // The "Braking" term to stop overshoot
+		config.Slot0.kD = 0.0; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
@@ -100,18 +100,21 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
-		SmartDashboard.putData("Turret Mech", mech);
-		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
-		SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("Turret Mech", mech);
+			SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
+			SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+			SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
-		SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
-		turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
-		turretTestChooser.addOption("Turn to -90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0)));
-		turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
-		turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
-		turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
-		SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+			SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
+			turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
+			turretTestChooser.addOption("Turn to -90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0)));
+			turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
+			turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
+			turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
+
+			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+		}
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
@@ -201,7 +204,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
 			
 		// Multiply goal velocity by kV
-		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
+		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
 		if(calibrating){
 			motor.set(0.05);
@@ -216,8 +219,10 @@ public class Turret extends SubsystemBase implements TurretIO{
 			.withFeedForward(robotTurnCompensation));
 		}
 
-        Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+			Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        }
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
@@ -225,9 +230,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
 
-		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
-		SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		}
+		
 	}
 
 	/* ---------------- Simulation ---------------- */

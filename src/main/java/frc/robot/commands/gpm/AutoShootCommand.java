@@ -134,8 +134,9 @@ public class AutoShootCommand extends Command {
         turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         
         lastTurretAngle = turretAngle;
-
-        Logger.recordOutput("Lookahead Pose", lookaheadPose);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Lookahead Pose", lookaheadPose);
+        }
 
         // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
@@ -189,9 +190,11 @@ public class AutoShootCommand extends Command {
         hood.setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(hoodSetpoint)), hoodVelocity);
         shooter.setShooter(ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
 
-        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
-        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
-        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+            Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+            Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+        }
 
         /** Spindexer Stuff!! */
         if(spindexer != null){
