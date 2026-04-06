@@ -27,7 +27,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
-import frc.robot.util.HubActive;
 import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
