@@ -23,8 +23,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private SpindexerState state = SpindexerState.STOPPED;
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
-
-        private Debouncer noBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
+    private Debouncer noBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
+    public boolean noIndexing = false;
 
     public Spindexer() {
         updateInputs();
@@ -102,7 +102,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         }
     }
 
-    public boolean spinningAir() {
+    public boolean hasNoBalls() {
         // TODO: tune the threshold of course
         double current = motor.getStatorCurrent().getValueAsDouble();
         boolean currentWithinRange = current < SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT_UPPER && current > SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT_LOWER;

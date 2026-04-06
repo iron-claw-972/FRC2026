@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.auto_comm.SpindexerDeadline;
@@ -29,6 +28,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -40,7 +40,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LED.LED2;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -77,7 +77,7 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
-  private LED2 led = null;
+  private LED led = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -127,9 +127,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
-        led = new LED2();
+        led = new LED();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -145,7 +143,6 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -169,6 +166,8 @@ public class RobotContainer {
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
+
+        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -292,14 +291,7 @@ public class RobotContainer {
   }
 
   public void addAuto(String name, Command auto) {
-    try {
-      autoChooser.addOption(name, auto);
-    }
-    // is this the right one??
-    catch (AutoBuilderException e) {
-      e.printStackTrace();
-      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-    }
+    autoChooser.addOption(name, auto);
   }
 
   /**
@@ -327,12 +319,14 @@ public class RobotContainer {
     addAuto(leftLiberalSwipeTranslation);
 
     // dynamic autos built here
-    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
-    
-    String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
-    String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
-    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
-    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
+    if (spindexer != null && turret != null && hood != null && intake != null) {
+        DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+        
+        String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
+        String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
+        addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
+        addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
+    }
 
 
     // put the Chooser on the SmartDashboard

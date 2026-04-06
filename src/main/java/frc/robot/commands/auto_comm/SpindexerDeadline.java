@@ -22,6 +22,6 @@ public class SpindexerDeadline extends Command {
 
   @Override
   public boolean isFinished() {
-    return spindexer.spinningAir() && airTimer.hasElapsed(AIR_SPINNING_MAX_TIME);
+    return spindexer.hasNoBalls() && airTimer.hasElapsed(AIR_SPINNING_MAX_TIME);
   }
 }
