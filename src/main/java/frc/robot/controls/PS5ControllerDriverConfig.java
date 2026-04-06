@@ -71,7 +71,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Reverse motors
         if (intake != null && spindexer != null) {
-            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
+            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake));
         }
 
         // Intake
