@@ -38,7 +38,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LED.LED2;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -75,7 +75,7 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
-  private LED2 led = null;
+  private LED led = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -125,9 +125,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
-        led = new LED2();
+        led = new LED();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -143,7 +141,6 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -249,8 +246,8 @@ public class RobotContainer {
       }));
     }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret, hood);
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
