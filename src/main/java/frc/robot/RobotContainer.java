@@ -26,6 +26,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -163,6 +164,8 @@ public class RobotContainer {
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
+
+        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
