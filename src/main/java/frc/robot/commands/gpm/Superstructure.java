@@ -182,6 +182,7 @@ public class Superstructure extends Command {
         lastHoodAngle = hoodAngle;
 
         distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
+        Logger.recordOutput("Shooting/distanceToTarget", distanceFromTarget);
     }
 
     public void updateDrivePose(){

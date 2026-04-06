@@ -119,6 +119,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
 		}
+		SmartDashboard.putData("Set Locked", new InstantCommand(() -> {locked = !locked;}));
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
