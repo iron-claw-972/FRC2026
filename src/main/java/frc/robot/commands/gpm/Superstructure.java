@@ -162,16 +162,10 @@ public class Superstructure extends Command {
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
 
         // Shortest path
-        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
-
-        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
-        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
-        if (potentialSetpoint > turretRange/2) {
-            potentialSetpoint -= 360;
-        } else if (potentialSetpoint < -turretRange/2) {
-            potentialSetpoint += 360;
-        }
+        double current = Units.radiansToDegrees(turret.getPositionRad());
+        double targetDeg = Units.radiansToDegrees(adjustedTurretSetpoint);
+        double error = targetDeg - current;
+        double potentialSetpoint = current + error + turretOffset;
 
         turretSetpoint = potentialSetpoint;
 
@@ -195,7 +189,7 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,

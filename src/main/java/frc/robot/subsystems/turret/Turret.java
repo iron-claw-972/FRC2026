@@ -172,12 +172,14 @@ public class Turret extends SubsystemBase implements TurretIO{
 		double best = lastGoalRad;
 		boolean found = false;
 
-		for (int i = -2; i <= 2; i++) {
+		for (int i = -2; i<=2; i++) {
 			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
-			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE) || candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
-				continue;
 
-			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
+			double candidateDeg = Units.radiansToDegrees(candidate);
+			if (candidateDeg < TurretConstants.MIN_ANGLE || candidate > TurretConstants.MAX_ANGLE) {
+				continue;
+			}
+			if (!found || Math.abs(candidate -lastGoalRad) < Math.abs(best - lastGoalRad)) {
 				best = candidate;
 				found = true;
 			}
