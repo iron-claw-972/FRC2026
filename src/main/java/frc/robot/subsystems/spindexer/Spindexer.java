@@ -85,6 +85,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
+            SmartDashboard.putNumber("Spindexer Current", inputs.spindexerCurrent);
 
             SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
             SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
