@@ -12,8 +12,10 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
+import frc.robot.util.HubActive;
 import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
@@ -67,6 +70,8 @@ public class Superstructure extends Command {
     private double distanceFromTarget = 0.0;
 
     private double TOFAdjustment = 0.85;
+
+    private boolean hoodAssistEnabled = true;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -156,6 +161,8 @@ public class Superstructure extends Command {
             SmartDashboard.putNumber("Time of flight", timeOfFlight);
             SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
             SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
+            SmartDashboard.putData("Turn on Hood Assist", new InstantCommand(() -> turnOnHoodAssist()));
+            SmartDashboard.putData("Turn off Hood Assist", new InstantCommand(() -> turnOffHoodAssist()));
         }
 
         // Subtract the rotational angle of the robot from the setpoint
@@ -231,6 +238,14 @@ public class Superstructure extends Command {
         turretOffset -= 2.5; // 2.5 degree
     }
 
+    public void turnOnHoodAssist() {
+        hoodAssistEnabled = true;
+    }
+
+    public void turnOffHoodAssist() {
+        hoodAssistEnabled = false;
+    }
+
     @Override
     public void execute() {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
@@ -268,14 +283,16 @@ public class Superstructure extends Command {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
+            if (DriverStation.isAutonomous() && hoodAssistEnabled) {
+                double x = drivepose.getX(); // compared as meters
+                double y = drivepose.getY();
 
-            // if (FieldConstants.underTrench(x, y)) {
-            //     System.out.println("Hood forced down");
-            // } else {
-            //     hood.forceHoodDown(false);
-            // }
+                if (FieldConstants.underTrench(x, y)) {
+                    System.out.println("Hood forced down");
+                } else {
+                    hood.forceHoodDown(false);
+                }
+            }
 
             // different maps for shuttling vs shooting. Less powerful when shuttling.
             if (shuttling) {

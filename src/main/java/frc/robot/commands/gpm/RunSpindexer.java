@@ -2,6 +2,7 @@ package frc.robot.commands.gpm;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,7 @@ public class RunSpindexer extends Command {
     private Timer reverseTimer = new Timer();
 
     private double storedIntakeSpeed = 0.0;
+    private boolean reverseIntakeAntiJamEnabled = true;
     
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
@@ -67,22 +69,28 @@ public class RunSpindexer extends Command {
             reversing = true;
             reverseTimer.reset();
             reverseTimer.start();
-            storedIntakeSpeed = intake.getSpeed();
+            if (reverseIntakeAntiJamEnabled && DriverStation.isAutonomous()) {
+                storedIntakeSpeed = intake.getSpeed();
+            }
         }
         if (!reversing) {
             spindexer.maxSpindexer();
         } else {
             spindexer.reverseSpindexer();
 
-            if (intake.getPosition() > IntakeConstants.INTERMEDIATE_EXTENSION + 1.0) {
-                intake.spinReverse();
-            } else {
-                intake.extend();
+            if (reverseIntakeAntiJamEnabled && DriverStation.isAutonomous()) {
+                if (intake.getPosition() > IntakeConstants.INTERMEDIATE_EXTENSION + 1.0) {
+                    intake.spinReverse();
+                } else {
+                    intake.extend();
+                }
             }
 
             if (reverseTimer.hasElapsed(SpindexerConstants.REVERSE_DEBOUNCE_TIME)) {
                 reversing = false;
-                intake.spin(storedIntakeSpeed);
+                if (reverseIntakeAntiJamEnabled && DriverStation.isAutonomous()) {
+                    intake.spin(storedIntakeSpeed);
+                }
             }
         }
         if (!Constants.DISABLE_SMART_DASHBOARD) {
