@@ -20,7 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.SpindexerDeadline;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
@@ -244,6 +246,10 @@ public class RobotContainer {
       NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
         seizing = false;
       }));
+    }
+
+    if (spindexer != null) {
+      NamedCommands.registerCommand("Spindexer Air Spinning Deadline", new SpindexerDeadline(spindexer));
     }
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
