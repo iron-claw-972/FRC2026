@@ -56,10 +56,12 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
 
         setCurrentLimits(ClimbConstants.CALIBRATION_CURRENT);
 
-        SmartDashboard.putData("Calibrate", new InstantCommand(() -> hardstopCalibration()));
-        SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp())); // 0
-        SmartDashboard.putData("Go Down", new InstantCommand(() -> retract())); // 8
-        SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition())); // 6
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Calibrate", new InstantCommand(() -> hardstopCalibration()));
+            SmartDashboard.putData("Go Up", new InstantCommand(() -> goUp())); // 0
+            SmartDashboard.putData("Go Down", new InstantCommand(() -> retract())); // 8
+            SmartDashboard.putData("Climb", new InstantCommand(() -> climbPosition())); // 6
+        }
 
         // starting position
         motor.setPosition(metersToRotations(ClimbConstants.BOTTOM_POSITION));
@@ -148,14 +150,20 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
             }
         }
 
-        // motor.set(power); // during calibration we have 20ms of high power before we stop calibration
-        SmartDashboard.putNumber("Climb Power from PID", power);
-        SmartDashboard.putNumber("Climb PID_Setpoint_Rotations", pid.getSetpoint());
-        SmartDashboard.putNumber("Climb Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Climb Motor_Actual_Meters", inputs.positionMeters);
+        // motor.set(power); // during calibration we have 20ms of high power before we stop calibration\
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Climb Power from PID", power);
+            SmartDashboard.putNumber("Climb PID_Setpoint_Rotations", pid.getSetpoint());
+            SmartDashboard.putNumber("Climb Motor_Actual_Rotations", motor.getPosition().getValueAsDouble());
+            SmartDashboard.putNumber("Climb Motor_Actual_Meters", inputs.positionMeters);
+            SmartDashboard.putBoolean("Climb Calibrated", !calibrating);
+            SmartDashboard.putBoolean("Climb At Setpoint", atSetPoint());
+        }
 
-        Logger.recordOutput("LinearClimb setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
-                * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("LinearClimb setpointMeters", Units.rotationsToRadians(pid.getSetpoint())
+                    * ClimbConstants.WHEEL_RADIUS / ClimbConstants.CLIMB_GEAR_RATIO);
+        }
         updateInputs();
         Logger.processInputs("LinearClimb", inputs);
     }

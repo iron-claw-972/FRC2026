@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.util.Vision.Vision;
 
@@ -77,10 +78,13 @@ public class TestVisionDistance extends Command {
       endTimer.reset();
       driveDistance = drive.getPose().getTranslation().getDistance(driveStartTranslation);
       visionDistance = currentPose.getTranslation().getDistance(visionStartTranslation);
-      SmartDashboard.putNumber("Vision test drive distance", driveDistance);
-      SmartDashboard.putNumber("Vision test vision distnace", visionDistance);
-      SmartDashboard.putNumber("Vision test error", visionDistance - driveDistance);
-      SmartDashboard.putNumber("Vision test % error", (visionDistance-driveDistance) / driveDistance * 100);
+      if (!Constants.DISABLE_SMART_DASHBOARD) {
+        SmartDashboard.putNumber("Vision test drive distance", driveDistance);
+        SmartDashboard.putNumber("Vision test vision distnace", visionDistance);
+        SmartDashboard.putNumber("Vision test error", visionDistance - driveDistance);
+        SmartDashboard.putNumber("Vision test % error", (visionDistance-driveDistance) / driveDistance * 100);
+      }
+
       // If kPrintDelay seconds have passed, print the data
       if (printTimer.advanceIfElapsed(PRINT_DELAY)) {
         System.out.printf("\nDrive dist: %.2f\nVision dist: %.2f\nError: %.2f\n %% error: %.2f\n",

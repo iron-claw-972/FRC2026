@@ -67,8 +67,8 @@ public class VisionConstants {
          */
         public static final double MAX_DISTANCE = 6;
 
-        /** If vision should use manual calculations */
-        public static final boolean USE_MANUAL_CALCULATIONS = true;
+        /** If vision should use manual calculations (yawFunction-based vs referencePose-based). Changed to false to support gyro bias correction. */
+        public static final boolean USE_MANUAL_CALCULATIONS = false;
 
         // <ol start="0"> did not work
         /**
@@ -157,7 +157,7 @@ public class VisionConstants {
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(-8.47), 
                                         Units.inchesToMeters(11.54),
-                                        Units.inchesToMeters(19.7)),
+                                        Units.inchesToMeters(17.7)),
                                 new Rotation3d(0, Units.degreesToRadians(-22.0),
                                         Units.degreesToRadians(55.0)))),
                 new Pair<String, Transform3d>(
@@ -165,7 +165,7 @@ public class VisionConstants {
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(-8.47), 
                                         Units.inchesToMeters(-11.54),
-                                        Units.inchesToMeters(19.7)),
+                                        Units.inchesToMeters(17.7)),
                                 new Rotation3d(0, Units.degreesToRadians(-22.0),
                                         Units.degreesToRadians(-55.0)))),
                 new Pair<String, Transform3d>(
@@ -173,7 +173,7 @@ public class VisionConstants {
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(-10.91), 
                                         Units.inchesToMeters(12),
-                                        Units.inchesToMeters(19.66)),
+                                        Units.inchesToMeters(17.66)),
                                 new Rotation3d(0, Units.degreesToRadians(-22.0),
                                         Units.degreesToRadians(145.0)))),
                 new Pair<String, Transform3d>(
@@ -181,7 +181,7 @@ public class VisionConstants {
                         new Transform3d(
                                 new Translation3d(Units.inchesToMeters(-10.91), 
                                         Units.inchesToMeters(-12),
-                                        Units.inchesToMeters(19.66)),
+                                        Units.inchesToMeters(17.66)),
                                 new Rotation3d(0, Units.degreesToRadians(-22.0),
                                         Units.degreesToRadians(-145.0))))
                 ));

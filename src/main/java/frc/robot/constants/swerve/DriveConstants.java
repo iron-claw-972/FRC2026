@@ -23,9 +23,9 @@ public class DriveConstants {
      * <p>
      * The frame width is 26.5 inches, and each bumper is 3.25 inches.
      */
-    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.832;
+    public static final double ROBOT_WIDTH_WITH_BUMPERS = 0.83185; // 32.75 inches in meters
 
-    public static double ROBOT_MASS = Units.lbsToKilograms(108.3 + 13 + 13.4 + 5.0);
+    public static double ROBOT_MASS = Units.lbsToKilograms(111.6 + 13 + 13.4 + 5.0);
 
     /** Radius of the drive wheels [meters]. */
     public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
@@ -34,6 +34,7 @@ public class DriveConstants {
 
     
     /** Distance between the left and right wheels [meters]. */
+    // from center of wheels btw
     public static double TRACK_WIDTH = Units.inchesToMeters(20.75);//22.75 swerve bot, 20.75 comp bot
 
     // Mk4i gear ratios
@@ -53,7 +54,7 @@ public class DriveConstants {
         // To do so, divide by the radius. The radius is the diagonal of the square chassis, diagonal = sqrt(2) * side_length.
         public static final double MAX_ANGULAR_SPEED = MAX_SPEED / ((TRACK_WIDTH / 2) * Math.sqrt(2));
     
-        public static final double COSF = 0.9;
+        public static final double COSF = 1.5;
         
         // The maximum acceleration of the robot, limited by friction
         public static final double MAX_LINEAR_ACCEL = COSF * Constants.GRAVITY_ACCELERATION;
@@ -108,10 +109,10 @@ public class DriveConstants {
         public static final double TRANSLATIONAL_D = 0.001;
     
         //The PIDs for PathPlanner Command
-        public static final double PATH_PLANNER_HEADING_P = 3.5;
+        public static final double PATH_PLANNER_HEADING_P = 3.5/2;
         public static final double PATH_PLANNER_HEADING_D = 0;
     
-        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6;
+        public static final double PATH_PLANNER_TRANSLATIONAL_P = 6/2;
         public static final double PATH_PLANNER_TRANSLATIONAL_D = 0;
     
         // CAN
@@ -129,8 +130,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 60;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
@@ -147,10 +148,10 @@ public class DriveConstants {
     
         /* Drive Motor PID Values */
         public static final double[] P_VALUES = {
-            0.1,
-            0.1,
-            0.1,
-            0.1
+            0.3,
+            0.3,
+            0.3,
+            0.3
         };
         public static final double[] I_VALUES = {
             0,
@@ -188,7 +189,10 @@ public class DriveConstants {
         // Open loop prevents throttle from changing too quickly.
         // It will limit it to time given (in seconds) to go from zero to full throttle.
         // A small open loop ramp (0.25) helps with tread wear, tipping, etc
-        public static final double OPEN_LOOP_RAMP = 0.25;
+        public static final double OPEN_LOOP_RAMP = 0.1;
+
+        // limits maximum rate of change for motor
+        public static final double CLOSE_LOOP_RAMP = 0.0;
     
         public static final double WHEEL_CIRCUMFERENCE = 2*Math.PI*WHEEL_RADIUS;
     
@@ -204,10 +208,10 @@ public class DriveConstants {
          */
         public static void update(RobotId robotId) {
             if (robotId == RobotId.PrimeJr) {
-                STEER_OFFSET_FRONT_LEFT = 187.03125+180;
-                STEER_OFFSET_FRONT_RIGHT = 161.982421+180+180;
-                STEER_OFFSET_BACK_LEFT = 196.69921875+180;
-                STEER_OFFSET_BACK_RIGHT = 357.714843+180+180;
+                STEER_OFFSET_FRONT_LEFT = 188.26+180;
+                STEER_OFFSET_FRONT_RIGHT = 162.71+180+180;
+                STEER_OFFSET_BACK_LEFT = 196.69+180;
+                STEER_OFFSET_BACK_RIGHT = 357.90+180+180;
                 
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;

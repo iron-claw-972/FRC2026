@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -133,6 +134,12 @@ public class Intake extends SubsystemBase implements IntakeIO{
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
+        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimitEnable = true;
+        leftMotor.getConfigurator().apply(limitConfig);
+        rightMotor.getConfigurator().apply(limitConfig);
+
         leftMotor.setPosition(0.0);
         rightMotor.setPosition(0.0);
 
@@ -146,8 +153,14 @@ public class Intake extends SubsystemBase implements IntakeIO{
         robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
 
         // add some test commands.
-        SmartDashboard.putData("Extension Mechanism", mechanism);
-
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Extension Mechanism", mechanism);
+            SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
+            SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
+            SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
+            SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
+        }
+        
         if (RobotBase.isSimulation()) {
             // Extender simulation
             // the supply voltage should change with load....
@@ -177,10 +190,16 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void periodic() {
-        // Report position to SmartDashboard
         double inchExtension = getPosition();
-        Logger.recordOutput("Intake/Setpoint", setpointInches);
+        
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Intake/Setpoint", setpointInches);     
+        }
         robotExtension.setLength(inchExtension);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
+            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
+        }
 
         if(calibrating){
             leftMotor.set(-0.1);
@@ -193,6 +212,11 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         updateInputs();
         Logger.processInputs("Intake", inputs);
+
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
+            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
+        }
     }
 
     public void simulationPeriodic(){
@@ -230,7 +254,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param setpoint in inches
      */
     public void setPosition(double setpoint) {
-        double motorRotations = inchesToRotations(setpoint);
+        double motorRotations = -inchesToRotations(setpoint);
         rightMotor.setControl(voltageRequest.withPosition(motorRotations));
         leftMotor.setControl(voltageRequest.withPosition(motorRotations));
 
@@ -278,6 +302,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
         rollerMotor.set(speed);
     }
 
+    public double getSpeed() {
+        return rollerMotor.get();
+    }
+
     /**
      * Start the intake roller spinning.
      */
@@ -295,7 +323,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     /**
      * Reverses the intake roller
      */
-    public void spinReverse(){
+    public void spinReverse() {
         spin(-IntakeConstants.SPEED);
     }
 

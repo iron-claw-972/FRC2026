@@ -6,9 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
@@ -34,7 +32,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
     private final BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
-    private boolean spindexerBoolean = false;
     private Command autoShoot = null;
     private Shooter shooter;
     private Turret turret;
@@ -72,27 +69,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             CommandScheduler.getInstance().cancelAll();
         }));
 
-        // Align wheels
-        controller.get(PS5Button.MUTE).onTrue(new FunctionalCommand(
-                () -> getDrivetrain().setStateDeadband(false),
-                getDrivetrain()::alignWheels,
-                interrupted -> getDrivetrain().setStateDeadband(true),
-                () -> false, getDrivetrain()).withTimeout(2));
-
-        // Trench align
-        controller.get(PS5Button.CIRCLE).whileTrue(new StartEndCommand(
-                () -> {
-                    getDrivetrain().setTrenchAssist(true);
-                    getDrivetrain().setTrenchAlign(true);
-                },
-                () -> {
-                    getDrivetrain().setTrenchAssist(false);
-                    getDrivetrain().setTrenchAlign(false);
-                }));
-
         // Reverse motors
         if (intake != null && spindexer != null) {
-            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake, spindexer));
+            controller.get(PS5Button.LB).whileTrue(new ReverseMotors(intake));
         }
 
         // Intake
@@ -121,12 +100,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
                 .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
-            // Calibration
-            controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-                intake.calibrate();
-            })).onFalse(new InstantCommand(() -> {
-                intake.stopCalibrating();
-            }, intake));
+            // Calibration: you can now calibrate easily using this button
+            if (hood != null && intake != null) {
+                controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+                    intake.calibrate();
+                    hood.calibrate();
+                }, intake, hood)).onFalse(new InstantCommand(() -> {
+                    intake.stopCalibrating();
+                    hood.stopCalibrating();
+                }, intake, hood));
+            }
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
@@ -141,54 +124,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         }
 
         // Spindexer
-        if (spindexer != null) {
+        if (spindexer != null && turret != null && hood != null && intake != null) {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-                new RunSpindexer(spindexer, turret)
+                new RunSpindexer(spindexer, turret, hood, intake)
             );
         }
 
         // Auto shoot
-        if (turret != null && hood != null && shooter != null) {
+        if (turret != null && hood != null && shooter != null && spindexer != null) {
             autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
-        // Climb
-        if (climb != null) {
-            // Calibration
-            controller.get(PS5Button.OPTIONS).onTrue(new InstantCommand(() -> {
-                climb.hardstopCalibration();
-            })).onFalse(new InstantCommand(() -> {
-                climb.stopCalibrating();
-            }));
-
-            // Climb retract
-            controller.get(PS5Button.CROSS).onTrue(new InstantCommand(() -> {
-                climb.retract();
-            }));
-
-            // Go to up position
-            controller.get(PS5Button.TRIANGLE).onTrue(new InstantCommand(() -> {
-                climb.goUp();
-            }));
-
-            // Go to climb position
-            controller.get(PS5Button.TOUCHPAD).onTrue(new InstantCommand(() -> {
-                climb.climbPosition();
-            }));
-        }
-
+    
         // Hood
         if (hood != null) {
-            // Calibration
-            // controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-            //     hood.calibrate();
-            // })).onFalse(new InstantCommand(() -> {
-            //     hood.stopCalibrating();
-            // }));
-
             // Set the hood down -- for safety measures under trench
             controller.get(DPad.LEFT).onTrue(new InstantCommand(()->{
                 hood.forceHoodDown(true);

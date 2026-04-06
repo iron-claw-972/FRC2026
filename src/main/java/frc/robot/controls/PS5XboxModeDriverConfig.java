@@ -125,7 +125,7 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
         // Reverse motors
         if (intake != null && spindexer != null && shooter != null) {
             controller.get(CIRCLE).onTrue(new InstantCommand(() -> {
-                reverseMotors = new ReverseMotors(intake, spindexer);
+                reverseMotors = new ReverseMotors(intake);
                 CommandScheduler.getInstance().schedule(reverseMotors);
             })).onFalse(new InstantCommand(() -> {
                 if (reverseMotors != null) {

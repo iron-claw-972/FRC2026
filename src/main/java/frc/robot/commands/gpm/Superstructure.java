@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
+import frc.robot.constants.ShuttleInterpolation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
@@ -101,30 +102,38 @@ public class Superstructure extends Command {
         Pose2d lookaheadPose = turretPosition;
 
         /*
-         * Loop (20) until lookaheadPose converges BECAUSE -->
+         * Loop (max 20) until lookaheadPose converges BECAUSE -->
          * If you're 8m away (t = 1.0s) and moving at 2m/s towards target, you calculate for 6m (t = 0.8s)
          * At 6m, we run assuming t = 0.8 but then the 6m isn't correct since it was derived using t = 1.0s
          * So we make a bunch of guesses until it converges
+         * Early exit when change < 1mm to avoid unnecessary iterations
          */
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
-            Translation3d target3d = new Translation3d(target.getX(), target.getY(), 
+            Translation3d target3d = new Translation3d(target.getX(), target.getY(),
                 target == FieldConstants.getHubTranslation().toTranslation2d() ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
-					Translation2d.kZero,
-				target3d.minus(lookahead3d),
-					            2.0);
+            Translation2d.kZero,
+            target3d.minus(lookahead3d),
+            2.0);
 
             timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
-            lookaheadPose =
+            Pose2d newLookaheadPose =
                 new Pose2d(
                     turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
                     turretPosition.getRotation());
+            
+            // early exit if converged (change < 1mm)
+            if (i > 0 && lookaheadPose.getTranslation().getDistance(newLookaheadPose.getTranslation()) < 0.001) {
+                lookaheadPose = newLookaheadPose;
+                break;
+            }
+            lookaheadPose = newLookaheadPose;
         }
 
         // Get the field angle relative to the target pose
@@ -138,14 +147,16 @@ public class Superstructure extends Command {
         turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
         
         lastTurretAngle = turretAngle;
-
-        Logger.recordOutput("Turret/Target Pose", target);
-        SmartDashboard.putNumber("Time of flight", timeOfFlight);
-        SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
-        SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
         
-
-        Logger.recordOutput("Lookahead Pose", lookaheadPose);
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret/Target Pose", target);
+            Logger.recordOutput("Lookahead Pose", lookaheadPose);
+        }
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putNumber("Time of flight", timeOfFlight);
+            SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
+            SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
+        }
 
         // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
@@ -171,6 +182,7 @@ public class Superstructure extends Command {
         lastHoodAngle = hoodAngle;
 
         distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
+        Logger.recordOutput("Shooting/distanceToTarget", distanceFromTarget);
     }
 
     public void updateDrivePose(){
@@ -201,14 +213,41 @@ public class Superstructure extends Command {
         //spindexer.stopSpindexer();
     }
 
+    // shoot higher
+    public void bumpUpHoodOffset() {
+        hoodOffset += 1.0; // 1 degree
+    }
+
+    // shoot lower
+    public void bumpDownHoodOffset() {
+        hoodOffset -= 1.0; // 1 degree
+    }
+
+    // aim more left
+    public void bumpUpTurretOffset() {
+        turretOffset += 2.5; // 2.5 degree
+    }
+    // aim more right
+    public void bumpDownTurretOffset() {
+        turretOffset -= 2.5; // 2.5 degree
+    }
+
     @Override
     public void execute() {
-        TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-        SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-        hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
-        SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+            SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
+            hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
+            SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);   
+            turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+            SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        }// else {
+        //     TOFAdjustment = 0.0;
+        //     hoodOffset = 0.0;
+        //     turretOffset = 0.0;
+        // }
+
+        
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
@@ -220,36 +259,57 @@ public class Superstructure extends Command {
             stowEverything();
         } else {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
+
+            boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
+
+            // shuttling will move the hood so its angles very close to max (less arch)
+            if (shuttling) {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShuttleInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            } else {
+                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
+            }
             
-            // if(phaseManager.getCurrentState() == CurrentState.UNDER_TRENCH){
-            //     hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
-            // } else{
-                //hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.hoodAngleMap.get(hoodSetpoint)), hoodVelocity);
-            // }
+            double x = drivepose.getX(); // compared as meters
+            double y = drivepose.getY();
 
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
-            Logger.recordOutput("Distance From Target", distanceFromTarget);
-            //shooter.setShooter(-ShotInterpolation.exitVelocityMap.get(goalState.exitVel()));
-
-            // if (phaseManager.shouldFeed()) {
-            //     spindexer.maxSpindexer();
+            // if (FieldConstants.underTrench(x, y)) {
+            //     System.out.println("Hood forced down");
             // } else {
-            //     spindexer.stopSpindexer();
+            //     hood.forceHoodDown(false);
             // }
+
+            // different maps for shuttling vs shooting. Less powerful when shuttling.
+            if (shuttling) {
+                shooter.setShooter(-ShuttleInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            } else {
+                shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+            }
+
+            if (!Constants.DISABLE_LOGGING) {
+            // record when shuttling
+            Logger.recordOutput("Shuttling", shuttling);
+            // record distance for tuning if needed
+            Logger.recordOutput("Distance From Target", distanceFromTarget);
+            }
         }
 
-        Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
-        Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
-        Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
-        
-        Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
-
-        SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
+            Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
+            Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+            
+            Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
+        }
 
         // for operator
-        phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-        SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
+            
+            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
+            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
+        } else {
+            phaseDelay = 0.03;
+        }
     }
 
     @Override

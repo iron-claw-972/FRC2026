@@ -5,14 +5,12 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -20,13 +18,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constants.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.ModifiedCRT;
 
@@ -36,14 +35,15 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
+  public boolean locked = false;
+
+
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
 	/* ---------------- Hardware ---------------- */
 
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
-	private final CANcoder encoderLeft = new CANcoder(IdConstants.TURRET_ENCODER_LEFT_ID, Constants.CANIVORE_SUB);
-    private final CANcoder encoderRight = new CANcoder(IdConstants.TURRET_ENCODER_RIGHT_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
@@ -55,6 +55,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double lastGoalRad = 0.0;
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
+
 
 
 	/* ---------------- Visualization ---------------- */
@@ -78,7 +79,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		config.Slot0.kP = 12.0; 
 		config.Slot0.kS = 0.1; // Static friction compensation
 		config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
-		config.Slot0.kD = 0.2; // The "Braking" term to stop overshoot
+		config.Slot0.kD = 0.0; // The "Braking" term to stop overshoot
 
 		var mm = config.MotionMagic;
 		mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
@@ -103,35 +104,25 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
-		SmartDashboard.putData("Turret Mech", mech);
-		SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-		SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("Turret Mech", mech);
+			SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
+			SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
+			SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
+			SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
+			turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
+			turretTestChooser.addOption("Turn to -90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0)));
+			turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
+			turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
+			turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
 
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-		
-		double motorRotations = turretRot * TurretConstants.GEAR_RATIO;
-
-		//Sets the initial motor position
-		inputs.positionDeg = turretRot;
-		motor.setPosition(motorRotations);
-
+			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
+		}
+		SmartDashboard.putData("Set Locked", new InstantCommand(() -> {locked = !locked;}));
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
-
-		SmartDashboard.putData("Turn to 0", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0);}));
-		SmartDashboard.putData("Turn to -90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0);}));
-		SmartDashboard.putData("Turn to 90", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0);}));
-		SmartDashboard.putData("Turn to 200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0);}));
-		SmartDashboard.putData("Turn to -200", new InstantCommand(()->{setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0);}));
 	}
 
 	/* ---------------- Public API ---------------- */
@@ -146,10 +137,15 @@ public class Turret extends SubsystemBase implements TurretIO{
 		goalVelocityRadPerSec = velocityRadPerSec;
 	}
 
+	public void resetTurretPosition() {
+		inputs.positionDeg = 0.0;
+	}
+
 	/**
 	 * @return If the turret is at setpoint with tolerance of 10 degrees
 	 */
 	public boolean atSetpoint() {
+		if (locked) return true;
 		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(10.0);
 	}
 
@@ -214,7 +210,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
 			
 		// Multiply goal velocity by kV
-		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV;
+		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
 		if(calibrating){
 			motor.set(0.05);
@@ -222,15 +218,17 @@ public class Turret extends SubsystemBase implements TurretIO{
 			if(calibrationDebouncer.calculate(calibrated)){
 				stopCalibrating();
 			}
-		} else{
+		} else {
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
 			.withFeedForward(robotTurnCompensation));
 		}
 
-        Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-		Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+			Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+        }
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
@@ -238,22 +236,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
 
-		SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-		SmartDashboard.putNumber("Encoder left position", encoderLeft.getAbsolutePosition().getValueAsDouble());
-		SmartDashboard.putNumber("Encoder right position", encoderRight.getAbsolutePosition().getValueAsDouble());
-
-
-		double leftPosition = encoderLeft.getAbsolutePosition().getValueAsDouble();
-		double leftAbs = wrapUnit(leftPosition - TurretConstants.LEFT_ENCODER_OFFSET);
-
-		double rightPosition = encoderRight.getAbsolutePosition().getValueAsDouble();
-		double rightAbs = wrapUnit(rightPosition - TurretConstants.RIGHT_ENCODER_OFFSET);
-
-		crt = new ModifiedCRT(TurretConstants.LEFT_ENCODER_TEETH, TurretConstants.RIGHT_ENCODER_TEETH, TurretConstants.TURRET_TEETH_COUNT);
-
-		double turretRot = crt.solve(leftAbs, rightAbs); 
-
-		SmartDashboard.putNumber("CRT Position", Units.rotationsToDegrees(turretRot));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		}
+		
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -275,10 +263,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
-        inputs.encoderLeftRot = wrapUnit(encoderLeft.getAbsolutePosition().getValueAsDouble());
-        inputs.encoderRightRot = wrapUnit(encoderRight.getAbsolutePosition().getValueAsDouble());
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = crt.solve(inputs.encoderLeftRot, inputs.encoderRightRot);
+		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**
@@ -317,12 +303,5 @@ public class Turret extends SubsystemBase implements TurretIO{
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
 		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
-	}
-
-	// in rotations
-	public Pair<Double, Double> getEncoderPositions() {
-		return new Pair<Double, Double>(
-				encoderLeft.getAbsolutePosition().getValueAsDouble() - TurretConstants.LEFT_ENCODER_OFFSET,
-				encoderRight.getAbsolutePosition().getValueAsDouble() - TurretConstants.RIGHT_ENCODER_OFFSET);
 	}
 }

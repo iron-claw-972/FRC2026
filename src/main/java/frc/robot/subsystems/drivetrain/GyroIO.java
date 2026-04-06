@@ -13,11 +13,8 @@
 
 package frc.robot.subsystems.drivetrain;
 
-import org.littletonrobotics.junction.AutoLog;
-
-import com.ctre.phoenix6.sim.Pigeon2SimState;
-
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroIO {
   @AutoLog
@@ -33,5 +30,15 @@ public interface GyroIO {
 
   public default void updateInputs(GyroIOInputs inputs) {}
 
-  public Pigeon2SimState getSimState();
+  /**
+   * set the yaw angle of the gyro.
+   *
+   * @param rotation the new yaw angle
+   */
+  public default void setYaw(Rotation2d rotation) {}
+
+  /** returns the simulation state of the gyro, or null if not available. */
+  public default Object getSimState() {
+    return null;
+  }
 }

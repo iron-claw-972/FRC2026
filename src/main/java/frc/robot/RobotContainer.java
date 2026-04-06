@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -19,11 +20,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
-import frc.robot.commands.gpm.HardstopWarning;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -35,6 +38,7 @@ import frc.robot.controls.GameControllerDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -65,17 +69,31 @@ public class RobotContainer {
   private Intake intake = null;
 
   // this is inside addAuto()
-  //private Command auto = new DoNothing();
+  // private Command auto = new DoNothing();
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
+  private LED led = null;
+
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
 
-  // Auto Command selection
+  // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+  // custom match timer that counts down each phase
+  private final Timer matchTimer = new Timer();
+  private double currentPhaseDuration = 20.0; // default auto duration
+  private boolean timerActive = false;
+  private String currentPhase = "none";
+  
+  // phase durations
+  private static final double AUTO_DURATION = 20.0;
+  private static final double TRANSITION_SHIFT_DURATION = 10.0;
+  private static final double SHIFT_DURATION = 25.0;
+  private static final double ENDGAME_DURATION = 30.0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -84,7 +102,11 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     // display the current robot id on smartdashboard
-    SmartDashboard.putString("RobotID", robotId.toString());
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putString("RobotID", robotId.toString());
+
+      SmartDashboard.putNumber("Match Time", 0.0);
+    }
 
     // Filling the SendableChooser on SmartDashboard
 
@@ -94,6 +116,8 @@ public class RobotContainer {
         break;
 
       case TestBed2:
+        // led = new LED();
+        // led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:
@@ -101,12 +125,14 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        linearClimb = new LinearClimb();
+        led = new LED();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
+      
+      case TwinBot:
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -115,7 +141,6 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -131,37 +156,44 @@ public class RobotContainer {
         driver.configureControls();
         operator.configureControls();
 
-      
         registerCommands();
         PathGroupLoader.loadPathGroups();
-        
+
         initializeAutoBuilder();
         autoChooserInit();
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
 
-        
+        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
+
+        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
+          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
+        }
+        
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         break;
     }
 
 	if (intake != null && hood != null && turret != null)
-		CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret));
-
+		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
     // This is really annoying so it's disabled
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    CommandScheduler.getInstance().schedule(new LogCommand());
 
     // TODO: verify this claim.
     // LiveWindow is causing periodic loop overruns
     LiveWindow.disableAllTelemetry();
     LiveWindow.setEnabled(false);
 
-    SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
+    }
   }
 
   /**
@@ -180,7 +212,9 @@ public class RobotContainer {
         },
         () -> drive.getChassisSpeeds(),
         (chassisSpeeds) -> {
-          Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
+          if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("Auto/ChassisSpeeds", chassisSpeeds);
+          }
           drive.setChassisSpeeds(chassisSpeeds, false); // problem??
         },
         AutoConstants.AUTO_CONTROLLER,
@@ -212,12 +246,14 @@ public class RobotContainer {
       }));
     }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret);
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
       NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
+      NamedCommands.registerCommand("Reset Spindexer", new InstantCommand(() -> spindexer.resetSpindexer()));
+      NamedCommands.registerCommand("Reset Reset Angle", new InstantCommand(() -> spindexer.resetResetAngle()));
     }
 
     if (hood != null) {
@@ -227,7 +263,6 @@ public class RobotContainer {
       }));
       NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
         hood.forceHoodDown(false);
-        Logger.recordOutput("hello", true);
       }));
     }
 
@@ -237,16 +272,16 @@ public class RobotContainer {
 
   }
 
-  public void addAuto(String name){
-    try{
+  public void addAuto(String name) {
+    try {
       Command auto = new PathPlannerAuto(name);
       autoChooser.addOption(name, auto);
     }
     // is this the right one??
     catch (AutoBuilderException e) {
-          e.printStackTrace();
-          System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
-        }
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
   }
 
   /**
@@ -255,15 +290,27 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    String defaultAuto = "Test default auto";
+    String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
-    String rightSideAuto = "Right Week V1";      
+    String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
+    String leftLiberalSwipe = "LeftLiberalDoubleSwipe";
+    String rightLiberalSwipe = "RightLiberalDoubleSwipe";
+    String leftLiberalSwipeTranslation = "LeftLiberalDoubleSwipeTranslation";
+    String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
+    addAuto(leftConservativeSwipe);
+    addAuto(leftLiberalSwipe);
+    addAuto(rightLiberalSwipe);
+    addAuto(leftLiberalSwipeTranslation);
+
+
+    // put the Chooser on the SmartDashboard
+    SmartDashboard.putData("Auto chooser", autoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -302,5 +349,76 @@ public class RobotContainer {
         new Pose3d[] {
         // Subsystem Pose3ds
         });
+  }
+
+  /** Updates SmartDashboard values that need to be refreshed every loop */
+  public void periodic() {
+    double matchTime = DriverStation.getMatchTime();
+    String newPhase;
+    
+    if (matchTime > 130) {
+      newPhase = "auto";
+    } else if (matchTime > 120) {
+      newPhase = "transition_shift";
+    } else if (matchTime > 95) {
+      newPhase = "shift1";
+    } else if (matchTime > 70) {
+      newPhase = "shift2";
+    } else if (matchTime > 45) {
+      newPhase = "shift3";
+    } else if (matchTime > 20) {
+      newPhase = "shift4";
+    } else if (matchTime > 0) {
+      newPhase = "endgame";
+    } else {
+      newPhase = "disabled";
+    }
+    
+    if (!newPhase.equals(currentPhase)) {
+      currentPhase = newPhase;
+      matchTimer.reset();
+      matchTimer.start();
+      timerActive = true;
+      
+      switch (currentPhase) {
+        case "auto":
+          currentPhaseDuration = AUTO_DURATION;
+          break;
+        case "transition_shift":
+          currentPhaseDuration = TRANSITION_SHIFT_DURATION;
+          break;
+        case "shift1":
+        case "shift2":
+        case "shift3":
+        case "shift4":
+          currentPhaseDuration = SHIFT_DURATION;
+          break;
+        case "endgame":
+          currentPhaseDuration = ENDGAME_DURATION;
+          break;
+        default:
+          currentPhaseDuration = 0.0;
+          timerActive = false;
+      }
+    }
+    
+    double countdownTime = 0.0;
+    if (timerActive && currentPhaseDuration > 0) {
+      double elapsed = matchTimer.get();
+      countdownTime = Math.max(0, currentPhaseDuration - elapsed);
+    }
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putNumber("Phase Countdown", countdownTime);
+      SmartDashboard.putString("Current Phase", currentPhase);
+    }
+    
+    if (matchTime > 0) {
+      if (!Constants.DISABLE_SMART_DASHBOARD) {
+        SmartDashboard.putNumber("Match Time", matchTime);
+      }
+    }
+    if (!Constants.DISABLE_SMART_DASHBOARD) {
+      SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
+    }
   }
 }

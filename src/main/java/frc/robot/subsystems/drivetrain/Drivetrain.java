@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,10 +25,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
+import frc.robot.constants.GyroBiasConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.constants.swerve.ModuleConstants;
@@ -37,6 +41,8 @@ import frc.robot.util.SwerveModulePose;
 import frc.robot.util.SwerveStuff.SwerveSetpoint;
 import frc.robot.util.SwerveStuff.SwerveSetpointGenerator;
 import frc.robot.util.Vision.Vision;
+import frc.robot.util.Vision.GyroBiasEstimator;
+import org.photonvision.EstimatedRobotPose;
 
 /**
  * Represents a swerve drive style drivetrain.
@@ -52,6 +58,7 @@ public class Drivetrain extends SubsystemBase {
     protected final Module[] modules;
 
     private final GyroIO gyroIO;
+    private final boolean isPigeon2;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
     public static Lock odometryLock = new ReentrantLock();
@@ -112,6 +119,11 @@ public class Drivetrain extends SubsystemBase {
 
     private Rotation2d rawGyroRotation = new Rotation2d();
 
+    // for vision yaw correction
+    private GyroBiasEstimator gyroBiasEstimator = new GyroBiasEstimator();
+
+    private final Field2d field = new Field2d();
+
     /**
      * Creates a new Swerve Style Drivetrain.
      */
@@ -120,6 +132,7 @@ public class Drivetrain extends SubsystemBase {
 
         modules = new Module[4];
         this.gyroIO = gyroIO;
+        this.isPigeon2 = gyroIO instanceof GyroIOPigeon2;
         ModuleConstants[] constants = Arrays.copyOfRange(ModuleConstants.values(), 0, 4);
 
         if (RobotBase.isReal()) {
@@ -163,15 +176,22 @@ public class Drivetrain extends SubsystemBase {
 
         PathPlannerLogging.setLogActivePathCallback(
                 (activePath) -> {
-                    Logger.recordOutput(
-                            "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+                    if (!Constants.DISABLE_LOGGING) {
+                        Logger.recordOutput(
+                                "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+                    }
                 });
         PathPlannerLogging.setLogTargetPoseCallback(
                 (targetPose) -> {
-                    Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+                    if (!Constants.DISABLE_LOGGING) {
+                        Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+                    }
                 });
 
         // PPLibTelemetry.enableCompetitionMode();
+        if (!Constants.DISABLE_SMART_DASHBOARD) {
+            SmartDashboard.putData("Field", field);
+        }
     }
 
     public void close() {
@@ -198,6 +218,13 @@ public class Drivetrain extends SubsystemBase {
             positions[i] = modules[i].getOdometryPositions();
             sampleCount = Math.min(sampleCount, positions[i].length);
         }
+
+        // cap samples per cycle, more gives little benefit
+        final int MAX_SAMPLES_PER_CYCLE = 10;
+        if (sampleCount > MAX_SAMPLES_PER_CYCLE) {
+            sampleCount = MAX_SAMPLES_PER_CYCLE;
+        }
+
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
@@ -209,11 +236,17 @@ public class Drivetrain extends SubsystemBase {
             // Apply update
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
-		Logger.recordOutput("ihatethis/times", sampleTimestamps);
-		Logger.recordOutput("ihatethis/rotations", gyroInputs.odometryYawPositions);
-		Logger.recordOutput("ihatethis/positions", positions);
-        Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+
+        if (!Constants.DISABLE_LOGGING) {
+            Logger.recordOutput("ihatethis/times", sampleTimestamps);
+		    Logger.recordOutput("ihatethis/rotations", gyroInputs.odometryYawPositions);
+		    Logger.recordOutput("ihatethis/positions", positions);
+            Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+            Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+        }
+
         updateOdometryVision();
+        field.setRobotPose(getPose());
     }
 
     // DRIVE
@@ -247,7 +280,7 @@ public class Drivetrain extends SubsystemBase {
      */
     public void driveHeading(double xSpeed, double ySpeed, double heading, boolean fieldRelative) {
         double rot = rotationController.calculate(getYaw().getRadians(), heading);
-        ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, -rot);
+        ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
         if (fieldRelative) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getYaw());
         }
@@ -302,6 +335,41 @@ public class Drivetrain extends SubsystemBase {
                 if (vision.canSeeTag()) {
                     slipped = false;
                     modulePoses.reset();
+
+                    double currentGyroYaw = gyroInputs.yawPosition.getRadians();
+
+                    // to compare bias
+                    ArrayList<EstimatedRobotPose> visionPoses = vision.getEstimatedPoses(getPose());
+
+                    for (EstimatedRobotPose visionPose : visionPoses) {
+                        if (visionPose.estimatedPose != null && visionPose.timestampSeconds > 0) {
+                            double visionYaw = visionPose.estimatedPose.getRotation().getZ();
+
+                            // gets at vision timestamp, not current gyro yaw
+                            double gyroYawAtTimestamp = getGyroYawAtTimestamp(visionPose.timestampSeconds);
+
+                            if (!Double.isNaN(gyroYawAtTimestamp)) {
+                                if (!Constants.DISABLE_LOGGING) {
+                                    Logger.recordOutput("GyroYaw", Math.toDegrees(gyroYawAtTimestamp));
+                                    Logger.recordOutput("VisionYaw", Math.toDegrees(visionYaw));
+                                }
+                                // use weighted observation
+                                gyroBiasEstimator.addObservation(visionYaw, gyroYawAtTimestamp, 1.0);
+                            }
+                        }
+                    }
+
+                    // check if we have enough samples
+                    if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
+                        double fullBias = gyroBiasEstimator.getAndResetBias();
+                        double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
+                        System.out.println("bias: " + bias);
+                        System.out.println("FullBias"+ fullBias);
+
+                        if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
+                            gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
+                        }
+                    }
                 }
             }
         }
@@ -335,8 +403,8 @@ public class Drivetrain extends SubsystemBase {
             prevPose = pose3;
         }
 
-		if (Robot.isSimulation()) {
-			gyroIO.getSimState().addYaw(
+		if (Robot.isSimulation() && isPigeon2) {
+			((GyroIOPigeon2) gyroIO).getSimState().addYaw(
 					+Units.radiansToDegrees(currentSetpoint.chassisSpeeds().omegaRadiansPerSecond
 							* Constants.LOOP_TIME));
 		}
@@ -372,6 +440,13 @@ public class Drivetrain extends SubsystemBase {
 
     public void setTrenchAlign(boolean target) {
         trenchAlign = target;
+    }
+
+    // for current limit setting (brownout protection)
+    public void applyNewModuleCurrents(double steerCurrent, double driveCurrent) {
+        for (Module module : modules) { // iterate over our modules
+            module.setNewCurrentLimit(steerCurrent, driveCurrent);
+        }
     }
 
     /**
@@ -535,6 +610,18 @@ public class Drivetrain extends SubsystemBase {
      */
     public Module[] getModules() {
         return modules;
+    }
+
+    /**
+     * gets gyro yaw at a specific timestamp with interpolation
+     * this is used for timestamp-synchronized gyro/vision comparison.
+     * 
+     * @param timestampSeconds the timestamp to get the gyro yaw at
+     * @return the gyro yaw in radians, or Double.NaN if no valid data
+     */
+    private double 
+    getGyroYawAtTimestamp(double timestampSeconds) {
+        return getPose().getRotation().getRadians();
     }
 
     /**

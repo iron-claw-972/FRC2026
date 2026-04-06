@@ -24,8 +24,8 @@ public class FieldConstants {
 
   public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
   public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
-  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.167;
-  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.833;
+  public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.225;
+  public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.775;
 
   /**The coordinate of the climb position */
   public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(1.5, FIELD_WIDTH/2 - 2.0, new Rotation2d()); // TODO: find this
@@ -47,6 +47,7 @@ public class FieldConstants {
   public static final Translation3d HUB_RED =
       new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
     
+  // shuttling locations
   public static final Translation3d NEUTRAL_LEFT =
     new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
 
@@ -92,11 +93,17 @@ public class FieldConstants {
   public static final double ladderRedRight = FIELD_WIDTH - 35.75;
   public static final double ladderBlueRight = FIELD_WIDTH + 35.75;
 
+  public static final double TRENCH_CENTER_CHANNEL_WIDTH_INCHES = 50.0;
+  public static final double TRENCH_X_MIN_INCHES = 152.5;
+  public static final double TRENCH_X_MAX_INCHES = 187.5;
+
   public static final Zone neutralStrip = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone neutralLeft = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone neutralRight = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
   public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+
+  // trenches
 
 	public enum ShootingTarget {
 		HUB,
@@ -188,6 +195,19 @@ public class FieldConstants {
     }
   }
 
+  public static boolean underTrench(double x, double y) {
+    // ensures we aren't in center channel
+    if (y > Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES) && y < FIELD_WIDTH - Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES)) {
+      return false;
+    }
+    // if our location is to far away from right underneath trench in terms of x
+    // in between blue alliance trench
+    if (!(x > Units.inchesToMeters(TRENCH_X_MIN_INCHES) && x < Units.inchesToMeters(TRENCH_X_MAX_INCHES)) && !(x < FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MIN_INCHES) && x > FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MAX_INCHES))) {
+      return false;
+    }
+    return true;
+  }
+  
   /**
    * 
    * @return Whether Y coordinate is in the upper half (left side on blue alliance)

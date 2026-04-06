@@ -78,4 +78,8 @@ public class GyroIOPigeon2 implements GyroIO {
   public Pigeon2SimState getSimState() {
     return pigeon.getSimState();
   }
+  
+  public void setYaw(Rotation2d rotation) {
+    pigeon.getConfigurator().setYaw(rotation.getDegrees());
+  }
 }
