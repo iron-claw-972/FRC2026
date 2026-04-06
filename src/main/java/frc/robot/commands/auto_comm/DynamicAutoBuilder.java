@@ -25,23 +25,40 @@ public class DynamicAutoBuilder {
         this.intake = intake;
     }
 
-    public Command getDynamicAuto() {
+    public Command getLeftDynamicDoubleLiberalSwipe() {
         return new SequentialCommandGroup(
-            new PathPlannerAuto("SwipeOne"),
+            new PathPlannerAuto("LeftSwipeOne"),
             runSpindexerWithAbort(),
 
-            new PathPlannerAuto("SwipeTwo"),
+            new PathPlannerAuto("LeftSwipeTwo"),
             runSpindexerWithAbort(),
 
-            new PathPlannerAuto("SwipeThree"),
+            new PathPlannerAuto("LeftSwipeTwo"),
             runSpindexerWithAbort(),
 
-            new PathPlannerAuto("SwipeFour"),
+            new PathPlannerAuto("LeftSwipeTwo"),
+            runSpindexerWithAbort()
+        );
+    }
+
+    public Command getRightDynamicDoubleLiberalSwipe() {
+        return new SequentialCommandGroup(
+            new PathPlannerAuto("RightSwipeOne"),
+            runSpindexerWithAbort(),
+
+            new PathPlannerAuto("RightSwipeTwo"),
+            runSpindexerWithAbort(),
+
+            new PathPlannerAuto("RightSwipeTwo"),
+            runSpindexerWithAbort(),
+
+            new PathPlannerAuto("RightSwipeTwo"),
             runSpindexerWithAbort()
         );
     }
 
     private Command runSpindexerWithAbort() {
+        // should race: when a command finnishes (will always be the wait until command) then we will end the command
         return new RunSpindexer(spindexer, turret, hood, intake)
         .raceWith(new WaitUntilCommand(() -> spindexer.spinningAir())
         );
