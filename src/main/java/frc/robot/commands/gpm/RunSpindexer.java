@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
+import frc.robot.constants.IntakeConstants;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
@@ -15,6 +17,7 @@ public class RunSpindexer extends Command {
     private Spindexer spindexer;
     private Turret turret;
     private Hood hood;
+    private Intake intake;
 
     private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
 
@@ -22,11 +25,14 @@ public class RunSpindexer extends Command {
     private boolean wasHoodForcedDown = false;
 
     private Timer reverseTimer = new Timer();
+
+    private double storedIntakeSpeed = 0.0;
     
-    public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood) {
+    public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
+        this.intake = intake;
 
         addRequirements(spindexer);
     }
@@ -60,13 +66,22 @@ public class RunSpindexer extends Command {
             reversing = true;
             reverseTimer.reset();
             reverseTimer.start();
+            storedIntakeSpeed = intake.getSpeed();
         }
         if (!reversing) {
             spindexer.maxSpindexer();
         } else {
             spindexer.reverseSpindexer();
+
+            if (intake.getPosition() > IntakeConstants.INTERMEDIATE_EXTENSION + 1.0) {
+                intake.spinReverse();
+            } else {
+                intake.extend();
+            }
+
             if (reverseTimer.hasElapsed(SpindexerConstants.REVERSE_DEBOUNCE_TIME)) {
                 reversing = false;
+                intake.spin(storedIntakeSpeed);
             }
         }
         if (!Constants.DISABLE_SMART_DASHBOARD) {
