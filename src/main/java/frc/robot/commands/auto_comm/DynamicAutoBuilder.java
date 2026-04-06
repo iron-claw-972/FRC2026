@@ -7,8 +7,6 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 
-import java.util.function.BooleanSupplier;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class DynamicAutoBuilder {
@@ -58,11 +56,6 @@ public class DynamicAutoBuilder {
     }
 
     private Command runSpindexerWithAbort() {
-        // should race: when a command finnishes (will always be the wait until command) then we will end the command
-        // return new RunSpindexer(spindexer, turret, hood, intake)
-        // .raceWith(new WaitUntilCommand(() -> spindexer.spinningAir())
-        // );
-
-        return new ParallelDeadlineGroup(new WaitUntilCommand(() -> spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
+        return new ParallelDeadlineGroup(new WaitUntilCommand(spindexer::hasNoBalls), new RunSpindexer(spindexer, turret, hood, intake));
     }
 }

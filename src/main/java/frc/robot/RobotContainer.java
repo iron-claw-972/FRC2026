@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.auto_comm.SpindexerDeadline;
@@ -331,8 +330,8 @@ public class RobotContainer {
     
     String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
     String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
-    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getDynamicAuto());
-    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getDynamicAuto());
+    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
+    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
 
 
     // put the Chooser on the SmartDashboard
