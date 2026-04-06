@@ -1,10 +1,17 @@
 package frc.robot.subsystems.LED;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
-import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.ColorFlowAnimation;
+import com.ctre.phoenix6.controls.FireAnimation;
+import com.ctre.phoenix6.controls.RainbowAnimation;
+import com.ctre.phoenix6.controls.RgbFadeAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
+import com.ctre.phoenix6.controls.StrobeAnimation;
+import com.ctre.phoenix6.controls.TwinkleAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
@@ -13,17 +20,28 @@ import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import com.ctre.phoenix6.signals.VBatOutputModeValue;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
+import frc.robot.util.HubActive;
 
 public class LED extends SubsystemBase {
 
 	private CANdle candle;
 	public static final int stripLength = 67;
 
-	// Constructor
+	/// Hz
+	public static final int FLASH_RATE = 4;
+
+	private Color color;
+	
 	public LED() {
-		candle = new CANdle(IdConstants.CANDLE_ID);
+		candle = new CANdle(IdConstants.CANDLE_ID, Constants.RIO_CAN);
 		CANdleConfigurator configurator = candle.getConfigurator();
 
 		LEDConfigs ledConf = new LEDConfigs()
@@ -39,70 +57,125 @@ public class LED extends SubsystemBase {
 		configurator.apply(featureConf);
 		configurator.apply(ledConf);
 
+		setColor();
+
+		candle.clearAllAnimations();
+		lightsOff();
+
 		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
+
+		SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
+		SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));
+		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
+		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
+		SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
+		SmartDashboard.putData("LED Rainbow", new InstantCommand(() -> setRainbow()).ignoringDisable(true));
+		SmartDashboard.putData("LED Fade", new InstantCommand(() -> setRgbFadeAnimation()).ignoringDisable(true));
+		SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
+		SmartDashboard.putData("LED Color Flow", new InstantCommand(() -> setColorFlow()).ignoringDisable(true));
+		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
 	}
+
+	public void setColor() {
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isEmpty()) {
+			color = Color.kOrangeRed;
+		} else if (alliance.get() == Alliance.Red) {
+			color = Color.kRed;
+		} else if (alliance.get() == Alliance.Blue) {
+			color = Color.kBlue;
+		} else {
+			color = Color.kOrangeRed;
+		}
+	}
+
+	private enum State { OFF, ON, AUTO, SLOW, FAST, ENDGAME };
+
+	private State lastState = State.OFF;
+	private boolean forceOff = false;
 
 	@Override
 	public void periodic() {
-	}
+		State targetState = State.ON;
+		if (underSecsToFlip(5)) targetState = State.SLOW;
+		if (underSecsToFlip(1)) targetState = State.FAST;
+		if (DriverStation.isAutonomous()) targetState = State.AUTO;
+		if (DriverStation.getMatchTime() < 30) targetState = State.ENDGAME;
+		if (forceOff) targetState = State.OFF;
 
-	/**
-	 * Sets the color of all the LEDs.
-	 *
-	 * @param red   Red value (0-255)
-	 * @param green Green value (0-255)
-	 * @param blue  Blue value (0-255)
-	 */
-	public void setLEDs(int red, int green, int blue) {
-		setSection(red, green, blue, 0, stripLength);
-	}
-
-	/**
-	 * Sets an animation for the LEDs.
-	 *
-	 * @param animation The animation object (e.g., RainbowAnimation,
-	 *                  StrobeAnimation, etc.)
-	 */
-	public void animate(ControlRequest animation) {
-		candle.setControl(animation);
-	}
-
-	/**
-	 * Sets the color of a specific section of LEDs.
-	 *
-	 * @param r     Red value (0-255)
-	 * @param g     Green value (0-255)
-	 * @param b     Blue value (0-255)
-	 * @param start Start index of the section
-	 * @param end   End index of the section
-	 */
-	public void setSection(int r, int g, int b, int start, int end) {
-		SolidColor request = new SolidColor(start, end)
-				.withColor(new RGBWColor(r, g, b));
-		candle.setControl(request);
-	}
-
-	/**
-	 * Creates an alternating pattern of two colors across the LEDs.
-	 *
-	 * @param r1     Red value of the first color (0-255)
-	 * @param g1     Green value of the first color (0-255)
-	 * @param b1     Blue value of the first color (0-255)
-	 * @param r2     Red value of the second color (0-255)
-	 * @param g2     Green value of the second color (0-255)
-	 * @param b2     Blue value of the second color (0-255)
-	 * @param size   Size of each color block
-	 * @param offset Offset for the starting position of the pattern
-	 * @param total  Total number of LEDs
-	 */
-	public void alternate(int r1, int g1, int b1, int r2, int g2, int b2, int size, int offset, int total) {
-		for (int i = -offset; i < total; i += size) {
-			boolean color2 = ((i - offset) / size) % 2 == 0;
-			if (color2) {
-				setSection(r2, g2, b2, i, i + size - 1);
-			} else {
-				setSection(r1, g1, b1, i, i + size - 1);
+		if (targetState != lastState) {
+			switch (targetState) {
+				case OFF: lightsOff(); break;
+				case ON: setStatic(); break;
+				case AUTO: setTwinkle(); break;
+				case SLOW: setStrobe(); break;
+				case FAST: setFastStrobe(); break;
+				case ENDGAME: setRainbow(); break;
 			}
+			lastState = targetState;
 		}
 	}
+
+	public void setFire() {
+		candle.clearAllAnimations();
+		candle.setControl(new FireAnimation(8, 8 + stripLength).withSparking(0.5));
+	}
+
+	public void setRainbow() {
+		candle.clearAllAnimations();
+		candle.setControl(new RainbowAnimation(8, 8 + stripLength));
+	}
+
+	public void setRgbFadeAnimation() {
+		candle.clearAllAnimations();
+		candle.setControl(new RgbFadeAnimation(8, 8 + stripLength));
+	}
+
+	public void setTwinkle() {
+		candle.clearAllAnimations();
+		candle.setControl(new TwinkleAnimation(8, 8 + stripLength).withColor(new RGBWColor(Color.kViolet)));
+	}
+
+	public void setColorFlow() {
+		candle.clearAllAnimations();
+		candle.setControl(new ColorFlowAnimation(8, 8 + stripLength).withColor(new RGBWColor(Color.kAzure)));
+	}
+
+	public void setStrobe() {
+		candle.clearAllAnimations();
+		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE).withColor(new RGBWColor(color)));
+	}
+
+	public void setFastStrobe() {
+		candle.clearAllAnimations();
+		candle.setControl(new StrobeAnimation(8, 8 + stripLength).withFrameRate(FLASH_RATE * 4).withColor(new RGBWColor(color)));
+	}
+
+	public void setStatic() {
+		candle.clearAllAnimations();
+		candle.setControl(new SolidColor(8, 8 + stripLength).withColor(new RGBWColor(color)));
+	}
+
+	public void lightsOff() {
+		candle.clearAllAnimations();
+		candle.setControl(new SolidColor(8 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
+	}
+	
+
+	private boolean underSecsToFlip(double secs) {
+		Optional<Double> timeToActive = HubActive.timeToActive();
+		Optional<Double> timeToInactive = HubActive.timeToInactive();
+
+		if (timeToActive.isEmpty() && timeToInactive.isEmpty()) {
+			return false;
+		} else if (timeToActive.isPresent() && timeToActive.get() != 0) {
+			return (timeToActive.get() <= secs);
+
+		} else if (timeToInactive.isPresent() && timeToInactive.get() != 0) {
+			return (timeToInactive.get() <= secs);
+		} else {
+			return false;
+		}
+	}
+
 }
