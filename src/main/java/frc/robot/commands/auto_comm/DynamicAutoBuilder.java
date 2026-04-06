@@ -59,8 +59,10 @@ public class DynamicAutoBuilder {
 
     private Command runSpindexerWithAbort() {
         // should race: when a command finnishes (will always be the wait until command) then we will end the command
-        return new RunSpindexer(spindexer, turret, hood, intake)
-        .raceWith(new WaitUntilCommand(() -> spindexer.spinningAir())
-        );
+        // return new RunSpindexer(spindexer, turret, hood, intake)
+        // .raceWith(new WaitUntilCommand(() -> spindexer.spinningAir())
+        // );
+
+        return new ParallelDeadlineGroup(new WaitUntilCommand(() -> spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
     }
 }
