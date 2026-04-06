@@ -29,6 +29,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -40,7 +41,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LED.LED2;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -77,7 +78,7 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
-  private LED2 led = null;
+  private LED led = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -127,9 +128,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
-        led = new LED2();
+        led = new LED();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -145,7 +144,6 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -169,6 +167,8 @@ public class RobotContainer {
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
+
+        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));

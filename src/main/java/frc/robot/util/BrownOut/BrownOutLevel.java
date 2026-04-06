@@ -13,8 +13,8 @@ public class BrownOutLevel {
     public BrownOutLevel(
         double shooterCurrent, 
         double hoodCurrent,
-        double turretCurrent,
         double spindexerCurrent,
+        double turretCurrent,
         double intakeCurrent,
         double steerCurrent,
         double driveCurrent
@@ -22,8 +22,8 @@ public class BrownOutLevel {
         this.shooterCurrent = shooterCurrent;
         this.hoodCurrent = hoodCurrent;
         this.spindexerCurrent = spindexerCurrent;
-        this.intakeCurrent = intakeCurrent;
         this.turretCurrent = turretCurrent;
+        this.intakeCurrent = intakeCurrent;
         this.steerCurrent = steerCurrent;
         this.driveCurrent = driveCurrent;
     }

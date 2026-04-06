@@ -23,8 +23,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private SpindexerState state = SpindexerState.STOPPED;
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
-
-        private Debouncer noBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
+    private Debouncer noBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
+    public boolean noIndexing = false;
 
     public Spindexer() {
         updateInputs();
