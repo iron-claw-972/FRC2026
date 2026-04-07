@@ -26,36 +26,36 @@ public class DynamicAutoBuilder {
     public Command getLeftDynamicDoubleLiberalSwipe() {
         return new SequentialCommandGroup(
             new PathPlannerAuto("LeftSwipeOne"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("LeftSwipeTwo"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("LeftSwipeTwo"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("LeftSwipeTwo"),
-            runSpindexerWithAbort()
+            // runSpindexerWithAbort()
         );
     }
 
     public Command getRightDynamicDoubleLiberalSwipe() {
         return new SequentialCommandGroup(
             new PathPlannerAuto("RightSwipeOne"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("RightSwipeTwo"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("RightSwipeTwo"),
-            runSpindexerWithAbort(),
+            // runSpindexerWithAbort(),
 
             new PathPlannerAuto("RightSwipeTwo"),
-            runSpindexerWithAbort()
+            // runSpindexerWithAbort()
         );
     }
 
-    private Command runSpindexerWithAbort() {
-        return new ParallelDeadlineGroup(new WaitUntilCommand(spindexer::hasNoBalls), new RunSpindexer(spindexer, turret, hood, intake));
-    }
+    // private Command runSpindexerWithAbort() {
+    //     return new ParallelDeadlineGroup(new WaitUntilCommand(spindexer::hasNoBalls), new RunSpindexer(spindexer, turret, hood, intake));
+    // }
 }

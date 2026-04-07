@@ -100,6 +100,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
+            SmartDashboard.putBoolean("Spindexer Has Balls", inputs.spindexerCurrent > SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT);
         }
     }
 
