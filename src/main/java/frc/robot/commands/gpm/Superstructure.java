@@ -301,6 +301,7 @@ public class Superstructure extends Command {
             //         hood.forceHoodDown(false);
             //     }
             // }
+            }
 
             // different maps for shuttling vs shooting. Less powerful when shuttling.
             if (shuttling) {
@@ -339,6 +340,11 @@ public class Superstructure extends Command {
     @Override
     public void end(boolean interrupted) {
         stowEverything();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
     }
 
 }
