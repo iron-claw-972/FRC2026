@@ -118,8 +118,6 @@ public class RobotContainer {
         break;
 
       case TestBed2:
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:

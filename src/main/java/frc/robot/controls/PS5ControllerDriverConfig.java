@@ -12,6 +12,7 @@ import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
+import frc.robot.commands.drive_comm.SysIdPerModuleCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
@@ -68,6 +69,9 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
         }));
+
+        // // sysId per-module characterization
+        // controller.get(PS5Button.TRIANGLE).onTrue(new SysIdPerModuleCommand(getDrivetrain()));
 
         // Reverse motors
         if (intake != null && spindexer != null) {
