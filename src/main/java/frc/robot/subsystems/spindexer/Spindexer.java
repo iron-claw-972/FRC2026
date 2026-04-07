@@ -106,8 +106,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public boolean hasNoBalls() {
         // TODO: tune the threshold of course
         double current = motor.getStatorCurrent().getValueAsDouble();
-        boolean currentBelowThreshold = current < SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT_LOWER;
-        boolean noBalls = noBallsDebouncer.calculate(currentBelowThreshold);
+        boolean hasBalls = current > SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT;
+        boolean noBalls = noBallsDebouncer.calculate(!hasBalls);
         return noBalls;
     }
 
