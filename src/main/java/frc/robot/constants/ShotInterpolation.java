@@ -30,8 +30,8 @@ public class ShotInterpolation {
         exitVelocityMap.put(1.0, 2.2);
         exitVelocityMap.put(2.0, 4.4);
         exitVelocityMap.put(7.0, 12.0);
-        exitVelocityMap.put(7.8, 15.2);
         exitVelocityMap.put(7.78, 16.8);
+        exitVelocityMap.put(7.8, 15.2);
         exitVelocityMap.put(7.9, 17.1);
         exitVelocityMap.put(8.0, 17.9);
         exitVelocityMap.put(8.08, 19.0);

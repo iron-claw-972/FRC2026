@@ -2,6 +2,7 @@ package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
 
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,12 +30,11 @@ import frc.robot.util.PhaseManager;
 import frc.robot.util.ShooterPhysics;
 import frc.robot.util.ShooterPhysics.TurretState;
 
-public class Superstructure extends Command {
+public class LockedShoot extends Command {
     private Turret turret;
-    private Drivetrain drivetrain;
+    private Drivetrain drive;
     private Hood hood;
     private Shooter shooter;
-    private Spindexer spindexer;
 
     private double turretSetpoint;
     private double hoodSetpoint;
@@ -45,7 +45,7 @@ public class Superstructure extends Command {
     private final LinearFilter hoodAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     
     private Rotation2d lastTurretAngle;
-    private Rotation2d turretAngle;
+    private Rotation2d targetAngle;
     private double turretVelocity;
 
     private double lastHoodAngle;
@@ -68,13 +68,12 @@ public class Superstructure extends Command {
 
     private double TOFAdjustment = 0.85;
 
-    public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
+    public LockedShoot(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter) {
         this.turret = turret;
-        this.drivetrain = drivetrain;
+        this.drive = drivetrain;
         this.hood = hood;
         this.shooter = shooter;
-        this.spindexer = spindexer;
-        drivepose  = drivetrain.getPose();
+        drivepose = drivetrain.getPose();
 
         goalState = ShooterPhysics.getShotParams(
 				Translation2d.kZero,
@@ -85,12 +84,12 @@ public class Superstructure extends Command {
     }
 
     public void updateSetpoints(Pose2d drivepose) {
-		Pose2d turretPosition = drivepose.transformBy(
-				new Transform2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.toTranslation2d(), Rotation2d.kZero));
+    		Pose2d turretPosition = drivepose.transformBy(
+  				new Transform2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.toTranslation2d(), Rotation2d.kZero));
         
         // If the robot is moving, adjust the target position based on velocity
-        ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
-        ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
+        ChassisSpeeds robotRelVel = drive.getChassisSpeeds();
+        ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drive.getYaw());
 
         // Rotational adjustment is not being used, since turret is in center of robot
         double turretVelocityX =
@@ -137,43 +136,10 @@ public class Superstructure extends Command {
         }
 
         // Get the field angle relative to the target pose
-        turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
-        if (lastTurretAngle == null) {
-            lastTurretAngle = turretAngle;
-        }
+        targetAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
 
-        // Take the filtered average as the turret's velocity when robot is moving translationally
-        turretVelocity =
-        turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
-        
-        lastTurretAngle = turretAngle;
-        
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Turret/Target Pose", target);
-            Logger.recordOutput("Lookahead Pose", lookaheadPose);
-        }
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Time of flight", timeOfFlight);
-            SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
-            SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-        }
+        targetAngle = target.minus(lookaheadPose.getTranslation()).getAngle().minus(new Rotation2d(turret.getPositionRad()));
 
-        // Subtract the rotational angle of the robot from the setpoint
-        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
-
-        // Shortest path
-        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
-
-        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
-        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
-        if (potentialSetpoint > turretRange/2) {
-            potentialSetpoint -= 360;
-        } else if (potentialSetpoint < -turretRange/2) {
-            potentialSetpoint += 360;
-        }
-
-        turretSetpoint = potentialSetpoint;
 
         // Pitch is in radians
         hoodAngle = goalState.pitch();
@@ -182,39 +148,33 @@ public class Superstructure extends Command {
         lastHoodAngle = hoodAngle;
 
         distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
-        Logger.recordOutput("Shooting/distanceToTarget", distanceFromTarget);
     }
 
     public void updateDrivePose(){
-        Pose2d currentPose = drivetrain.getPose();
+        Pose2d currentPose = drive.getPose();
 
         drivepose = new Pose2d(
             currentPose.getTranslation(), 
             // Uncomment this if robot is backwards
             currentPose.getRotation()//.plus(new Rotation2d(Math.PI))
         );
-        ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
+        ChassisSpeeds robotRelVel = drive.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(
+        drivepose.exp(       //TODO this is a problem, drivepose.exp returns a Pose2d, should be drivepose = drivepose.exp(...)
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay));
+                robotRelVel.omegaRadiansPerSecond * phaseDelay)); 
     }
 
     /**
      * Stops and stows all subsystems involved in the command
      */
     public void stowEverything(){
-        turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
-        spindexer.noIndexing = true;
-    }
-
-    public void underLadder(){
-        spindexer.noIndexing = true;
+        //spindexer.stopSpindexer();
     }
 
     // shoot higher
@@ -238,34 +198,18 @@ public class Superstructure extends Command {
 
     @Override
     public void execute() {
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
-            SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);   
-            turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-            SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-        }// else {
-        //     TOFAdjustment = 0.0;
-        //     hoodOffset = 0.0;
-        //     turretOffset = 0.0;
-        // }
+        updateDrivePose();
 
-        
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
 
-        updateDrivePose();
         updateSetpoints(drivepose);
 
         if (phaseManager.isIdle()) {
-            underLadder();
+            stowEverything();
         } else {
-            if (spindexer.noIndexing) {
-                spindexer.noIndexing = false;
-            }
-            turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
+            drive.setAlignAngle(targetAngle.getRadians());
 
             boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
 
@@ -292,36 +236,25 @@ public class Superstructure extends Command {
                 shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             }
 
-            if (!Constants.DISABLE_LOGGING) {
-            // record when shuttling
-            Logger.recordOutput("Shuttling", shuttling);
-            // record distance for tuning if needed
-            Logger.recordOutput("Distance From Target", distanceFromTarget);
-            }
         }
 
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
-            Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
-            Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
-            
-            Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
-        }
 
-        // for operator
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
-            
-            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
-        } else {
-            phaseDelay = 0.03;
-        }
     }
 
     @Override
     public void end(boolean interrupted) {
-        stowEverything();
+      stowEverything();
+
+      drive.setIsAlign(false);
+
+      turret.locked = false;
+
+    }
+
+    @Override
+    public void initialize() {
+      drive.setIsAlign(true);
+      turret.locked = true;
     }
 
 }
