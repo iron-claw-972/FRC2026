@@ -10,7 +10,6 @@ public class SpindexerConstants {
     public static final double JAM_CURRENT_THRESHOLD = 75.0; // A
     public static final double JAM_DEBOUNCE_TIME = 0.3; // seconds
     public static final double REVERSE_DEBOUNCE_TIME = 0.25; // seconds
-    public static final double NO_BALLS_THRESHOLD_CURRENT_UPPER = 15.0; // A
-        public static final double NO_BALLS_THRESHOLD_CURRENT_LOWER = 5.0; // A
+    public static final double NO_BALLS_THRESHOLD_CURRENT_LOWER = 5.0; // A
     public static final double NO_BALLS_DEBOUNCE_TIME = 0.5; // sec
 }
