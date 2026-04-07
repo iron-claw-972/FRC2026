@@ -70,8 +70,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             CommandScheduler.getInstance().cancelAll();
         }));
 
-        // sysId per-module characterization
-        controller.get(PS5Button.TRIANGLE).onTrue(new SysIdPerModuleCommand(getDrivetrain()));
+        // // sysId per-module characterization
+        // controller.get(PS5Button.TRIANGLE).onTrue(new SysIdPerModuleCommand(getDrivetrain()));
 
         // Reverse motors
         if (intake != null && spindexer != null) {

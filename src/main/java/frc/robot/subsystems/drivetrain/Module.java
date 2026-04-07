@@ -250,7 +250,7 @@ public class Module implements ModuleIO{
         }
         if (isOpenLoop) {
             double percentOutput = desiredState.speedMetersPerSecond / DriveConstants.MAX_SPEED;
-            driveMotor.setControl(new DutyCycleOut(percentOutput).withEnableFOC(true));
+            driveMotor.setControl(new DutyCycleOut(percentOutput));
         } else {
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
             if (!Constants.DISABLE_LOGGING) {
@@ -261,8 +261,7 @@ public class Module implements ModuleIO{
             driveMotor.setControl(
                 velocityRequest
                     .withVelocity(velocity)
-                    .withFeedForward(feedforward)
-                    .withEnableFOC(true));
+                    .withFeedForward(feedforward));
         }     
     }
 
@@ -277,14 +276,14 @@ public class Module implements ModuleIO{
         if(desiredState == null){
             return;
         }
-        angleMotor.setControl(new PositionDutyCycle(desiredState.angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio).withEnableFOC(true));
+        angleMotor.setControl(new PositionDutyCycle(desiredState.angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio));
     }
 
     public void setDriveVoltage(Voltage voltage){
-        driveMotor.setControl(new VoltageOut(voltage.baseUnitMagnitude()).withEnableFOC(true));
+        driveMotor.setControl(new VoltageOut(voltage.baseUnitMagnitude()));
     }
     public void setAngle(Rotation2d angle){
-        angleMotor.setControl(new PositionDutyCycle(angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio).withEnableFOC(true));
+        angleMotor.setControl(new PositionDutyCycle(angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio));
     }
 
     public void setOptimize(boolean enable) {
