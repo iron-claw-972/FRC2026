@@ -255,8 +255,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
      */
     public void setPosition(double setpoint) {
         double motorRotations = -inchesToRotations(setpoint);
-        rightMotor.setControl(voltageRequest.withPosition(motorRotations));
-        leftMotor.setControl(voltageRequest.withPosition(motorRotations));
+        rightMotor.setControl(voltageRequest.withPosition(motorRotations).withEnableFOC(true));
+        leftMotor.setControl(voltageRequest.withPosition(motorRotations).withEnableFOC(true));
 
         setpointInches = setpoint;
     }

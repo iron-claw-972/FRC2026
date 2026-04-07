@@ -93,8 +93,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         }
 
         // Sets the motor control to target velocity
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS).withEnableFOC(true));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS).withEnableFOC(true));   
         
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);

@@ -216,7 +216,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			.withFeedForward(robotTurnCompensation)
+			.withEnableFOC(true));
 		}
 
         if (!Constants.DISABLE_LOGGING) {
