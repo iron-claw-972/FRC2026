@@ -193,13 +193,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
-		delta = MathUtil.angleModulus(delta);
+		delta = MathUtil.inputModulus(delta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
 		
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
 		
 		// apply filtered range
-		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastFilteredRad = MathUtil.inputModulus(lastFilteredRad + filteredDelta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
 		lastRawSetpoint = best;
 		best = lastFilteredRad;
 
@@ -241,7 +241,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 		}
-		
+		Logger.recordOutput("Turret/Position", getPositionDeg());
 	}
 
 	/* ---------------- Simulation ---------------- */
