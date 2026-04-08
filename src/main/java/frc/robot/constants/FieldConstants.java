@@ -59,7 +59,7 @@ public class FieldConstants {
     new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(BLUE_BORDER - 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+    new Translation3d(BLUE_BORDER - 3.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE =
     new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
@@ -68,7 +68,8 @@ public class FieldConstants {
     new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
 
   public static final Translation3d ALLIANCE_RIGHT_RED =
-    new Translation3d(RED_BORDER + 2.2, RIGHT_SIDE_TARGET, 0);
+    new Translation3d(RED_BORDER + 3.2
+    , RIGHT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_CENTER_BLUE =
     new Translation3d(BLUE_BORDER - 2, FIELD_WIDTH/2, 0);
