@@ -100,14 +100,13 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
-            SmartDashboard.putBoolean("Spindexer Has Balls", inputs.spindexerCurrent > SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT);
+            SmartDashboard.putBoolean("Spindexer Has Balls", inputs.spindexerCurrent > SpindexerConstants.HAS_BALLS_THRESHOLD_CURRENT);
         }
     }
 
     public boolean hasNoBalls() {
         // TODO: tune the threshold of course
-        double current = motor.getStatorCurrent().getValueAsDouble();
-        boolean hasBalls = current > SpindexerConstants.NO_BALLS_THRESHOLD_CURRENT;
+        boolean hasBalls = inputs.spindexerCurrent > SpindexerConstants.HAS_BALLS_THRESHOLD_CURRENT;
         boolean noBalls = noBallsDebouncer.calculate(!hasBalls);
         return noBalls;
     }
