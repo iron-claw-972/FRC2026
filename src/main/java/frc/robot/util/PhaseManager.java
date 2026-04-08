@@ -101,11 +101,10 @@ public class PhaseManager {
             double targetY;
 
             if (drivePose.getY() > 4.0) {
-                targetY = (FieldConstants.FIELD_WIDTH * (11.0/8.0)) - (drivePose.getY() * .75);
+                targetY = (FieldConstants.FIELD_WIDTH * 1.5) - drivePose.getY();
             } else {
-                targetY = (FieldConstants.FIELD_WIDTH * (3.0/8.0)) - (drivePose.getY() * .75);
+                targetY = (FieldConstants.FIELD_WIDTH * 0.5) - drivePose.getY();
             }
-
             return new Translation2d(FieldConstants.getAllianceSideTranslation(true).getX(), targetY);
         }
     }
