@@ -136,7 +136,7 @@ public class RobotContainer {
 
       case SwerveCompetition: // AKA "Vantage"
 
-      case BetaBot: // AKA "Pancake"
+      case SlopBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
         // fall-through
 
@@ -165,7 +165,7 @@ public class RobotContainer {
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
 
-        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
+        // SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -227,52 +227,52 @@ public class RobotContainer {
 
   public void registerCommands() {
 
-    if (intake != null) {
+    // if (intake != null) {
 
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
-        intake.extend();
-      }));
-      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
-      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
-      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
-      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
+    //   NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
+    //     intake.extend();
+    //   }));
+    //   NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
+    //   NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
+    //   NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
+    //   NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
 
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
-        seizing = true;
-        CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
-      }));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
-        seizing = false;
-      }));
-    }
+    //   NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
+    //     seizing = true;
+    //     CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
+    //   }));
+    //   NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
+    //     seizing = false;
+    //   }));
+    // }
 
-    if (spindexer != null) {
-      NamedCommands.registerCommand("Spindexer Air Spinning Deadline", new SpindexerDeadline(spindexer));
-    }
+    // if (spindexer != null) {
+    //   NamedCommands.registerCommand("Spindexer Air Spinning Deadline", new SpindexerDeadline(spindexer));
+    // }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
-      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
-      NamedCommands.registerCommand("Start Spindexer",
-          new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
-      NamedCommands.registerCommand("Reset Spindexer", new InstantCommand(() -> spindexer.resetSpindexer()));
-      NamedCommands.registerCommand("Reset Reset Angle", new InstantCommand(() -> spindexer.resetResetAngle()));
-    }
+    // if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
+    //   Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
+    //   NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
+    //   NamedCommands.registerCommand("Start Spindexer",
+    //       new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
+    //   NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
+    //   NamedCommands.registerCommand("Reset Spindexer", new InstantCommand(() -> spindexer.resetSpindexer()));
+    //   NamedCommands.registerCommand("Reset Reset Angle", new InstantCommand(() -> spindexer.resetResetAngle()));
+    // }
 
-    if (hood != null) {
+    // if (hood != null) {
 
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
-        hood.forceHoodDown(true);
-      }));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
-        hood.forceHoodDown(false);
-      }));
-    }
+    //   NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+    //     hood.forceHoodDown(true);
+    //   }));
+    //   NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+    //     hood.forceHoodDown(false);
+    //   }));
+    // }
 
-    if (linearClimb != null && drive != null) {
-      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
-    }
+    // if (linearClimb != null && drive != null) {
+    //   NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
+    // }
 
   }
 
@@ -308,23 +308,23 @@ public class RobotContainer {
     String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
 
     autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
-    addAuto(leftSideAuto);
-    addAuto(rightSideAuto);
-    addAuto(shootOnlyAuto);
-    addAuto(leftConservativeSwipe);
-    addAuto(leftLiberalSwipe);
-    addAuto(rightLiberalSwipe);
-    addAuto(leftLiberalSwipeTranslation);
+    // addAuto(leftSideAuto);
+    // addAuto(rightSideAuto);
+    // addAuto(shootOnlyAuto);
+    // addAuto(leftConservativeSwipe);
+    // addAuto(leftLiberalSwipe);
+    // addAuto(rightLiberalSwipe);
+    // addAuto(leftLiberalSwipeTranslation);
 
     // dynamic autos built here
-    if (spindexer != null && turret != null && hood != null && intake != null) {
-        DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+    // if (spindexer != null && turret != null && hood != null && intake != null) {
+        DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder();
         
         String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
-        String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
+        // String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
         addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
-        addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
-    }
+        // addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
+    // }
 
 
     // put the Chooser on the SmartDashboard

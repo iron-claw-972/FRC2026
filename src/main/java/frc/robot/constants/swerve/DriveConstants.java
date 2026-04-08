@@ -248,7 +248,7 @@ public class DriveConstants {
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
 
-            } else if(robotId == RobotId.BetaBot) {
+            } else if(robotId == RobotId.SlopBot) {
                 STEER_OFFSET_FRONT_LEFT = 193.884-180;
                 STEER_OFFSET_FRONT_RIGHT = 110.914;
                 STEER_OFFSET_BACK_LEFT = 128.054+180;

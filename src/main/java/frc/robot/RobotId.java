@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Preferences;
  */
 public enum RobotId {
     Default,
-    PrimeJr, WaffleHouse, TwinBot, SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
+    PrimeJr, WaffleHouse, TwinBot, SwerveCompetition, Vertigo, Vivace, Phil, SlopBot,
     ClassBot1, ClassBot2, ClassBot3, ClassBot4,
     TestBed1, TestBed2;
 
@@ -34,7 +34,7 @@ public enum RobotId {
      */
     @Deprecated
     public boolean isSwerveBot() {
-        return this == SwerveCompetition || this == Phil || this == Vertigo || this == Vivace || this == BetaBot;
+        return this == SwerveCompetition || this == Phil || this == Vertigo || this == Vivace || this == SlopBot;
     }
     
     /**

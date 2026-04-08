@@ -1,6 +1,7 @@
 package frc.robot.commands.auto_comm;
 
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.commands.DoNothing;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.hood.Hood;
@@ -11,16 +12,16 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class DynamicAutoBuilder {
 
-    private final Spindexer spindexer;
-    private final Turret turret;
-    private final Hood hood;
-    private final Intake intake;
+    // private final Spindexer spindexer;
+    // private final Turret turret;
+    // private final Hood hood;
+    // private final Intake intake;
 
-    public DynamicAutoBuilder(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
-        this.spindexer = spindexer;
-        this.turret = turret;
-        this.hood = hood;
-        this.intake = intake;
+    public DynamicAutoBuilder(/*Spindexer spindexer, Turret turret, Hood hood, Intake intake*/) {
+        // this.spindexer = spindexer;
+        // this.turret = turret;
+        // this.hood = hood;
+        // this.intake = intake;
     }
 
     public Command getLeftDynamicDoubleLiberalSwipe() {
@@ -34,7 +35,7 @@ public class DynamicAutoBuilder {
             new PathPlannerAuto("LeftSwipeTwo"),
             // runSpindexerWithAbort(),
 
-            new PathPlannerAuto("LeftSwipeTwo"),
+            new PathPlannerAuto("LeftSwipeTwo")
             // runSpindexerWithAbort()
         );
     }
@@ -50,12 +51,12 @@ public class DynamicAutoBuilder {
             new PathPlannerAuto("RightSwipeTwo"),
             // runSpindexerWithAbort(),
 
-            new PathPlannerAuto("RightSwipeTwo"),
+            new PathPlannerAuto("RightSwipeTwo")
             // runSpindexerWithAbort()
         );
     }
 
     // private Command runSpindexerWithAbort() {
-    //     return new ParallelDeadlineGroup(new WaitUntilCommand(spindexer::hasNoBalls), new RunSpindexer(spindexer, turret, hood, intake));
+    //     // return new ParallelDeadlineGroup(new WaitUntilCommand(spindexer::hasNoBalls), new RunSpindexer(spindexer, turret, hood, intake));
     // }
 }
