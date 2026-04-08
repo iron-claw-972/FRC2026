@@ -234,9 +234,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-		updateInputs();
-		Logger.processInputs("Turret", inputs);
-
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
 			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
