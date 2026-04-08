@@ -162,7 +162,7 @@ public class Superstructure extends Command {
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
 
         // Shortest path
-        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
+        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
