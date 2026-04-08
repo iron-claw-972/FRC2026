@@ -34,7 +34,7 @@ public class DynamicAutoBuilder {
             new PathPlannerAuto("LeftSwipeTwo"),
             // runSpindexerWithAbort(),
 
-            new PathPlannerAuto("LeftSwipeTwo"),
+            new PathPlannerAuto("LeftSwipeTwo")
             // runSpindexerWithAbort()
         );
     }
@@ -50,7 +50,7 @@ public class DynamicAutoBuilder {
             new PathPlannerAuto("RightSwipeTwo"),
             // runSpindexerWithAbort(),
 
-            new PathPlannerAuto("RightSwipeTwo"),
+            new PathPlannerAuto("RightSwipeTwo")
             // runSpindexerWithAbort()
         );
     }
