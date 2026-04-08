@@ -34,7 +34,6 @@ public class CurrentModes extends Command {
   public enum Modes {
     NORMAL,
     SHOOTING_FOCUS,
-    DRIVING_FOCUS,
     PURE_DRIVETRAIN
   }
 
@@ -54,21 +53,12 @@ public class CurrentModes extends Command {
     ));
 
     MODE_MAP.put(Modes.SHOOTING_FOCUS, new ModeCurrents(ShooterConstants.SHOOTER_CURRENT_LIMIT,
-      SpindexerConstants.currentLimit * 1.0,
+      SpindexerConstants.currentLimit * 2.0,
       TurretConstants.NORMAL_CURRENT_LIMIT * 1.0,
       IntakeConstants.NORMAL_CURRENT_LIMIT * 1.0,
-      HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, //TODO add proper current lims
-      DriveConstants.STEER_PEAK_CURRENT_LIMIT * 1.0,
-      DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 1.0
-    ));
-
-    MODE_MAP.put(Modes.DRIVING_FOCUS, new ModeCurrents(ShooterConstants.SHOOTER_CURRENT_LIMIT,
-      SpindexerConstants.currentLimit * 1.0,
-      TurretConstants.NORMAL_CURRENT_LIMIT * 1.0,
-      IntakeConstants.NORMAL_CURRENT_LIMIT * 1.0,
-      HoodConstants.NORMAL_CURRENT_LIMIT * 1.0,  //TODO add proper current lims
-      DriveConstants.STEER_PEAK_CURRENT_LIMIT * 1.0,
-      DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 1.0
+      HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, //TODO tune
+      DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.6,
+      DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.2
     ));
 
     MODE_MAP.put(Modes.PURE_DRIVETRAIN, new ModeCurrents(ShooterConstants.SHOOTER_CURRENT_LIMIT,
@@ -76,8 +66,8 @@ public class CurrentModes extends Command {
       TurretConstants.NORMAL_CURRENT_LIMIT * 0.0,
       IntakeConstants.NORMAL_CURRENT_LIMIT * 0.0,
       HoodConstants.NORMAL_CURRENT_LIMIT * 0.0,
-      DriveConstants.STEER_PEAK_CURRENT_LIMIT * 1.0,//TODO set increased drivetrain current lims
-      DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 1.0
+      DriveConstants.STEER_PEAK_CURRENT_LIMIT * 2.0,
+      DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 2.0
     ));
   }
 
