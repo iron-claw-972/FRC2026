@@ -62,7 +62,7 @@ public class LED extends SubsystemBase {
 		candle.clearAllAnimations();
 		lightsOff();
 
-		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
+		// System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
 		SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
 		SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));
