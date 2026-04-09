@@ -222,7 +222,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			.withFeedForward(robotTurnCompensation)
+			.withEnableFOC(true));
 		}
 
         if (!Constants.DISABLE_LOGGING) {
@@ -232,9 +233,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
-
-		updateInputs();
-		Logger.processInputs("Turret", inputs);
 
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
@@ -264,7 +262,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**

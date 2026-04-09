@@ -150,7 +150,8 @@ public class Hood extends SubsystemBase implements HoodIO {
 			// Set control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(velocityCompensation));
+			.withFeedForward(velocityCompensation)
+			.withEnableFOC(true));
 		}
 
         if (!Constants.DISABLE_LOGGING) {

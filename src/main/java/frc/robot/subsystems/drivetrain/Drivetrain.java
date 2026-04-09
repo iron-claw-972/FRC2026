@@ -324,7 +324,10 @@ public class Drivetrain extends SubsystemBase {
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
                 vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
-                if (vision.canSeeTag()) {
+                // skip vision if no tags
+                if (!vision.canSeeTag()) {
+                    slipped = true;
+                } else {
                     slipped = false;
                     modulePoses.reset();
 
@@ -355,9 +358,7 @@ public class Drivetrain extends SubsystemBase {
                     if (gyroBiasEstimator.getSampleCount() >= GyroBiasConstants.MIN_SAMPLES) {
                         double fullBias = gyroBiasEstimator.getAndResetBias();
                         double bias = gyroBiasEstimator.applyPartialCorrection(fullBias);
-                        System.out.println("bias: " + bias);
-                        System.out.println("FullBias"+ fullBias);
-
+                        
                         if (Math.abs(bias) > GyroBiasConstants.MIN_CORRECTION_RAD) {
                             gyroIO.setYaw(new Rotation2d(currentGyroYaw + bias));
                         }

@@ -62,7 +62,7 @@ public class Superstructure extends Command {
 
     private double hoodOffset = 0.0;
 
-    private double turretOffset = 0.0;
+    private double turretOffset = 5.0;
 
     private double distanceFromTarget = 0.0;
 
@@ -112,7 +112,7 @@ public class Superstructure extends Command {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
@@ -165,11 +165,10 @@ public class Superstructure extends Command {
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
-        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
-        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
-        if (potentialSetpoint > turretRange/2) {
+        // Stay within physical limits -- if shortest path is past max angle, we go long way around
+        if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
             potentialSetpoint -= 360;
-        } else if (potentialSetpoint < -turretRange/2) {
+        } else if (potentialSetpoint < TurretConstants.MIN_ANGLE) {
             potentialSetpoint += 360;
         }
 
@@ -210,7 +209,11 @@ public class Superstructure extends Command {
         turret.setFieldRelativeTarget(new Rotation2d(0.0), 0.0);
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
-        //spindexer.stopSpindexer();
+        spindexer.noIndexing = true;
+    }
+
+    public void underLadder(){
+        spindexer.noIndexing = true;
     }
 
     // shoot higher
@@ -256,8 +259,11 @@ public class Superstructure extends Command {
         updateSetpoints(drivepose);
 
         if (phaseManager.isIdle()) {
-            stowEverything();
+            underLadder();
         } else {
+            if (spindexer.noIndexing) {
+                spindexer.noIndexing = false;
+            }
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
 
             boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
