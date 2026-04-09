@@ -159,10 +159,10 @@ public class Superstructure extends Command {
         }
 
         // Subtract the rotational angle of the robot from the setpoint
-        double adjustedTurretSetpoint = MathUtil.inputModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians(), TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+        double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
 
         // Shortest path
-        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+        double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
