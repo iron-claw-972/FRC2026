@@ -46,12 +46,11 @@ public class ShotInterpolation {
         // currently regresses to y = 1.34959x + 9.79618
         shooterVelocityMap.put(0.0, 9.55);
         shooterVelocityMap.put(1.00, 11.5);
-        shooterVelocityMap.put(1.49, 11.5);
-        shooterVelocityMap.put(2.09, 12.5);
-        shooterVelocityMap.put(2.95, 14.1);
-        shooterVelocityMap.put(4.07, 15.5);
-        shooterVelocityMap.put(5.05, 16.7);
-        shooterVelocityMap.put(5.79, 18.0);
+        shooterVelocityMap.put(2.00, 12.3);
+        shooterVelocityMap.put(3.00, 14.0);
+        shooterVelocityMap.put(4.00, 15.5);
+        shooterVelocityMap.put(5.00, 16.4);
+        shooterVelocityMap.put(5.60, 17.4);
         shooterVelocityMap.put(25.0, 43.44);
 
         newHoodMap.put(1.00, 78.0);
