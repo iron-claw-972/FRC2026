@@ -62,7 +62,7 @@ public class Superstructure extends Command {
 
     private double hoodOffset = 0.0;
 
-    private double turretOffset = 0.0;
+    private double turretOffset = 5.0;
 
     private double distanceFromTarget = 0.0;
 
