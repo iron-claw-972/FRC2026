@@ -63,6 +63,7 @@ public class DynamicAutoBuilder {
         // .raceWith(new WaitUntilCommand(() -> spindexer.spinningAir())
         // );
 
-        return new ParallelDeadlineGroup(new WaitUntilCommand(() -> spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
+        // return new ParallelDeadlineGroup(new WaitUntilCommand(() -> spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
+        return new ParallelDeadlineGroup(new WaitUntilCommand(5.0), new RunSpindexer(spindexer, turret, hood, intake));
     }
 }
