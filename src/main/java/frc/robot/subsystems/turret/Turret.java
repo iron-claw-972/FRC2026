@@ -264,7 +264,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**
