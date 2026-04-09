@@ -62,7 +62,7 @@ public class Superstructure extends Command {
 
     private double hoodOffset = 0.0;
 
-    private double turretOffset = 0.0;
+    private double turretOffset = 5.0;
 
     private double distanceFromTarget = 0.0;
 
@@ -243,13 +243,14 @@ public class Superstructure extends Command {
             SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
             hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
             SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);   
-            turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-            SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
         }// else {
         //     TOFAdjustment = 0.0;
         //     hoodOffset = 0.0;
         //     turretOffset = 0.0;
         // }
+
+        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
 
         
         // Phase manager stuff
