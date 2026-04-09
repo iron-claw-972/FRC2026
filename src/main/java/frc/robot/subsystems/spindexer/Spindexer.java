@@ -103,10 +103,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     }
 
     public boolean spinningAir() {
-        // TODO: tune the threshold of course
-        double vel = motor.getVelocity().getValueAsDouble();
-        boolean velWithinRange = vel < SpindexerConstants.NO_BALLS_THRESHOLD_VELOCITY_UPPER && vel > SpindexerConstants.NO_BALLS_THRESHOLD_VELOCITY_LOWER;
-        boolean noBalls = noBallsDebouncer.calculate(velWithinRange);
+        boolean hasBalls = inputs.spindexerCurrent > SpindexerConstants.BALLS_THRESHOLD_CURRENT_THRESHOLD;
+        boolean noBalls = noBallsDebouncer.calculate(!hasBalls);
+        
+        
         return (noBalls);
     }
 

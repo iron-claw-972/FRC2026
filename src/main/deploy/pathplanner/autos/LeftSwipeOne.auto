@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Spin Intake Rollers"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Left Swipe1"
