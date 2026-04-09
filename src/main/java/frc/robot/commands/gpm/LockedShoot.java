@@ -106,7 +106,7 @@ public class LockedShoot extends Command {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(

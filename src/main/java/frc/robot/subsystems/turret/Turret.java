@@ -193,13 +193,13 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
-		delta = MathUtil.inputModulus(delta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+		delta = MathUtil.inputModulus(delta, Units.degreesToRadians(TurretConstants.MIN_ANGLE), Units.degreesToRadians(TurretConstants.MAX_ANGLE));
 		
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
 		
 		// apply filtered range
-		lastFilteredRad = MathUtil.inputModulus(lastFilteredRad + filteredDelta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+		lastFilteredRad = MathUtil.inputModulus(lastFilteredRad + filteredDelta, Units.degreesToRadians(TurretConstants.MIN_ANGLE), Units.degreesToRadians(TurretConstants.MAX_ANGLE));
 		lastRawSetpoint = best;
 		best = lastFilteredRad;
 
@@ -262,7 +262,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**
