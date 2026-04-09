@@ -13,7 +13,7 @@ import frc.robot.util.MathUtils;
  */
 public abstract class BaseDriverConfig {
 
-    private final Drivetrain drive;
+    public final Drivetrain drive;
 
     private double previousHeading = 0;
 
