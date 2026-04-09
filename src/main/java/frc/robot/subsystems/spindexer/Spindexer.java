@@ -133,7 +133,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public void setNewCurrentLimit(double newCurrentLimit) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_SPIKE_LIMIT;
+        limitConfig.StatorCurrentLimit = newCurrentLimit;
         limitConfig.StatorCurrentLimitEnable = true;
         limitConfig.SupplyCurrentLowerLimit = newCurrentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
