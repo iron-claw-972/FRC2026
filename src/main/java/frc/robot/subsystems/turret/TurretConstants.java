@@ -5,7 +5,7 @@ import edu.wpi.first.math.util.Units;
 
 public class TurretConstants {
     public static double MAX_ANGLE = 180; // Deg
-    public static double MIN_ANGLE = -200; // Deg
+    public static double MIN_ANGLE = -250; // Deg
 
     public static double CALIBRATION_OFFSET = 0.0; // TODO: find this at hardstop
 
