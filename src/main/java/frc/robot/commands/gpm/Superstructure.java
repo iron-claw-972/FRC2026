@@ -251,10 +251,12 @@ public class Superstructure extends Command {
 
         turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
         SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putData("Hood: Shoot Higher", new InstantCommand(() -> bumpUpHoodOffset()));
-        SmartDashboard.putData("Hood: Shoot Lower", new InstantCommand(() -> bumpDownHoodOffset()));
-        SmartDashboard.putData("Turret: Aim Left", new InstantCommand(() -> bumpUpTurretOffset()));
-        SmartDashboard.putData("Turret: Aim Right", new InstantCommand(() -> bumpDownTurretOffset()));
+
+        // If we ever need to lose a match use this code below
+        // SmartDashboard.putData("Hood: Shoot Higher", new InstantCommand(() -> bumpUpHoodOffset()));
+        // SmartDashboard.putData("Hood: Shoot Lower", new InstantCommand(() -> bumpDownHoodOffset()));
+        // SmartDashboard.putData("Turret: Aim Left", new InstantCommand(() -> bumpUpTurretOffset()));
+        // SmartDashboard.putData("Turret: Aim Right", new InstantCommand(() -> bumpDownTurretOffset()));
 
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
