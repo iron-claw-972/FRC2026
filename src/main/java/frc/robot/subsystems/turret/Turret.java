@@ -35,8 +35,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-  public boolean locked = false;
-
+  	public boolean locked = false;
 
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
