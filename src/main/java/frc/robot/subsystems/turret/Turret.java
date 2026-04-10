@@ -40,32 +40,19 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
-	/* ---------------- Hardware ---------------- */
-
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
 	private SingleJointedArmSim turretSim;
 
-	/* ---------------- Control ---------------- */
-
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
-	private double lastGoalRad = 0.0;
-	private double lastFilteredRad = 0.0;
-	private double lastRawSetpoint = 0.0;
-
-
-
-	/* ---------------- Visualization ---------------- */
 
 	private final Mechanism2d mech = new Mechanism2d(100, 100);
 	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
-
-	/* ---------------- Constructor ---------------- */
 
 	public Turret() {
 		motor.setNeutralMode(NeutralModeValue.Brake);
@@ -86,8 +73,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 
-		lastGoalRad = 0.0;
-
 		if (RobotBase.isSimulation()) {
 			simState = motor.getSimState();
 			turretSim = new SingleJointedArmSim(
@@ -101,26 +86,11 @@ public class Turret extends SubsystemBase implements TurretIO{
 					0.0);
 		}
 
-		if (!Constants.DISABLE_SMART_DASHBOARD) {
-			SmartDashboard.putData("Turret Mech", mech);
-			SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
-
-			SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
-			turretTestChooser.setDefaultOption("Turn to 0", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(0), 0.0)));
-			turretTestChooser.addOption("Turn to -90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-90), 0.0)));
-			turretTestChooser.addOption("Turn to 90", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(90), 0.0)));
-			turretTestChooser.addOption("Turn to 200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(200), 0.0)));
-			turretTestChooser.addOption("Turn to -200", new InstantCommand(()-> setFieldRelativeTarget(Rotation2d.fromDegrees(-200), 0.0)));
-
-			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
-		}
 		SmartDashboard.putData("Set Locked", new InstantCommand(() -> {locked = !locked;}));
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
 	}
-
-	/* ---------------- Public API ---------------- */
 
 	/**
 	 * Sets the setpoint position and velocity of the turret. Call in command execute.
@@ -158,79 +128,16 @@ public class Turret extends SubsystemBase implements TurretIO{
 		return Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 	}
 
-	/* ---------------- Periodic ---------------- */
-
 	@Override
 	public void periodic() {
 		updateInputs();
-		Logger.processInputs("Turret", inputs);
-
-		// Position extrapolation
-		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT; 
-    	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
-
-		//Continuous wrap selection
-		double best = lastGoalRad;
-		boolean found = false;
-
-		for (int i = -2; i <= 2; i++) {
-			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
-			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE) || candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
-				continue;
-
-			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
-				best = candidate;
-				found = true;
-			}
-		}
-
-		lastGoalRad = best;
-
-		// calculate shortest angular delta
-		double delta = best - lastRawSetpoint;
-		delta = MathUtil.angleModulus(delta);
-		
-		// filter delta
-		double filteredDelta = setpointFilter.calculate(delta);
-		
-		// apply filtered range
-		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
-		lastRawSetpoint = best;
-		best = lastFilteredRad;
-
-		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
-
-		// Clamp position setpoint to min and max angles
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
-			
-		// Multiply goal velocity by kV
-		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
 		// Sets motor control with feedforward
 		motor.setControl(mmVoltageRequest
 		.withPosition(motorGoalRotations)
 		.withFeedForward(robotTurnCompensation)
 		.withEnableFOC(true));
-
-
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-			Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
-        }
-
-		// --- Visualization ---
-		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
-
-		if (!Constants.DISABLE_SMART_DASHBOARD) {
-			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
-			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
-		}
-		
 	}
-
-	/* ---------------- Simulation ---------------- */
 
 	@Override
 	public void simulationPeriodic() {
