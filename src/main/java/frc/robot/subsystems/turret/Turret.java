@@ -193,13 +193,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
-		delta = MathUtil.angleModulus(delta);
 		
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
 		
 		// apply filtered range
-		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastFilteredRad += filteredDelta;
 		lastRawSetpoint = best;
 		best = lastFilteredRad;
 
