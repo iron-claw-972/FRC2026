@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
-import frc.robot.util.ModifiedCRT;
 
 public class Turret extends SubsystemBase implements TurretIO{
 	// Super low magnitude filter for the position to make it less jittery
@@ -65,8 +64,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
-
-	ModifiedCRT crt;
 
 	/* ---------------- Constructor ---------------- */
 
@@ -106,8 +103,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putData("Turret Mech", mech);
-			SmartDashboard.putData("Start turret calibration", new InstantCommand(()-> calibrate()));
-			SmartDashboard.putData("Stop turret calibration", new InstantCommand(()-> stopCalibrating()));
 			SmartDashboard.putData("Reset Turret Position to Zero", new InstantCommand(() -> resetTurretPosition()));
 
 			SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
@@ -212,19 +207,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
-		if(calibrating){
-			motor.set(0.05);
-			boolean calibrated = Math.abs(motor.getStatorCurrent().getValueAsDouble()) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
-			if(calibrationDebouncer.calculate(calibrated)){
-				stopCalibrating();
-			}
-		} else {
-			// Sets motor control with feedforward
-			motor.setControl(mmVoltageRequest
-			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation)
-			.withEnableFOC(true));
-		}
+		// Sets motor control with feedforward
+		motor.setControl(mmVoltageRequest
+		.withPosition(motorGoalRotations)
+		.withFeedForward(robotTurnCompensation)
+		.withEnableFOC(true));
+
 
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
@@ -282,23 +270,4 @@ public class Turret extends SubsystemBase implements TurretIO{
 
         motor.getConfigurator().apply(limits);
     }
-
-	// Also ignore this for now
-	private double wrapUnit(double value) {
-		value %= 1.0;
-		if (value < 0) value += 1.0;
-		return value;
-	}
-
-	private void calibrate(){
-		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
-		calibrating = true;
-	}
-
-	private void stopCalibrating(){
-		motor.set(Units.degreesToRotations(TurretConstants.CALIBRATION_OFFSET) * TurretConstants.GEAR_RATIO);
-		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
-		calibrating = false;
-		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
-	}
 }
