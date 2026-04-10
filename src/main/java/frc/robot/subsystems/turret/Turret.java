@@ -34,12 +34,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-  public boolean locked = false;
-
-
-	private boolean calibrating;
-	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
-
+  	public boolean locked = false;
+	
 	private final TalonFX motor = new TalonFX(IdConstants.TURRET_MOTOR_ID, Constants.CANIVORE_SUB);
 
 	private TalonFXSimState simState;
@@ -47,10 +43,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 	private Rotation2d goalAngle = Rotation2d.kZero;
 	private double goalVelocityRadPerSec = 0.0;
-
-	private final Mechanism2d mech = new Mechanism2d(100, 100);
-	private final MechanismRoot2d root = mech.getRoot("turret", 50, 50);
-	private final MechanismLigament2d ligament = root.append(new MechanismLigament2d("barrel", 30, 0));
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
