@@ -67,7 +67,8 @@ public class Superstructure extends Command {
 
     private double distanceFromTarget = 0.0;
 
-    private double TOFAdjustment = 0.85;
+    // private double TOFAdjustment = 0.85;
+    private double TOFAdjustment = 1.1;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
