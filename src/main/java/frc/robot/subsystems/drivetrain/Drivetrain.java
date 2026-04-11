@@ -324,10 +324,7 @@ public class Drivetrain extends SubsystemBase {
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
                 vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
-                // skip vision if no tags
-                if (!vision.canSeeTag()) {
-                    slipped = true;
-                } else {
+                if (vision.canSeeTag()) {
                     slipped = false;
                     modulePoses.reset();
 
