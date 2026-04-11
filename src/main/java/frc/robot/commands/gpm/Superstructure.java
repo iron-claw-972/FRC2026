@@ -55,7 +55,7 @@ public class Superstructure extends Command {
 
     private TurretState goalState;
 
-    private double phaseDelay = 0.03; // Extrapolation delay due to latency
+    private LoggedNetworkNumber phaseDelay = new LoggedNetworkNumber("OPERATOR: Phase Delay", 0.03); //Extrapolation delay due to latency
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
@@ -200,9 +200,9 @@ public class Superstructure extends Command {
         // Add a phase delay extrapolation component for latency delay
         drivepose.exp(
             new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay,
-                robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay));
+                robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+                robotRelVel.vyMetersPerSecond * phaseDelay.get(),
+                robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
     }
 
     /**
@@ -307,10 +307,8 @@ public class Superstructure extends Command {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
             
-            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
         } else {
-            phaseDelay = 0.03;
+            phaseDelay.set(0.03);
         }
     }
 
