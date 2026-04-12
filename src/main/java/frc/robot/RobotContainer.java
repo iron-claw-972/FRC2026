@@ -39,6 +39,8 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeIO;
+import frc.robot.subsystems.Intake.IntakeIOTalonFX;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -123,7 +125,7 @@ public class RobotContainer {
 
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
-        intake = new Intake();
+        intake = new Intake(new IntakeIOTalonFX());
         led = new LED();
 
       case WaffleHouse: // AKA Betabot

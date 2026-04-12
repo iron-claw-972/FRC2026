@@ -30,379 +30,166 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.IntakeConstants;
 
-public class Intake extends SubsystemBase implements IntakeIO{
-    // Mechanism Display...
-    private final Mechanism2d mechanism;
-    private final MechanismLigament2d robotExtension;
-    @SuppressWarnings("unused")
-    private final MechanismLigament2d robotFrame; 
-    private final MechanismLigament2d robotHeight; 
-    private final MechanismLigament2d robotPos;
+public class Intake extends SubsystemBase {
 
-    // create the motors
-    /** Motor to move the roller */
-    private TalonFX rollerMotor = new TalonFX(IdConstants.ROLLER_MOTOR_ID, Constants.CANIVORE_SUB);
-    /** Right motor (master) */
-    private TalonFX rightMotor = new TalonFX(IdConstants.RIGHT_MOTOR_ID, Constants.CANIVORE_SUB);
-    /** Left motor (slave) */
-    private TalonFX leftMotor = new TalonFX(IdConstants.LEFT_MOTOR_ID, Constants.CANIVORE_SUB);
+  private boolean calibrating = false;
+  private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
-    /** Motor characteristics for the roller motor, a single Kraken X44 (aka gearbox) */
-    private final DCMotor dcMotorRoller = DCMotor.getKrakenX44(1);
-    /** Motor characteristics for the extending pair of Kraken X44 motors (aka gearbox) */
-    private final DCMotor dcMotorExtend = DCMotor.getKrakenX44(2);
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final IntakeIO io;
 
-    private double maxVelocity;
-    private double maxAcceleration;
+  public Intake(IntakeIO io) {
+    this.io = io;
+  }
 
-    // Use FlywheelSim for the roller
-    private FlywheelSim rollerSim;
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Intake", inputs);
 
-    // Use ElevatorSim for the extender
-    private ElevatorSim intakeSim;
+    double inchExtension = io.getPosition();
 
-    private final MotionMagicVoltage voltageRequest = new MotionMagicVoltage(0);
-
-    private double setpointInches = 0.0;
-
-    private boolean calibrating = false;
-    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
-
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-
-    public Intake() {
-     
-        // get the maximum free speed
-        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
-
-        // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
-        // safety margin, limits velocity to .75 free speed
-        maxVelocity = 0.75 * maxFreeSpeed;
-        maxAcceleration = maxVelocity / 0.25;
-
-        // Configure the motors
-        // Build the configuration for the roller
-        TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
-
-        // config Slot 0 PID params
-        var slot0Configs = rollerConfig.Slot0;
-        slot0Configs.kP = 5.0;
-        slot0Configs.kI = 0.0;
-        slot0Configs.kD = 0.0;
-        slot0Configs.kV = 0.0;
-        slot0Configs.kA = 0.0;
-
-        // set the brake mode
-        rollerConfig.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
-
-        // apply the configuration to the right motor (master)
-        rollerMotor.getConfigurator().apply(rollerConfig);
-
-        // Build the configuration for the left and right Motor
-        TalonFXConfiguration config = new TalonFXConfiguration();
-
-        // config the current limits (low value for testing)
-        config.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
-        .withSupplyCurrentLimitEnable(true);
-
-        // config Slot 0 PID params
-        var rollerSlot0Configs = config.Slot0;
-        rollerSlot0Configs.kP = 5.0;
-        rollerSlot0Configs.kI = 0.0;
-        rollerSlot0Configs.kD = 0.0;
-        rollerSlot0Configs.kV = 0.0;
-        rollerSlot0Configs.kA = 0.0;
-
-        // configure MotionMagic
-        MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
-
-        motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
-        motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
-
-        rightMotor.getConfigurator().apply(config);
-        leftMotor.getConfigurator().apply(config);
-
-        leftMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive)
-            .withNeutralMode(NeutralModeValue.Coast)
-        );
-
-        rightMotor.getConfigurator().apply(
-            new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
-        );
-
-        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
-        limitConfig.StatorCurrentLimitEnable = true;
-        leftMotor.getConfigurator().apply(limitConfig);
-        rightMotor.getConfigurator().apply(limitConfig);
-
-        leftMotor.setPosition(0.0);
-        rightMotor.setPosition(0.0);
-
-        // Build the mechanism for display
-        mechanism = new Mechanism2d(80, 80);
-        MechanismRoot2d root = mechanism.getRoot("Root", 0, 1);
-        robotPos = root.append(new MechanismLigament2d("robotPos", 40, 0.0, 1, new Color8Bit(0, 0, 0)));
-        robotFrame = robotPos.append(new MechanismLigament2d("Robot Frame",28,0.0, 2, new Color8Bit(0, 255, 255)));
-        robotHeight = robotPos.append(new MechanismLigament2d("Robot Height", 22.5, 90, 1, new Color8Bit(0,255,255)));
-        // extensiion is initially retracted.
-        robotExtension = robotHeight.append(new MechanismLigament2d("Robot Extension", 0, 90, 2, new Color8Bit(255, 0, 0) ));
-
-        // add some test commands.
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putData("Extension Mechanism", mechanism);
-            SmartDashboard.putData("Intake Calibrate", new InstantCommand(() -> calibrate()));
-            SmartDashboard.putData("Intake Stop Calibrating", new InstantCommand(() -> stopCalibrating()));
-            SmartDashboard.putData("Extend Intake", new InstantCommand(() -> extend()));
-            SmartDashboard.putData("Retract Intake", new InstantCommand(() -> retract()));
-        }
-        
-        if (RobotBase.isSimulation()) {
-            // Extender simulation
-            // the supply voltage should change with load....
-            rightMotor.getSimState().setSupplyVoltage(12.0);
-
-            // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
-            double drumRadiusMeters = Units.inchesToMeters(1.0);
-            double minHeightMeters = Units.inchesToMeters(0.0);
-            double maxHeightMeters = Units.inchesToMeters(IntakeConstants.MAX_EXTENSION);
-            // start retracted
-            double startingHeightMeters = Units.inchesToMeters(0.0);
-            intakeSim = new ElevatorSim(
-                dcMotorExtend,
-                IntakeConstants.GEAR_RATIO,
-                IntakeConstants.CARRIAGE_MASS_KG, 
-                drumRadiusMeters, 
-                minHeightMeters, 
-                maxHeightMeters, 
-                false, 
-                startingHeightMeters);
-
-            // Roller simulation
-            rollerSim = new FlywheelSim(
-                LinearSystemId.createFlywheelSystem(dcMotorRoller, IntakeConstants.ROLLER_MOI_KG_M_SQ, IntakeConstants.ROLLER_GEARING),
-                dcMotorRoller);
-        }
+    if (calibrating) {
+      io.setRightMotor(-0.1);
+      io.setLeftMotor(-0.1);
+      boolean atHardStop = Math
+          .abs((inputs.leftCurrent + inputs.rightCurrent)
+              / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
     }
 
-    public void periodic() {
-        double inchExtension = getPosition();
-        
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Intake/Setpoint", setpointInches);     
-        }
-        robotExtension.setLength(inchExtension);
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Intake Extension (in)", inchExtension);
-            SmartDashboard.putBoolean("Intake Extended", inchExtension > 1.0);
-        }
+  }
 
-        if(calibrating){
-            leftMotor.set(-0.1);
-            rightMotor.set(-0.1);
-            boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
-        }
+  /**
+   * convert rotations to inches
+   * 
+   * @param rotations of the motor
+   * @return inches of rack travel
+   */
+  public static double rotationsToInches(double motorRotations) {
+    // circumference of the rack pinion
+    double circ = 2 * Math.PI * 0.5;
+    double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
+    double inches = pinionRotations * circ;
+    return inches;
+  }
 
-        updateInputs();
-        Logger.processInputs("Intake", inputs);
+  /**
+   * convert inches to rotations
+   * 
+   * @param inches of rack travel
+   * @return motor rotations
+   */
+  public static double inchesToRotations(double inches) {
+    double circ = 2 * Math.PI * 0.5;
+    double pinionRotations = inches / circ;
+    double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
+    return motorRotations;
+  }
 
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
-            SmartDashboard.putBoolean("Intake At Setpoint", Math.abs(inchExtension - setpointInches) < 0.5);
-        }
-    }
+  /**
+   * Set the roller speed.
+   * 
+   * @param speed duty cycle in the range [-1, 1]
+   */
+  public void spin(double speed) {
+    io.setRollerMotor(speed);
+  }
 
-    public void simulationPeriodic(){
-        // get the applied motor voltage
-        double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
+  public double getSpeed() {
+    return inputs.rollerSetSpeed;
+  }
 
-        // tell the simulator that voltage
-        intakeSim.setInputVoltage(voltage);
-        // run the siimulation
-        intakeSim.update(0.02);
+  /**
+   * Get the intake extender position
+   * 
+   * @return inches
+   */
+  public double getPosition() {
+    return inputs.leftPosition;
+  }
 
-        // get the simulation result
-        double metersExtend = intakeSim.getPositionMeters();
-        double inchesExtend = Units.metersToInches(metersExtend);
-        double motorRotations = inchesToRotations(inchesExtend);
+  /**
+   * Start the intake roller spinning.
+   */
+  public void spinStart() {
+    spin(IntakeConstants.SPEED);
+  }
 
-        // set the motor to that position
-        rightMotor.getSimState().setRawRotorPosition(motorRotations);
+  /**
+   * Stop the intake roller.
+   */
+  public void spinStop() {
+    spin(0.0);
+  }
 
-        // update the display
-        robotExtension.setLength(inchesExtend);
+  /**
+   * Reverses the intake roller
+   */
+  public void spinReverse() {
+    spin(-IntakeConstants.SPEED);
+  }
 
-        // simulate roller
-        voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
-        rollerSim.setInputVoltage(voltage);
-        rollerSim.update(0.020);
+  /** Extend the intake the maximum distance. */
+  public void extend() {
+    io.setPosition(IntakeConstants.MAX_EXTENSION);
+  }
 
-        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
+  /** Extend to a position that doesn't hit the spindexer */
+  public void intermediateExtend() {
+    io.setPosition(IntakeConstants.INTERMEDIATE_EXTENSION);
+  }
 
-        rollerMotor.getSimState().setRotorVelocity(velocity);
-    }
+  /** Retract the intake to a safe starting position. */
+  public void retract() {
+    io.setPosition(IntakeConstants.STOW_EXTENSION);
+  }
 
-    /**
-     * Set the intake extender position
-     * @param setpoint in inches
-     */
-    public void setPosition(double setpoint) {
-        double motorRotations = -inchesToRotations(setpoint);
-        rightMotor.setControl(voltageRequest.withPosition(motorRotations).withEnableFOC(true));
-        leftMotor.setControl(voltageRequest.withPosition(motorRotations).withEnableFOC(true));
+  /** Goes to the zero position */
+  public void zeroPosition() {
+    io.setPosition(0.0);
+  }
 
-        setpointInches = setpoint;
-    }
+  public void zeroMotors() {
+    io.setRawPosition(0.0);
+  }
 
-    /**
-     * Get the intake extender position
-     * @return inches
-     */
-    public double getPosition(){
-        return inputs.leftPosition;
-    }
+  /**
+   * Reclaim all the resources (e.g., motors and other devices).
+   * This step is necessary for multiple unit tests to work.
+   */
+  public void close() {
+    io.close();
+  }
 
-    /**
-     * convert rotations to inches
-     * @param rotations of the motor
-     * @return inches of rack travel
-     */
-    public double rotationsToInches(double motorRotations) {
-        // circumference of the rack pinion
-        double circ = 2 * Math.PI * 0.5;
-        double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
-        double inches = pinionRotations * circ;
-        return inches; 
-    }
+  /**
+   * Starts calibrating by running it backwards
+   */
+  public void calibrate() {
+    setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
+    calibrating = true;
+  }
 
-    /**
-     * convert inches to rotations
-     * @param inches of rack travel
-     * @return motor rotations
-     */
-    public double inchesToRotations(double inches){
-        double circ = 2 * Math.PI * 0.5;
-        double pinionRotations = inches / circ;
-        double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
-        return motorRotations;
-    }
+  /**
+   * Stops, zeros, and moves it to retract position
+   */
+  public void stopCalibrating() {
+    zeroMotors();
+    setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
+    calibrating = false;
+    retract();
+  }
 
-    /**
-     * Set the roller speed.
-     * @param speed duty cycle in the range [-1, 1]
-     */
-    public void spin(double speed) {
-        rollerMotor.set(speed);
-    }
-
-    public double getSpeed() {
-        return rollerMotor.get();
-    }
-
-    /**
-     * Start the intake roller spinning.
-     */
-    public void spinStart() {
-        spin(IntakeConstants.SPEED);
-    }
-
-    /**
-     * Stop the intake roller.
-     */
-    public void spinStop() {
-        spin(0.0);
-    }
-
-    /**
-     * Reverses the intake roller
-     */
-    public void spinReverse() {
-        spin(-IntakeConstants.SPEED);
-    }
-
-    /** Extend the intake the maximum distance. */
-    public void extend() {
-       setPosition(IntakeConstants.MAX_EXTENSION);
-    }
-
-    /** Extend to a position that doesn't hit the spindexer */
-    public void intermediateExtend(){
-        setPosition(IntakeConstants.INTERMEDIATE_EXTENSION);
-    }
-
-    /** Retract the intake to a safe starting position. */
-    public void retract(){
-        setPosition(IntakeConstants.STOW_EXTENSION);
-    }
-
-    /** Goes to the zero position */
-    public void zeroPosition(){
-        setPosition(0.0);
-    }
-
-    public void zeroMotors() {
-        rightMotor.setPosition(0.0);
-        leftMotor.setPosition(0.0);
-    }
-
-    /**
-     * Reclaim all the resources (e.g., motors and other devices).
-     * This step is necessary for multiple unit tests to work.
-     */
-    public void close() {
-        leftMotor.close();
-        rightMotor.close();
-        rollerMotor.close();
-    }
-
-    /**
-     * Starts calibrating by running it backwards
-     */
-    public void calibrate(){
-        setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
-        calibrating = true;
-    }
-
-    /**
-     * Stops, zeros, and moves it to retract position
-     */
-    public void stopCalibrating(){
-        zeroMotors();
-        setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
-        calibrating = false;
-        retract();
-    }
-
-    /**
-     * sets supply and stator current limits
-     * @param limit the current limit for stator and supply current
-     */
-    public void setCurrentLimits(double limit) {
-        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+  /**
+   * sets supply and stator current limits
+   * 
+   * @param limit the current limit for stator and supply current
+   */
+  public void setCurrentLimits(double limit) {
+    CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
         .withStatorCurrentLimitEnable(true)
         .withStatorCurrentLimit(limit)
         .withSupplyCurrentLimitEnable(true)
         .withSupplyCurrentLimit(limit);
 
-        leftMotor.getConfigurator().apply(limits);
-        rightMotor.getConfigurator().apply(limits);
-    }
-
-    @Override
-    public void updateInputs() {
-        inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
-        inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
-        inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
-        inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
-        inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
-        inputs.rollerCurrent = rollerMotor.getStatorCurrent().getValueAsDouble();
-    }
-
+    io.setLimits(limits);
+  }
 }
