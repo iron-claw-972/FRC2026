@@ -25,28 +25,28 @@ public interface IntakeIO {
    * 
    * @return inches
    */
-  double getPosition();
+  public double getPosition();
 
   /**
    * Set the intake extender position
    * 
    * @param setpoint in inches
    */
-  void setPosition(double setpoint);
+  public void setPosition(double setpoint);
 
-  void setLeftMotor(double speed);
+  public void setLeftMotor(double speed);
 
-  void setRightMotor(double speed);
+  public void setRightMotor(double speed);
 
-  void setRollerMotor(double speed);
+  public void setRollerMotor(double speed);
 
-  void setLimits(CurrentLimitsConfigs limits);
+  public void setLimits(CurrentLimitsConfigs limits);
 
-  void setRawPosition(double pos);
+  public void setRawPosition(double pos);
 
   /**
    * Reclaim all the resources (e.g., motors and other devices).
    * This step is necessary for multiple unit tests to work.
    */
-  void close();
+  public void close();
 }
