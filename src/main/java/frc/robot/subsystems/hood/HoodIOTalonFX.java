@@ -8,8 +8,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import sun.jvm.hotspot.utilities.Unsigned5.SetPosition;
 
 public class HoodIOTalonFX implements HoodIO {
   private TalonFX motor = new TalonFX(IdConstants.HOOD_ID, Constants.CANIVORE_SUB);

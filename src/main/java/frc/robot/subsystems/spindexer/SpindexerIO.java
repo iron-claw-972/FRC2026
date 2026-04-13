@@ -2,12 +2,21 @@ package frc.robot.subsystems.spindexer;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface SpindexerIO {
-    @AutoLog
-    public static class SpindexerIOInputs {
-        public double spindexerVelocity = 0.0;
-        public double spindexerCurrent = 0.0;
-    }
+import com.ctre.phoenix6.controls.ControlRequest;
 
-    public void updateInputs();
+public interface SpindexerIO {
+  @AutoLog
+  public static class SpindexerIOInputs {
+    public double spindexerVelocity = 0.0;
+    public double spindexerCurrent = 0.0;
+    public double spindexerPosition = 0.0;
+  }
+
+  public void updateInputs(SpindexerIOInputs inputs);
+
+  public void setControl(ControlRequest request);
+
+  public void setPositionRaw(double pos);
+
+  public void setNewCurrentLimit(double newCurrentLimit);
 }

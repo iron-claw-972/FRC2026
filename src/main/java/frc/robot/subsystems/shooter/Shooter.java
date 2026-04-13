@@ -75,7 +75,7 @@ public class Shooter extends SubsystemBase {
         return Math.abs(getShooterVelocity() - shooterTargetSpeed) < 1.0;
     }
 
-    public void setNewCurrentLimits(double limit) {
+    public void setNewCurrentLimit(double limit) {
         io.setNewCurrentLimit(limit);
     }
 
