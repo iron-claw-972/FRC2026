@@ -35,8 +35,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
-  public boolean locked = false;
-
+  	public boolean locked = false;
 
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
@@ -193,13 +192,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
-		delta = MathUtil.inputModulus(delta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
 		
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
 		
 		// apply filtered range
-		lastFilteredRad = MathUtil.inputModulus(lastFilteredRad + filteredDelta, TurretConstants.MIN_ANGLE, TurretConstants.MAX_ANGLE);
+		lastFilteredRad += filteredDelta;
 		lastRawSetpoint = best;
 		best = lastFilteredRad;
 
@@ -222,7 +220,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			.withFeedForward(robotTurnCompensation)
+			.withEnableFOC(true));
 		}
 
         if (!Constants.DISABLE_LOGGING) {
@@ -233,15 +232,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-		updateInputs();
-		Logger.processInputs("Turret", inputs);
-
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
 			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 		}
-		Logger.recordOutput("Turret/Position", getPositionDeg());
+		
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -264,7 +260,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**

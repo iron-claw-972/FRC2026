@@ -73,6 +73,11 @@ public class GyroIOPigeon2 implements GyroIO {
   }
 
   @Override
+  public StatusSignal<Angle> getYawSignal() {
+    return yaw;
+  }
+  
+  @Override
   public void setYaw(Rotation2d rotation) {
     pigeon.getConfigurator().setYaw(rotation.getDegrees());
   }

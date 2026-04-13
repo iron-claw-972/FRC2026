@@ -1,8 +1,5 @@
 package frc.robot.commands.gpm;
 
-import org.littletonrobotics.junction.Logger;
-
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -23,7 +19,6 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.PhaseManager;
@@ -111,7 +106,7 @@ public class LockedShoot extends Command {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target == FieldConstants.getHubTranslation().toTranslation2d() ?
+                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(

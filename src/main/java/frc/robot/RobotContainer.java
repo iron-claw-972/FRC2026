@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
@@ -116,8 +117,6 @@ public class RobotContainer {
         break;
 
       case TestBed2:
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:
@@ -290,7 +289,6 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
@@ -298,8 +296,11 @@ public class RobotContainer {
     String rightLiberalSwipe = "RightLiberalDoubleSwipe";
     String leftLiberalSwipeTranslation = "LeftLiberalDoubleSwipeTranslation";
     String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
+    String leftDoNothing = "Left Do Nothing";
+    String rightDoNothing = "Right Do Nothing";
+    String centerDoNothing = "Center Do Nothing";
 
-    autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
+    autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
@@ -307,7 +308,9 @@ public class RobotContainer {
     addAuto(leftLiberalSwipe);
     addAuto(rightLiberalSwipe);
     addAuto(leftLiberalSwipeTranslation);
-
+    addAuto(leftDoNothing);
+    addAuto(rightDoNothing);
+    addAuto(centerDoNothing);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
@@ -334,6 +337,13 @@ public class RobotContainer {
     } else {
       return false;
     }
+  }
+
+  public Command getDefaultAuto() {
+    ParallelCommandGroup defaultShoot = new ParallelCommandGroup(
+      new RunSpindexer(spindexer, turret, hood, intake)
+    );
+    return defaultShoot;
   }
 
   public Command getAutoCommand() {
