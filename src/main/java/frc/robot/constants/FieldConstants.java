@@ -57,24 +57,13 @@ public class FieldConstants {
 
   public static final Translation3d NEUTRAL_RIGHT = new Translation3d(FIELD_LENGTH / 2, RIGHT_SIDE_TARGET, 0);
 
-  public static final Translation3d ALLIANCE_LEFT_BLUE = new Translation3d(BLUE_BORDER - 3.2, LEFT_SIDE_TARGET, 0); // previous
-                                                                                                                    // hub
-                                                                                                                    // +
-                                                                                                                    // a
-                                                                                                                    // few
-                                                                                                                    // feet
-                                                                                                                    // further
-                                                                                                                    // back
+  // previous hub + a few feet further back
+  public static final Translation3d ALLIANCE_LEFT_BLUE = new Translation3d(BLUE_BORDER - 3.2, LEFT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_RIGHT_BLUE = new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
+  // previous hub + a few feet further back
 
-  public static final Translation3d ALLIANCE_LEFT_RED = new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0); // previous
-                                                                                                                  // hub
-                                                                                                                  // + a
-                                                                                                                  // few
-                                                                                                                  // feet
-                                                                                                                  // further
-                                                                                                                  // back
+  public static final Translation3d ALLIANCE_LEFT_RED = new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0);
 
   public static final Translation3d ALLIANCE_RIGHT_RED = new Translation3d(RED_BORDER + 3.2, RIGHT_SIDE_TARGET, 0);
 
@@ -195,17 +184,6 @@ public class FieldConstants {
 
     if (underLadder(drivepose)) {
       return FieldZone.UNDER_LADDER;
-    }
-
-    if ((y > -3.437731 && y < FieldConstants.FIELD_WIDTH - 3.437731)
-        && (x > (FieldConstants.BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2)
-            && (x < RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS / 2)))) {
-      if (Robot.getAlliance() == Alliance.Red && y > FieldConstants.FIELD_LENGTH / 2) {
-        return FieldZone.UNDER_LADDER;
-      }        
-      if (Robot.getAlliance() == Alliance.Blue && y < FieldConstants.FIELD_LENGTH / 2) {
-        return FieldZone.UNDER_LADDER;
-      }        
     }
 
     if (x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
