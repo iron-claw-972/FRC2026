@@ -48,14 +48,12 @@ public class TurretIOTalonFX implements TurretIO {
 
   @Override
   public void setMotorRaw(double speed) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setMotorRaw'");
+    motor.set(speed);
   }
 
   @Override
   public void setControl(ControlRequest request) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setControl'");
+    motor.setControl(request);
   }
 
   /**
