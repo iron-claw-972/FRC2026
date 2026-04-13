@@ -44,8 +44,6 @@ public class ShooterPhysics {
 	 * @param peakHeight        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
-	/* 
-
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			double peakHeight) {
 		double zExitVel = Math.sqrt(2 * peakHeight * Constants.GRAVITY_ACCELERATION);
