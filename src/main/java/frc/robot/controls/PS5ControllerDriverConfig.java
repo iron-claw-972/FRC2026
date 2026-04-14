@@ -151,9 +151,8 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }));
         }
 
-        // Hood
+        // shoot focus mode: reduces drive current
         if (spindexer != null) {
-            // Set the hood down -- for safety measures under trench
             controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> shootFocus(true)))
             .onFalse(new InstantCommand(()->  shootFocus(false)));
         }
@@ -163,12 +162,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         if (turnOn) {
             System.out.println("Shooting is now Focused");
             spindexer.setNewCurrentLimit(SpindexerConstants.currentLimit);
-            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.25
-            );
+            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
+                    DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.25);
         } else {
             System.out.println("Shooting back to normal (From focus)");
             spindexer.setNewCurrentLimit(SpindexerConstants.currentLimit);
-            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, DriveConstants.DRIVE_PEAK_CURRENT_LIMIT);
+            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
+                    DriveConstants.DRIVE_PEAK_CURRENT_LIMIT);
         }
     }
 
