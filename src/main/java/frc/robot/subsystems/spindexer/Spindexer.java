@@ -14,7 +14,9 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class Spindexer extends SubsystemBase implements SpindexerIO {
-    private TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID, Constants.CANIVORE_SUB);
+    private TalonFX motorOne = new TalonFX(IdConstants.SPINDEXER_ID, Constants.CANIVORE_SUB);
+    private TalonFX motorTwo = new TalonFX(67, Constants.CANIVORE_SUB);
+
 
     private double power = 0.0;
     public int ballCount = 0;
@@ -35,7 +37,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.StatorCurrentLimitEnable = true;
         limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
-        motor.getConfigurator().apply(limitConfig);
+        motorOne.getConfigurator().apply(limitConfig);
+        motorTwo.getConfigurator().apply(limitConfig);
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
@@ -60,24 +63,25 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         Logger.processInputs("Spindexer", inputs);
 
         if (resetPos == null) {
-            motor.setPosition(0.1 * gearRatio);
-            resetPos = (motor.getPosition().getValueAsDouble() / gearRatio) % 1.0;
+            motorOne.setPosition(0.1 * gearRatio);
+            motorTwo.setPosition(0.1 * gearRatio);
+            resetPos = (motorOne.getPosition().getValueAsDouble() / gearRatio) % 1.0;
             resetPID.reset();
         }
 
         if (state == SpindexerState.MAX) {
-            motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
+            setMotors(SpindexerConstants.spindexerMaxPower);
             reversing = false;
         } else if (state == SpindexerState.REVERSE) {
-            motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerReversePower).withEnableFOC(true));
+            setMotors(SpindexerConstants.spindexerReversePower);
             reversing = true;
         } else if (state == SpindexerState.STOPPED) {
-            motor.setControl(new DutyCycleOut(0.0).withEnableFOC(true));
+            setMotors(0.0);
             reversing = false;
         } else if (state == SpindexerState.RESET && resetPos != null) {
-            motor.setControl(new DutyCycleOut(resetPID.calculate((motor.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
+            setMotors(resetPID.calculate((motorOne.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos));
         } else {
-            motor.setControl(new DutyCycleOut(power).withEnableFOC(true));
+            setMotors(power);
             reversing = false;
         }
 
@@ -100,6 +104,11 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
+    }
+
+    public void setMotors(double value) {
+        motorOne.setControl(new DutyCycleOut(value).withEnableFOC(true));
+        motorTwo.setControl(new DutyCycleOut(value).withEnableFOC(true));
     }
 
     public void maxSpindexer() {
