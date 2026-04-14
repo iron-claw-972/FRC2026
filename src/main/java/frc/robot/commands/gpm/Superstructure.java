@@ -66,8 +66,15 @@ public class Superstructure extends Command {
 
     private double distanceFromTarget = 0.0;
 
-    // private double TOFAdjustment = 0.85;
-    private double TOFAdjustment = 1.1;
+    private double TOFAdjustment = 1.0; 
+
+    private double hoodDeg;
+    private double velocity;
+
+    private double finalHoodDeg;
+    private double finalVelocity;
+
+    public boolean hoodAssist = false;
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -116,12 +123,26 @@ public class Superstructure extends Command {
                 target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
-            goalState = ShooterPhysics.getShotParams(
-            Translation2d.kZero,
-            target3d.minus(lookahead3d),
-            2.0);
+            double distance = target.getDistance(lookaheadPose.getTranslation());
+            
+            boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d());
+            if (shuttling) {
+                hoodDeg = ShuttleInterpolation.newHoodMap.get(distance);
+                velocity = ShuttleInterpolation.shooterVelocityMap.get(distance);
+            } else {
+                hoodDeg = ShotInterpolation.newHoodMap.get(distance);
+                velocity = ShotInterpolation.shooterVelocityMap.get(distance);
+            }
+            
+            double theta = Units.degreesToRadians(hoodDeg);
 
-            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
+            // height dif
+            double h = target3d.getZ() - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ();
+
+            double vy = velocity * Math.sin(theta);
+            timeOfFlight = (vy + Math.sqrt(vy*vy + 2 * 9.81 * h)) / 9.81;
+            timeOfFlight *= TOFAdjustment;
+
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             Pose2d newLookaheadPose =
@@ -136,6 +157,8 @@ public class Superstructure extends Command {
             }
             lookaheadPose = newLookaheadPose;
         }
+        finalHoodDeg = hoodDeg;
+        finalVelocity = velocity;
 
         // Get the field angle relative to the target pose
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
@@ -176,10 +199,9 @@ public class Superstructure extends Command {
         turretSetpoint = potentialSetpoint;
 
         // Pitch is in radians
-        hoodAngle = goalState.pitch();
-        hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
-        hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
-        lastHoodAngle = hoodAngle;
+        hoodSetpoint = MathUtil.clamp(hoodDeg + hoodOffset, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
+        hoodVelocity = hoodAngleFilter.calculate((Units.degreesToRadians(hoodSetpoint) - lastHoodAngle) / Constants.LOOP_TIME);
+        lastHoodAngle = Units.degreesToRadians(hoodSetpoint);
 
         distanceFromTarget = target.getDistance(lookaheadPose.getTranslation());
         Logger.recordOutput("Shooting/distanceToTarget", distanceFromTarget);
@@ -263,34 +285,23 @@ public class Superstructure extends Command {
             }
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
 
-            boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
-
-            // shuttling will move the hood so its angles very close to max (less arch)
-            if (shuttling) {
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShuttleInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            } else {
-                hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
-            }
+            // shuttling is solved in convergance loop
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(finalHoodDeg + hoodOffset), hoodVelocity);
+            shooter.setShooter(-finalVelocity);
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
+            if (hoodAssist) {
+                double x = drivepose.getX(); // compared as meters
+                double y = drivepose.getY();
 
-            // if (FieldConstants.underTrench(x, y)) {
-            //     System.out.println("Hood forced down");
-            // } else {
-            //     hood.forceHoodDown(false);
-            // }
-
-            // different maps for shuttling vs shooting. Less powerful when shuttling.
-            if (shuttling) {
-                shooter.setShooter(-ShuttleInterpolation.shooterVelocityMap.get(distanceFromTarget));
-            } else {
-                shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
+                if (FieldConstants.underTrench(x, y)) {
+                    System.out.println("Hood forced down");
+                } else {
+                    hood.forceHoodDown(false);
+                }
             }
+
 
             if (!Constants.DISABLE_LOGGING) {
-            // record when shuttling
-            Logger.recordOutput("Shuttling", shuttling);
             // record distance for tuning if needed
             Logger.recordOutput("Distance From Target", distanceFromTarget);
             }
@@ -299,7 +310,7 @@ public class Superstructure extends Command {
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Turret Calculated Setpoint", turretSetpoint);
             Logger.recordOutput("Hood Calculate Setpoint", hoodSetpoint);
-            Logger.recordOutput("Shooter Calculate Velocity", goalState.exitVel());
+            Logger.recordOutput("Shooter Calculate Velocity", finalVelocity);
             
             Logger.recordOutput("DistanceToTarget", target.getDistance(drivepose.getTranslation()));
         }
