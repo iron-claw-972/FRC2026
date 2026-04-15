@@ -60,7 +60,7 @@ public class VisionConstants {
          * If multiple cameras return different poses, they will be ignored if the
          * difference between them is greater than this
          */
-        public static final double MAX_POSE_DIFFERENCE = 0.2;
+        public static final double MAX_POSE_DIFFERENCE = 0.35;
 
         /**
          * The maximum distance to the tag to use
@@ -128,7 +128,7 @@ public class VisionConstants {
          * <p>
          * Only affects calculations using PhotonVision, not manual calculations.
          */
-        public static final double HIGHEST_AMBIGUITY = 0.05;
+        public static final double HIGHEST_AMBIGUITY = 0.15;
 
         public static final int MAX_EMPTY_TICKS = 10;
 
