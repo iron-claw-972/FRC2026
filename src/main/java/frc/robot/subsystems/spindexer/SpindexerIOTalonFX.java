@@ -17,7 +17,7 @@ public class SpindexerIOTalonFX implements SpindexerIO {
     limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_SPIKE_LIMIT;
     limitConfig.StatorCurrentLimitEnable = true;
     limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
-    limitConfig.SupplyCurrentLowerTime = 1.5;
+    limitConfig.SupplyCurrentLowerTime = .2;
     motor.getConfigurator().apply(limitConfig);
 
   }

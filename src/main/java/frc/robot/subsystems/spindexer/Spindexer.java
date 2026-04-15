@@ -1,6 +1,9 @@
 package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -50,9 +53,10 @@ public class Spindexer extends SubsystemBase {
 
         if (state == SpindexerState.MAX) {
             io.setControl(new DutyCycleOut(SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
+            // io.setControl(new ToqueCurrentFOC(Output)); TODO this is better, use torquecurerntFOC, we want to control torque not speed 
             reversing = false;
         } else if (state == SpindexerState.REVERSE) {
-            io.setControl(new DutyCycleOut(SpindexerConstants.spindexerReversePower).withEnableFOC(true));
+            io.setControl(new VoltageOut(SpindexerConstants.spindexerReversePower * 12).withEnableFOC(true)); //TODO voltageout, direct upgrade from dutycycle, which multiplies by battery voltage, so worse when driving around
             reversing = true;
         } else if (state == SpindexerState.STOPPED) {
             io.setControl(new DutyCycleOut(0.0).withEnableFOC(true));

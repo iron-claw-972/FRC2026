@@ -9,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
@@ -320,6 +321,9 @@ public class Module implements ModuleIO {
     config.SupplyCurrentLimit = DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT;
     config.SupplyCurrentLowerLimit = DriveConstants.STEER_PEAK_CURRENT_LIMIT;
     config.SupplyCurrentLowerTime = DriveConstants.STEER_PEAK_CURRENT_DURATION;
+    // new FeedbackConfigs().FeedbackRemoteSensorID //TODO use fused encoders and this, should be able to do offsets and all with just this
+    var x = new FeedbackConfigs();
+    
     angleMotor.getConfigurator().apply(config);
     angleMotor.getConfigurator().apply(new Slot0Configs()
         .withKP(DriveConstants.MODULE_CONSTANTS.angleKP)

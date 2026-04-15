@@ -46,6 +46,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
 
     CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
+    //TODO add higher stator current lim
     limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
     limitConfig.StatorCurrentLimitEnable = true;
     shooterMotorLeft.getConfigurator().apply(limitConfig);
