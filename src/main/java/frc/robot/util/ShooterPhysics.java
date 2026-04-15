@@ -44,17 +44,6 @@ public class ShooterPhysics {
 	 * @param peakHeight        The peak height the trajectory should reach.
 	 * @return A TurretState that represents the shot the robot should take.
 	 */
-	/* 
-	zExitVel = 6.260990336 <-- im calling this x
-	z is the hub height = 72 inches
-	(-x - sqrt(x^2 -2 gz)) / -g
-	0.83 seconds when shooting
-
-	1.28 seconds when shuttling since target is 0;
-
-	0.83 * 0.85 
-
-	*/ 
 	public static TurretState getShotParams(Translation2d robotVelocity, Translation3d robotToTarget,
 			double peakHeight) {
 		double zExitVel = Math.sqrt(2 * peakHeight * Constants.GRAVITY_ACCELERATION);
