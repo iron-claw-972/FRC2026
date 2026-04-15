@@ -145,11 +145,10 @@ public class AutoShootCommand extends Command {
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
         double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error;
 
-        // Stay within +/- 200 -- if  shortest path is past 200, we go long way around
-        double turretRange = TurretConstants.MAX_ANGLE - TurretConstants.MIN_ANGLE;
-        if (potentialSetpoint > turretRange/2) {
+        // Stay within physical limits -- if shortest path is past max angle, we go long way around
+        if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
             potentialSetpoint -= 360;
-        } else if (potentialSetpoint < -turretRange/2) {
+        } else if (potentialSetpoint < TurretConstants.MIN_ANGLE) {
             potentialSetpoint += 360;
         }
 

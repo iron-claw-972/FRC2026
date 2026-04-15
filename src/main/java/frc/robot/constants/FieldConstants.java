@@ -14,7 +14,7 @@ import frc.robot.constants.swerve.DriveConstants;
 
 public class FieldConstants {
 
-  /**Apriltag layout for 2026 REBUILT */
+  /** Apriltag layout for 2026 REBUILT */
   public static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   /** Width of the field [meters] */
@@ -22,60 +22,54 @@ public class FieldConstants {
   /** Height of the field [meters] */
   public static final double FIELD_WIDTH = field.getFieldWidth();
 
-  public static final double RED_BORDER = FIELD_LENGTH/2 + Units.inchesToMeters(167.0);
-  public static final double BLUE_BORDER = FIELD_LENGTH/2 - Units.inchesToMeters(167.0);
+  public static final double RED_BORDER = FIELD_LENGTH / 2 + Units.inchesToMeters(167.0);
+  public static final double BLUE_BORDER = FIELD_LENGTH / 2 - Units.inchesToMeters(167.0);
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.225;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.775;
 
   /** Location of hub target */
-  public static final Translation3d HUB_BLUE =
-      new Translation3d(Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
-  
-  public static final Translation3d HUB_RED =
-      new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11), FIELD_WIDTH/2, Units.inchesToMeters(72));
-    
+  public static final Translation3d HUB_BLUE = new Translation3d(Units.inchesToMeters(182.11), FIELD_WIDTH / 2,
+      Units.inchesToMeters(72));
+
+  public static final Translation3d HUB_RED = new Translation3d(FIELD_LENGTH - Units.inchesToMeters(182.11),
+      FIELD_WIDTH / 2, Units.inchesToMeters(72));
+
   // shuttle safety constants
   public static final double LADDER_ZONE_WIDTH = 1.251; // meters
   public static final double LADDER_ZONE_DEPTH = 1.143; // meters
-  
+
   // tower positions (center of the zone)
   public static final double LADDER_Y_OFFSET = 1.7526 * 2; // two driver stations
-  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(LADDER_ZONE_DEPTH/2, FIELD_WIDTH - LADDER_Y_OFFSET - LADDER_ZONE_WIDTH/2, new Rotation2d());
-  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(FIELD_LENGTH - LADDER_ZONE_DEPTH/2, LADDER_Y_OFFSET + LADDER_ZONE_WIDTH/2, new Rotation2d());
+  public static final Pose2d BLUE_CLIMB_LOCATION = new Pose2d(LADDER_ZONE_DEPTH / 2,
+      FIELD_WIDTH - LADDER_Y_OFFSET - LADDER_ZONE_WIDTH / 2, new Rotation2d());
+  public static final Pose2d RED_CLIMB_LOCATION = new Pose2d(FIELD_LENGTH - LADDER_ZONE_DEPTH / 2,
+      LADDER_Y_OFFSET + LADDER_ZONE_WIDTH / 2, new Rotation2d());
 
-  public static final Pose2d getClimbLocation(){
-    if (Robot.getAlliance() == Alliance.Blue){
+  public static final Pose2d getClimbLocation() {
+    if (Robot.getAlliance() == Alliance.Blue) {
       return BLUE_CLIMB_LOCATION;
-    }
-    else{
+    } else {
       return RED_CLIMB_LOCATION;
     }
   }
 
-  public static final Translation3d NEUTRAL_LEFT =
-    new Translation3d(FIELD_LENGTH/2, LEFT_SIDE_TARGET, 0);
+  public static final Translation3d NEUTRAL_LEFT = new Translation3d(FIELD_LENGTH / 2, LEFT_SIDE_TARGET, 0);
 
-  public static final Translation3d NEUTRAL_RIGHT =
-    new Translation3d(FIELD_LENGTH/2, RIGHT_SIDE_TARGET, 0);
+  public static final Translation3d NEUTRAL_RIGHT = new Translation3d(FIELD_LENGTH / 2, RIGHT_SIDE_TARGET, 0);
 
-  public static final Translation3d ALLIANCE_LEFT_BLUE =
-    new Translation3d(BLUE_BORDER - 3.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+  // previous hub + a few feet further back
+  public static final Translation3d ALLIANCE_LEFT_BLUE = new Translation3d(BLUE_BORDER - 3.2, LEFT_SIDE_TARGET, 0);
 
-  public static final Translation3d ALLIANCE_RIGHT_BLUE =
-    new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
+  public static final Translation3d ALLIANCE_RIGHT_BLUE = new Translation3d(BLUE_BORDER - 2.2, RIGHT_SIDE_TARGET, 0);
+  // previous hub + a few feet further back
 
-  public static final Translation3d ALLIANCE_LEFT_RED =
-    new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0); // previous hub + a few feet further back
+  public static final Translation3d ALLIANCE_LEFT_RED = new Translation3d(RED_BORDER + 2.2, LEFT_SIDE_TARGET, 0);
 
-  public static final Translation3d ALLIANCE_RIGHT_RED =
-    new Translation3d(RED_BORDER + 3.2
-    , RIGHT_SIDE_TARGET, 0);
+  public static final Translation3d ALLIANCE_RIGHT_RED = new Translation3d(RED_BORDER + 3.2, RIGHT_SIDE_TARGET, 0);
 
-  public static final Translation3d ALLIANCE_CENTER_BLUE =
-    new Translation3d(BLUE_BORDER - 2, FIELD_WIDTH/2, 0);
-  
-  public static final Translation3d ALLIANCE_CENTER_RED =
-    new Translation3d(RED_BORDER + 2, FIELD_WIDTH/2, 0);
+  public static final Translation3d ALLIANCE_CENTER_BLUE = new Translation3d(BLUE_BORDER - 2, FIELD_WIDTH / 2, 0);
+
+  public static final Translation3d ALLIANCE_CENTER_RED = new Translation3d(RED_BORDER + 2, FIELD_WIDTH / 2, 0);
 
   public static final double BLUE_ALLIANCE_LINE = BLUE_BORDER; // That's the distance from one side to the blue bump
   public static final double RED_ALLIANCE_LINE = RED_BORDER; // That's the distance from one side to the red bump
@@ -90,8 +84,8 @@ public class FieldConstants {
 
   public static final double hubWidthLeft = FIELD_WIDTH / 2 - (47.0 / 2);
   public static final double hubWidthRight = FIELD_WIDTH / 2 + (47.0 / 2);
-  public static final double hubBackRed = FIELD_LENGTH + 120.0; 
-  public static final double hubBackBlue = FIELD_LENGTH - 120.0; 
+  public static final double hubBackRed = FIELD_LENGTH + 120.0;
+  public static final double hubBackBlue = FIELD_LENGTH - 120.0;
 
   public static final double ladderRedLeft = FIELD_WIDTH + 13.0;
   public static final double ladderBlueLeft = FIELD_WIDTH - 12.375;
@@ -102,35 +96,40 @@ public class FieldConstants {
   public static final double TRENCH_X_MIN_INCHES = 152.5;
   public static final double TRENCH_X_MAX_INCHES = 187.5;
 
-  public static final Zone neutralStrip = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
-  public static final Zone neutralLeft = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
-  public static final Zone neutralRight = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
-  public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
-  public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone neutralStrip = new Zone(centerLengthLine, centerWidthLine,
+      rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone neutralLeft = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine,
+      redLine - blueLine);
+  public static final Zone neutralRight = new Zone(centerLengthLine, centerWidthLine,
+      rightNeutralLine - leftNeutralLine, redLine - blueLine);
+  public static final Zone blueHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine,
+      redLine - blueLine);
+  public static final Zone redHubOut = new Zone(centerLengthLine, centerWidthLine, rightNeutralLine - leftNeutralLine,
+      redLine - blueLine);
 
-	public enum ShootingTarget {
-		HUB,
-		NEUTRAL,
-		ALLIANCE,
-		OPPOSITION, // not sure why you'd ever do this :)
-	}
+  public enum ShootingTarget {
+    HUB,
+    NEUTRAL,
+    ALLIANCE,
+    OPPOSITION, // not sure why you'd ever do this :)
+  }
 
-	public enum FieldZone {
-		ALLIANCE,
-		NEUTRAL,
-		OPPOSITION,
-		TRENCH_BUMP,
+  public enum FieldZone {
+    ALLIANCE,
+    NEUTRAL,
+    OPPOSITION,
+    TRENCH_BUMP,
     UNDER_LADDER,
     UNDER_MY_HUB
-	}
+  }
 
-	/** checks if robot is under climb structure */
-	public static boolean underLadder(Translation2d drivepose) {
-		Pose2d ladderPos = getClimbLocation();
-		double dx = Math.abs(drivepose.getX() - ladderPos.getX());
-		double dy = Math.abs(drivepose.getY() - ladderPos.getY());
-		return (dx < LADDER_ZONE_DEPTH / 2.0) && (dy < LADDER_ZONE_WIDTH / 2.0);
-	}
+  /** checks if robot is under climb structure */
+  public static boolean underLadder(Translation2d drivepose) {
+    Pose2d ladderPos = getClimbLocation();
+    double dx = Math.abs(drivepose.getX() - ladderPos.getX());
+    double dy = Math.abs(drivepose.getY() - ladderPos.getY());
+    return (dx < LADDER_ZONE_DEPTH / 2.0) && (dy < LADDER_ZONE_WIDTH / 2.0);
+  }
 
   public static Translation3d getHubTranslation() {
     if (Robot.getAlliance() == Alliance.Blue) {
@@ -176,14 +175,17 @@ public class FieldConstants {
     double x = drivepose.getX();
     double y = drivepose.getY();
 
-    if ((x < FIELD_LENGTH/2 - Units.inchesToMeters(120.0) && x > (BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) //blue alliance line
-        || x > FIELD_LENGTH/2 + Units.inchesToMeters(120.0) && x < (RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS)/2)) {
-          return FieldZone.TRENCH_BUMP;
-        }
+    if ((x < FIELD_LENGTH / 2 - Units.inchesToMeters(120.0)
+        && x > (BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2)) // blue alliance line
+        || x > FIELD_LENGTH / 2 + Units.inchesToMeters(120.0)
+            && x < (RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2)) {
+      return FieldZone.TRENCH_BUMP;
+    }
 
     if (underLadder(drivepose)) {
       return FieldZone.UNDER_LADDER;
     }
+
     if (x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
       return (Robot.getAlliance() == Alliance.Red) ? FieldZone.ALLIANCE : FieldZone.OPPOSITION;
     } else if (x < FieldConstants.BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
@@ -193,30 +195,36 @@ public class FieldConstants {
     }
   }
 
-    /** returns true if robot is currently underneath or touching the climbing ladder */
-    public static boolean isUnderLadder(Translation2d drivepose) {
-        return getZone(drivepose) == FieldZone.UNDER_LADDER;
-    }
+  /**
+   * returns true if robot is currently underneath or touching the climbing ladder
+   */
+  public static boolean isUnderLadder(Translation2d drivepose) {
+    return getZone(drivepose) == FieldZone.UNDER_LADDER;
+  }
 
   public static boolean underTrench(double x, double y) {
     // ensures we aren't in center channel
-    if (y > Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES) && y < FIELD_WIDTH - Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES)) {
+    if (y > Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES)
+        && y < FIELD_WIDTH - Units.inchesToMeters(TRENCH_CENTER_CHANNEL_WIDTH_INCHES)) {
       return false;
     }
     // if our location is to far away from right underneath trench in terms of x
     // in between blue alliance trench
-    if (!(x > Units.inchesToMeters(TRENCH_X_MIN_INCHES) && x < Units.inchesToMeters(TRENCH_X_MAX_INCHES)) && !(x < FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MIN_INCHES) && x > FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MAX_INCHES))) {
+    if (!(x > Units.inchesToMeters(TRENCH_X_MIN_INCHES) && x < Units.inchesToMeters(TRENCH_X_MAX_INCHES))
+        && !(x < FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MIN_INCHES)
+            && x > FIELD_LENGTH - Units.inchesToMeters(TRENCH_X_MAX_INCHES))) {
       return false;
     }
     return true;
   }
-  
+
   /**
    * 
-   * @return Whether Y coordinate is in the upper half (left side on blue alliance)
+   * @return Whether Y coordinate is in the upper half (left side on blue
+   *         alliance)
    */
-  public static boolean isOnLeftSideOfField(Translation2d drivepose){
-    return drivepose.getY() > FIELD_WIDTH/2;
+  public static boolean isOnLeftSideOfField(Translation2d drivepose) {
+    return drivepose.getY() > FIELD_WIDTH / 2;
   }
 
   public static Translation3d getOppositionTranslation(boolean sideLeft) {
