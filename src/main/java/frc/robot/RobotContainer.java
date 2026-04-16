@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
@@ -164,7 +165,9 @@ public class RobotContainer {
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
 
-        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
+        if (turret != null && drive != null && hood != null && shooter != null) {
+          SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
+        }
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -174,7 +177,9 @@ public class RobotContainer {
           CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
         }
         
-        drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        if (drive != null && driver != null) {
+          drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        }
         break;
     }
 
@@ -340,6 +345,9 @@ public class RobotContainer {
   }
 
   public Command getDefaultAuto() {
+    if (spindexer == null || turret == null || hood == null || intake == null) {
+      return new DoNothing();
+    }
     ParallelCommandGroup defaultShoot = new ParallelCommandGroup(
       new RunSpindexer(spindexer, turret, hood, intake)
     );
