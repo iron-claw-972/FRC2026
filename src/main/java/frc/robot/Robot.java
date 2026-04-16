@@ -151,6 +151,7 @@ public class Robot extends LoggedRobot {
         // This access is fast (about 14 microseconds) because the value is already resident in the Network Tables.
         // There was a problem last year because the operation also installed about over a dozen items (taking more than 20 ms).
         autoCommand = robotContainer.getAutoCommand();
+        System.out.println("!@#%&)_@YTUITIU AUTO IS :" + autoCommand);
 
         // If there is an autonomous command, then schedule it
         if (autoCommand != null) {

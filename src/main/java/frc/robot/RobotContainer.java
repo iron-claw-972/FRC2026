@@ -299,8 +299,11 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
+    String testAuto = "Test Auto";
+    String newAuto = "New Auto";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
+    addAuto(newAuto);
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
