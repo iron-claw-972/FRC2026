@@ -1,7 +1,7 @@
 package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import org.littletonrobotics.junction.Logger;
@@ -66,15 +66,15 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         }
 
         if (state == SpindexerState.MAX) {
-            motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
+            motor.setControl(new VoltageOut(12 * SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
         } else if (state == SpindexerState.REVERSE) {
-            motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerReversePower).withEnableFOC(true));
+            motor.setControl(new VoltageOut(12 * SpindexerConstants.spindexerReversePower).withEnableFOC(true));
         } else if (state == SpindexerState.STOPPED) {
-            motor.setControl(new DutyCycleOut(0.0).withEnableFOC(true));
+            motor.setControl(new VoltageOut(12 * 0.0).withEnableFOC(true));
         } else if (state == SpindexerState.RESET && resetPos != null) {
-            motor.setControl(new DutyCycleOut(resetPID.calculate((motor.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
+            motor.setControl(new VoltageOut(12 * resetPID.calculate((motor.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
         } else {
-            motor.setControl(new DutyCycleOut(power).withEnableFOC(true));
+            motor.setControl(new VoltageOut(12 * power).withEnableFOC(true));
         }
 
 
