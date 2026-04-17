@@ -48,6 +48,7 @@ import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretIOTalonFX;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -128,7 +129,7 @@ public class RobotContainer {
         led = new LED();
 
       case WaffleHouse: // AKA Betabot
-        turret = new Turret();
+        turret = new Turret(new TurretIOTalonFX());
         shooter = new Shooter(new ShooterIOTalonFX());
         hood = new Hood(new HoodIOTalonFX());
       

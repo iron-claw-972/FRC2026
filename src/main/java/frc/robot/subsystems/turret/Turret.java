@@ -60,7 +60,8 @@ public class Turret extends SubsystemBase {
 
 	/* ---------------- Constructor ---------------- */
 
-	public Turret() {
+	public Turret(TurretIO io) {
+		this.io = io;
 
 		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
 
