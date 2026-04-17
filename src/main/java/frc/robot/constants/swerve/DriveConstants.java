@@ -28,7 +28,8 @@ public class DriveConstants {
     public static double ROBOT_MASS = Units.lbsToKilograms(111.6 + 13 + 13.4 + 5.0);
 
     /** Radius of the drive wheels [meters]. */
-    public static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
+    // I think its middle of wheel to middle of wheel
+    public static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
 
     public static double WHEEL_MOI = 0.000326 * ROBOT_MASS;
 

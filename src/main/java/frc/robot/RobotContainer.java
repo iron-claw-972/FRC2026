@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PS5Controller;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
-import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
@@ -37,6 +37,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Brownout.BrownOutControl;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
@@ -46,6 +47,7 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.util.HubActive;
 import frc.robot.util.PathGroupLoader;
 import frc.robot.util.Vision.DetectedObject;
 import frc.robot.util.Vision.Vision;
@@ -68,6 +70,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
+  private BrownOutControl brownOutControl = null;
 
   // this is inside addAuto()
   // private Command auto = new DoNothing();
@@ -148,6 +151,8 @@ public class RobotContainer {
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
         operator = new Operator(drive);
 
+        brownOutControl = new BrownOutControl(shooter, spindexer, turret, intake, hood, drive);
+
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
 
@@ -168,10 +173,6 @@ public class RobotContainer {
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
-        }
-
-        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
-          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
         }
         
         drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
@@ -364,53 +365,65 @@ public class RobotContainer {
   /** Updates SmartDashboard values that need to be refreshed every loop */
   public void periodic() {
     double matchTime = DriverStation.getMatchTime();
-    String newPhase;
     
-    if (matchTime > 130) {
-      newPhase = "auto";
-    } else if (matchTime > 120) {
-      newPhase = "transition_shift";
-    } else if (matchTime > 95) {
-      newPhase = "shift1";
-    } else if (matchTime > 70) {
-      newPhase = "shift2";
-    } else if (matchTime > 45) {
-      newPhase = "shift3";
-    } else if (matchTime > 20) {
-      newPhase = "shift4";
-    } else if (matchTime > 0) {
-      newPhase = "endgame";
-    } else {
-      newPhase = "disabled";
-    }
+    // run in shooter just cus: This is for elastic
+    SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+    SmartDashboard.putBoolean("Hub Active", HubActive.isHubActive());
+    double timeToActive = HubActive.timeToActive().orElse(0.0);
+    double timeTillInactive = HubActive.timeToInactive().orElse(0.0);
+    SmartDashboard.putNumber("Time till active", timeToActive);
+    SmartDashboard.putNumber("Time till Unactive", timeTillInactive);
+    // for aditiya
+    Logger.recordOutput("Timing/", timeToActive);
+    Logger.recordOutput("Timing/", timeTillInactive);
+
+    // String newPhase;
     
-    if (!newPhase.equals(currentPhase)) {
-      currentPhase = newPhase;
-      matchTimer.reset();
-      matchTimer.start();
-      timerActive = true;
+    // if (matchTime > 130) {
+    //   newPhase = "auto";
+    // } else if (matchTime > 120) {
+    //   newPhase = "transition_shift";
+    // } else if (matchTime > 95) {
+    //   newPhase = "shift1";
+    // } else if (matchTime > 70) {
+    //   newPhase = "shift2";
+    // } else if (matchTime > 45) {
+    //   newPhase = "shift3";
+    // } else if (matchTime > 20) {
+    //   newPhase = "shift4";
+    // } else if (matchTime > 0) {
+    //   newPhase = "endgame";
+    // } else {
+    //   newPhase = "disabled";
+    // }
+    
+    // if (!newPhase.equals(currentPhase)) {
+    //   currentPhase = newPhase;
+    //   matchTimer.reset();
+    //   matchTimer.start();
+    //   timerActive = true;
       
-      switch (currentPhase) {
-        case "auto":
-          currentPhaseDuration = AUTO_DURATION;
-          break;
-        case "transition_shift":
-          currentPhaseDuration = TRANSITION_SHIFT_DURATION;
-          break;
-        case "shift1":
-        case "shift2":
-        case "shift3":
-        case "shift4":
-          currentPhaseDuration = SHIFT_DURATION;
-          break;
-        case "endgame":
-          currentPhaseDuration = ENDGAME_DURATION;
-          break;
-        default:
-          currentPhaseDuration = 0.0;
-          timerActive = false;
-      }
-    }
+    //   switch (currentPhase) {
+    //     case "auto":
+    //       currentPhaseDuration = AUTO_DURATION;
+    //       break;
+    //     case "transition_shift":
+    //       currentPhaseDuration = TRANSITION_SHIFT_DURATION;
+    //       break;
+    //     case "shift1":
+    //     case "shift2":
+    //     case "shift3":
+    //     case "shift4":
+    //       currentPhaseDuration = SHIFT_DURATION;
+    //       break;
+    //     case "endgame":
+    //       currentPhaseDuration = ENDGAME_DURATION;
+    //       break;
+    //     default:
+    //       currentPhaseDuration = 0.0;
+    //       timerActive = false;
+    //   }
+    // }
     
     double countdownTime = 0.0;
     if (timerActive && currentPhaseDuration > 0) {

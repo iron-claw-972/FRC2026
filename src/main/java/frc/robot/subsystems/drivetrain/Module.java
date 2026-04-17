@@ -209,6 +209,7 @@ public class Module implements ModuleIO{
     }
     
     public void periodic() {
+        
         updateInputs();
         Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
 
@@ -350,6 +351,10 @@ public class Module implements ModuleIO{
 
     public double getDriveStatorCurrent(){
         return inputs.driveCurrentAmps;
+    }
+
+    public double getDriveSupplyCurrent() {
+        return driveMotor.getSupplyCurrent().getValueAsDouble();
     }
 
     // I took the config things straight from this file

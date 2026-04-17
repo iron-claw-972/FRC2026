@@ -69,8 +69,6 @@ public class HubActive {
 
 
   static public Optional<Double> timeToActive() {
-
-
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
@@ -104,15 +102,11 @@ public class HubActive {
       }
     }
 
-
-
-
     // Shift was is active for blue if red won auto, or red if blue won auto.
     boolean shift1Active = switch (alliance.get()) {
       case Red -> !redInactiveFirst;
       case Blue -> redInactiveFirst;
     };
-
 
     if (matchTime > 130) {
       // Transition shift, hub is active.

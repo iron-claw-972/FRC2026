@@ -136,6 +136,30 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(limitConfig);
     }
 
+    public double getLeftStatorCurrent() {
+        return inputs.shooterCurrentLeft;
+    }
+
+    public double getLeftSupplyCurrent() {
+        return shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
+    }
+
+    public double getRightStatorCurrent() {
+        return inputs.shooterCurrentRight;
+    }
+
+    public double getRightSupplyCurrent() {
+        return shooterMotorRight.getSupplyCurrent().getValueAsDouble();
+    }
+
+    private void bumpUpShooterModifier() {
+        powerModifier += 0.5;
+    }
+
+    private void bumpDownShooterModifier() {
+        powerModifier -= 0.5;
+    }
+
     @Override
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;

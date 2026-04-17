@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
@@ -235,6 +236,27 @@ public class Superstructure extends Command {
     public void bumpDownTurretOffset() {
         turretOffset -= 2.5; // 2.5 degree
     }
+
+    // shoot higher
+    public void bumpUpHoodOffset() {
+        hoodOffset += 1.0;
+    }
+
+    // shoot lower
+    public void bumpDownHoodOffset() {
+        hoodOffset -= 1.0;
+    }
+
+    // aim more left
+    public void bumpLeftTurretOffset() {
+        turretOffset += 2.5;
+    }
+
+    // aim more right
+    public void bumpRightTurretOffset() {
+        turretOffset -= 2.5;
+    }
+
 
     @Override
     public void execute() {
