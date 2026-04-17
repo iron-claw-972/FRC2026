@@ -21,6 +21,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private boolean wasSpindexerSlow = false;
     private SpindexerState state = SpindexerState.STOPPED;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
+    private double currentLimit = SpindexerConstants.currentLimit;
 
     public boolean noIndexing = false;
 
@@ -127,12 +128,17 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     }
 
     public void setNewCurrentLimit(double newCurrentLimit) {
+        currentLimit = newCurrentLimit;
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
         limitConfig.StatorCurrentLimit = newCurrentLimit;
         limitConfig.StatorCurrentLimitEnable = true;
         limitConfig.SupplyCurrentLowerLimit = newCurrentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
         motor.getConfigurator().apply(limitConfig);
+    }
+
+    public double getCurrentLimit() {
+        return currentLimit;
     }
 
     @Override

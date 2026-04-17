@@ -269,7 +269,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      */
     public double rotationsToInches(double motorRotations) {
         // circumference of the rack pinion
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
         double inches = pinionRotations * circ;
         return inches; 
@@ -281,7 +281,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @return motor rotations
      */
     public double inchesToRotations(double inches){
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = inches / circ;
         double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
         return motorRotations;

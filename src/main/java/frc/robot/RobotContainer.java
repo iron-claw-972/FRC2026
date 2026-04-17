@@ -155,9 +155,6 @@ public class RobotContainer {
         initializeAutoBuilder();
         autoChooserInit();
 
-        // put the Chooser on the SmartDashboard
-        SmartDashboard.putData("Auto chooser", autoChooser);
-
         if (turret != null && drive != null && hood != null && shooter != null) {
           SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
         }
@@ -424,7 +421,7 @@ public class RobotContainer {
       }
     }
     if (!Constants.DISABLE_SMART_DASHBOARD) {
-      SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
+      SmartDashboard.putString("Alliance", DriverStation.getAlliance().map(a -> a.name()).orElse("Unknown"));
     }
   }
 }
