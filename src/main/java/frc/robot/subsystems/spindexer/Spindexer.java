@@ -2,14 +2,12 @@ package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,9 +20,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     private double power = 0.0;
     public int ballCount = 0;
-    private boolean wasSpindexerSlow = false;
     private SpindexerState state = SpindexerState.STOPPED;
-    private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
     public boolean noIndexing = false;
@@ -64,16 +60,12 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         if (state == SpindexerState.MAX) {
             setMotorVoltages(SpindexerConstants.spindexerForwardVoltage);
-            reversing = false;
         } else if (state == SpindexerState.REVERSE) {
             setMotorVoltages(SpindexerConstants.spindexerReverseVoltage);
-            reversing = true;
         } else if (state == SpindexerState.STOPPED) {
             setMotorVoltages(0.0);
-            reversing = false;
         } else {
             setMotorVoltages(power);
-            reversing = false;
         }
 
 
