@@ -143,7 +143,7 @@ public class LockedShoot extends Command {
         ChassisSpeeds robotRelVel = drive.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(       //TODO this is a problem, drivepose.exp returns a Pose2d, should be drivepose = drivepose.exp(...)
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,
