@@ -237,16 +237,6 @@ public class Superstructure extends Command {
         turretOffset -= 2.5; // 2.5 degree
     }
 
-    // shoot higher
-    public void bumpUpHoodOffset() {
-        hoodOffset += 1.0;
-    }
-
-    // shoot lower
-    public void bumpDownHoodOffset() {
-        hoodOffset -= 1.0;
-    }
-
     // aim more left
     public void bumpLeftTurretOffset() {
         turretOffset += 2.5;
