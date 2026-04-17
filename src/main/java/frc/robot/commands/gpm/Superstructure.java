@@ -55,6 +55,7 @@ public class Superstructure extends Command {
     private TurretState goalState;
 
     private double phaseDelay = 0.03; // Extrapolation delay due to latency
+    private double kRadial = 1.0; // TUNE TS for shot compensation
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
@@ -70,6 +71,7 @@ public class Superstructure extends Command {
 
     private double hoodDeg;
     private double velocity;
+    private double compensatedVelocity;
 
     private double finalHoodDeg;
     private double finalVelocity;
@@ -136,10 +138,20 @@ public class Superstructure extends Command {
             
             double theta = Units.degreesToRadians(hoodDeg);
 
+            Translation2d toTarget = target.minus(lookaheadPose.getTranslation());
+            double norm = toTarget.getNorm(); // I learned about this in math class... I actually used math from school
+
+            // for tincy tiny number this is bad
+            Translation2d unit = norm > 1e-6 ? toTarget.div(norm) : new Translation2d(); // new Translation just means zero
+
+            double radialVelocity = fieldRelVel.vxMetersPerSecond * unit.getX() + fieldRelVel.vyMetersPerSecond * unit.getY();
+
+            compensatedVelocity = velocity + kRadial * radialVelocity; // if we move backward ==
+
             // height dif
             double h = target3d.getZ() - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ();
 
-            double vy = velocity * Math.sin(theta);
+            double vy = compensatedVelocity * Math.sin(theta);
             timeOfFlight = (vy + Math.sqrt(vy*vy + 2 * 9.81 * h)) / 9.81;
             timeOfFlight *= TOFAdjustment;
 
@@ -157,15 +169,16 @@ public class Superstructure extends Command {
             }
             lookaheadPose = newLookaheadPose;
         }
+
+        // set this
+        finalVelocity = compensatedVelocity; 
         finalHoodDeg = hoodDeg;
-        finalVelocity = velocity;
 
         // Get the field angle relative to the target pose
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
         if (lastTurretAngle == null) {
             lastTurretAngle = turretAngle;
         }
-
         // Take the filtered average as the turret's velocity when robot is moving translationally
         turretVelocity =
         turretAngleFilter.calculate(turretAngle.minus(lastTurretAngle).getRadians() / Constants.LOOP_TIME);
