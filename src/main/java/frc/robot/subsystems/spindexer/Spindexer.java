@@ -1,9 +1,11 @@
 package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -39,6 +41,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.SupplyCurrentLowerTime = 1.5;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
+        motorTwo.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
