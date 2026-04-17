@@ -1,6 +1,7 @@
 package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -54,20 +55,21 @@ public class Superstructure extends Command {
 
     private TurretState goalState;
 
-    private double phaseDelay = 0.03; // Extrapolation delay due to latency
+    private LoggedNetworkNumber phaseDelay = new LoggedNetworkNumber("OPERATOR: Phase Delay", 0.03); //Extrapolation delay due to latency
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
 
-    private double hoodOffset = 0.0;
+    private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("OPERATOR: Hood Offset", 0.0);
 
-    private double turretOffset = 0.0;
+    private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("OPERATOR: Turret Offset", 0.0);
 
     private double distanceFromTarget = 0.0;
 
     // private double TOFAdjustment = 0.85;
-    private double TOFAdjustment = 1.1;
+    // private double TOFAdjustment = 1.1;
+    private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("OPERATOR: TOF Adjustment", 1.1);
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -121,7 +123,7 @@ public class Superstructure extends Command {
             target3d.minus(lookahead3d),
             2.0);
 
-            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment;
+            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             Pose2d newLookaheadPose =
@@ -164,7 +166,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset.get();
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
         if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
@@ -198,9 +200,9 @@ public class Superstructure extends Command {
         // Add a phase delay extrapolation component for latency delay
         drivepose = drivepose.exp(
             new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay,
-                robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay));
+                robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+                robotRelVel.vyMetersPerSecond * phaseDelay.get(),
+                robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
     }
 
     /**
@@ -219,35 +221,26 @@ public class Superstructure extends Command {
 
     // shoot higher
     public void bumpUpHoodOffset() {
-        hoodOffset += 1.0; // 1 degree
+        hoodOffset.set(hoodOffset.get() + 1.0); //1 deg
     }
 
     // shoot lower
     public void bumpDownHoodOffset() {
-        hoodOffset -= 1.0; // 1 degree
+        hoodOffset.set(hoodOffset.get() - 1.0); //1 deg
     }
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset += 2.5; // 2.5 degree
+        turretOffset.set(turretOffset.get() + 2.5); //2.5 deg
     }
+
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset -= 2.5; // 2.5 degree
+        turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
     }
 
     @Override
     public void execute() {
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
-            SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
-        }
-
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
@@ -305,10 +298,8 @@ public class Superstructure extends Command {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
             
-            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
         } else {
-            phaseDelay = 0.03;
+            phaseDelay.set(0.03);
         }
     }
 

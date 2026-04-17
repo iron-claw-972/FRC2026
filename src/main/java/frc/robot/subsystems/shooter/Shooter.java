@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -35,7 +36,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
 
-    double powerModifier = 1.05; // TESTED
+    LoggedNetworkNumber powerModifier = new LoggedNetworkNumber("OPERATOR: Shooter Power Modifier", 1.05);
 
     public Shooter() {
         updateInputs();
@@ -69,7 +70,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(limitConfig);
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
             SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
         }
     }
@@ -81,13 +81,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        }
         
         // Convert to RPS
-        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier.get();
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
@@ -148,11 +144,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void bumpUpShooterModifier() {
-        powerModifier += 0.025;
+        powerModifier.set(powerModifier.get() + 0.025);
     }
 
     public void bumpDownShooterModifier() {
-        powerModifier -= 0.025;
+        powerModifier.set(powerModifier.get() - 0.025);
     }
 
     /**
