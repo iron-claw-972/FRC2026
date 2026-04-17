@@ -44,6 +44,9 @@ public class Superstructure extends Command {
     private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     private final LinearFilter hoodAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     
+    private final LinearFilter accelerationFilterX = LinearFilter.singlePoleIIR(0.05, Constants.LOOP_TIME);
+    private final LinearFilter accelerationFilterY = LinearFilter.singlePoleIIR(0.05, Constants.LOOP_TIME);
+
     private Rotation2d lastTurretAngle;
     private Rotation2d turretAngle;
     private double turretVelocity;
@@ -78,6 +81,11 @@ public class Superstructure extends Command {
 
     public boolean hoodAssist = false;
 
+    // for accel            
+    ChassisSpeeds lastFieldRelVel = new ChassisSpeeds();
+    double accelX = 0.0;
+    double accelY = 0.0;
+
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
         this.drivetrain = drivetrain;
@@ -102,13 +110,21 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
         ChassisSpeeds fieldRelVel = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelVel, drivetrain.getYaw());
 
+        double dt = Constants.LOOP_TIME;
+
+        accelX = accelerationFilterX.calculate((fieldRelVel.vxMetersPerSecond - lastFieldRelVel.vxMetersPerSecond) / dt);
+        accelY = accelerationFilterY.calculate((fieldRelVel.vyMetersPerSecond - lastFieldRelVel.vyMetersPerSecond) / dt);
+        
+        lastFieldRelVel = fieldRelVel;
+
         // Rotational adjustment is not being used, since turret is in center of robot
         double turretVelocityX =
             fieldRelVel.vxMetersPerSecond;
         double turretVelocityY =
             fieldRelVel.vyMetersPerSecond;
 
-        double timeOfFlight = 0;
+        // setting TOF to a non zero, educated guess should help converange be much faster I think
+        double timeOfFlight = target.getDistance(turretPosition.getTranslation()) / velocity;
         Pose2d lookaheadPose = turretPosition;
 
         /*
@@ -119,8 +135,6 @@ public class Superstructure extends Command {
          * Early exit when change < 1mm to avoid unnecessary iterations
          */
         for (int i = 0; i < 20; i++) {
-            Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
-            
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
                 target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
@@ -146,7 +160,12 @@ public class Superstructure extends Command {
 
             double radialVelocity = fieldRelVel.vxMetersPerSecond * unit.getX() + fieldRelVel.vyMetersPerSecond * unit.getY();
 
-            compensatedVelocity = velocity + kRadial * radialVelocity; // if we move backward ==
+            // lowk chat told me to add this:
+            double radialAccel = accelX * unit.getX() + accelY * unit.getY();
+            double futureRadialVelocity = radialVelocity + radialAccel * timeOfFlight;
+            
+            // compensates for intertia of the ball (also accounts for acceleration)
+            compensatedVelocity = velocity + kRadial * futureRadialVelocity; // if we move backward ==
 
             // height dif
             double h = target3d.getZ() - TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ();
@@ -155,8 +174,10 @@ public class Superstructure extends Command {
             timeOfFlight = (vy + Math.sqrt(vy*vy + 2 * 9.81 * h)) / 9.81;
             timeOfFlight *= TOFAdjustment;
 
-            double offsetX = turretVelocityX * timeOfFlight;
-            double offsetY = turretVelocityY * timeOfFlight;
+            double t = timeOfFlight;
+            double offsetX = turretVelocityX * t + 0.5 * accelX * t * t;
+            double offsetY = turretVelocityY * t + 0.5 * accelY * t * t;
+
             Pose2d newLookaheadPose =
                 new Pose2d(
                     turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
