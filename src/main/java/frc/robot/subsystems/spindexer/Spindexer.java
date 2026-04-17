@@ -1,12 +1,13 @@
 package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,11 +15,11 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
 public class Spindexer extends SubsystemBase implements SpindexerIO {
-    private TalonFX motor = new TalonFX(IdConstants.SPINDEXER_ID, Constants.CANIVORE_SUB);
+    private TalonFX motorOne = new TalonFX(IdConstants.SPINDEXER_ONE_ID, Constants.CANIVORE_SUB);
+    private TalonFX motorTwo = new TalonFX(IdConstants.SPINDEXER_TWO_ID, Constants.CANIVORE_SUB);
 
     private double power = 0.0;
     public int ballCount = 0;
-    private boolean wasSpindexerSlow = false;
     private SpindexerState state = SpindexerState.STOPPED;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
     private double currentLimit = SpindexerConstants.currentLimit;
@@ -35,22 +36,21 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.StatorCurrentLimitEnable = true;
         limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
-        motor.getConfigurator().apply(limitConfig);
+        motorOne.getConfigurator().apply(limitConfig);
+        motorTwo.getConfigurator().apply(limitConfig);
+        motorTwo.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
             SmartDashboard.putData("Spindexer Run Reverse", new InstantCommand(() -> reverseSpindexer()));
             SmartDashboard.putData("Spindexer Stop", new InstantCommand(() -> stopSpindexer()));
         }
-
-        resetPID.setTolerance(0.05);
     }
 
     public enum SpindexerState {
         MAX,
         REVERSE,
         STOPPED,
-        RESET,
         CUSTOM,
     }
 
@@ -59,43 +59,30 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         updateInputs();
         Logger.processInputs("Spindexer", inputs);
 
-        if (resetPos == null) {
-            motor.setPosition(0.1 * gearRatio);
-            resetPos = (motor.getPosition().getValueAsDouble() / gearRatio) % 1.0;
-            resetPID.reset();
-        }
-
         if (state == SpindexerState.MAX) {
-            motor.setControl(new VoltageOut(12 * SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
+            setMotorVoltages(SpindexerConstants.spindexerForwardVoltage);
         } else if (state == SpindexerState.REVERSE) {
-            motor.setControl(new VoltageOut(12 * SpindexerConstants.spindexerReversePower).withEnableFOC(true));
+            setMotorVoltages(SpindexerConstants.spindexerReverseVoltage);
         } else if (state == SpindexerState.STOPPED) {
-            motor.setControl(new VoltageOut(12 * 0.0).withEnableFOC(true));
-        } else if (state == SpindexerState.RESET && resetPos != null) {
-            motor.setControl(new VoltageOut(12 * resetPID.calculate((motor.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
+            setMotorVoltages(0.0);
         } else {
-            motor.setControl(new VoltageOut(12 * power).withEnableFOC(true));
+            setMotorVoltages(power);
         }
 
 
-        // scale threshold based on power
-        double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
         if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Spindexer Ball Count", ballCount);
-
             SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
             SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
         }
 
-        boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
-        if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
-            ballCount++;
-        }
-        wasSpindexerSlow = isSpindexerSlow;
-
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
+    }
+
+    public void setMotorVoltages(double voltage) {
+        motorOne.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
+        motorTwo.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
     }
 
     public void maxSpindexer() {
@@ -115,16 +102,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         state = SpindexerState.CUSTOM;
     }
 
-    public void resetSpindexer() {
-        state = SpindexerState.RESET;
-    }
-
-    public void resetResetAngle() {
-        resetPos = null;
-    }
-
     public double getStatorCurrent() {
-        return inputs.spindexerCurrent;
+        return inputs.spindexerOneCurrent + inputs.spindexerTwoCurrent;
     }
 
     public void setNewCurrentLimit(double newCurrentLimit) {
@@ -134,7 +113,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         limitConfig.StatorCurrentLimitEnable = true;
         limitConfig.SupplyCurrentLowerLimit = newCurrentLimit;
         limitConfig.SupplyCurrentLowerTime = 1.5;
-        motor.getConfigurator().apply(limitConfig);
+        motorOne.getConfigurator().apply(limitConfig);
+        motorTwo.getConfigurator().apply(limitConfig);
     }
 
     public double getCurrentLimit() {
@@ -143,15 +123,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     @Override
     public void updateInputs() {
-        inputs.spindexerVelocity = motor.getVelocity().getValueAsDouble(); //SpindexerConstants.gearRatio;
-        inputs.spindexerCurrent = motor.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerOneVelocity = motorOne.getVelocity().getValueAsDouble();
+        inputs.spindexerOneCurrent = motorOne.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerTwoVelocity = motorTwo.getVelocity().getValueAsDouble();
+        inputs.spindexerTwoCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
     }
-
-    private Double resetPos;
-    private PIDController resetPID = new PIDController(4.0, 0.0, 0);
-
-    private final double gearRatio = 27.0 / 1.0; //spindexer spins once for every 27 motor spins
-
-    
-
 }
