@@ -20,7 +20,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public int ballCount = 0;
     private boolean wasSpindexerSlow = false;
     private SpindexerState state = SpindexerState.STOPPED;
-    private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
     public boolean noIndexing = false;
@@ -67,18 +66,14 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         if (state == SpindexerState.MAX) {
             motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
-            reversing = false;
         } else if (state == SpindexerState.REVERSE) {
             motor.setControl(new DutyCycleOut(SpindexerConstants.spindexerReversePower).withEnableFOC(true));
-            reversing = true;
         } else if (state == SpindexerState.STOPPED) {
             motor.setControl(new DutyCycleOut(0.0).withEnableFOC(true));
-            reversing = false;
         } else if (state == SpindexerState.RESET && resetPos != null) {
             motor.setControl(new DutyCycleOut(resetPID.calculate((motor.getPosition().getValueAsDouble() / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
         } else {
             motor.setControl(new DutyCycleOut(power).withEnableFOC(true));
-            reversing = false;
         }
 
 

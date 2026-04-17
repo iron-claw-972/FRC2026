@@ -50,14 +50,14 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private Spindexer spindexer;
 
     // PS5 button aliases
-    private final Button CROSS = Button.A;
+    // private final Button CROSS = Button.A;
     private final Button CIRCLE = Button.B;
     private final Button SQUARE = Button.X;
-    private final Button TRIANGLE = Button.Y;
-    private final Button LB = Button.LB;
+    // private final Button TRIANGLE = Button.Y;
+    // private final Button LB = Button.LB;
     private final Button RB = Button.RB;
     private final Button CREATE = Button.BACK;
-    private final Button OPTIONS = Button.START;
+    // private final Button OPTIONS = Button.START;
     private final Button LEFT_JOY = Button.LEFT_JOY;
     private final Button RIGHT_JOY = Button.RIGHT_JOY;
 
@@ -70,8 +70,8 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private final Axis LEFT_Y = Axis.LEFT_Y;
     private final Axis RIGHT_X = Axis.RIGHT_X;
     private final Axis RIGHT_Y = Axis.RIGHT_Y;
-    private final Axis LEFT_TRIGGER = Axis.LEFT_TRIGGER;
-    private final Axis RIGHT_TRIGGER = Axis.RIGHT_TRIGGER;
+    // private final Axis LEFT_TRIGGER = Axis.LEFT_TRIGGER;
+    // private final Axis RIGHT_TRIGGER = Axis.RIGHT_TRIGGER;
 
     public PS5XboxModeDriverConfig(
             Drivetrain drive,

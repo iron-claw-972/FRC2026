@@ -12,7 +12,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -67,6 +66,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
+  private LED led = null;
 
   // this is inside addAuto()
   // private Command auto = new DoNothing();
@@ -74,10 +74,6 @@ public class RobotContainer {
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
-  private LED led = null;
-
-  // TODO: move to correct robot and put the correct port?
-  private PS5Controller ps5 = new PS5Controller(0);
 
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
