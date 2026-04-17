@@ -88,8 +88,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     }
 
     public void setMotorVoltages(double voltage) {
-        motorOne.setControl(new VoltageOut(voltage).withEnableFOC(true));
-        motorTwo.setControl(new VoltageOut(voltage).withEnableFOC(true));
+        motorOne.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
+        motorTwo.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
     }
 
     public void maxSpindexer() {
