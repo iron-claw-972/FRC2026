@@ -136,16 +136,6 @@ public class IntakeIOTalonFX implements IntakeIO {
     leftMotor.setControl(voltageRequest.withPosition(motorRotations).withEnableFOC(true));
   }
 
-  /**
-   * Get the intake extender position
-   * 
-   * @return inches
-   */
-  @Override
-  public double getPosition() {
-    return Intake.rotationsToInches(leftMotor.getPosition().getValueAsDouble());
-  }
-
   @Override
   public void setLeftMotor(double speed) {
     leftMotor.set(speed);

@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
 
-    double inchExtension = io.getPosition();
+    double inchExtension = inputs.leftPosition;
 
     if (calibrating) {
       io.setRightMotor(-0.1);

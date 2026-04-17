@@ -21,13 +21,6 @@ public interface IntakeIO {
   public void updateInputs(IntakeIOInputs inputs);
 
   /**
-   * Get the intake extender position
-   * 
-   * @return inches
-   */
-  public double getPosition();
-
-  /**
    * Set the intake extender position
    * 
    * @param setpoint in inches
