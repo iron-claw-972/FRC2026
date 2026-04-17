@@ -22,8 +22,8 @@ public class FieldConstants {
   /** Height of the field [meters] */
   public static final double FIELD_WIDTH = field.getFieldWidth();
 
-  public static final double RED_BORDER = FIELD_LENGTH / 2 + Units.inchesToMeters(155.0);
-  public static final double BLUE_BORDER = FIELD_LENGTH / 2 - Units.inchesToMeters(155.0);
+  public static final double RED_BORDER = FIELD_LENGTH / 2 + Units.inchesToMeters(167.0);
+  public static final double BLUE_BORDER = FIELD_LENGTH / 2 - Units.inchesToMeters(167.0);
   public static final double LEFT_SIDE_TARGET = FIELD_WIDTH * 0.225;
   public static final double RIGHT_SIDE_TARGET = FIELD_WIDTH * 0.775;
 
