@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
@@ -229,7 +228,6 @@ public class RobotContainer {
 
     if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
       Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
-      NamedCommands.registerCommand("Auto shoot", new AutoShootCommand(turret, drive, hood, shooter, spindexer));
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));

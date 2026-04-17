@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
-import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ReverseMotors;
+import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
@@ -166,16 +166,9 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
         }
 
         // Auto shoot
-        if (turret != null && hood != null && shooter != null) {
-            controller.get(SQUARE).onTrue(
-                    new InstantCommand(() -> {
-                        if (autoShoot != null && autoShoot.isScheduled()) {
-                            autoShoot.cancel();
-                        } else {
-                            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
-                            CommandScheduler.getInstance().schedule(autoShoot);
-                        }
-                    }));
+        if (turret != null && hood != null && shooter != null && spindexer != null) {
+            autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
+            controller.get(SQUARE).toggleOnTrue(autoShoot);
         }
 
         // Hood
