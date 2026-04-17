@@ -26,7 +26,6 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
-import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -38,7 +37,6 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
-import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -76,7 +74,6 @@ public class RobotContainer {
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
-  private LinearClimb linearClimb = null;
   private LED led = null;
 
   // TODO: move to correct robot and put the correct port?
@@ -146,7 +143,7 @@ public class RobotContainer {
 
       case Vertigo: // AKA "French Toast"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
-        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer, linearClimb);
+        driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
 
         // Detected objects need access to the drivetrain
@@ -269,11 +266,6 @@ public class RobotContainer {
         hood.forceHoodDown(false);
       }));
     }
-
-    if (linearClimb != null && drive != null) {
-      NamedCommands.registerCommand("Climb", new ClimbDriveCommand(linearClimb, drive));
-    }
-
   }
 
   public void addAuto(String name) {

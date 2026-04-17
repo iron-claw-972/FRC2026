@@ -11,8 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -66,7 +64,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     private double setpointInches = 0.0;
 
     private boolean calibrating = false;
-    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
@@ -205,9 +202,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
             boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
         }
 
         updateInputs();

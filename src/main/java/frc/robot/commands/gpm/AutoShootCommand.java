@@ -24,7 +24,6 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.util.ShooterPhysics;
-import frc.robot.util.ShooterPhysics.Constraints;
 import frc.robot.util.ShooterPhysics.TurretState;
 
 public class AutoShootCommand extends Command {
@@ -33,10 +32,7 @@ public class AutoShootCommand extends Command {
     private Hood hood;
     private Shooter shooter;
     private Spindexer spindexer;
-
-    //TODO: find maximum interpolation
-    private Constraints shooterConstraints = new Constraints(Units.inchesToMeters(80.0), 67676767, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
-
+    
     private double turretSetpoint;
     private double hoodSetpoint;
 

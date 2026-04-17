@@ -12,10 +12,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.AutoShootCommand;
-import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.Intake.Intake;
@@ -50,7 +48,6 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private LinearClimb climb;
 
     // PS5 button aliases
     private final Button CROSS = Button.A;
@@ -82,15 +79,13 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
             Turret turret,
             Hood hood,
             Intake intake,
-            Spindexer spindexer,
-            LinearClimb climb) {
+            Spindexer spindexer) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
-        this.climb = climb;
     }
 
     public void configureControls() {
@@ -181,28 +176,6 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
                             CommandScheduler.getInstance().schedule(autoShoot);
                         }
                     }));
-        }
-
-        // Climb
-        if (climb != null) {
-            // Calibration
-            controller.get(OPTIONS).onTrue(new InstantCommand(() -> {
-                climb.hardstopCalibration();
-            })).onFalse(new InstantCommand(() -> {
-                climb.stopCalibrating();
-            }));
-
-            // Climb retract
-            controller.get(CROSS).onTrue(new InstantCommand(() -> {
-                climb.retract();
-            }));
-
-            // Drive to climb position and rumble
-            controller.get(TRIANGLE).onTrue(new SequentialCommandGroup(
-                    new ClimbDriveCommand(climb, getDrivetrain()),
-                    new InstantCommand(() -> this.startRumble()),
-                    new WaitCommand(1),
-                    new InstantCommand(() -> this.endRumble())));
         }
 
         // Hood
