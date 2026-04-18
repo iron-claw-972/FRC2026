@@ -24,7 +24,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
-        private Debouncer hasBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
+    private Debouncer hasBallsDebouncer = new Debouncer(SpindexerConstants.NO_BALLS_DEBOUNCE_TIME, DebounceType.kRising);
 
     public Spindexer() {
         updateInputs();
@@ -105,7 +105,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public boolean hasBalls() {
         boolean hasBalls = inputs.spindexerCurrent > SpindexerConstants.BALLS_THRESHOLD_CURRENT_THRESHOLD;
         return hasBallsDebouncer.calculate(hasBalls);
-        
     }
 
     public void maxSpindexer() {
