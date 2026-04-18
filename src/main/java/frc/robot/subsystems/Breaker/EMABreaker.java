@@ -1,13 +1,11 @@
 package frc.robot.subsystems.Breaker;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.hal.PowerDistributionJNI;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -27,7 +25,6 @@ public class EMABreaker extends SubsystemBase {
     private List<Current> filters = new ArrayList<>(); // contains currents with their alphas and thresholds
     private List<Current> subsystems = new ArrayList<>();
 
-    private int count = 0;
     public EMABreaker() {
         for (Map.Entry<Double, Double> entry : BreakerConstants.THRESHOLDS.entrySet()) {
             double tau = entry.getKey(); // sec
