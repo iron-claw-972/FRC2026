@@ -80,7 +80,7 @@ public class DynamicAutoBuilder {
                 // extend intake
                 new InstantCommand(() -> intake.extend()),
                 // reset spindexer
-                new InstantCommand(() -> spindexer.resetSpindexer()),
+                // new InstantCommand(() -> spindexer.resetSpindexer()),
                 // hood down
                 new InstantCommand(() -> hood.forceHoodDown(true))
 

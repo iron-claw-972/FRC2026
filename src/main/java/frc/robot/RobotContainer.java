@@ -297,6 +297,10 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
+
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+
     // String testAuto = "Test Auto";
     // String newAuto = "New Auto";
     String leftBumpDepot = "LeftBumpDepot";
@@ -318,6 +322,8 @@ public class RobotContainer {
     addAuto(leftBumpDepot);
     addAuto(loopDepot);
     addAuto(leftBump);
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
