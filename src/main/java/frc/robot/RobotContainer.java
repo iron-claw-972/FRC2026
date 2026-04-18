@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.auto_comm.SpindexerDeadline;
@@ -29,6 +29,7 @@ import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
+import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.commands.vision.ShutdownAllPis;
@@ -40,7 +41,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LED.LED2;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -77,7 +78,7 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
   private LinearClimb linearClimb = null;
-  private LED2 led = null;
+  private LED led = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -118,8 +119,6 @@ public class RobotContainer {
         break;
 
       case TestBed2:
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
         break;
 
       default:
@@ -127,9 +126,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
-        // led.setDefaultCommand(new LEDDefaultCommand(led));
-        led = new LED2();
+        led = new LED();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -145,7 +142,6 @@ public class RobotContainer {
         // fall-through
 
       case Vivace:
-        // linearClimb = new LinearClimb();
 
       case Phil: // AKA "IHOP"
 
@@ -169,6 +165,8 @@ public class RobotContainer {
 
         // put the Chooser on the SmartDashboard
         SmartDashboard.putData("Auto chooser", autoChooser);
+
+        SmartDashboard.putData("Lock Shooting", new LockedShoot(turret, drive, hood, shooter));
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
@@ -259,8 +257,6 @@ public class RobotContainer {
       NamedCommands.registerCommand("Start Spindexer",
           new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
       NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
-      NamedCommands.registerCommand("Reset Spindexer", new InstantCommand(() -> spindexer.resetSpindexer()));
-      NamedCommands.registerCommand("Reset Reset Angle", new InstantCommand(() -> spindexer.resetResetAngle()));
     }
 
     if (hood != null) {
@@ -308,7 +304,6 @@ public class RobotContainer {
    */
   public void autoChooserInit() {
     // add the options to the Chooser
-    String defaultAuto = "Trial Auto Path";
     String leftSideAuto = "Left Week V1";
     String rightSideAuto = "Right Week V1";
     String shootOnlyAuto = "Shoot Only Left Week V1";
@@ -316,8 +311,11 @@ public class RobotContainer {
     String rightLiberalSwipe = "RightLiberalDoubleSwipe";
     String leftLiberalSwipeTranslation = "LeftLiberalDoubleSwipeTranslation";
     String leftConservativeSwipe = "LeftConservativeDoubleSwipe";
+    String leftDoNothing = "Left Do Nothing";
+    String rightDoNothing = "Right Do Nothing";
+    String centerDoNothing = "Center Do Nothing";
 
-    autoChooser.setDefaultOption("Default", new PathPlannerAuto(defaultAuto));
+    autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
@@ -334,6 +332,9 @@ public class RobotContainer {
     addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
     addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
 
+    addAuto(leftDoNothing);
+    addAuto(rightDoNothing);
+    addAuto(centerDoNothing);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
@@ -360,6 +361,13 @@ public class RobotContainer {
     } else {
       return false;
     }
+  }
+
+  public Command getDefaultAuto() {
+    ParallelCommandGroup defaultShoot = new ParallelCommandGroup(
+      new RunSpindexer(spindexer, turret, hood, intake)
+    );
+    return defaultShoot;
   }
 
   public Command getAutoCommand() {

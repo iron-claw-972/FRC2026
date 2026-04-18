@@ -45,7 +45,7 @@ public class LinearClimb extends SubsystemBase implements LinearClimbIO {
             ClimbConstants.PID_D);
 
     public LinearClimb() {
-        motor = new TalonFX(IdConstants.CLIMB_MOTOR_ID, Constants.CANIVORE_SUB);
+        motor = new TalonFX(IdConstants.SPINDEXER_TWO_ID, Constants.CANIVORE_SUB);
         pid.setTolerance(ClimbConstants.PID_TOLERANCE);
 
         motor.setNeutralMode(NeutralModeValue.Brake);

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.RgbFadeAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TwinkleAnimation;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
@@ -31,7 +30,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
 
-public class LED2 extends SubsystemBase {
+public class LED extends SubsystemBase {
 
 	private CANdle candle;
 	public static final int stripLength = 67;
@@ -41,7 +40,7 @@ public class LED2 extends SubsystemBase {
 
 	private Color color;
 	
-	public LED2() {
+	public LED() {
 		candle = new CANdle(IdConstants.CANDLE_ID, Constants.RIO_CAN);
 		CANdleConfigurator configurator = candle.getConfigurator();
 
@@ -63,7 +62,7 @@ public class LED2 extends SubsystemBase {
 		candle.clearAllAnimations();
 		lightsOff();
 
-		System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
+		// System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
 
 		SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
 		SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));

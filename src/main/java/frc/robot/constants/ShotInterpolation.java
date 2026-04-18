@@ -30,8 +30,8 @@ public class ShotInterpolation {
         exitVelocityMap.put(1.0, 2.2);
         exitVelocityMap.put(2.0, 4.4);
         exitVelocityMap.put(7.0, 12.0);
-        exitVelocityMap.put(7.8, 15.2);
         exitVelocityMap.put(7.78, 16.8);
+        exitVelocityMap.put(7.8, 15.2);
         exitVelocityMap.put(7.9, 17.1);
         exitVelocityMap.put(8.0, 17.9);
         exitVelocityMap.put(8.08, 19.0);
@@ -44,26 +44,24 @@ public class ShotInterpolation {
         exitVelocityMap.put(25.0, 25.0* 3.2);
 
         // currently regresses to y = 1.34959x + 9.79618
-        shooterVelocityMap.put(0.0, 9.55);
-        shooterVelocityMap.put(1.00, 11.5);
-        shooterVelocityMap.put(1.49, 11.5);
-        shooterVelocityMap.put(2.09, 12.5);
-        shooterVelocityMap.put(2.95, 14.1);
-        shooterVelocityMap.put(4.07, 15.5);
-        shooterVelocityMap.put(5.05, 16.7);
-        shooterVelocityMap.put(5.79, 18.0);
-        shooterVelocityMap.put(25.0, 43.44);
+        shooterVelocityMap.put(0.0, 9.55 * 1.05);
+        shooterVelocityMap.put(1.00, 11.5 * 1.05);
+        shooterVelocityMap.put(2.00, 12.3 * 1.1);
+        shooterVelocityMap.put(3.00, 14.0 * 1.075);
+        shooterVelocityMap.put(4.00, 15.5 * 1.075);
+        shooterVelocityMap.put(5.00, 17.0 * 1.05);
+        shooterVelocityMap.put(5.60, 18.0 * 1.05);
+        shooterVelocityMap.put(25.0, 43.44 * 1.05);
 
-        newHoodMap.put(1.00, 78.0);
-        newHoodMap.put(1.49, 72.0);
-        newHoodMap.put(2.09, 70.0);
-        newHoodMap.put(2.95, 68.0);
-        newHoodMap.put(5.05, 60.0);
-        newHoodMap.put(5.79, 59.0);
-        newHoodMap.put(4.07, 65.0);
 
         newHoodMap.put(0.0, 75.9);
+        newHoodMap.put(1.00, 78.0);
+        newHoodMap.put(1.49, 72.0 - 2.0 - 1.0);
+        newHoodMap.put(2.09, 70.0 - 4.0 - 2.0);
+        newHoodMap.put(2.95, 68.0 - 4.0 - 2.0);
+        newHoodMap.put(4.07, 65.0 - 3.0 - 2.0);
+        newHoodMap.put(5.05, 60.0 - 1.0 - 1.0);
+        newHoodMap.put(5.79, 59.0 - 2.0);
         newHoodMap.put(27.99, 0.0);
-
     }
 }

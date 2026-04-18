@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -34,8 +35,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-
-    double powerModifier = 1.05; // TESTED
+    double powerModifier = 1.00;
 
     public Shooter() {
         updateInputs();
@@ -69,7 +69,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.getConfigurator().apply(limitConfig);
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
             SmartDashboard.putData("Turn on shooter", new InstantCommand(()-> setShooter(12.0)));
         }
     }
@@ -81,8 +80,6 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // shooterTargetSpeed = SmartDashboard.getNumber("Shooter Setpoint", shooterTargetSpeed);
         // SmartDashboard.putNumber("Shooter Setpoint", shooterTargetSpeed);
 
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         
         // Convert to RPS
         double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
@@ -93,8 +90,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         }
 
         // Sets the motor control to target velocity
-        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS));
-        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS));   
+        shooterMotorLeft.setControl(voltageRequest.withVelocity(targetVelocityRPS).withEnableFOC(true));
+        shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS).withEnableFOC(true));   
         
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
@@ -108,7 +105,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
-        
+        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+
         // keep this
         SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }

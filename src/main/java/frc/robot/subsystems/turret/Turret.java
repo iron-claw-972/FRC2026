@@ -35,6 +35,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 
     private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
+  	public boolean locked = false;
+
 	private boolean calibrating;
 	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
@@ -52,6 +54,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	private double lastGoalRad = 0.0;
 	private double lastFilteredRad = 0.0;
 	private double lastRawSetpoint = 0.0;
+
 
 
 	/* ---------------- Visualization ---------------- */
@@ -115,6 +118,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 			SmartDashboard.putData("Turret Test Positions", turretTestChooser);
 		}
+		SmartDashboard.putData("Set Locked", new InstantCommand(() -> {locked = !locked;}));
 		//motor.setPosition(Units.degreesToRotations(238.86) * TurretConstants.GEAR_RATIO);
 
 		motor.setPosition(0.0);
@@ -140,6 +144,7 @@ public class Turret extends SubsystemBase implements TurretIO{
 	 * @return If the turret is at setpoint with tolerance of 10 degrees
 	 */
 	public boolean atSetpoint() {
+		if (locked) return true;
 		return Math.abs(goalAngle.getRadians() - getPositionRad()) < Units.degreesToRadians(10.0);
 	}
 
@@ -187,13 +192,12 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// calculate shortest angular delta
 		double delta = best - lastRawSetpoint;
-		delta = MathUtil.angleModulus(delta);
 		
 		// filter delta
 		double filteredDelta = setpointFilter.calculate(delta);
 		
 		// apply filtered range
-		lastFilteredRad = MathUtil.angleModulus(lastFilteredRad + filteredDelta);
+		lastFilteredRad += filteredDelta;
 		lastRawSetpoint = best;
 		best = lastFilteredRad;
 
@@ -216,7 +220,8 @@ public class Turret extends SubsystemBase implements TurretIO{
 			// Sets motor control with feedforward
 			motor.setControl(mmVoltageRequest
 			.withPosition(motorGoalRotations)
-			.withFeedForward(robotTurnCompensation));
+			.withFeedForward(robotTurnCompensation)
+			.withEnableFOC(true));
 		}
 
         if (!Constants.DISABLE_LOGGING) {
@@ -226,9 +231,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 
 		// --- Visualization ---
 		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
-
-		updateInputs();
-		Logger.processInputs("Turret", inputs);
 
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
@@ -258,7 +260,6 @@ public class Turret extends SubsystemBase implements TurretIO{
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
 		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 		inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
-		inputs.positionDeg = motor.getPosition().getValueAsDouble();
 	}
 
 	/**

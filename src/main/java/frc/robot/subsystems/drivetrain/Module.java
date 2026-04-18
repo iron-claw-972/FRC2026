@@ -15,9 +15,10 @@ import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
@@ -152,7 +153,6 @@ public class Module implements ModuleIO{
             turnVelocity,
             turnAppliedVolts,
             turnCurrent);
-        ParentDevice.optimizeBusUtilizationForAll(driveMotor, angleMotor);
         
         setDesiredState(new SwerveModuleState(0, getAngle()), false);
     }
@@ -250,7 +250,7 @@ public class Module implements ModuleIO{
         }
         if (isOpenLoop) {
             double percentOutput = desiredState.speedMetersPerSecond / DriveConstants.MAX_SPEED;
-            driveMotor.set(percentOutput);
+            driveMotor.setControl(new DutyCycleOut(percentOutput));
         } else {
             double velocity = desiredState.speedMetersPerSecond/DriveConstants.WHEEL_RADIUS/2/Math.PI*DriveConstants.DRIVE_GEAR_RATIO;
             if (!Constants.DISABLE_LOGGING) {
@@ -280,7 +280,7 @@ public class Module implements ModuleIO{
     }
 
     public void setDriveVoltage(Voltage voltage){
-        driveMotor.setVoltage(voltage.baseUnitMagnitude());
+        driveMotor.setControl(new VoltageOut(voltage.baseUnitMagnitude()));
     }
     public void setAngle(Rotation2d angle){
         angleMotor.setControl(new PositionDutyCycle(angle.getRotations()*DriveConstants.MODULE_CONSTANTS.angleGearRatio));
@@ -316,6 +316,7 @@ public class Module implements ModuleIO{
 
     private void configAngleMotor() {
         angleMotor.getConfigurator().apply(new TalonFXConfiguration());
+        
         CurrentLimitsConfigs config = new CurrentLimitsConfigs();
         config.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
         config.SupplyCurrentLimit = DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT;
@@ -329,6 +330,9 @@ public class Module implements ModuleIO{
         angleMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(DriveConstants.INVERT_STEER_MOTOR));
         angleMotor.setNeutralMode(DriveConstants.STEER_NEUTRAL_MODE);
         angleMotor.setPosition(0);
+        
+        // optimize bus utilization for angle motor
+        angleMotor.optimizeBusUtilization();
         
         resetToAbsolute();
     }
@@ -359,14 +363,14 @@ public class Module implements ModuleIO{
         angleMotor.getConfigurator().apply(steerConfig); // apply
 
         // drive
-        CurrentLimitsConfigs dirveConfig = new CurrentLimitsConfigs();
-        dirveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-        dirveConfig.SupplyCurrentLimit = currentDrive;
-        dirveConfig.SupplyCurrentLowerLimit = currentDrive;
-        dirveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
-        dirveConfig.StatorCurrentLimit = currentDrive;
-        dirveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
-        driveMotor.getConfigurator().apply(dirveConfig); // apply
+        CurrentLimitsConfigs driveConfig = new CurrentLimitsConfigs();
+        driveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveConfig.SupplyCurrentLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        driveConfig.StatorCurrentLimit = currentDrive;
+        driveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveMotor.getConfigurator().apply(driveConfig); // apply
     }
 
     private void configDriveMotor() {
@@ -395,6 +399,9 @@ public class Module implements ModuleIO{
         driveMotor.getConfigurator().apply(new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(DriveConstants.OPEN_LOOP_RAMP));
         driveMotor.getConfigurator().apply(new ClosedLoopRampsConfigs().withDutyCycleClosedLoopRampPeriod(DriveConstants.CLOSE_LOOP_RAMP));
         driveMotor.setNeutralMode(DriveConstants.DRIVE_NEUTRAL_MODE);
+        
+        // optimize bus utilization for drive motor
+        driveMotor.optimizeBusUtilization();
         
     }
 
@@ -450,4 +457,22 @@ public class Module implements ModuleIO{
         return inputs.odometryTimestamps;
     }
 
+    /** returns the drive position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getDrivePositionSignal() {
+        return drivePosition;
+    }
+
+    /** returns the turn position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getTurnPositionSignal() {
+        return turnPosition;
+    }
+
+    /** returns the turn absolute position status signal for time-synced odometry. */
+    public StatusSignal<Angle> getTurnAbsolutePositionSignal() {
+        return turnAbsolutePosition;
+    }
+
+    public TalonFX[] getMotors() {
+        return new TalonFX[]{angleMotor, driveMotor};
+    }
 }

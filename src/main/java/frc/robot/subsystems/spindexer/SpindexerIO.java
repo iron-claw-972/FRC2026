@@ -5,8 +5,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface SpindexerIO {
     @AutoLog
     public static class SpindexerIOInputs {
-        public double spindexerVelocity = 0.0;
-        public double spindexerCurrent = 0.0;
+        public double spindexerOneVelocity = 0.0;
+        public double spindexerOneCurrent = 0.0;
+        public double spindexerTwoVelocity = 0.0;
+        public double spindexerTwoCurrent = 0.0;
     }
 
     public void updateInputs();

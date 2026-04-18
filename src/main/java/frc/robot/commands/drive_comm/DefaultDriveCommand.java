@@ -3,9 +3,7 @@ package frc.robot.commands.drive_comm;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -70,34 +68,34 @@ public class DefaultDriveCommand extends Command {
             Logger.recordOutput("TrenchAlign", swerve.getTrenchAlign());
             Logger.recordOutput("AlignZones", TrenchAssistConstants.ALIGN_ZONES);
         }
-        if (swerve.getTrenchAlign()) {
-            boolean inZone = false;
-            for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
-                if (rectangle.contains(swerve.getPose().getTranslation())) {
-                    inZone = true;
-                }
-            }
+        // if (swerve.getTrenchAlign()) {
+        //     boolean inZone = false;
+        //     for (Rectangle2d rectangle : TrenchAssistConstants.ALIGN_ZONES) {
+        //         if (rectangle.contains(swerve.getPose().getTranslation())) {
+        //             inZone = true;
+        //         }
+        //     }
 
-            if (inZone) {
+        //     if (inZone) {
 
-                double yawDegrees = swerve.getYaw().getDegrees();
-                // double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
-                if (Math.abs(yawDegrees) <= 90) {
-                    swerve.setAlignAngle(Units.degreesToRadians(0.0));
-                } else {
-                    swerve.setAlignAngle(Units.degreesToRadians(180.0));
-                }
-                // swerve.setAlignAngle(snappedDeg);
-                // Logger.recordOutput("snappy", snappedDeg);
-            } else {
-                swerve.setIsAlign(false);
-            }
-        } else {
-            swerve.setIsAlign(false);
-        }
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
-        }
+        //         double yawDegrees = swerve.getYaw().getDegrees();
+        //         // double snappedDeg = Math.round(yawDegrees / 90.0) * 90.0;
+        //         if (Math.abs(yawDegrees) <= 90) {
+        //             swerve.setAlignAngle(Units.degreesToRadians(0.0));
+        //         } else {
+        //             swerve.setAlignAngle(Units.degreesToRadians(180.0));
+        //         }
+        //         // swerve.setAlignAngle(snappedDeg);
+        //         // Logger.recordOutput("snappy", snappedDeg);
+        //     } else {
+        //         swerve.setIsAlign(false);
+        //     }
+        // } else {
+        //     swerve.setIsAlign(false);
+        // }
+        // if (!Constants.DISABLE_LOGGING) {
+        //     Logger.recordOutput("TrenchAssist", swerve.getTrenchAssist());
+        // }
 
         if (swerve.getTrenchAssist()) {
             drive(TrenchAssist.calculate(swerve, corrected, trenchAssistPid));
