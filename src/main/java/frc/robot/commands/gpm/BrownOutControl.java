@@ -79,7 +79,7 @@ public class BrownOutControl extends Command {
         shooter.setNewCurrentLimit(shooterCurrent);
         turret.setCurrentLimits(turretCurrent);
         hood.setCurrentLimits(hoodCurrent);
-        spindexer.setNewCurrentLimit(spindexerCurrent);
+        spindexer.setNewCurrentLimit(spindexerCurrent, 67);
         intake.setCurrentLimits(intakeCurrent);
         drivetrain.applyNewModuleCurrents(steerCurrent, driveCurrent);
 
