@@ -27,8 +27,25 @@ public class Breaker extends SubsystemBase {
         for (double index : trimmedCurrents) {
             sum += index;
         }
-        
         return sum/trimmedCurrents.size();
+    }
+
+    public boolean thresholdPassed(double threshold, double secondsBackward) {
+        return average(secondsBackward) > threshold;
+    }
+
+    public boolean checkThresholdsBroken() {
+        if (
+            thresholdPassed(BreakerConstants.HALF_SECOND_THRESHOLD_AMPS, 0.5)
+            || thresholdPassed(BreakerConstants.ONE_SECOND_THRESHOLD_AMPS, 1)
+            || thresholdPassed(BreakerConstants.TWO_SECOND_THRESHOLD_AMPS, 2)
+            || thresholdPassed(BreakerConstants.FOUR_SECOND_THRESHOLD_AMPS, 4)
+            || thresholdPassed(BreakerConstants.EIGHT_SECOND_THRESHOLD_AMPS, 8)
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public double getCurrentFromPowerDistribution() {
