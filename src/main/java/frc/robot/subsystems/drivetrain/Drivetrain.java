@@ -322,6 +322,7 @@ public class Drivetrain extends SubsystemBase {
 
         if (VisionConstants.ENABLED) {
             if (vision != null && visionEnabled && visionEnableTimer.hasElapsed(5)) {
+                Logger.recordOutput("/Odometry/Slipping", slipped);
                 vision.updateOdometry(poseEstimator, time -> getPoseAt(time).getRotation().getRadians(), slipped);
 
                 if (vision.canSeeTag()) {
