@@ -110,7 +110,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // config Slot 0 PID params
         var rollerSlot0Configs = config.Slot0;
-        rollerSlot0Configs.kP = 5.0;
+        rollerSlot0Configs.kP = 0.5;
         rollerSlot0Configs.kI = 0.0;
         rollerSlot0Configs.kD = 0.0;
         rollerSlot0Configs.kV = 0.0;
