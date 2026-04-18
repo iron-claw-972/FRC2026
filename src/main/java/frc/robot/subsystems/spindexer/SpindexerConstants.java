@@ -3,8 +3,8 @@ package frc.robot.subsystems.spindexer;
 public class SpindexerConstants {
     public static final double spindexerVelocityWithBall = 6.0; // rps (for counting balls)
     public static final double currentLimit = 40; // A
-    public static final double spindexerForwardVoltage = 1.00; // Volts (set low for testing)
-    public static final double spindexerReverseVoltage = -1.00; // Volts
+    public static final double spindexerForwardVoltage = 1.00; // Percent (set low for testing)
+    public static final double spindexerReverseVoltage = -1.00; // Percent
     public static final double GEAR_RATIO = 27.0; // unused & both motors have same gearing
 
     public static final double CURRENT_SPIKE_LIMIT = 150.0;
