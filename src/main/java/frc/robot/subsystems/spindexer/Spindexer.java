@@ -14,7 +14,6 @@ public class Spindexer extends SubsystemBase {
     public int ballCount = 0;
     private boolean wasSpindexerSlow = false;
     private SpindexerState state = SpindexerState.STOPPED;
-    private boolean reversing = false;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
 
     public boolean noIndexing = false;
@@ -44,24 +43,20 @@ public class Spindexer extends SubsystemBase {
 
         if (resetPos == null) {
             io.setPositionRaw(0.1 * gearRatio);
-            resetPos = (inputs.spindexerPosition / gearRatio) % 1.0;
+            resetPos = (inputs.spindexerOneVelocity / gearRatio) % 1.0;
             resetPID.reset();
         }
 
         if (state == SpindexerState.MAX) {
-            io.setControl(new DutyCycleOut(SpindexerConstants.spindexerMaxPower).withEnableFOC(true));
-            reversing = false;
+            io.setControl(new DutyCycleOut(SpindexerConstants.spindexerForwardVoltage / 12.0).withEnableFOC(true));
         } else if (state == SpindexerState.REVERSE) {
-            io.setControl(new DutyCycleOut(SpindexerConstants.spindexerReversePower).withEnableFOC(true));
-            reversing = true;
+            io.setControl(new DutyCycleOut(SpindexerConstants.spindexerReverseVoltage / 12.0).withEnableFOC(true));
         } else if (state == SpindexerState.STOPPED) {
             io.setControl(new DutyCycleOut(0.0).withEnableFOC(true));
-            reversing = false;
         } else if (state == SpindexerState.RESET && resetPos != null) {
-            io.setControl(new DutyCycleOut(resetPID.calculate((inputs.spindexerPosition / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
+            io.setControl(new DutyCycleOut(resetPID.calculate((inputs.spindexerOneVelocity / gearRatio) % 1.0, resetPos)).withEnableFOC(true));
         } else {
             io.setControl(new DutyCycleOut(power).withEnableFOC(true));
-            reversing = false;
         }
 
 
@@ -74,7 +69,7 @@ public class Spindexer extends SubsystemBase {
             SmartDashboard.putBoolean("Spindexer Has Ball", ballCount > 0);
         }
 
-        boolean isSpindexerSlow = inputs.spindexerVelocity < velocityThreshold;
+        boolean isSpindexerSlow = (inputs.spindexerOneVelocity + inputs.spindexerTwoVelocity) / 2.0 < velocityThreshold;
         if (wasSpindexerSlow && !isSpindexerSlow && power > 0.1) {
             ballCount++;
         }
@@ -111,7 +106,7 @@ public class Spindexer extends SubsystemBase {
     }
 
     public double getStatorCurrent() {
-        return inputs.spindexerCurrent;
+        return inputs.spindexerOneCurrent + inputs.spindexerTwoCurrent;
     }
 
     public void setNewCurrentLimit(double newCurrentLimit) {
