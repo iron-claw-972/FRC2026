@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.ShotInterpolation;
@@ -52,6 +53,7 @@ public class Superstructure extends Command {
     private double lastHoodAngle;
     private double hoodAngle;
     private double hoodVelocity;
+    private boolean useHoodAssist = HoodConstants.useHoodAssistDefault;
 
     private TurretState goalState;
 
@@ -85,6 +87,9 @@ public class Superstructure extends Command {
 				8.0); // Random initial goalState to prevent it being null
         
         addRequirements(turret, shooter);
+
+        SmartDashboard.putBoolean("Use Hood Assist", useHoodAssist);
+        SmartDashboard.putData("Toggle Hood Assist", new InstantCommand(() -> toggleHoodAssist()));
     }
 
     public void updateSetpoints(Pose2d drivepose) {
@@ -239,6 +244,11 @@ public class Superstructure extends Command {
         turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
     }
 
+    public void toggleHoodAssist(){
+        useHoodAssist = !useHoodAssist;
+        SmartDashboard.putBoolean("Use Hood Assist", useHoodAssist);
+    }
+
     @Override
     public void execute() {
         // Phase manager stuff
@@ -264,15 +274,19 @@ public class Superstructure extends Command {
             } else {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
+
             
             double x = drivepose.getX(); // compared as meters
             double y = drivepose.getY();
 
-            // if (FieldConstants.underTrench(x, y)) {
-            //     System.out.println("Hood forced down");
-            // } else {
-            //     hood.forceHoodDown(false);
-            // }
+            if(useHoodAssist){
+                if (FieldConstants.underTrench(x, y)) {
+                    System.out.println("Hood forced down");
+                    hood.forceHoodDown(true);
+                } else {
+                    hood.forceHoodDown(false);
+                }
+            }   
 
             // different maps for shuttling vs shooting. Less powerful when shuttling.
             if (shuttling) {
