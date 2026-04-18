@@ -37,6 +37,7 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
+import frc.robot.subsystems.Breaker.EMABreaker;
 import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
@@ -77,6 +78,8 @@ public class RobotContainer {
   private Operator operator = null;
   private LinearClimb linearClimb = null;
   private LED led = null;
+
+  private EMABreaker breaker = null;
 
   // TODO: move to correct robot and put the correct port?
   private PS5Controller ps5 = new PS5Controller(0);
@@ -125,6 +128,7 @@ public class RobotContainer {
         spindexer = new Spindexer();
         intake = new Intake();
         led = new LED();
+        breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
