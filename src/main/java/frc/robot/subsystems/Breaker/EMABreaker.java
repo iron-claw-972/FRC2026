@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
-public class Breaker extends SubsystemBase {
+public class EMABreaker extends SubsystemBase {
 
     private static class Current {
         double alpha; // how much of the error we correct per loop
@@ -21,7 +21,7 @@ public class Breaker extends SubsystemBase {
 
     private List<Current> filters = new ArrayList<>(); // contains currents with their alphas and thresholds
 
-    public Breaker() {
+    public EMABreaker() {
         for (Map.Entry<Double, Double> entry : BreakerConstants.THRESHOLDS.entrySet()) {
             double tau = entry.getKey(); // sec
             double threshold = entry.getValue(); // A
