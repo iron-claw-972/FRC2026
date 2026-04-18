@@ -32,7 +32,7 @@ public class BrownOutConstants {
     public static final BrownOutLevel BROWNOUT_LVL_ONE = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT, 
         HoodConstants.NORMAL_CURRENT_LIMIT, 
-        SpindexerConstants.currentLimit, 
+        SpindexerConstants.SUPPLY_CURRENT_LIMIT, 
         TurretConstants.NORMAL_CURRENT_LIMIT, 
         IntakeConstants.NORMAL_CURRENT_LIMIT, 
         DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
@@ -43,7 +43,7 @@ public class BrownOutConstants {
     public static final BrownOutLevel BROWNOUT_LVL_TWO = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
         HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
-        SpindexerConstants.currentLimit * 1.0, // preserve indexing speed
+        SpindexerConstants.SUPPLY_CURRENT_LIMIT * 1.0, // preserve indexing speed
         TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.8, // lower drive rotation
@@ -54,7 +54,7 @@ public class BrownOutConstants {
     public static final BrownOutLevel BROWNOUT_LVL_THREE = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
         HoodConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
-        SpindexerConstants.currentLimit * 0.8, // preserve indexing speed
+        SpindexerConstants.SUPPLY_CURRENT_LIMIT * 0.8, // preserve indexing speed
         TurretConstants.NORMAL_CURRENT_LIMIT * 1.0, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.7, // lower drive rotation
@@ -65,7 +65,7 @@ public class BrownOutConstants {
     public static final BrownOutLevel BROWNOUT_LVL_FOUR = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT * 1.0, // keep as same 
         HoodConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve aiming speed
-        SpindexerConstants.currentLimit * 0.6, // preserve indexing speed
+        SpindexerConstants.SUPPLY_CURRENT_LIMIT * 0.6, // preserve indexing speed
         TurretConstants.NORMAL_CURRENT_LIMIT * 0.8, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.6, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.5, // lower drive rotation
@@ -76,7 +76,7 @@ public class BrownOutConstants {
     public static final BrownOutLevel BROWNOUT_LVL_FIVE = new BrownOutLevel(
         ShooterConstants.SHOOTER_CURRENT_LIMIT * 0.8, // keep as same 
         HoodConstants.NORMAL_CURRENT_LIMIT * 0.7, // preserve aiming speed
-        SpindexerConstants.currentLimit * 0.5, // preserve indexing speed
+        SpindexerConstants.SUPPLY_CURRENT_LIMIT * 0.5, // preserve indexing speed
         TurretConstants.NORMAL_CURRENT_LIMIT * 0.7, // preserve aiming speed
         IntakeConstants.NORMAL_CURRENT_LIMIT * 0.5, // preserve indexing speed
         DriveConstants.STEER_PEAK_CURRENT_LIMIT * 0.45, // lower drive rotation
