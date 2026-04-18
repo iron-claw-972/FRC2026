@@ -5,33 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Left Swipe1 Bump"
+            "name": "Stop Hood Down"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Left Swipe1 Bump"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Swipe1 Bump"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Swipe1 Bump"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Left Swipe1 Bump"
+            "name": null
           }
         }
       ]
