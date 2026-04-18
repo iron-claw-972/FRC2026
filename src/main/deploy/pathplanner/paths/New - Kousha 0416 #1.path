@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.5,
+        "x": 4.4,
         "y": 7.623
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.749689734980109,
+        "x": 4.649689734980109,
         "y": 7.635451355169741
       },
       "isLocked": false,
@@ -244,15 +244,9 @@
       }
     },
     {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
       "name": "Spin Intake Rollers",
       "waypointRelativePos": 1.3498312710910954,
-      "endWaypointRelativePos": 6.209223847019083,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
@@ -306,7 +300,7 @@
     },
     {
       "name": "Extend Intake",
-      "waypointRelativePos": 8.053993250843748,
+      "waypointRelativePos": 8.691166077738544,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -317,7 +311,7 @@
     },
     {
       "name": "Spin Intake Rollers",
-      "waypointRelativePos": 8.1,
+      "waypointRelativePos": 8.73780918727915,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -328,15 +322,37 @@
     },
     {
       "name": "Stop Spindexer",
-      "waypointRelativePos": 8.616422947131568,
+      "waypointRelativePos": 9.126501766784463,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "Hood Down",
-      "waypointRelativePos": 8.62,
+      "waypointRelativePos": 9.219787985865741,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Hood Down"
+        }
+      }
+    },
+    {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 9.82614840989399,
       "endWaypointRelativePos": null,
       "command": null
+    },
+    {
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 9.83,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
     }
   ],
   "globalConstraints": {
