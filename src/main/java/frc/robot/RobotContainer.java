@@ -299,11 +299,14 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
-    String testAuto = "Test Auto";
-    String newAuto = "New Auto";
+    // String testAuto = "Test Auto";
+    // String newAuto = "New Auto";
+    String leftBumpDepot = "LeftBumpDepot";
+    String loopDepot = "LoopDepot";
+    String leftBump = "LeftBump";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
-    addAuto(newAuto);
+    //addAuto(newAuto);
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
     addAuto(shootOnlyAuto);
@@ -314,6 +317,9 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto(leftBumpDepot);
+    addAuto(loopDepot);
+    addAuto(leftBump);
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

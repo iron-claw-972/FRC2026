@@ -68,12 +68,12 @@
         "y": 5.568185053380782
       },
       "prevControl": {
-        "x": 8.097852906287072,
-        "y": 5.740332147093714
+        "x": 8.028429824610942,
+        "y": 5.720533116618405
       },
       "nextControl": {
-        "x": 7.619951084000919,
-        "y": 5.4329441780716525
+        "x": 7.631995377935355,
+        "y": 5.41583699014316
       },
       "isLocked": false,
       "linkedName": null
@@ -203,15 +203,15 @@
     },
     {
       "waypointRelativePos": 5.3924509985207205,
-      "rotationDegrees": 174.20763230266883
+      "rotationDegrees": -90.0
     },
     {
       "waypointRelativePos": 6.970938116370813,
-      "rotationDegrees": -178.8450028856059
+      "rotationDegrees": -90.0
     },
     {
       "waypointRelativePos": 7.622418947238659,
-      "rotationDegrees": 98.55538087137747
+      "rotationDegrees": 35.39060987236753
     },
     {
       "waypointRelativePos": 9.512704943293905,
@@ -263,7 +263,7 @@
     },
     {
       "name": "Stop Hood Down",
-      "waypointRelativePos": 7.028121484814383,
+      "waypointRelativePos": 6.934275618374536,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -274,7 +274,7 @@
     },
     {
       "name": "Start Spindexer",
-      "waypointRelativePos": 7.03,
+      "waypointRelativePos": 6.94982332155476,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
