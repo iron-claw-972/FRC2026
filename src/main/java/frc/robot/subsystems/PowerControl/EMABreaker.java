@@ -108,11 +108,24 @@ public class EMABreaker extends SubsystemBase {
         return false;
     }
 
-    public double percentageUsage() {
+    // returns an average of the filters
+    public double percentageAverageUsage() {
         double sumAvg = 0;
         for (Current f : filters) {
             sumAvg += f.average / f.threshold; // gets percentage of us
         }
         return sumAvg / filters.size(); // average across filters
+    }
+
+    // gives the worst case filter
+    public double[] percentageMaxUsage() {
+        Current worst = filters.get(0); // returns worst (default to tau filter)
+        for (Current f : filters) {
+            if (f.average / f.threshold > worst.average / worst.threshold) {
+                worst = f;
+            }
+        }
+        double[] returnValue = {worst.average/worst.threshold, worst.tau};
+        return returnValue;
     }
 }
