@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Breaker;
+package frc.robot.subsystems.PowerControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class EMABreaker extends SubsystemBase {
 
         // total stuff
         Logger.recordOutput("Breaker/TotalCurrent", current);
-        Logger.recordOutput("Breaker/OverCurrent", isOverCurrent());
+        Logger.recordOutput("Breaker/OverCurrent", isInWarning());
     }
 
     public double getAverageCurrentDraw(int[] ports) {
@@ -99,12 +99,20 @@ public class EMABreaker extends SubsystemBase {
         return pDis.getAllCurrents();
     }
 
-    public boolean isOverCurrent() {
+    public boolean isInWarning() {
         for (Current f : filters) {
-            if (f.average > f.threshold) {
+            if (f.average > f.threshold * BreakerConstants.WARNING_PERCENTAGE) {
                 return true; // uh oh
             }
         }
         return false;
+    }
+
+    public double percentageUsage() {
+        double sumAvg = 0;
+        for (Current f : filters) {
+            sumAvg += f.average / f.threshold; // gets percentage of us
+        }
+        return sumAvg / filters.size(); // average across filters
     }
 }

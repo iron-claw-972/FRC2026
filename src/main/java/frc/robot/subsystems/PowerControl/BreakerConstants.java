@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Breaker;
+package frc.robot.subsystems.PowerControl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,6 +12,8 @@ public class BreakerConstants {
         THRESHOLDS.put(20.0, 1.6 * 120);
         THRESHOLDS.put(30.0, 1.5 * 120);
     }
+
+    public static final double WARNING_PERCENTAGE = 0.6; // percent that the system reacts to approaching thresholds
 
     // ports
     public static int[] DRIVETRAIN_PORTS = {8,9,10,11,18,19,0,1}; // bls, bld, fld, fls, frs, frd, brd, brs
