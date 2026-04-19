@@ -22,7 +22,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     public int ballCount = 0;
     private SpindexerState state = SpindexerState.STOPPED;
     private SpindexerIOInputsAutoLogged inputs = new SpindexerIOInputsAutoLogged();
-    private double currentLimit = SpindexerConstants.currentLimit;
 
     public boolean noIndexing = false;
 
@@ -32,10 +31,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         // configure current limit
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_SPIKE_LIMIT;
+        limitConfig.StatorCurrentLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
-        limitConfig.SupplyCurrentLowerTime = 1.5;
+        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT;
+        limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
@@ -69,6 +68,11 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             setMotorVoltages(power);
         }
 
+        if (state == SpindexerState.REVERSE) {
+            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_REVERSE_STATOR_LIMIT);
+        } else {
+            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
+        }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Running", state == SpindexerState.MAX || state == SpindexerState.CUSTOM);
@@ -106,19 +110,14 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         return inputs.spindexerOneCurrent + inputs.spindexerTwoCurrent;
     }
 
-    public void setNewCurrentLimit(double newCurrentLimit) {
-        currentLimit = newCurrentLimit;
+    public void setNewCurrentLimit(double supply, double stator) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = newCurrentLimit;
+        limitConfig.StatorCurrentLimit = stator;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLowerLimit = newCurrentLimit;
-        limitConfig.SupplyCurrentLowerTime = 1.5;
+        limitConfig.SupplyCurrentLowerLimit = supply;
+        limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
-    }
-
-    public double getCurrentLimit() {
-        return currentLimit;
     }
 
     @Override
