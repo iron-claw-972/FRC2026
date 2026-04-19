@@ -66,6 +66,7 @@ public class Superstructure extends Command {
     private double turretOffset = 0.0;
 
     private double distanceFromTarget = 0.0;
+    private double shuttlingTOFMultiplier = 0.8;
 
     // private double TOFAdjustment = 0.85;
     // private double TOFAdjustment = 1.1;
@@ -111,11 +112,12 @@ public class Superstructure extends Command {
          * So we make a bunch of guesses until it converges
          * Early exit when change < 1mm to avoid unnecessary iterations
          */
+        boolean shuttling = target.equals(FieldConstants.getHubTranslation().toTranslation2d());
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
+                shuttling ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
@@ -123,7 +125,13 @@ public class Superstructure extends Command {
             target3d.minus(lookahead3d),
             2.0);
 
-            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
+            if (!shuttling) {
+                timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
+            } else {
+                double distance = target.getDistance(lookaheadPose.getTranslation());
+                timeOfFlight = distance * shuttlingTOFMultiplier;
+            }
+
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             Pose2d newLookaheadPose =
@@ -250,6 +258,9 @@ public class Superstructure extends Command {
 
         turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
         SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+
+        shuttlingTOFMultiplier = SmartDashboard.getNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
+        SmartDashboard.putNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
 
         if (phaseManager.isIdle()) {
             underLadder();
