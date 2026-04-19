@@ -22,7 +22,7 @@ public class ShuttleInterpolation {
         shooterVelocityMap.put(4.0, 12.8);
         shooterVelocityMap.put(7.6, 19.0);
         shooterVelocityMap.put(11.4, 28.1); // was 25.2 before
-        shooterVelocityMap.put(16.54, 44.8); // untested
+        shooterVelocityMap.put(16.54, 70.0); // untested
         
         // always shoot at low angle to ground.
         newHoodMap.put(0.0, 60.0);

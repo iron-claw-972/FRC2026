@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.AutoShootCommand;
 import frc.robot.commands.gpm.ClimbDriveCommand;
@@ -280,6 +281,17 @@ public class RobotContainer {
     }
   }
 
+  public void addAuto(String name, Command auto) {
+    try {
+      autoChooser.addOption(name, auto);
+    }
+    // is this the right one??
+    catch (AutoBuilderException e) {
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
@@ -297,6 +309,9 @@ public class RobotContainer {
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
 
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+
     autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
@@ -308,6 +323,16 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
+
+
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake, breaker);
+
+    String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
+    String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
+    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
+    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

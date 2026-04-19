@@ -62,7 +62,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         );
 
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_STATOR_CURRENT_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
@@ -105,10 +105,10 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
         powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        // SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
 
         // keep this
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        Logger.recordOutput("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
 
     /**
