@@ -35,8 +35,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-
-    LoggedNetworkNumber powerModifier = new LoggedNetworkNumber("OPERATOR: Shooter Power Modifier", 1.05);
+    double powerModifier = 1.00;
 
     public Shooter() {
         updateInputs();
@@ -83,7 +82,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         
         // Convert to RPS
-        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier.get();
+        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
@@ -106,7 +105,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
-        
+        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+
         // keep this
         SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
@@ -144,11 +145,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void bumpUpShooterModifier() {
-        powerModifier.set(powerModifier.get() + 0.025);
+        powerModifier += 0.025;
     }
 
     public void bumpDownShooterModifier() {
-        powerModifier.set(powerModifier.get() - 0.025);
+        powerModifier -= 0.025;
     }
 
     /**

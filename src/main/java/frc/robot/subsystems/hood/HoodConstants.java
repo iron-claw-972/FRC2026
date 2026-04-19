@@ -12,8 +12,8 @@ public class HoodConstants {
     public static final double MAX_VELOCITY = 25; // rad/s
     public static final double MAX_ACCELERATION = 160; // rad/s^2
 
-    public static final double MAX_ANGLE = 82; // degrees
-    public static final double MIN_ANGLE = 58.5; // degrees
+    public static final double MAX_ANGLE = 78.0; // degrees
+    public static final double MIN_ANGLE = 54.5; // degrees
 
     public static final double FEEDFORWARD_KV = 0.12;
 
