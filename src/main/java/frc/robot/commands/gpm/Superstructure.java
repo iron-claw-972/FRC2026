@@ -198,7 +198,7 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay.get(),
                 robotRelVel.vyMetersPerSecond * phaseDelay.get(),
@@ -268,9 +268,6 @@ public class Superstructure extends Command {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
-
             // if (FieldConstants.underTrench(x, y)) {
             //     System.out.println("Hood forced down");
             // } else {
