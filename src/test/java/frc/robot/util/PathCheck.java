@@ -21,7 +21,6 @@ public class PathCheck {
     public static void registerPlaceholderCommands() {
         NamedCommands.registerCommand("Extend intake", new InstantCommand());
         NamedCommands.registerCommand("Intake", new InstantCommand());
-        NamedCommands.registerCommand("Climb", new InstantCommand());
     }
 
     /**

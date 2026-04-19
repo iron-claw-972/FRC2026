@@ -63,7 +63,7 @@ public class Superstructure extends Command {
 
     private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("OPERATOR: Hood Offset", 0.0);
 
-    private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("OPERATOR: Turret Offset", 0.0);
+    private double turretOffset = 0.0;
 
     private double distanceFromTarget = 0.0;
 
@@ -166,7 +166,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset.get();
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
         if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
@@ -198,7 +198,7 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay.get(),
                 robotRelVel.vyMetersPerSecond * phaseDelay.get(),
@@ -231,12 +231,12 @@ public class Superstructure extends Command {
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset.set(turretOffset.get() + 2.5); //2.5 deg
+        turretOffset += 2.5; //2.5 deg
     }
 
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
+        turretOffset -= 2.5; //2.5 deg
     }
 
     @Override
@@ -247,6 +247,9 @@ public class Superstructure extends Command {
 
         updateDrivePose();
         updateSetpoints(drivepose);
+
+        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
 
         if (phaseManager.isIdle()) {
             underLadder();
@@ -265,9 +268,6 @@ public class Superstructure extends Command {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
-
             // if (FieldConstants.underTrench(x, y)) {
             //     System.out.println("Hood forced down");
             // } else {

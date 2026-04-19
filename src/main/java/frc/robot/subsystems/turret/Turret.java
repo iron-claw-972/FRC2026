@@ -281,13 +281,6 @@ public class Turret extends SubsystemBase implements TurretIO{
         motor.getConfigurator().apply(limits);
     }
 
-	// Also ignore this for now
-	private double wrapUnit(double value) {
-		value %= 1.0;
-		if (value < 0) value += 1.0;
-		return value;
-	}
-
 	private void calibrate(){
 		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
 		calibrating = true;

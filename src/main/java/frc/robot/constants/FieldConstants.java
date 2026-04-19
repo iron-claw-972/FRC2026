@@ -173,7 +173,6 @@ public class FieldConstants {
 
   public static FieldZone getZone(Translation2d drivepose) {
     double x = drivepose.getX();
-    double y = drivepose.getY();
 
     if ((x < FIELD_LENGTH / 2 - Units.inchesToMeters(120.0)
         && x > (BLUE_ALLIANCE_LINE + (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2)) // blue alliance line
