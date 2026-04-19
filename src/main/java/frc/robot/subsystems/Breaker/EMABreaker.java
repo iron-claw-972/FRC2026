@@ -13,6 +13,7 @@ import frc.robot.constants.Constants;
 public class EMABreaker extends SubsystemBase {
 
     private static class Current {
+        double tau;
         double alpha; // how much of the error we correct per loop
         double average = 0;
         double threshold;
@@ -31,6 +32,7 @@ public class EMABreaker extends SubsystemBase {
             double threshold = entry.getValue(); // A
 
             Current w = new Current(); // create a filter for the threshold
+            w.tau = tau;
             w.threshold = threshold;
             w.alpha = 1 - Math.exp(-Constants.LOOP_TIME / tau); // 1 - e^(-0.02/1) = 0.0198, 1 - e^(-0.02/2) = 0.00995 
 
@@ -42,6 +44,7 @@ public class EMABreaker extends SubsystemBase {
             double tau = 1.0;
             double threshold = i;
             Current w = new Current();
+            w.tau = tau;
             w.threshold = threshold;
             w.alpha = 1 - Math.exp(-Constants.LOOP_TIME / tau); // 1 - e^(-0.02/1) = 0.
 
@@ -56,76 +59,37 @@ public class EMABreaker extends SubsystemBase {
         for (Current f : filters) {
             // new avg = old avg + fractionAlpha * difference
             f.average += f.alpha * (current - f.average);
-            Logger.recordOutput("Breaker/Filter Port" + f.threshold + "Avg", f.average);
+            Logger.recordOutput("Breaker/IntervalAverage/" + f.tau, f.average);
         }
 
         // this is getting currents coming out of all the ports from PDH (big thing under robot all the wires come out of)
         subsystemCurrents = getAllCurrentFromPowerDistribution();
+        
+        // this should average out all ports
         for (Current s : subsystems) {
             s.average += s.alpha * (subsystemCurrents[(int) s.threshold] - s.average);
-            Logger.recordOutput("Breaker/Current Port" + s.threshold + "Avg", s.average);
         }
 
+        // this should use updated port averages and sum them to get drivetrain average draw for 1 tau (can add more later)
+        Logger.recordOutput("Breaker/DrivetrainAverageDraw", getAverageCurrentDraw(BreakerConstants.DRIVETRAIN_PORTS));
+        Logger.recordOutput("Breaker/SpindexerDraw", getAverageCurrentDraw(BreakerConstants.SPINDEXER_PORTS));
+        Logger.recordOutput("Breaker/ShooterDraw", getAverageCurrentDraw(BreakerConstants.SHOOTER_PORTS));
+        Logger.recordOutput("Breaker/IntakeDraw", getAverageCurrentDraw(BreakerConstants.INTAKE_PORTS));
+        Logger.recordOutput("Breaker/TurretDraw", getAverageCurrentDraw(BreakerConstants.TURRET_PORTS));
+        Logger.recordOutput("Breaker/HoodDraw", getAverageCurrentDraw(BreakerConstants.HOOD_PORTS));
+
+        // total stuff
         Logger.recordOutput("Breaker/TotalCurrent", current);
         Logger.recordOutput("Breaker/OverCurrent", isOverCurrent());
-
-        // subsystems
-        Logger.recordOutput("Breaker/DrivetrainDraw", getDrivetrainCurrentDraw(subsystemCurrents));
-        Logger.recordOutput("Breaker/SpindexerDraw", getSpindexerCurrentDraw(subsystemCurrents));
-        Logger.recordOutput("Breaker/ShooterDraw", getShooterCurrentDraw(subsystemCurrents));
-        Logger.recordOutput("Breaker/IntakeDraw", getIntakeCurrentDraw(subsystemCurrents));
-        Logger.recordOutput("Breaker/TurretDraw", getTurretCurrentDraw(subsystemCurrents));
-        Logger.recordOutput("Breaker/HoodDraw", getHoodCurrentDraw(subsystemCurrents));
     }
 
-    public double getDrivetrainCurrentDraw(double[] subsystemCurrents) {
+    public double getAverageCurrentDraw(int[] ports) {
         double sum = 0;
-        for (int number : BreakerConstants.DRIVETRAIN_PORTS) {
-            sum += subsystemCurrents[number];
+        for (int number : ports) {
+            sum += subsystems.get(number - 1).average; // the list starts at zero, so ports will be shifted
         }
         return sum;
     }
-
-    public double getSpindexerCurrentDraw(double[] subsystemCurrents) {
-        double sum = 0;
-        for (int number : BreakerConstants.SPINDEXER_PORTS) {
-            sum += subsystemCurrents[number];
-        }
-        return sum;
-    }
-
-    public double getShooterCurrentDraw(double[] subsystemCurrents) {
-        double sum = 0;
-        for (int number : BreakerConstants.SHOOTER_PORTS) {
-            sum += subsystemCurrents[number];
-        }
-        return sum;
-    }
-
-    public double getIntakeCurrentDraw(double[] subsystemCurrents) {
-        double sum = 0;
-        for (int number : BreakerConstants.INTAKE_PORTS) {
-            sum += subsystemCurrents[number];
-        }
-        return sum;
-    }
-
-    public double getTurretCurrentDraw(double[] subsystemCurrents) {
-        double sum = 0;
-        for (int number : BreakerConstants.TURRET_PORTS) {
-            sum += subsystemCurrents[number];
-        }
-        return sum;
-    }
-
-    public double getHoodCurrentDraw(double[] subsystemCurrents) {
-        double sum = 0;
-        for (int number : BreakerConstants.HOOD_PORTS) {
-            sum += subsystemCurrents[number];
-        }
-        return sum;
-    }
-    
 
     public double getCurrentFromPowerDistribution() {
         return pDis.getTotalCurrent(); // not using .getCurrent() and then an arguement for the port you can get just one port
