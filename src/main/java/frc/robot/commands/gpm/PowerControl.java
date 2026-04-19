@@ -62,7 +62,11 @@ public class PowerControl extends Command {
 
     @Override
     public void execute() {
-        
+        double[] worstFilter = breaker.percentageMaxUsage();
+        double percentage = worstFilter[0]; // percentage of current average until we trip breaker
+        double tau = worstFilter[1]; // how quickly this issue is happenning and if we need to respond quickly
+
+        // Some logic here
     }
 
     @Override
