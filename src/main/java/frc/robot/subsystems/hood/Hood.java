@@ -116,6 +116,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 			goalVelocityRadPerSec = 0.0;
 		}
 
+
 		double setpointRad = goalAngle.getRadians();
 
         // calculate shortest angular delta

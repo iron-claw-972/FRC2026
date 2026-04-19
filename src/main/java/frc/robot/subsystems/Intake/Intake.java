@@ -11,8 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -66,7 +64,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     private double setpointInches = 0.0;
 
     private boolean calibrating = false;
-    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
@@ -110,7 +107,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // config Slot 0 PID params
         var rollerSlot0Configs = config.Slot0;
-        rollerSlot0Configs.kP = 5.0;
+        rollerSlot0Configs.kP = 0.5;
         rollerSlot0Configs.kI = 0.0;
         rollerSlot0Configs.kD = 0.0;
         rollerSlot0Configs.kV = 0.0;
@@ -204,10 +201,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         if(calibrating){
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
-            boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
         }
 
         updateInputs();
@@ -276,7 +269,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      */
     public double rotationsToInches(double motorRotations) {
         // circumference of the rack pinion
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
         double inches = pinionRotations * circ;
         return inches; 
@@ -288,7 +281,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @return motor rotations
      */
     public double inchesToRotations(double inches){
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = inches / circ;
         double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
         return motorRotations;

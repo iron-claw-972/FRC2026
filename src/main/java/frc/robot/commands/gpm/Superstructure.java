@@ -1,6 +1,7 @@
 package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -256,7 +257,8 @@ public class Superstructure extends Command {
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay));
+                robotRelVel.omegaRadiansPerSecond * phaseDelay
+            ));
     }
 
     /**
@@ -275,41 +277,35 @@ public class Superstructure extends Command {
 
     // shoot higher
     public void bumpUpHoodOffset() {
-        hoodOffset += 1.0; // 1 degree
+        hoodOffset += 1.0; //1 deg
     }
 
     // shoot lower
     public void bumpDownHoodOffset() {
-        hoodOffset -= 1.0; // 1 degree
+        hoodOffset -= 1.0; //1 deg
     }
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset += 2.5; // 2.5 degree
+        turretOffset += 2.5; //2.5 deg
     }
+
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset -= 2.5; // 2.5 degree
+        turretOffset -= 2.5; //2.5 deg
     }
 
     @Override
     public void execute() {
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            TOFAdjustment = SmartDashboard.getNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            SmartDashboard.putNumber("OPERATOR: TOF Adjustment", TOFAdjustment);
-            hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
-            SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
-        }
-
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-
         // Phase manager stuff
         phaseManager.update(drivepose, shooter, turret);
         target = phaseManager.getTarget(drivepose);
 
         updateDrivePose();
         updateSetpoints(drivepose);
+
+        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
 
         if (phaseManager.isIdle()) {
             underLadder();
@@ -353,8 +349,6 @@ public class Superstructure extends Command {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
             
-            phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
-            SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
         } else {
             phaseDelay = 0.03;
         }
