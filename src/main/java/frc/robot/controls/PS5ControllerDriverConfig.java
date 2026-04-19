@@ -158,14 +158,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
     private void shootFocus(boolean turnOn) {
         if (turnOn) {
-            Logger.recordOutput("ShootFocus", "Focused");
-            originalSpindexerCurrentLimit = spindexer.getCurrentLimit();
-            spindexer.setNewCurrentLimit(SpindexerConstants.currentLimit);
+            System.out.println("Shooting is now Focused");
+            spindexer.setNewCurrentLimit(SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT, SpindexerConstants.SUPPLY_CURRENT_LIMIT);
             drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
                     DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.25);
         } else {
-            Logger.recordOutput("ShootFocus", "Normal");
-            spindexer.setNewCurrentLimit(originalSpindexerCurrentLimit);
+            System.out.println("Shooting back to normal (From focus)");
+                        spindexer.setNewCurrentLimit(SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT, SpindexerConstants.SUPPLY_CURRENT_LIMIT);
             drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
                     DriveConstants.DRIVE_PEAK_CURRENT_LIMIT);
         }
