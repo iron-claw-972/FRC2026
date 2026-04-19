@@ -7,7 +7,8 @@ public interface HoodIO {
     public static class HoodIOInputs{
         public double positionDeg = HoodConstants.MAX_ANGLE;
         public double velocityRadPerSec = 0.0;
-        public double motorCurrent = 0.0;
+        public double motorStatorCurrent = 0.0;
+        public double motorSupplyCurrent = 0.0;
     }
 
     public void updateInputs();

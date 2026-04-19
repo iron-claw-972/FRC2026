@@ -17,7 +17,8 @@ public class HoodConstants {
 
     public static final double FEEDFORWARD_KV = 0.12;
 
-    public static final double NORMAL_CURRENT_LIMIT = 40.0; // A
+    public static final double STATOR_CURRENT_LIMIT = 40.0; // A
+    public static final double SUPPLY_CURRENT_LIMIT = 40.0; // A
     public static final double CALIBRATING_CURRENT_LIMIT = 10.0; // A
     public static final double CALIBRATION_CURRENT_THRESHOLD = 9.0; // A
 }

@@ -124,21 +124,32 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         return inputs.shooterSpeedLeft;
     }
 
-    public void setNewCurrentLimit(double newCurrentLimit) {
+    public void setNewCurrentLimit(double stator, double supply) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = newCurrentLimit;
+        limitConfig.StatorCurrentLimit = stator;
         limitConfig.StatorCurrentLimitEnable = true;
+        limitConfig.SupplyCurrentLimit = supply;
+        limitConfig.SupplyCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
+    }
+
+    public double getSubsystemStatorCurrent() {
+        return inputs.shooterStatorCurrentLeft + inputs.shooterStatorCurrentRight;
+    }
+
+    public double getSubsystemSupplyCurrent() {
+        return inputs.shooterSupplyCurrentLeft + inputs.shooterSupplyCurrentRight;
     }
 
     @Override
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
-        inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-        inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
-
+        inputs.shooterStatorCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterStatorCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+        inputs.shooterSupplyCurrentLeft = shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterSupplyCurrentRight = shooterMotorRight.getSupplyCurrent().getValueAsDouble();
 
         Logger.processInputs("Shooter", inputs);
     }
