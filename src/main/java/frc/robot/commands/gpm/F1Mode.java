@@ -45,10 +45,10 @@ public class F1Mode extends Command {
     @Override
     public void end(boolean interrupted) {
         drive.applyNewModuleCurrents(
-            DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT * 1.75,
-            DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT * 1.75, 
-            DriveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT * 1.75, 
-            DriveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT * 1.75
+            DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT * 1.00,
+            DriveConstants.STEER_CONTINUOUS_CURRENT_LIMIT * 1.00, 
+            DriveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT * 1.00, 
+            DriveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT * 1.00
         );
         hood.forceHoodDown(false);
         shooter.setNewCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT, ShooterConstants.SHOOTER_CURRENT_LIMIT);
