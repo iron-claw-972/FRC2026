@@ -11,7 +11,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -75,9 +74,6 @@ public class RobotContainer {
   private Operator operator = null;
 
   private EMABreaker breaker = null;
-
-  // TODO: move to correct robot and put the correct port?
-  private PS5Controller ps5 = new PS5Controller(0);
 
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();

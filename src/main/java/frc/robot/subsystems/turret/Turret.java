@@ -11,8 +11,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -27,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.IdConstants;
-import frc.robot.util.ModifiedCRT;
 
 public class Turret extends SubsystemBase implements TurretIO{
 	// Super low magnitude filter for the position to make it less jittery
@@ -38,7 +35,6 @@ public class Turret extends SubsystemBase implements TurretIO{
   	public boolean locked = false;
 
 	private boolean calibrating;
-	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
 	/* ---------------- Hardware ---------------- */
 

@@ -13,19 +13,16 @@ import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
-import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Driver controls for the PS5 controller
@@ -40,7 +37,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private double originalSpindexerCurrentLimit;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,

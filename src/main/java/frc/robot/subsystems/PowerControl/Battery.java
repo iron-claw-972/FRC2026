@@ -1,6 +1,5 @@
 package frc.robot.subsystems.PowerControl;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
