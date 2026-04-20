@@ -19,13 +19,12 @@ public class ShuttleInterpolation {
         // we can be less aggressive: y = 0.65 * (1.34959x + 9.79618)
         // will likely be this that requires tuning.
         shooterVelocityMap.put(0.0, 9.0);
-        shooterVelocityMap.put(4.0, 12.8);
-        shooterVelocityMap.put(7.6, 19.0);
-        shooterVelocityMap.put(11.4, 28.1); // was 25.2 before
+        shooterVelocityMap.put(4.0, 12.0 * 1.3); // tuned
+        shooterVelocityMap.put(8.0, 22.0 * 1.075); // tuned
         shooterVelocityMap.put(16.54, 70.0); // untested
         
         // always shoot at low angle to ground.
-        newHoodMap.put(0.0, 60.0);
-        newHoodMap.put(27.99, 60.0);
+        newHoodMap.put(0.0, 55.0);
+        newHoodMap.put(27.99, 55.0);
     }
 }
