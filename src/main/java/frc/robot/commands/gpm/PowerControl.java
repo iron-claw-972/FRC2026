@@ -1,26 +1,22 @@
 package frc.robot.commands.gpm;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.PowerControl.Battery;
 import frc.robot.subsystems.PowerControl.EMABreaker;
-import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.turret.Turret;
+
 
 public class PowerControl extends Command {
     // my beautiful power control subsystems
     private EMABreaker breaker;
     private Battery battery;
     // the real subsystems
-    private Drivetrain drivetrain;
-    private Shooter shooter;
-    private Turret turret;
-    private Hood hood;
-    private Intake intake;
-    private Spindexer spindexer;
+    // TODO: implement current limit logic for these subsystems
+    // private Drivetrain drivetrain;
+    // private Shooter shooter;
+    // private Turret turret;
+    // private Hood hood;
+    // private Intake intake;
+    // private Spindexer spindexer;
 
     public SeverityLevel severityLevel;
 
@@ -35,22 +31,24 @@ public class PowerControl extends Command {
 
     public PowerControl(
         EMABreaker breaker, // pc
-        Battery battery, // pc
-        Drivetrain drivetrain, // main draw
-        Shooter shooter, // aiming (vital)
-        Turret turret, // aiming
-        Hood hood, // aiming
-        Intake intake, // bps
-        Spindexer spindexer // bps
+        Battery battery // pc
+        // TODO: add subsystems back when implementing logic:
+        // Drivetrain drivetrain, // main draw
+        // Shooter shooter, // aiming (vital)
+        // Turret turret, // aiming
+        // Hood hood, // aiming
+        // Intake intake, // bps
+        // Spindexer spindexer // bps
     ) {
         this.breaker = breaker;
         this.battery = battery;
-        this.drivetrain = drivetrain;
-        this.shooter = shooter;
-        this.turret = turret;
-        this.hood = hood;
-        this.intake = intake;
-        this.spindexer = spindexer;
+        // TODO: add these back when implementing logic:
+        // this.drivetrain = drivetrain;
+        // this.shooter = shooter;
+        // this.turret = turret;
+        // this.hood = hood;
+        // this.intake = intake;
+        // this.spindexer = spindexer;
 
         addRequirements(breaker, battery); // not sure if I'll need requirement access for setting new current limits
     }

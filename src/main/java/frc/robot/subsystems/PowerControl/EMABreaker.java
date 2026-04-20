@@ -34,13 +34,13 @@ public class EMABreaker extends SubsystemBase {
             Current w = new Current(); // create a filter for the threshold
             w.tau = tau;
             w.threshold = threshold;
-            w.alpha = 1 - Math.exp(-Constants.LOOP_TIME / tau); // 1 - e^(-0.02/1) = 0.0198, 1 - e^(-0.02/2) = 0.00995 
+            w.alpha = 1 - Math.exp(-Constants.LOOP_TIME / tau); // 1 - e^(-0.02/1) = 0.0198, 1 - e^(-0.02/2) = 0.00995
 
             filters.add(w);
         }
 
         // subsystems
-        for (int i=0; i<pDis.getNumChannels(); i++) {
+        for (int i = 0; i < pDis.getNumChannels(); i++) {
             double tau = 1.0;
             double threshold = i;
             Current w = new Current();
@@ -62,15 +62,17 @@ public class EMABreaker extends SubsystemBase {
             Logger.recordOutput("Breaker/IntervalAverage/" + f.tau, f.average);
         }
 
-        // this is getting currents coming out of all the ports from PDH (big thing under robot all the wires come out of)
+        // this is getting currents coming out of all the ports from PDH (big thing
+        // under robot all the wires come out of)
         subsystemCurrents = getAllCurrentFromPowerDistribution();
-        
+
         // this should average out all ports
         for (Current s : subsystems) {
             s.average += s.alpha * (subsystemCurrents[(int) s.threshold] - s.average);
         }
 
-        // this should use updated port averages and sum them to get drivetrain average draw for 1 tau (can add more later)
+        // this should use updated port averages and sum them to get drivetrain average
+        // draw for 1 tau (can add more later)
         Logger.recordOutput("Breaker/DrivetrainAverageDraw", getAverageCurrentDraw(BreakerConstants.DRIVETRAIN_PORTS));
         Logger.recordOutput("Breaker/SpindexerDraw", getAverageCurrentDraw(BreakerConstants.SPINDEXER_PORTS));
         Logger.recordOutput("Breaker/ShooterDraw", getAverageCurrentDraw(BreakerConstants.SHOOTER_PORTS));
@@ -92,7 +94,8 @@ public class EMABreaker extends SubsystemBase {
     }
 
     public double getCurrentFromPowerDistribution() {
-        return pDis.getTotalCurrent(); // not using .getCurrent() and then an arguement for the port you can get just one port
+        return pDis.getTotalCurrent(); // not using .getCurrent() and then an arguement for the port you can get just
+                                       // one port
     }
 
     public double[] getAllCurrentFromPowerDistribution() {
@@ -125,7 +128,7 @@ public class EMABreaker extends SubsystemBase {
                 worst = f;
             }
         }
-        double[] returnValue = {worst.average/worst.threshold, worst.tau};
+        double[] returnValue = { worst.average / worst.threshold, worst.tau };
         return returnValue;
     }
 }
