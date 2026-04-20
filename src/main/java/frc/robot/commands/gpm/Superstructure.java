@@ -55,22 +55,22 @@ public class Superstructure extends Command {
 
     private TurretState goalState;
 
-    private LoggedNetworkNumber phaseDelay = new LoggedNetworkNumber("OPERATOR: Phase Delay", 0.03); //Extrapolation delay due to latency
+    private LoggedNetworkNumber phaseDelay = new LoggedNetworkNumber("/Tuning/OPERATOR/Phase Delay", 0.03); //Extrapolation delay due to latency
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
 
-    private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("OPERATOR: Hood Offset", 0.0);
+    private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Hood Offset", 0.0);
 
-    private double turretOffset = 0.0;
+    private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Turret Offet",0.0);
 
     private double distanceFromTarget = 0.0;
-    private double shuttlingTOFMultiplier = 0.8;
+    private LoggedNetworkNumber shuttlingTOFMultiplier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shuttling TOF Multiplier",0.8);
 
     // private double TOFAdjustment = 0.85;
     // private double TOFAdjustment = 1.1;
-    private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("OPERATOR: TOF Adjustment", 1.1);
+    private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("/Tuning/OPERATOR/TOF Adjustment", 1.1);
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
         this.turret = turret;
@@ -129,7 +129,7 @@ public class Superstructure extends Command {
                 timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
             } else {
                 double distance = target.getDistance(lookaheadPose.getTranslation());
-                timeOfFlight = distance * shuttlingTOFMultiplier;
+                timeOfFlight = distance * shuttlingTOFMultiplier.get();
             }
 
             double offsetX = turretVelocityX * timeOfFlight;
@@ -174,7 +174,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset.get();
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
         if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
@@ -239,12 +239,12 @@ public class Superstructure extends Command {
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset += 2.5; //2.5 deg
+        turretOffset.set(turretOffset.get() + 2.5); //2.5 deg
     }
 
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset -= 2.5; //2.5 deg
+        turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
     }
 
     @Override
@@ -255,12 +255,6 @@ public class Superstructure extends Command {
 
         updateDrivePose();
         updateSetpoints(drivepose);
-
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-
-        shuttlingTOFMultiplier = SmartDashboard.getNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
-        SmartDashboard.putNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
 
         if (phaseManager.isIdle()) {
             underLadder();
