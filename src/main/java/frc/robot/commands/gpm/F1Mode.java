@@ -51,7 +51,7 @@ public class F1Mode extends Command {
             DriveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT * 1.00
         );
         hood.forceHoodDown(false);
-        shooter.setNewCurrentLimit(ShooterConstants.SHOOTER_CURRENT_LIMIT, ShooterConstants.SHOOTER_CURRENT_LIMIT);
+        shooter.setNewCurrentLimit(ShooterConstants.SHOOTER_STATOR_CURRENT_LIMIT, ShooterConstants.SHOOTER_CURRENT_LIMIT);
         turret.setNewCurrentLimit(TurretConstants.STATOR_CURRENT_LIMIT, TurretConstants.SUPPLY_CURRENT_LIMIT);
     }
 }
