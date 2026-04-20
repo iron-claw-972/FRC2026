@@ -58,6 +58,7 @@ import frc.robot.util.Vision.Vision;
  */
 public class RobotContainer {
   // The robot's subsystems are defined here...
+  public static boolean SUBSYSTEM_LOGGING_DISABLED = false;
   private Drivetrain drive = null;
   private Vision vision = null;
   private Turret turret = null;
@@ -89,6 +90,9 @@ public class RobotContainer {
    */
   public RobotContainer(RobotId robotId) {
     // display the current robot id on smartdashboard
+    SmartDashboard.putData("Turn on Subsystem Logging", new InstantCommand(() -> turnOnSubsystemLogging()));
+    SmartDashboard.putData("Turn off Subsystem Logging", new InstantCommand(() -> turnOffSubsystemLogging()));
+    
     if (!Constants.DISABLE_SMART_DASHBOARD) {
       SmartDashboard.putString("RobotID", robotId.toString());
 
@@ -204,6 +208,13 @@ public class RobotContainer {
         AutoConstants.CONFIG,
         getAllianceColorBooleanSupplier(),
         drive);
+  }
+
+  public void turnOnSubsystemLogging() {
+    SUBSYSTEM_LOGGING_DISABLED = false;
+  }
+  public void turnOffSubsystemLogging() {
+    SUBSYSTEM_LOGGING_DISABLED = true;
   }
 
   private boolean seizing;

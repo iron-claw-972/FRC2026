@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
@@ -56,7 +57,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     @Override
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Spindexer", inputs);
+        if (!RobotContainer.SUBSYSTEM_LOGGING_DISABLED) {
+            Logger.processInputs("Spindexer", inputs);
+        }
 
         if (state == SpindexerState.MAX) {
             setMotorVoltages(SpindexerConstants.spindexerForwardVoltage);

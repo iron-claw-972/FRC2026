@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
@@ -106,8 +107,9 @@ public class Hood extends SubsystemBase implements HoodIO {
     @Override
     public void periodic() {
 		updateInputs();
-		Logger.processInputs("Hood", inputs);
-
+		if (!RobotContainer.SUBSYSTEM_LOGGING_DISABLED) {
+			Logger.processInputs("Hood", inputs);
+		}
 		// goalAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("Hood Setpoint", goalAngle.getDegrees()));
 		// SmartDashboard.putNumber("Hood Setpoint", goalAngle.getDegrees());
 

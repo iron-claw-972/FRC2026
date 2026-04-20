@@ -29,6 +29,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -214,8 +215,9 @@ public class Module implements ModuleIO{
     
     public void periodic() {
         updateInputs();
-        Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
-
+        if (!RobotContainer.SUBSYSTEM_LOGGING_DISABLED) {
+            Logger.processInputs("Drive/Module" + Integer.toString(moduleConstants.ordinal()), inputs);
+        }
          // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
         odometryPositions = new SwerveModulePosition[sampleCount];

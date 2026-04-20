@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 import frc.robot.util.HubActive;
@@ -151,7 +152,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         inputs.shooterSupplyCurrentLeft = shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
         inputs.shooterSupplyCurrentRight = shooterMotorRight.getSupplyCurrent().getValueAsDouble();
 
-        Logger.processInputs("Shooter", inputs);
+        if (!RobotContainer.SUBSYSTEM_LOGGING_DISABLED) {
+            Logger.processInputs("Shooter", inputs);
+        }
     }
 
     public void bumpUpShooterModifier() {

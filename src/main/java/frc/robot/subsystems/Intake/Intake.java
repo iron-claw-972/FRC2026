@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
 
@@ -196,7 +197,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         }
 
         updateInputs();
-        Logger.processInputs("Intake", inputs);
+        if (!RobotContainer.SUBSYSTEM_LOGGING_DISABLED) {
+            Logger.processInputs("Intake", inputs);
+        }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Intake Calibrated", !calibrating);
