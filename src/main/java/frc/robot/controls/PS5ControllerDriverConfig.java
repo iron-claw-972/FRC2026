@@ -8,24 +8,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.F1Mode;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
-import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Driver controls for the PS5 controller
@@ -40,7 +38,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private double originalSpindexerCurrentLimit;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -63,7 +60,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 new Rotation2d(Robot.getAlliance() == Alliance.Blue ? 0 : Math.PI))));
 
         // Cancel commands
-        controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
+        controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
             getDrivetrain().setIsAlign(false);
             getDrivetrain().setDesiredPose(() -> null);
             CommandScheduler.getInstance().cancelAll();
@@ -101,15 +98,15 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 .alongWith(new InstantCommand(()-> intakeBoolean = true)));
 
             // Calibration: you can now calibrate easily using this button
-            if (hood != null && intake != null) {
-                controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-                    intake.calibrate();
-                    hood.calibrate();
-                }, intake, hood)).onFalse(new InstantCommand(() -> {
-                    intake.stopCalibrating();
-                    hood.stopCalibrating();
-                }, intake, hood));
-            }
+            // if (hood != null && intake != null) {
+            //     controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            //         intake.calibrate();
+            //         hood.calibrate();
+            //     }, intake, hood)).onFalse(new InstantCommand(() -> {
+            //         intake.stopCalibrating();
+            //         hood.stopCalibrating();
+            //     }, intake, hood));
+            // }
 
             // Stop intake roller
             controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
@@ -147,6 +144,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }, hood)).onFalse(new InstantCommand(()->{
                 hood.forceHoodDown(false);
             }));
+        }
+
+        if (turret != null && hood != null && shooter != null && spindexer != null && drive != null) {
+            // should be hold
+            controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> {
+                new F1Mode(turret, shooter, hood, intake, drive);
+            }, turret, shooter, hood, intake, drive));
         }
     }
 
