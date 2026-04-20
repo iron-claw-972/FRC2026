@@ -14,7 +14,6 @@ import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.constants.swerve.DriveConstants;
-import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
@@ -26,6 +25,7 @@ import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Driver controls for the PS5 controller
@@ -40,7 +40,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private LinearClimb climb;
+    private double originalSpindexerCurrentLimit;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -48,15 +48,13 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Turret turret,
             Hood hood,
             Intake intake,
-            Spindexer spindexer,
-            LinearClimb climb) {
+            Spindexer spindexer) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
-        this.climb = climb;
     }
 
     public void configureControls() {
