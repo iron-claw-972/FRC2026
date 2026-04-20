@@ -86,7 +86,7 @@ public class EMABreaker extends SubsystemBase {
     public double getAverageCurrentDraw(int[] ports) {
         double sum = 0;
         for (int number : ports) {
-            sum += subsystems.get(number - 1).average; // the list starts at zero, so ports will be shifted
+            sum += subsystems.get(number).average;
         }
         return sum;
     }
