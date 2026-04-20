@@ -13,19 +13,16 @@ import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
-import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
 import lib.controllers.PS5Controller.PS5Axis;
 import lib.controllers.PS5Controller.PS5Button;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Driver controls for the PS5 controller
@@ -40,7 +37,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
-    private double originalSpindexerCurrentLimit;
 
     public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -147,26 +143,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }, hood)).onFalse(new InstantCommand(()->{
                 hood.forceHoodDown(false);
             }));
-        }
-
-        // shoot focus mode: reduces drive current
-        if (spindexer != null) {
-            controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> shootFocus(true)))
-            .onFalse(new InstantCommand(()->  shootFocus(false)));
-        }
-    }
-
-    private void shootFocus(boolean turnOn) {
-        if (turnOn) {
-            System.out.println("Shooting is now Focused");
-            spindexer.setNewCurrentLimit(SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT, SpindexerConstants.SUPPLY_CURRENT_LIMIT);
-            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-                    DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.25);
-        } else {
-            System.out.println("Shooting back to normal (From focus)");
-                        spindexer.setNewCurrentLimit(SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT, SpindexerConstants.SUPPLY_CURRENT_LIMIT);
-            drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, 
-                    DriveConstants.DRIVE_PEAK_CURRENT_LIMIT);
         }
     }
 

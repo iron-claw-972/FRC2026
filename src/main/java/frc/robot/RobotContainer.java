@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -36,6 +35,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
+import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -73,6 +73,8 @@ public class RobotContainer {
   private BaseDriverConfig driver = null;
   private Operator operator = null;
 
+  private EMABreaker breaker = null;
+
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -105,6 +107,7 @@ public class RobotContainer {
         spindexer = new Spindexer();
         intake = new Intake();
         led = new LED();
+        breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -147,10 +150,6 @@ public class RobotContainer {
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
-        }
-
-        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
-          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
         }
         
         if (drive != null && driver != null) {
