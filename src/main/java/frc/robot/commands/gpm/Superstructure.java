@@ -86,6 +86,8 @@ public class Superstructure extends Command {
 				8.0); // Random initial goalState to prevent it being null
         
         addRequirements(turret, shooter);
+
+        // SmartDashboard.putNumber("targetVelocity", 0.0);
     }
 
     public void updateSetpoints(Pose2d drivepose) {
@@ -247,6 +249,8 @@ public class Superstructure extends Command {
         turretOffset -= 2.5; //2.5 deg
     }
 
+    // LoggedNetworkNumber velocity = new LoggedNetworkNumber("targetVelocity", 0.0);
+
     @Override
     public void execute() {
         // Phase manager stuff
@@ -257,7 +261,7 @@ public class Superstructure extends Command {
         updateSetpoints(drivepose);
 
         turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+        // SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
 
         shuttlingTOFMultiplier = SmartDashboard.getNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
         SmartDashboard.putNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
@@ -288,6 +292,7 @@ public class Superstructure extends Command {
             // different maps for shuttling vs shooting. Less powerful when shuttling.
             if (shuttling) {
                 shooter.setShooter(-ShuttleInterpolation.shooterVelocityMap.get(distanceFromTarget));
+                // shooter.setShooter(-SmartDashboard.getNumber("targetVelocity", 0.0));
             } else {
                 shooter.setShooter(-ShotInterpolation.shooterVelocityMap.get(distanceFromTarget));
             }

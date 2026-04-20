@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
-import frc.robot.commands.gpm.BrownOutControl;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -36,6 +37,7 @@ import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.LED.LED;
+import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
@@ -64,7 +66,6 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
-  private LED led = null;
 
   // this is inside addAuto()
   // private Command auto = new DoNothing();
@@ -72,6 +73,13 @@ public class RobotContainer {
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
+  private LED led = null;
+
+  private EMABreaker breaker = null;
+
+  // TODO: move to correct robot and put the correct port?
+  private PS5Controller ps5 = new PS5Controller(0);
+
 
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -105,6 +113,7 @@ public class RobotContainer {
         spindexer = new Spindexer();
         intake = new Intake();
         led = new LED();
+        breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
         turret = new Turret();
@@ -147,10 +156,6 @@ public class RobotContainer {
 
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
-        }
-
-        if (shooter != null && spindexer != null && turret != null && intake != null && hood != null && drive != null) {
-          CommandScheduler.getInstance().schedule(new BrownOutControl(shooter, spindexer, turret, intake, hood, drive));
         }
         
         if (drive != null && driver != null) {
@@ -256,6 +261,17 @@ public class RobotContainer {
     }
   }
 
+  public void addAuto(String name, Command auto) {
+    try {
+      autoChooser.addOption(name, auto);
+    }
+    // is this the right one??
+    catch (AutoBuilderException e) {
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
@@ -273,6 +289,9 @@ public class RobotContainer {
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
 
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+
     autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
     addAuto(rightSideAuto);
@@ -284,6 +303,16 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
+
+
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake, breaker);
+
+    String leftDynamicDoubleLiberalSwipe = "LeftDynamicDoubleLiberalSwipe";
+    String rightDynamicDoubleLiberalSwipe = "RightDynamicDoubleLiberalSwipe";
+    addAuto(leftDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
+    addAuto(rightDynamicDoubleLiberalSwipe, dynamicAutoBuilder.getRightDynamicDoubleLiberalSwipe());
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

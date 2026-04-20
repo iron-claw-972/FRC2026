@@ -114,17 +114,27 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
         limitConfig.StatorCurrentLimit = stator;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLowerLimit = supply;
+        limitConfig.SupplyCurrentLimit = supply;
         limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
     }
 
+    public double getSubsystemStatorCurrent() {
+        return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
+    }
+
+    public double getSubsystemSupplyCurrent() {
+        return inputs.spindexerOneSupplyCurrent + inputs.spindexerTwoSupplyCurrent;
+    }
+
     @Override
     public void updateInputs() {
         inputs.spindexerOneVelocity = motorOne.getVelocity().getValueAsDouble();
-        inputs.spindexerOneCurrent = motorOne.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerOneStatorCurrent = motorOne.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerOneSupplyCurrent = motorOne.getSupplyCurrent().getValueAsDouble();
         inputs.spindexerTwoVelocity = motorTwo.getVelocity().getValueAsDouble();
-        inputs.spindexerTwoCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerTwoStatorCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
+        inputs.spindexerTwoSupplyCurrent = motorTwo.getSupplyCurrent().getValueAsDouble();
     }
 }

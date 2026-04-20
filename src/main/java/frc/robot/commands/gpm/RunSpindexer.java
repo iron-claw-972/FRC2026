@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
-import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeConstants;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
@@ -62,7 +62,7 @@ public class RunSpindexer extends Command {
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
         }
-        boolean jammed = spindexer.getStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        boolean jammed = spindexer.getSubsystemStatorCurrent() / 2 > SpindexerConstants.JAM_CURRENT_THRESHOLD;
         if (jam_debouncer.calculate(jammed)) {
             reversing = true;
             reverseTimer.reset();
