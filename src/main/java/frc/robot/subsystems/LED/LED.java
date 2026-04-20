@@ -63,17 +63,18 @@ public class LED extends SubsystemBase {
 		lightsOff();
 
 		// System.out.println("CANdle features: " + featureConf + ", LED config: " + ledConf);
-
-		SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
-		SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));
-		SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
-		SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
-		SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
-		SmartDashboard.putData("LED Rainbow", new InstantCommand(() -> setRainbow()).ignoringDisable(true));
-		SmartDashboard.putData("LED Fade", new InstantCommand(() -> setRgbFadeAnimation()).ignoringDisable(true));
-		SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
-		SmartDashboard.putData("LED Color Flow", new InstantCommand(() -> setColorFlow()).ignoringDisable(true));
-		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
+		if (!Constants.DISABLE_SMART_DASHBOARD) {
+			SmartDashboard.putData("LED Disable", new InstantCommand(() -> {forceOff = true; lightsOff();}).ignoringDisable(true));
+			SmartDashboard.putData("LED Enable", new InstantCommand(() -> forceOff = false).ignoringDisable(true));
+			SmartDashboard.putData("LED Strobe", new InstantCommand(() -> setStrobe()).ignoringDisable(true));
+			SmartDashboard.putData("LED Static", new InstantCommand(() -> setStatic()).ignoringDisable(true));
+			SmartDashboard.putData("LED Fire", new InstantCommand(() -> setFire()).ignoringDisable(true));
+			SmartDashboard.putData("LED Rainbow", new InstantCommand(() -> setRainbow()).ignoringDisable(true));
+			SmartDashboard.putData("LED Fade", new InstantCommand(() -> setRgbFadeAnimation()).ignoringDisable(true));
+			SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
+			SmartDashboard.putData("LED Color Flow", new InstantCommand(() -> setColorFlow()).ignoringDisable(true));
+			SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
+		}
 	}
 
 	public void setColor() {
