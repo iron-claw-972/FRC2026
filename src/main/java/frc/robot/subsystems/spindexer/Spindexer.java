@@ -82,9 +82,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
-
-        Logger.recordOutput("HasBalls", spinningAir());
-
     }
 
     public void setMotorVoltages(double voltage) {
@@ -109,43 +106,25 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         state = SpindexerState.CUSTOM;
     }
 
-    public void setNewCurrentLimit(double stator, double supply) {
+    public double getStatorCurrent() {
+        return inputs.spindexerOneCurrent + inputs.spindexerTwoCurrent;
+    }
+
+    public void setNewCurrentLimit(double supply, double stator) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
         limitConfig.StatorCurrentLimit = stator;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLimit = supply;
+        limitConfig.SupplyCurrentLowerLimit = supply;
         limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
     }
 
-    public double getSubsystemStatorCurrent() {
-        return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
-    }
-
-    public double getMotorOneStatorCurrent() {
-        return inputs.spindexerOneStatorCurrent;
-    }
-
-    public double getMotorTwoStatorCurrent() {
-        return inputs.spindexerTwoStatorCurrent;
-    }
-
-    public double getSubsystemSupplyCurrent() {
-        return inputs.spindexerOneSupplyCurrent + inputs.spindexerTwoSupplyCurrent;
-    }
-
-    public boolean spinningAir() {
-        return getMotorOneStatorCurrent() < 16.0 && getMotorTwoStatorCurrent() < 28.0;
-    }
-
     @Override
     public void updateInputs() {
         inputs.spindexerOneVelocity = motorOne.getVelocity().getValueAsDouble();
-        inputs.spindexerOneStatorCurrent = motorOne.getStatorCurrent().getValueAsDouble();
-        inputs.spindexerOneSupplyCurrent = motorOne.getSupplyCurrent().getValueAsDouble();
+        inputs.spindexerOneCurrent = motorOne.getStatorCurrent().getValueAsDouble();
         inputs.spindexerTwoVelocity = motorTwo.getVelocity().getValueAsDouble();
-        inputs.spindexerTwoStatorCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
-        inputs.spindexerTwoSupplyCurrent = motorTwo.getSupplyCurrent().getValueAsDouble();
+        inputs.spindexerTwoCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
     }
 }

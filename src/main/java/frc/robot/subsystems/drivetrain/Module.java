@@ -191,25 +191,21 @@ public class Module implements ModuleIO{
       // Update encoder inputs
       inputs.encoderOffset = Units.rotationsToDegrees(CANcoder.getAbsolutePosition().getValueAsDouble());
 
-        // Update odometry inputs
-        inputs.odometryTimestamps =
-            timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-        inputs.odometryDrivePositionsRad =
-            drivePositionQueue.stream()
-                .mapToDouble((Double value) -> Units.rotationsToRadians(value))
-                .toArray();
-        inputs.odometryTurnPositions =
-            turnPositionQueue.stream()
-                .map((Double value) -> Rotation2d.fromRotations(value))
-                .toArray(Rotation2d[]::new);
-        timestampQueue.clear();
-        drivePositionQueue.clear();
-        turnPositionQueue.clear();
+    // Update odometry inputs
+    inputs.odometryTimestamps =
+        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    inputs.odometryDrivePositionsRad =
+        drivePositionQueue.stream()
+            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
+            .toArray();
+    inputs.odometryTurnPositions =
+        turnPositionQueue.stream()
+            .map((Double value) -> Rotation2d.fromRotations(value))
+            .toArray(Rotation2d[]::new);
+    timestampQueue.clear();
+    drivePositionQueue.clear();
+    turnPositionQueue.clear();
 
-        inputs.driveStator = driveMotor.getStatorCurrent().getValueAsDouble();
-        inputs.driveSupply = driveMotor.getSupplyCurrent().getValueAsDouble();
-        inputs.steerStator = angleMotor.getStatorCurrent().getValueAsDouble();
-        inputs.steerSupply = angleMotor.getSupplyCurrent().getValueAsDouble();
     }
     
     public void periodic() {
@@ -356,32 +352,24 @@ public class Module implements ModuleIO{
         return inputs.driveCurrentAmps;
     }
 
-    public double getModuleStatorCurrent() {
-        return inputs.steerStator + inputs.driveStator;
-    }
-
-    public double getModuleSupplyCurrent() {
-        return inputs.steerSupply + inputs.driveSupply;
-    }
-
     // I took the config things straight from this file
-    public void setNewCurrentLimit(double currentSteerStator, double currentSteerSupply, double currentDriveStator, double currentDriveSupply) {
+    public void setNewCurrentLimit(double currentSteer, double currentDrive) {
         CurrentLimitsConfigs steerConfig = new CurrentLimitsConfigs();
         // steer
-        steerConfig.SupplyCurrentLimitEnable = true;
-        steerConfig.StatorCurrentLimitEnable = true;
-        steerConfig.StatorCurrentLimit = currentSteerSupply;
-        steerConfig.SupplyCurrentLimit = currentSteerSupply;
+        steerConfig.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
+        steerConfig.SupplyCurrentLimit = currentSteer;
+        steerConfig.SupplyCurrentLowerLimit = currentSteer;
         steerConfig.SupplyCurrentLowerTime = DriveConstants.STEER_PEAK_CURRENT_DURATION;
         angleMotor.getConfigurator().apply(steerConfig); // apply
 
         // drive
         CurrentLimitsConfigs driveConfig = new CurrentLimitsConfigs();
-        driveConfig.SupplyCurrentLimitEnable = true;
-        driveConfig.StatorCurrentLimitEnable = true;
-        driveConfig.SupplyCurrentLimit = currentDriveSupply;
-        driveConfig.StatorCurrentLimit = currentDriveStator;
+        driveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        driveConfig.SupplyCurrentLimit = currentDrive;
+        driveConfig.SupplyCurrentLowerLimit = currentDrive;
         driveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+        driveConfig.StatorCurrentLimit = currentDrive;
+        driveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
         driveMotor.getConfigurator().apply(driveConfig); // apply
     }
 

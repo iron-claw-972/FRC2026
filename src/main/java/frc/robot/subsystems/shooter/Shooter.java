@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -62,7 +63,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         );
 
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_STATOR_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
@@ -93,11 +94,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         shooterMotorRight.setControl(voltageRequest.withVelocity(targetVelocityRPS).withEnableFOC(true));   
         
         if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Shooter/realVelocity", Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER * shooterMotorLeft.getVelocity().getValueAsDouble());
+            Logger.recordOutput("Shooter/realVelocity", shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER);
             Logger.recordOutput("Shooter/targetVelocity", shooterTargetSpeed);
         }
 
-        double actualWheelVelocity = Math.PI * ShooterConstants.SHOOTER_LAUNCH_DIAMETER * shooterMotorLeft.getVelocity().getValueAsDouble();
+        double actualWheelVelocity = shooterMotorLeft.getVelocity().getValueAsDouble() * ShooterConstants.SHOOTER_LAUNCH_DIAMETER;
         
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Shooter Speed Error (mps)", shooterTargetSpeed - actualWheelVelocity);
@@ -124,32 +125,21 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         return inputs.shooterSpeedLeft;
     }
 
-    public void setNewCurrentLimit(double stator, double supply) {
+    public void setNewCurrentLimit(double newCurrentLimit) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = stator;
+        limitConfig.StatorCurrentLimit = newCurrentLimit;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLimit = supply;
-        limitConfig.SupplyCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
-    }
-
-    public double getSubsystemStatorCurrent() {
-        return inputs.shooterStatorCurrentLeft + inputs.shooterStatorCurrentRight;
-    }
-
-    public double getSubsystemSupplyCurrent() {
-        return inputs.shooterSupplyCurrentLeft + inputs.shooterSupplyCurrentRight;
     }
 
     @Override
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
-        inputs.shooterStatorCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-        inputs.shooterStatorCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
-        inputs.shooterSupplyCurrentLeft = shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
-        inputs.shooterSupplyCurrentRight = shooterMotorRight.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+
 
         Logger.processInputs("Shooter", inputs);
     }

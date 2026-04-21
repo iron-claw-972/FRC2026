@@ -37,8 +37,8 @@ public class Robot extends LoggedRobot {
 
     public Robot(){
         CanBridge.runTCP();
-        PortForwarder.add(5800, Constants.VISION_CAMERA_HOST, 5800);
-        PortForwarder.add(1182, Constants.VISION_CAMERA_HOST, 1182);
+        PortForwarder.add(5800,"10.9.72.12",5800);
+        PortForwarder.add(1182,"10.9.72.12",1182);
 
         // Set up data receivers & replay source
         switch (Constants.CURRENT_MODE) {

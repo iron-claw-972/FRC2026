@@ -37,12 +37,6 @@ public interface ModuleIO {
     public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
 
     public double encoderOffset = 0.0;
-
-    // drivetrain is scary. I'm adding my own seperate logging
-    public double driveStator = 0.0;
-    public double driveSupply = 0.0;
-    public double steerStator = 0.0;
-    public double steerSupply = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
