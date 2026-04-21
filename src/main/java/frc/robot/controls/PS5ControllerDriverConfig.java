@@ -11,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
+import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Intake.Intake;
@@ -124,7 +125,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-                new RunSpindexer(spindexer, turret, hood, intake)
+                new RunSpindexerWithStop(spindexer, turret, hood, intake)
             );
         }
 

@@ -138,8 +138,6 @@ public class DynamicAutoBuilder {
     }
 
     private Command startShootingCommand() {
-        return new InstantCommand(() -> {
-            new InstantCommand(() -> hood.forceHoodDown(false));
-        });
+        return new InstantCommand(() -> hood.forceHoodDown(false));
     }
 }

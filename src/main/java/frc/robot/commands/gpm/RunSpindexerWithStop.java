@@ -38,6 +38,8 @@ public class RunSpindexerWithStop extends Command {
 
     private Timer runTimer = new Timer();
     private boolean seizing;
+
+    private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
     
     public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
@@ -123,6 +125,6 @@ public class RunSpindexerWithStop extends Command {
 
     @Override
     public boolean isFinished() {
-        return spindexer.spinningAir() && runTimer.hasElapsed(1.0);
+        return runTimer.hasElapsed(1.0) && debouncer.calculate(spindexer.spinningAir());
     }
 }
