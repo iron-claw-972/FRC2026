@@ -82,6 +82,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
+
+        Logger.recordOutput("HasBalls", spinningAir());
+
     }
 
     public void setMotorVoltages(double voltage) {
@@ -120,8 +123,20 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
     }
 
+    public double getMotorOneStatorCurrent() {
+        return inputs.spindexerOneStatorCurrent;
+    }
+
+    public double getMotorTwoStatorCurrent() {
+        return inputs.spindexerTwoStatorCurrent;
+    }
+
     public double getSubsystemSupplyCurrent() {
         return inputs.spindexerOneSupplyCurrent + inputs.spindexerTwoSupplyCurrent;
+    }
+
+    public boolean spinningAir() {
+        return getMotorOneStatorCurrent() < 16.0 && getMotorTwoStatorCurrent() < 28.0;
     }
 
     @Override

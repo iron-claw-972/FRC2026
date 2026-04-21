@@ -86,8 +86,11 @@ public class DynamicAutoBuilder {
         var timer = new Timer();
         timer.start();
 
-        return new RunSpindexer(spindexer, turret, hood, intake).raceWith(
-                new WaitUntilCommand(() -> breaker.getAverageCurrentDraw(BreakerConstants.SPINDEXER_PORTS) < 5.0 && timer.hasElapsed(3.0)));
+        // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(
+        //         new WaitUntilCommand(() -> spindexer.spinningAir() && timer.hasElapsed(3.0)));
+        // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(new WaitCommand(3.0));
+        return new RunSpindexer(spindexer, turret, hood, intake).until(() -> spindexer.spinningAir() && timer.hasElapsed(3.0));
+
 
         // return new ParallelDeadlineGroup(new WaitUntilCommand(() ->
         // spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));

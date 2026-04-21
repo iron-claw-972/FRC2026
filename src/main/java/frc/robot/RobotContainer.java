@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
@@ -255,6 +256,15 @@ public class RobotContainer {
     }
   }
 
+  public void addAuto(String name, Command auto) {
+    try {
+      autoChooser.addOption(name, auto);
+    } catch (AutoBuilderException e){
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
@@ -283,6 +293,11 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake, breaker);
+    
+    String leftDynamicDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
+    addAuto(leftDynamicDoubleSwipe, dynamicAutoBuilder.getLeftDynamicDoubleLiberalSwipe());
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
