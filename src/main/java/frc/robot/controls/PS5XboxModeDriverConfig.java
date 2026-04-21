@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.commands.gpm.AutoShootCommand;
+import frc.robot.commands.gpm.ClimbDriveCommand;
 import frc.robot.commands.gpm.ReverseMotors;
-import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
+import frc.robot.subsystems.Climb.LinearClimb;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.Intake.Intake;
@@ -48,16 +50,17 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private Hood hood;
     private Intake intake;
     private Spindexer spindexer;
+    private LinearClimb climb;
 
     // PS5 button aliases
-    // private final Button CROSS = Button.A;
+    private final Button CROSS = Button.A;
     private final Button CIRCLE = Button.B;
     private final Button SQUARE = Button.X;
-    // private final Button TRIANGLE = Button.Y;
-    // private final Button LB = Button.LB;
+    private final Button TRIANGLE = Button.Y;
+    private final Button LB = Button.LB;
     private final Button RB = Button.RB;
     private final Button CREATE = Button.BACK;
-    // private final Button OPTIONS = Button.START;
+    private final Button OPTIONS = Button.START;
     private final Button LEFT_JOY = Button.LEFT_JOY;
     private final Button RIGHT_JOY = Button.RIGHT_JOY;
 
@@ -70,8 +73,8 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
     private final Axis LEFT_Y = Axis.LEFT_Y;
     private final Axis RIGHT_X = Axis.RIGHT_X;
     private final Axis RIGHT_Y = Axis.RIGHT_Y;
-    // private final Axis LEFT_TRIGGER = Axis.LEFT_TRIGGER;
-    // private final Axis RIGHT_TRIGGER = Axis.RIGHT_TRIGGER;
+    private final Axis LEFT_TRIGGER = Axis.LEFT_TRIGGER;
+    private final Axis RIGHT_TRIGGER = Axis.RIGHT_TRIGGER;
 
     public PS5XboxModeDriverConfig(
             Drivetrain drive,
@@ -79,13 +82,15 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
             Turret turret,
             Hood hood,
             Intake intake,
-            Spindexer spindexer) {
+            Spindexer spindexer,
+            LinearClimb climb) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
         this.spindexer = spindexer;
+        this.climb = climb;
     }
 
     public void configureControls() {
@@ -166,9 +171,38 @@ public class PS5XboxModeDriverConfig extends BaseDriverConfig {
         }
 
         // Auto shoot
-        if (turret != null && hood != null && shooter != null && spindexer != null) {
-            autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
-            controller.get(SQUARE).toggleOnTrue(autoShoot);
+        if (turret != null && hood != null && shooter != null) {
+            controller.get(SQUARE).onTrue(
+                    new InstantCommand(() -> {
+                        if (autoShoot != null && autoShoot.isScheduled()) {
+                            autoShoot.cancel();
+                        } else {
+                            autoShoot = new AutoShootCommand(turret, getDrivetrain(), hood, shooter, spindexer);
+                            CommandScheduler.getInstance().schedule(autoShoot);
+                        }
+                    }));
+        }
+
+        // Climb
+        if (climb != null) {
+            // Calibration
+            controller.get(OPTIONS).onTrue(new InstantCommand(() -> {
+                climb.hardstopCalibration();
+            })).onFalse(new InstantCommand(() -> {
+                climb.stopCalibrating();
+            }));
+
+            // Climb retract
+            controller.get(CROSS).onTrue(new InstantCommand(() -> {
+                climb.retract();
+            }));
+
+            // Drive to climb position and rumble
+            controller.get(TRIANGLE).onTrue(new SequentialCommandGroup(
+                    new ClimbDriveCommand(climb, getDrivetrain()),
+                    new InstantCommand(() -> this.startRumble()),
+                    new WaitCommand(1),
+                    new InstantCommand(() -> this.endRumble())));
         }
 
         // Hood

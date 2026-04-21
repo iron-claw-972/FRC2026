@@ -83,7 +83,4 @@ public class Constants {
 
     // Enables 3D logs of mechanisms
     public static final boolean LOG_MECHANISMS = true;
-
-    // Network setting for vision
-    public static final String VISION_CAMERA_HOST = "10.9.72.12";
 }

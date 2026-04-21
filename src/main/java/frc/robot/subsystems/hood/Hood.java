@@ -57,7 +57,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 		mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
         motor.getConfigurator().apply(config);
 
-		setNewCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT, HoodConstants.SUPPLY_CURRENT_LIMIT);
+		setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
 
 		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 
@@ -169,38 +169,34 @@ public class Hood extends SubsystemBase implements HoodIO {
 
 	public void calibrate(){
 		calibrating = true;
-		setNewCurrentLimit(HoodConstants.CALIBRATING_CURRENT_LIMIT, HoodConstants.CALIBRATING_CURRENT_LIMIT);
+		setCurrentLimits(HoodConstants.CALIBRATING_CURRENT_LIMIT);
 	}
 
 	public void stopCalibrating(){
 		motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
 		goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
-		setNewCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT, HoodConstants.SUPPLY_CURRENT_LIMIT);
+		setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
 		calibrating = false;
 	}
 
-	public void setNewCurrentLimit(double stator, double supply) {
-        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = stator;
-        limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLimit = supply;
-        limitConfig.SupplyCurrentLimitEnable = true;
-        motor.getConfigurator().apply(limitConfig);
-    }
+	/**
+     * sets supply and stator current limits
+     * @param limitAmps the current limit for stator and supply current
+     */
+    public void setCurrentLimits(double limitAmps) {
+        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
+        .withStatorCurrentLimitEnable(true)
+        .withStatorCurrentLimit(limitAmps)
+        .withSupplyCurrentLimitEnable(true)
+        .withSupplyCurrentLimit(limitAmps);
 
-    public double getSubsystemStatorCurrent() {
-        return inputs.motorStatorCurrent;
-    }
-
-    public double getSubsystemSupplyCurrent() {
-        return inputs.motorSupplyCurrent;
+        motor.getConfigurator().apply(limits);
     }
 
     @Override
 	public void updateInputs() {
 		inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
 		inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble()) / HoodConstants.HOOD_GEAR_RATIO;
-		inputs.motorStatorCurrent = motor.getStatorCurrent().getValueAsDouble();
-		inputs.motorSupplyCurrent = motor.getStatorCurrent().getValueAsDouble();
+		inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
 	}
 }

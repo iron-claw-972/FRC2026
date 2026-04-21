@@ -429,28 +429,10 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // for current limit setting (brownout protection)
-    public void applyNewModuleCurrents(
-        double steerCurrentStator, double steerCurrentSupply, 
-        double driveCurrentStator, double driveCurrentSupply) {
+    public void applyNewModuleCurrents(double steerCurrent, double driveCurrent) {
         for (Module module : modules) { // iterate over our modules
-            module.setNewCurrentLimit(steerCurrentStator, steerCurrentSupply, driveCurrentStator, driveCurrentSupply);
+            module.setNewCurrentLimit(steerCurrent, driveCurrent);
         }
-    }
-    
-    public double getSubsystemStatorCurrent() {
-        double sum = 0;
-        for (Module module : modules) {
-            sum += module.getModuleStatorCurrent();
-        }
-        return sum;
-    }
-
-    public double getSubsystemSupplyCurrent() {
-        double sum = 0;
-        for (Module module : modules) {
-            sum += module.getModuleSupplyCurrent();
-        }
-        return sum;
     }
 
     /**
