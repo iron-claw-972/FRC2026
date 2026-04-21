@@ -73,7 +73,7 @@
       },
       "nextControl": {
         "x": 6.092792303186677,
-        "y": 0.9060800465577783
+        "y": 0.9060800465577782
       },
       "isLocked": false,
       "linkedName": null
@@ -108,30 +108,7 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Stop Hood Down",
-      "waypointRelativePos": 5.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Stop Hood Down"
-        }
-      }
-    },
-    {
-      "name": "Start Spindexer",
-      "waypointRelativePos": 5.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Spindexer"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3,
     "maxAcceleration": 2.5,

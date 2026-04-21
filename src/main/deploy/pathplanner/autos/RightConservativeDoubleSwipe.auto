@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "W5 Left Trench Start"
+            "pathName": "W5 Right Trench Start"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftConservativeSwipe1"
+            "pathName": "RightConservativeSwipe1"
           }
         },
         {
@@ -97,7 +97,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left Swipe2"
+            "pathName": "Right Swipe2"
           }
         },
         {
