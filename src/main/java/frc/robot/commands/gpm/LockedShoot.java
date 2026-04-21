@@ -1,6 +1,5 @@
 package frc.robot.commands.gpm;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
@@ -31,17 +29,11 @@ public class LockedShoot extends Command {
     private Hood hood;
     private Shooter shooter;
 
-    private double turretSetpoint;
-    private double hoodSetpoint;
-
     private Pose2d drivepose;
 
-    private final LinearFilter turretAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     private final LinearFilter hoodAngleFilter = LinearFilter.movingAverage((int) (0.1 / Constants.LOOP_TIME));
     
-    private Rotation2d lastTurretAngle;
     private Rotation2d targetAngle;
-    private double turretVelocity;
 
     private double lastHoodAngle;
     private double hoodAngle;
@@ -54,10 +46,6 @@ public class LockedShoot extends Command {
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
-
-    private double hoodOffset = 0.0;
-
-    private double turretOffset = 0.0;
 
     private double distanceFromTarget = 0.0;
 
@@ -138,7 +126,6 @@ public class LockedShoot extends Command {
 
         // Pitch is in radians
         hoodAngle = goalState.pitch();
-        hoodSetpoint = MathUtil.clamp(Units.radiansToDegrees(hoodAngle), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = hoodAngle;
 
@@ -156,7 +143,7 @@ public class LockedShoot extends Command {
         ChassisSpeeds robotRelVel = drive.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(       //TODO this is a problem, drivepose.exp returns a Pose2d, should be drivepose = drivepose.exp(...)
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay,
                 robotRelVel.vyMetersPerSecond * phaseDelay,
@@ -170,25 +157,6 @@ public class LockedShoot extends Command {
         hood.setFieldRelativeTarget(Rotation2d.fromDegrees(HoodConstants.MAX_ANGLE), 0.0);
         shooter.setShooter(0.0);
         //spindexer.stopSpindexer();
-    }
-
-    // shoot higher
-    public void bumpUpHoodOffset() {
-        hoodOffset += 1.0; // 1 degree
-    }
-
-    // shoot lower
-    public void bumpDownHoodOffset() {
-        hoodOffset -= 1.0; // 1 degree
-    }
-
-    // aim more left
-    public void bumpUpTurretOffset() {
-        turretOffset += 2.5; // 2.5 degree
-    }
-    // aim more right
-    public void bumpDownTurretOffset() {
-        turretOffset -= 2.5; // 2.5 degree
     }
 
     @Override
@@ -215,9 +183,6 @@ public class LockedShoot extends Command {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
-
             // if (FieldConstants.underTrench(x, y)) {
             //     System.out.println("Hood forced down");
             // } else {

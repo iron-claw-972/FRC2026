@@ -11,8 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -28,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase implements IntakeIO{
     // Mechanism Display...
@@ -66,7 +63,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     private double setpointInches = 0.0;
 
     private boolean calibrating = false;
-    private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
@@ -80,6 +76,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         maxVelocity = 0.75 * maxFreeSpeed;
         maxAcceleration = maxVelocity / 0.25;
 
+        // ----Rollers
         // Configure the motors
         // Build the configuration for the roller
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
@@ -98,23 +95,18 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // apply the configuration to the right motor (master)
         rollerMotor.getConfigurator().apply(rollerConfig);
 
+        // --- Extenders
+
         // Build the configuration for the left and right Motor
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        // config the current limits (low value for testing)
-        config.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
-        .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
-        .withSupplyCurrentLimitEnable(true);
-
         // config Slot 0 PID params
-        var rollerSlot0Configs = config.Slot0;
-        rollerSlot0Configs.kP = 0.5;
-        rollerSlot0Configs.kI = 0.0;
-        rollerSlot0Configs.kD = 0.0;
-        rollerSlot0Configs.kV = 0.0;
-        rollerSlot0Configs.kA = 0.0;
+        var extenderSlot0Configs = config.Slot0;
+        extenderSlot0Configs.kP = 0.5;
+        extenderSlot0Configs.kI = 0.0;
+        extenderSlot0Configs.kD = 0.0;
+        extenderSlot0Configs.kV = 0.0;
+        extenderSlot0Configs.kA = 0.0;
 
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
@@ -134,14 +126,11 @@ public class Intake extends SubsystemBase implements IntakeIO{
             new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
         );
 
-        CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
-        limitConfig.StatorCurrentLimitEnable = true;
-        leftMotor.getConfigurator().apply(limitConfig);
-        rightMotor.getConfigurator().apply(limitConfig);
 
         leftMotor.setPosition(0.0);
         rightMotor.setPosition(0.0);
+
+        setNewCurrentLimit(IntakeConstants.STATOR_CURRENT_EXTENDER_LIMIT, IntakeConstants.SUPPLY_CURRENT_EXTENDER_LIMIT, IntakeConstants.STATOR_ROLLER_CURRENT_LIMIT, IntakeConstants.SUPPLY_ROLLER_CURRENT_LIMIT);
 
         // Build the mechanism for display
         mechanism = new Mechanism2d(80, 80);
@@ -204,10 +193,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         if(calibrating){
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
-            boolean atHardStop = Math.abs((leftMotor.getStatorCurrent().getValueAsDouble() + rightMotor.getStatorCurrent().getValueAsDouble()) / 2) >= IntakeConstants.CALIBRATING_CURRENT_THRESHOLD;
-            // if(calibrationDebouncer.calculate(atHardStop)){
-            //     stopCalibrating();
-            // }
         }
 
         updateInputs();
@@ -276,7 +261,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      */
     public double rotationsToInches(double motorRotations) {
         // circumference of the rack pinion
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
         double inches = pinionRotations * circ;
         return inches; 
@@ -288,7 +273,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @return motor rotations
      */
     public double inchesToRotations(double inches){
-        double circ = 2 * Math.PI * 0.5;
+        double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
         double pinionRotations = inches / circ;
         double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
         return motorRotations;
@@ -366,7 +351,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * Starts calibrating by running it backwards
      */
     public void calibrate(){
-        setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
+        setNewCurrentLimit(IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS);
         calibrating = true;
     }
 
@@ -375,34 +360,48 @@ public class Intake extends SubsystemBase implements IntakeIO{
      */
     public void stopCalibrating(){
         zeroMotors();
-        setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
+        setNewCurrentLimit(IntakeConstants.STATOR_CURRENT_EXTENDER_LIMIT, IntakeConstants.SUPPLY_CURRENT_EXTENDER_LIMIT, IntakeConstants.STATOR_ROLLER_CURRENT_LIMIT, IntakeConstants.SUPPLY_ROLLER_CURRENT_LIMIT);
         calibrating = false;
         retract();
     }
 
-    /**
-     * sets supply and stator current limits
-     * @param limit the current limit for stator and supply current
-     */
-    public void setCurrentLimits(double limit) {
-        CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
-        .withStatorCurrentLimitEnable(true)
-        .withStatorCurrentLimit(limit)
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(limit);
+    public void setNewCurrentLimit(double statorExtenders, double supplyExtenders, double statorRoller, double supplyRollers) {
+        CurrentLimitsConfigs limitConfigExtender = new CurrentLimitsConfigs();
+        limitConfigExtender.StatorCurrentLimit = statorExtenders;
+        limitConfigExtender.StatorCurrentLimitEnable = true;
+        limitConfigExtender.SupplyCurrentLimit = statorExtenders;
+        limitConfigExtender.SupplyCurrentLimitEnable = true;
+        leftMotor.getConfigurator().apply(limitConfigExtender);
+        rightMotor.getConfigurator().apply(limitConfigExtender);
 
-        leftMotor.getConfigurator().apply(limits);
-        rightMotor.getConfigurator().apply(limits);
+        // roller
+        CurrentLimitsConfigs limitConfigRoller = new CurrentLimitsConfigs();
+        limitConfigRoller.StatorCurrentLimit = statorRoller;
+        limitConfigRoller.StatorCurrentLimitEnable = true;
+        limitConfigRoller.SupplyCurrentLimit = supplyRollers;
+        limitConfigRoller.SupplyCurrentLimitEnable = true;
+        rollerMotor.getConfigurator().apply(limitConfigRoller);
+    }
+
+    public double getSubsystemStatorCurrent() {
+        return inputs.leftStatorCurrent + inputs.rightStatorCurrent + inputs.rollerStatorCurrent;
+    }
+
+    public double getSubsystemSupplyCurrent() {
+        return inputs.leftSupplyCurrent + inputs.rightSupplyCurrent + inputs.rollerSupplyCurrent;
     }
 
     @Override
     public void updateInputs() {
         inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
         inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
-        inputs.leftCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
-        inputs.rightCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.leftStatorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rightStatorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
+        inputs.leftSupplyCurrent = leftMotor.getSupplyCurrent().getValueAsDouble();
+        inputs.rightSupplyCurrent = rightMotor.getSupplyCurrent().getValueAsDouble();
         inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
-        inputs.rollerCurrent = rollerMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rollerStatorCurrent = rollerMotor.getStatorCurrent().getValueAsDouble();
+        inputs.rollerSupplyCurrent = rollerMotor.getSupplyCurrent().getValueAsDouble();
     }
 
 }

@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +16,7 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 
-public class RunSpindexer extends Command {
+public class RunSpindexerWithStop extends Command {
     private Spindexer spindexer;
     private Turret turret;
     private Hood hood;
@@ -31,7 +32,7 @@ public class RunSpindexer extends Command {
     private double storedIntakeSpeed = 0.0;
 
     
-    public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
+    public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
@@ -48,6 +49,8 @@ public class RunSpindexer extends Command {
     @Override
     public void initialize() {
         wasHoodForcedDown = hood.getHoodForcedDown();
+        timer.reset();
+        timer.start();
     }
 
     @Override
@@ -101,8 +104,10 @@ public class RunSpindexer extends Command {
         reversing = false;
     }
 
-    // @Override
-    // public boolean isFinished() {
-    //     return false;  // never ends on its own
-    // }
+    private Timer timer = new Timer();
+
+    @Override
+    public boolean isFinished() {
+        return spindexer.spinningAir() && timer.hasElapsed(1.0);
+    }
 }
