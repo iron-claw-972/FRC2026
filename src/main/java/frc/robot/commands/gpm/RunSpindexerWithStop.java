@@ -2,12 +2,16 @@ package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeConstants;
@@ -31,6 +35,9 @@ public class RunSpindexerWithStop extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
+
+    private Timer runTimer = new Timer();
+    private boolean seizing;
     
     public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
@@ -49,8 +56,8 @@ public class RunSpindexerWithStop extends Command {
     @Override
     public void initialize() {
         wasHoodForcedDown = hood.getHoodForcedDown();
-        timer.reset();
-        timer.start();
+        runTimer.reset();
+        runTimer.start();
     }
 
     @Override
@@ -93,6 +100,16 @@ public class RunSpindexerWithStop extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
+
+        // need to test
+        // // intake jostle
+        // if (runTimer.hasElapsed(3.0)) {
+        //     seizing = true;
+        //     new IntakeMovementCommand(intake).until(() -> !seizing);
+        // } else {
+        //     seizing = false;
+        // }
+
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);
         }
@@ -104,10 +121,8 @@ public class RunSpindexerWithStop extends Command {
         reversing = false;
     }
 
-    private Timer timer = new Timer();
-
     @Override
     public boolean isFinished() {
-        return spindexer.spinningAir() && timer.hasElapsed(1.0);
+        return spindexer.spinningAir() && runTimer.hasElapsed(1.0);
     }
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.gpm.IntakeCommand;
 import frc.robot.commands.gpm.RunSpindexer;
+import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.PowerControl.BreakerConstants;
 import frc.robot.subsystems.PowerControl.EMABreaker;
@@ -19,62 +20,98 @@ public class DynamicAutoBuilder {
     private final Turret turret;
     private final Hood hood;
     private final Intake intake;
-    private final EMABreaker breaker;
 
-    public DynamicAutoBuilder(Spindexer spindexer, Turret turret, Hood hood, Intake intake, EMABreaker breaker) {
+    public DynamicAutoBuilder(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
-        this.breaker = breaker;
     }
 
-    public Command getLeftDynamicDoubleLiberalSwipe() {
+    /*
+     * Autos have no named commands within them. They must be added here
+     * Still need to make one method to call that four command block in each sequential
+     */
+
+    public Command getDynamicDoubleLiberalSwipe(boolean left) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    hood.forceHoodDown(true);
-                    intake.extend();
-                    intake.spinStart();
-                }),
-
-                new PathPlannerAuto("LeftSwipeOne"),
-
-                new InstantCommand(() -> hood.forceHoodDown(false)),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeOne" : "RightSwipeOne"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
-                new InstantCommand(() -> hood.forceHoodDown(true)),
 
-                new PathPlannerAuto("LeftSwipeTwo"),
-                new InstantCommand(() -> hood.forceHoodDown(false)),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
-                new InstantCommand(() -> hood.forceHoodDown(true)),
 
-                new PathPlannerAuto("LeftSwipeTwo"),
-                new InstantCommand(() -> hood.forceHoodDown(false)),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
-                new InstantCommand(() -> hood.forceHoodDown(true)),
+                
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
+                runSpindexerWithAbort()
+        ); 
+    }
+        
+    public Command getDynamicDoubleConservativeSwipe(boolean left) {
+        return new SequentialCommandGroup(
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeConservative" : "RightSwipeConservative"),
+                startShootingCommand(),
+                runSpindexerWithAbort(),
 
-                new PathPlannerAuto("LeftSwipeTwo"),
-                new InstantCommand(() -> hood.forceHoodDown(false)),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
-                new InstantCommand(() -> hood.forceHoodDown(true))
-        );       
+
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
+                runSpindexerWithAbort(),
+                
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
+                runSpindexerWithAbort()
+        ); 
     }
 
-    public Command getRightDynamicDoubleLiberalSwipe() {
+    public Command getDynamicDoubleShallowSwipe(boolean left) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> hood.forceHoodDown(true)),
-
-                new PathPlannerAuto("RightSwipeOne"),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeThree" : "RightSwipeThree"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
 
-                new PathPlannerAuto("RightSwipeTwo"),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
 
-                new PathPlannerAuto("RightSwipeTwo"),
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
                 runSpindexerWithAbort(),
+                
+                departCommand(),
+                new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
+                startShootingCommand(),
+                runSpindexerWithAbort()
+        ); 
+    }
 
-                new PathPlannerAuto("RightSwipeTwo"),
-                runSpindexerWithAbort());
+    private Command departCommand() {
+        return new InstantCommand(() -> {
+            hood.forceHoodDown(true);
+            intake.extend();
+            intake.spinStart();
+            spindexer.stopSpindexer();
+        });
     }
 
     private Command runSpindexerWithAbort() {
@@ -83,18 +120,26 @@ public class DynamicAutoBuilder {
         // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(new
         // WaitCommand(5.0));
 
-        var timer = new Timer();
-        timer.start();
+        // var timer = new Timer();
+        // timer.start();
 
         // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(
         //         new WaitUntilCommand(() -> spindexer.spinningAir() && timer.hasElapsed(3.0)));
         // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(new WaitCommand(3.0));
-        return new RunSpindexer(spindexer, turret, hood, intake).until(() -> spindexer.spinningAir() && timer.hasElapsed(3.0));
+        // return new RunSpindexer(spindexer, turret, hood, intake).until(() -> spindexer.spinningAir() && timer.hasElapsed(3.0));
 
+        // has an isFinnished so it should work
+        return new RunSpindexerWithStop(spindexer, turret, hood, intake);
 
         // return new ParallelDeadlineGroup(new WaitUntilCommand(() ->
         // spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
         // return new ParallelDeadlineGroup(new WaitCommand(5.0), new
         // RunSpindexer(spindexer, turret, hood, intake));
+    }
+
+    private Command startShootingCommand() {
+        return new InstantCommand(() -> {
+            new InstantCommand(() -> hood.forceHoodDown(false));
+        });
     }
 }

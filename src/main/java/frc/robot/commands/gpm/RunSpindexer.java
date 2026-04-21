@@ -30,7 +30,6 @@ public class RunSpindexer extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-    
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
