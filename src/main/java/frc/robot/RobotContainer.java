@@ -294,7 +294,7 @@ public class RobotContainer {
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
 
-    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake, breaker);
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
     
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
