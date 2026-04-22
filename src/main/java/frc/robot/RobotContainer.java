@@ -105,6 +105,9 @@ public class RobotContainer {
 
       default:
 
+      case TwinBot:
+
+
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
@@ -116,8 +119,6 @@ public class RobotContainer {
         shooter = new Shooter();
         hood = new Hood();
       
-      case TwinBot:
-
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"

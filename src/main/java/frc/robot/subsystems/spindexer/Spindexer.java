@@ -53,6 +53,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         CUSTOM,
     }
 
+    private SpindexerState pastState = SpindexerState.STOPPED;
+
     @Override
     public void periodic() {
         updateInputs();
@@ -68,10 +70,12 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             setMotorVoltages(power);
         }
 
-        if (state == SpindexerState.REVERSE) {
-            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_REVERSE_STATOR_LIMIT);
-        } else {
-            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
+        if (state != pastState) {
+            if (state == SpindexerState.REVERSE) {
+                setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_REVERSE_STATOR_LIMIT);
+            } else {
+                setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
+            }
         }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
