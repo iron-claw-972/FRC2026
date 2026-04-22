@@ -125,7 +125,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-                new RunSpindexerWithStop(spindexer, turret, hood, intake)
+                new RunSpindexer(spindexer, turret, hood, intake)
             );
         }
 
