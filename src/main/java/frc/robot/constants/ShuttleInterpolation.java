@@ -21,7 +21,7 @@ public class ShuttleInterpolation {
         shooterVelocityMap.put(0.0, 9.0);
         shooterVelocityMap.put(4.0, 12.0 * 1.3); // tuned by wesley
         shooterVelocityMap.put(8.0, 22.0 * 1.075); // tuned by wesley
-        shooterVelocityMap.put(16.5, 70.0); // tuned by taren
+        shooterVelocityMap.put(16.0, 100.0); // tuned by taren
         
         // always shoot at low angle to ground.
         newHoodMap.put(0.0, 55.0); // min angle (w/ 0.5 deg buffer)

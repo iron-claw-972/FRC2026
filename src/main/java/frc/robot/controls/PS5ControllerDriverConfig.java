@@ -11,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
 import frc.robot.commands.gpm.RunSpindexer;
+import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.commands.gpm.Superstructure;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Intake.Intake;

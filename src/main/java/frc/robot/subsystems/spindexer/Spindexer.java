@@ -31,9 +31,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         // configure current limit
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT;
+        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
         limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
