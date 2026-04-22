@@ -58,20 +58,20 @@ public class Superstructure extends Command {
 
     private TurretState goalState;
 
-    private double phaseDelay = 0.03; // Extrapolation delay due to latency
+    private LoggedNetworkNumber phaseDelay = new LoggedNetworkNumber("/Tuning/OPERATOR/Phase Delay", 0.03); //Extrapolation delay due to latency
     private double kRadial = 1.0; // TUNE TS for shot compensation
 
     private Translation2d target = FieldConstants.HUB_BLUE.toTranslation2d();
 
     private PhaseManager phaseManager = new PhaseManager();
 
-    private double hoodOffset = 0.0;
+    private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Hood Offset", 0.0);
 
-    private double turretOffset = 0.0;
+    private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Turret Offet",0.0);
 
     private double distanceFromTarget = 0.0;
 
-    private double TOFAdjustment = 1.0; 
+    private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("/Tuning/OPERATOR/TOF Adjustment", 1.1);
 
     private double hoodDeg;
     private double velocity;
@@ -173,7 +173,7 @@ public class Superstructure extends Command {
 
             double vy = compensatedVelocity * Math.sin(theta);
             timeOfFlight = (vy + Math.sqrt(vy*vy + 2 * 9.81 * h)) / 9.81;
-            timeOfFlight *= TOFAdjustment;
+            timeOfFlight *= TOFAdjustment.get();
 
             double t = timeOfFlight;
             double offsetX = turretVelocityX * t + 0.5 * accelX * t * t;
@@ -222,7 +222,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset.get();
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
         if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
@@ -234,7 +234,7 @@ public class Superstructure extends Command {
         turretSetpoint = potentialSetpoint;
 
         // Pitch is in radians
-        hoodSetpoint = MathUtil.clamp(hoodDeg + hoodOffset, HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
+        hoodSetpoint = MathUtil.clamp(hoodDeg + hoodOffset.get(), HoodConstants.MIN_ANGLE, HoodConstants.MAX_ANGLE);
         hoodVelocity = hoodAngleFilter.calculate((Units.degreesToRadians(hoodSetpoint) - lastHoodAngle) / Constants.LOOP_TIME);
         lastHoodAngle = Units.degreesToRadians(hoodSetpoint);
 
@@ -255,9 +255,9 @@ public class Superstructure extends Command {
         // Add a phase delay extrapolation component for latency delay
         drivepose = drivepose.exp(
             new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay,
-                robotRelVel.vyMetersPerSecond * phaseDelay,
-                robotRelVel.omegaRadiansPerSecond * phaseDelay
+                robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+                robotRelVel.vyMetersPerSecond * phaseDelay.get(),
+                robotRelVel.omegaRadiansPerSecond * phaseDelay.get()
             ));
     }
 
@@ -277,22 +277,22 @@ public class Superstructure extends Command {
 
     // shoot higher
     public void bumpUpHoodOffset() {
-        hoodOffset += 1.0; //1 deg
+        hoodOffset.set(hoodOffset.get() + 1.0); //1 deg
     }
 
     // shoot lower
     public void bumpDownHoodOffset() {
-        hoodOffset -= 1.0; //1 deg
+        hoodOffset.set(hoodOffset.get() - 1.0); //1 deg
     }
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset += 2.5; //2.5 deg
+        turretOffset.set(turretOffset.get() + 2.5); //2.5 deg
     }
 
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset -= 2.5; //2.5 deg
+        turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
     }
 
     @Override
@@ -304,9 +304,6 @@ public class Superstructure extends Command {
         updateDrivePose();
         updateSetpoints(drivepose);
 
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
-        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
-
         if (phaseManager.isIdle()) {
             underLadder();
         } else {
@@ -316,7 +313,7 @@ public class Superstructure extends Command {
             turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), turretVelocity - drivetrain.getAngularRate(2));
 
             // shuttling is solved in convergance loop
-            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(finalHoodDeg + hoodOffset), hoodVelocity);
+            hood.setFieldRelativeTarget(Rotation2d.fromDegrees(finalHoodDeg + hoodOffset.get()), hoodVelocity);
             shooter.setShooter(-finalVelocity);
             
             if (hoodAssist) {
@@ -349,8 +346,6 @@ public class Superstructure extends Command {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putString("Phase Manager State", phaseManager.getCurrentState().toString());
             
-        } else {
-            phaseDelay = 0.03;
         }
     }
 

@@ -2,11 +2,16 @@ package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeConstants;
@@ -15,7 +20,7 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 
-public class RunSpindexer extends Command {
+public class RunSpindexerWithStop extends Command {
     private Spindexer spindexer;
     private Turret turret;
     private Hood hood;
@@ -30,7 +35,11 @@ public class RunSpindexer extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-    public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
+
+    private Timer runTimer = new Timer();
+    private boolean seizing;
+    
+    public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
@@ -47,6 +56,8 @@ public class RunSpindexer extends Command {
     @Override
     public void initialize() {
         wasHoodForcedDown = hood.getHoodForcedDown();
+        runTimer.reset();
+        runTimer.start();
     }
 
     @Override
@@ -89,6 +100,16 @@ public class RunSpindexer extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
+
+        // need to test
+        // // intake jostle
+        // if (runTimer.hasElapsed(3.0)) {
+        //     seizing = true;
+        //     new IntakeMovementCommand(intake).until(() -> !seizing);
+        // } else {
+        //     seizing = false;
+        // }
+
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);
         }
@@ -100,8 +121,8 @@ public class RunSpindexer extends Command {
         reversing = false;
     }
 
-    // @Override
-    // public boolean isFinished() {
-    //     return false;  // never ends on its own
-    // }
+    @Override
+    public boolean isFinished() {
+        return spindexer.spinningAir() && runTimer.hasElapsed(1.0);
+    }
 }

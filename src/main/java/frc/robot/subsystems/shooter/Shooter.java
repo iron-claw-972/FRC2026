@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.00;
+    private LoggedNetworkNumber powerModifier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shooter Modifier", 1.0);
 
     public Shooter() {
         updateInputs();
@@ -63,7 +63,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         );
 
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimit = ShooterConstants.SHOOTER_STATOR_CURRENT_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         
         // Convert to RPS
-        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier.get();
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
@@ -105,8 +105,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        
+        // powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        // SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
 
         // keep this
         SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
@@ -125,31 +126,42 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         return inputs.shooterSpeedLeft;
     }
 
-    public void setNewCurrentLimit(double newCurrentLimit) {
+    public void setNewCurrentLimit(double stator, double supply) {
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = newCurrentLimit;
+        limitConfig.StatorCurrentLimit = stator;
         limitConfig.StatorCurrentLimitEnable = true;
+        limitConfig.SupplyCurrentLimit = supply;
+        limitConfig.SupplyCurrentLimitEnable = true;
         shooterMotorLeft.getConfigurator().apply(limitConfig);
         shooterMotorRight.getConfigurator().apply(limitConfig);
+    }
+
+    public double getSubsystemStatorCurrent() {
+        return inputs.shooterStatorCurrentLeft + inputs.shooterStatorCurrentRight;
+    }
+
+    public double getSubsystemSupplyCurrent() {
+        return inputs.shooterSupplyCurrentLeft + inputs.shooterSupplyCurrentRight;
     }
 
     @Override
     public void updateInputs(){
         inputs.shooterSpeedLeft = Units.rotationsToRadians(shooterMotorLeft.getVelocity().getValueAsDouble()) * ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
         inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())* ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2;
-        inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-        inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
-
+        inputs.shooterStatorCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+        inputs.shooterStatorCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+        inputs.shooterSupplyCurrentLeft = shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
+        inputs.shooterSupplyCurrentRight = shooterMotorRight.getSupplyCurrent().getValueAsDouble();
 
         Logger.processInputs("Shooter", inputs);
     }
 
     public void bumpUpShooterModifier() {
-        powerModifier += 0.025;
+        powerModifier.set(powerModifier.get() + 0.025);
     }
 
     public void bumpDownShooterModifier() {
-        powerModifier -= 0.025;
+        powerModifier.set(powerModifier.get() - 0.025);
     }
 
     /**
