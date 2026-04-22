@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -34,7 +35,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.00;
+    private LoggedNetworkNumber powerModifier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shooter Modifier", 1.0);
 
     public Shooter() {
         updateInputs();
@@ -81,7 +82,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
         
         // Convert to RPS
-        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier;
+        double targetVelocityRPS = Units.radiansToRotations(shooterTargetSpeed / (ShooterConstants.SHOOTER_LAUNCH_DIAMETER/2)) * powerModifier.get();
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putNumber("Target Velocity RPS", targetVelocityRPS);
@@ -104,8 +105,9 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
-        powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
-        SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        
+        // powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
+        // SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
 
         // keep this
         SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
@@ -155,11 +157,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
     }
 
     public void bumpUpShooterModifier() {
-        powerModifier += 0.025;
+        powerModifier.set(powerModifier.get() + 0.025);
     }
 
     public void bumpDownShooterModifier() {
-        powerModifier -= 0.025;
+        powerModifier.set(powerModifier.get() - 0.025);
     }
 
     /**

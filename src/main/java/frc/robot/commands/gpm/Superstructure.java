@@ -66,8 +66,6 @@ public class Superstructure extends Command {
     private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Turret Offet",0.0);
 
     private double distanceFromTarget = 0.0;
-    private LoggedNetworkNumber shuttlingTOFMultiplier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shuttling TOF Multiplier",0.8);
-
     // private double TOFAdjustment = 0.85;
     // private double TOFAdjustment = 1.1;
     private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("/Tuning/OPERATOR/TOF Adjustment", 1.1);
