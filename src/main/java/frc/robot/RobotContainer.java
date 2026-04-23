@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
-import frc.robot.commands.Music;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
@@ -244,6 +243,11 @@ public class RobotContainer {
         hood.forceHoodDown(false);
       }));
     }
+
+    NamedCommands.registerCommand("After Depot", new InstantCommand());
+    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    NamedCommands.registerCommand("Depot", new InstantCommand());
+    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
