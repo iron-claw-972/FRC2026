@@ -2,16 +2,11 @@ package frc.robot.commands.gpm;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeConstants;
@@ -26,7 +21,8 @@ public class RunSpindexerWithStop extends Command {
     private Hood hood;
     private Intake intake;
 
-    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
+    // if there is jam I would think this is 0 -> 1
+    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising);
 
     private boolean reversing = false;
     private boolean wasHoodForcedDown = false;
@@ -35,10 +31,10 @@ public class RunSpindexerWithStop extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-
     private Timer runTimer = new Timer();
-    private boolean seizing;
-    
+
+    private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
+
     public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -47,11 +43,6 @@ public class RunSpindexerWithStop extends Command {
 
         addRequirements(spindexer);
     }
-
-        // public RunSpindexer(Spindexer spindexer) {
-        // this.spindexer = spindexer;
-        // addRequirements(spindexer);
-    // }
 
     @Override
     public void initialize() {
@@ -63,12 +54,12 @@ public class RunSpindexerWithStop extends Command {
     @Override
     public void execute() {
         boolean hoodForcedDown = hood.getHoodForcedDown();
-        
+
         if (wasHoodForcedDown && !hoodForcedDown) {
             spindexer.maxSpindexer();
         }
         wasHoodForcedDown = hoodForcedDown;
-        
+
         if (!turret.atSetpoint() || hoodForcedDown || spindexer.noIndexing) {
             spindexer.stopSpindexer();
             reversing = false;
@@ -101,15 +92,6 @@ public class RunSpindexerWithStop extends Command {
             }
         }
 
-        // need to test
-        // // intake jostle
-        // if (runTimer.hasElapsed(3.0)) {
-        //     seizing = true;
-        //     new IntakeMovementCommand(intake).until(() -> !seizing);
-        // } else {
-        //     seizing = false;
-        // }
-
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);
         }
@@ -123,6 +105,6 @@ public class RunSpindexerWithStop extends Command {
 
     @Override
     public boolean isFinished() {
-        return spindexer.spinningAir() && runTimer.hasElapsed(1.0);
+        return runTimer.hasElapsed(1.0) && debouncer.calculate(spindexer.spinningAir());
     }
 }

@@ -226,11 +226,11 @@ public class DriveConstants {
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
-            } else if(robotId == RobotId.WaffleHouse){
-                STEER_OFFSET_FRONT_LEFT = 300.058594 - 350 + 180;
-                STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
-                STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
-                STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
+            } else if(robotId == RobotId.TwinBot){
+                STEER_OFFSET_FRONT_LEFT = 131.201172;
+                STEER_OFFSET_FRONT_RIGHT = 247.324219;
+                STEER_OFFSET_BACK_LEFT = 39.814463;
+                STEER_OFFSET_BACK_RIGHT = 294.873047;
                 
                 // MK5n gear ratio 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;

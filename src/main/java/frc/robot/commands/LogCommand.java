@@ -4,7 +4,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.Constants;
-import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.util.Elastic;
 import frc.robot.util.HubActive;
 import frc.robot.util.Elastic.Notification;
@@ -19,6 +18,10 @@ public class LogCommand extends Command {
 
     @Override
     public void execute() {
+        if (Constants.DISABLE_LOGGING) {
+            return;
+        }
+
         boolean current = HubActive.isHubActive();
         Logger.recordOutput("HubActive", current);
         

@@ -67,9 +67,6 @@ public class RobotContainer {
   private Intake intake = null;
   private LED led = null;
 
-  // this is inside addAuto()
-  // private Command auto = new DoNothing();
-
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
@@ -104,6 +101,9 @@ public class RobotContainer {
 
       default:
 
+      case TwinBot:
+
+
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
@@ -115,8 +115,6 @@ public class RobotContainer {
         shooter = new Shooter();
         hood = new Hood();
       
-      case TwinBot:
-
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -242,6 +240,11 @@ public class RobotContainer {
         hood.forceHoodDown(false);
       }));
     }
+
+    NamedCommands.registerCommand("After Depot", new InstantCommand());
+    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    NamedCommands.registerCommand("Depot", new InstantCommand());
+    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
@@ -293,20 +296,23 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto("LeftShallowDoubleSwipe");
+    addAuto("RightShallowDoubleSwipe");
+
 
     DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
     
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
     String rightDynamicLiberalDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
-    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
-    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
+    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleConservativeSwipe";
+    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleConservativeSwipe";
 
     // add commands
     addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
     addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
-    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
-    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
+    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
+    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
