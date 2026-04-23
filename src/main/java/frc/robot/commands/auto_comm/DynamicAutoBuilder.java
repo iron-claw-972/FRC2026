@@ -3,7 +3,6 @@ package frc.robot.commands.auto_comm;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
@@ -16,14 +15,12 @@ public class DynamicAutoBuilder {
     private final Turret turret;
     private final Hood hood;
     private final Intake intake;
-    private final Drivetrain drive;
 
-    public DynamicAutoBuilder(Spindexer spindexer, Turret turret, Hood hood, Intake intake, Drivetrain drive) {
+    public DynamicAutoBuilder(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
         this.intake = intake;
-        this.drive = drive;
     }
 
     /*
@@ -40,19 +37,16 @@ public class DynamicAutoBuilder {
                 runSpindexerWithAbort(),
 
                 departCommand(),
-                // new InstantCommand(() -> drive.setPose(Translation2d.kZero)),
                 new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
                 startShootingCommand(),
                 runSpindexerWithAbort(),
 
                 departCommand(),
-                // new InstantCommand(() -> drive.setPose(Translation2d.kZero)),
                 new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
                 startShootingCommand(),
                 runSpindexerWithAbort(),
 
                 departCommand(),
-                // new InstantCommand(() -> drive.setPose(Translation2d.kZero)),
                 new PathPlannerAuto(left ? "LeftSwipeTwo" : "RightSwipeTwo"),
                 startShootingCommand(),
                 runSpindexerWithAbort());
@@ -114,29 +108,8 @@ public class DynamicAutoBuilder {
     }
 
     private Command runSpindexerWithAbort() {
-        // should race: when a command finnishes (will always be the wait until command)
-        // then we will end the command
-        // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(new
-        // WaitCommand(5.0));
-
-        // var timer = new Timer();
-        // timer.start();
-
-        // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(
-        // new WaitUntilCommand(() -> spindexer.spinningAir() &&
-        // timer.hasElapsed(3.0)));
-        // return new RunSpindexer(spindexer, turret, hood, intake).raceWith(new
-        // WaitCommand(3.0));
-        // return new RunSpindexer(spindexer, turret, hood, intake).until(() ->
-        // spindexer.spinningAir() && timer.hasElapsed(3.0));
-
-        // has an isFinnished so it should work
+        // has an isFinnished so works
         return new RunSpindexerWithStop(spindexer, turret, hood, intake);
-
-        // return new ParallelDeadlineGroup(new WaitUntilCommand(() ->
-        // spindexer.spinningAir()), new RunSpindexer(spindexer, turret, hood, intake));
-        // return new ParallelDeadlineGroup(new WaitCommand(5.0), new
-        // RunSpindexer(spindexer, turret, hood, intake));
     }
 
     private Command startShootingCommand() {

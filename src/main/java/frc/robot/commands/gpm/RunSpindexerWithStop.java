@@ -32,7 +32,6 @@ public class RunSpindexerWithStop extends Command {
 
 
     private Timer runTimer = new Timer();
-    private boolean seizing;
 
     private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
     
@@ -44,11 +43,6 @@ public class RunSpindexerWithStop extends Command {
 
         addRequirements(spindexer);
     }
-
-        // public RunSpindexer(Spindexer spindexer) {
-        // this.spindexer = spindexer;
-        // addRequirements(spindexer);
-    // }
 
     @Override
     public void initialize() {
@@ -97,15 +91,6 @@ public class RunSpindexerWithStop extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
-
-        // need to test
-        // // intake jostle
-        // if (runTimer.hasElapsed(3.0)) {
-        //     seizing = true;
-        //     new IntakeMovementCommand(intake).until(() -> !seizing);
-        // } else {
-        //     seizing = false;
-        // }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);

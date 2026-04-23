@@ -227,9 +227,9 @@ public class DriveConstants {
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
             } else if(robotId == RobotId.TwinBot){
-                STEER_OFFSET_FRONT_LEFT = 301.201172 - 350 + 180;
-                STEER_OFFSET_FRONT_RIGHT = 67.324219 + 180;
-                STEER_OFFSET_BACK_LEFT = 39.814463 + 180 + 180;
+                STEER_OFFSET_FRONT_LEFT = 131.201172;
+                STEER_OFFSET_FRONT_RIGHT = 247.324219;
+                STEER_OFFSET_BACK_LEFT = 39.814463;
                 STEER_OFFSET_BACK_RIGHT = 294.873047;
                 
                 // MK5n gear ratio 
