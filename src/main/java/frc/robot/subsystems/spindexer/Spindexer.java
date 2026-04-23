@@ -76,6 +76,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             } else {
                 setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
             }
+            pastState = state;
         }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
