@@ -195,11 +195,11 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose = drivepose.exp(
-            new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay.get(),
-                robotRelVel.vyMetersPerSecond * phaseDelay.get(),
-                robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
+        // drivepose = drivepose.exp(
+        //     new Twist2d(
+        //         robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+        //         robotRelVel.vyMetersPerSecond * phaseDelay.get(),
+        //         robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
     }
 
     /**
