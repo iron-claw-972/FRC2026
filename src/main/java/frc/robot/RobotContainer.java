@@ -305,14 +305,14 @@ public class RobotContainer {
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
     String rightDynamicLiberalDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
-    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
-    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
+    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleConservativeSwipe";
+    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleConservativeSwipe";
 
     // add commands
     addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
     addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
-    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
-    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
+    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
+    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
