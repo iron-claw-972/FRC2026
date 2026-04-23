@@ -21,7 +21,8 @@ public class RunSpindexerWithStop extends Command {
     private Hood hood;
     private Intake intake;
 
-    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
+    // if there is jam I would think this is 0 -> 1
+    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising);
 
     private boolean reversing = false;
     private boolean wasHoodForcedDown = false;
@@ -30,11 +31,10 @@ public class RunSpindexerWithStop extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-
     private Timer runTimer = new Timer();
 
     private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
-    
+
     public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -54,12 +54,12 @@ public class RunSpindexerWithStop extends Command {
     @Override
     public void execute() {
         boolean hoodForcedDown = hood.getHoodForcedDown();
-        
+
         if (wasHoodForcedDown && !hoodForcedDown) {
             spindexer.maxSpindexer();
         }
         wasHoodForcedDown = hoodForcedDown;
-        
+
         if (!turret.atSetpoint() || hoodForcedDown || spindexer.noIndexing) {
             spindexer.stopSpindexer();
             reversing = false;
