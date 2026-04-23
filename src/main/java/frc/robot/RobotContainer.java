@@ -67,9 +67,6 @@ public class RobotContainer {
   private Intake intake = null;
   private LED led = null;
 
-  // this is inside addAuto()
-  // private Command auto = new DoNothing();
-
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
