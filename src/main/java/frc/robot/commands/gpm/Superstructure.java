@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -194,12 +193,13 @@ public class Superstructure extends Command {
         );
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
-        // Add a phase delay extrapolation component for latency delay
-        // drivepose = drivepose.exp(
-        //     new Twist2d(
-        //         robotRelVel.vxMetersPerSecond * phaseDelay.get(),
-        //         robotRelVel.vyMetersPerSecond * phaseDelay.get(),
-        //         robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
+        // Add a phase delay extrapolation component for latency delay (translation only)
+        Translation2d currentTranslation = drivepose.getTranslation();
+        Translation2d extrapolatedTranslation = currentTranslation.plus(
+                new Translation2d(
+                        robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+                        robotRelVel.vyMetersPerSecond * phaseDelay.get()));
+        drivepose = new Pose2d(extrapolatedTranslation, drivepose.getRotation());
     }
 
     /**
