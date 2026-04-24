@@ -16,44 +16,44 @@
     },
     {
       "anchor": {
-        "x": 0.5018623962040341,
-        "y": 4.911874258600237
+        "x": 0.1575682087781738,
+        "y": 4.9871886120996445
       },
       "prevControl": {
-        "x": 0.5018623962040341,
-        "y": 4.14140782882557
+        "x": 0.1575682087781738,
+        "y": 4.216722182324977
       },
       "nextControl": {
-        "x": 0.5018623962040341,
-        "y": 5.342241992882562
+        "x": 0.1575682087781738,
+        "y": 5.41755634638197
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.6309727164887315,
-        "y": 6.988398576512456
+        "x": 0.38351126927639445,
+        "y": 7.257378410438909
       },
       "prevControl": {
-        "x": 0.44012614514645276,
-        "y": 6.826913016145912
+        "x": 0.06367204449278147,
+        "y": 7.034460162862452
       },
       "nextControl": {
-        "x": 1.038758919288973,
-        "y": 7.3334484404203515
+        "x": 0.7385646500593126,
+        "y": 7.504839857651245
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.5,
-        "y": 7.623
+        "x": 1.5354,
+        "y": 7.408
       },
       "prevControl": {
-        "x": 3.9017674970344016,
-        "y": 7.0417129300118635
+        "x": 0.932230130486359,
+        "y": 7.41876631079478
       },
       "nextControl": null,
       "isLocked": false,
@@ -92,46 +92,59 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Hood Down",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
       "name": "Spin Intake Rollers",
       "waypointRelativePos": 0.9988974641675645,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Spin Intake Rollers"
+        }
+      }
     },
     {
       "name": "Stop Spindexer",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Spindexer"
+        }
+      }
     },
     {
       "name": "Extend Intake",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend Intake"
+        }
+      }
     },
     {
       "name": "Start Spindexer",
       "waypointRelativePos": 3.0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Spindexer"
+        }
+      }
     },
     {
       "name": "Stop Hood Down",
       "waypointRelativePos": 3.0,
       "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Start Intake Seizure",
-      "waypointRelativePos": 3.0,
-      "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Hood Down"
+        }
+      }
     }
   ],
   "globalConstraints": {

@@ -9,6 +9,30 @@
           "data": {
             "pathName": "Depot Center Path"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Intake Seizure"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BookItToNeutral"
+          }
         }
       ]
     }

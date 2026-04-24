@@ -9,6 +9,30 @@
           "data": {
             "pathName": "Left Trench Depot Center Path"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Intake Seizure"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BookItToNeutral"
+          }
         }
       ]
     }
