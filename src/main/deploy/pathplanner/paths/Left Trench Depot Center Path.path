@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 2.492313167259787,
-        "y": 6.891565836298932
+        "y": 6.568790035587188
       },
       "isLocked": false,
       "linkedName": null
@@ -32,32 +32,32 @@
     },
     {
       "anchor": {
-        "x": 0.7062870699861263,
-        "y": 4.944151838666582
+        "x": 0.8461565836298937,
+        "y": 4.997947805456701
       },
       "prevControl": {
-        "x": 0.23241295545659613,
-        "y": 4.787437564570203
+        "x": 0.3722824691003634,
+        "y": 4.841233531360322
       },
       "nextControl": {
-        "x": 2.0727046263325084,
-        "y": 5.396037959663023
+        "x": 2.212574139976275,
+        "y": 5.449833926453142
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.7290154211130537,
-        "y": 6.041589561086512
+        "x": 2.5138315539739033,
+        "y": 6.030830367734283
       },
       "prevControl": {
-        "x": 2.4159215599025865,
-        "y": 5.447156064644024
+        "x": 2.3524436536180313,
+        "y": 5.471352313167261
       },
       "nextControl": {
-        "x": 3.042109282323521,
-        "y": 6.636023057528999
+        "x": 2.7881778575014478,
+        "y": 6.981897553296436
       },
       "isLocked": false,
       "linkedName": null
@@ -68,8 +68,8 @@
         "y": 7.623
       },
       "prevControl": {
-        "x": 3.428383113987069,
-        "y": 7.720021902743396
+        "x": 3.5036773428232504,
+        "y": 7.354211150652431
       },
       "nextControl": null,
       "isLocked": false,
@@ -88,25 +88,12 @@
   ],
   "constraintZones": [
     {
-      "name": "After Depot",
-      "minWaypointRelativePos": 1.5082690187431023,
-      "maxWaypointRelativePos": 2.2403528114663795,
-      "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
-        "maxAngularVelocity": 200.0,
-        "maxAngularAcceleration": 300.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    },
-    {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 3.5,
-      "maxWaypointRelativePos": 3.995589856670343,
+      "minWaypointRelativePos": 0.4769403824521941,
+      "maxWaypointRelativePos": 3.1136107986502153,
       "constraints": {
         "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
+        "maxAcceleration": 1.0,
         "maxAngularVelocity": 200.0,
         "maxAngularAcceleration": 300.0,
         "nominalVoltage": 12.0,
@@ -175,7 +162,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

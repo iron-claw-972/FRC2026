@@ -284,6 +284,11 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+    String leftBumpDepotCenter = "LeftBumpDepotCenter";
+    String leftTrenchDepotCenter = "LeftTrenchDepotCenter";
+    String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
@@ -296,8 +301,11 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
-    addAuto("LeftShallowDoubleSwipe");
-    addAuto("RightShallowDoubleSwipe");
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
+    addAuto(leftBumpDepotCenter);
+    addAuto(leftTrenchDepotCenter);
+    addAuto(depotCenterPath);
 
 
     DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);

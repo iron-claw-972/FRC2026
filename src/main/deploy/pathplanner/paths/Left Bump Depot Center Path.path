@@ -36,7 +36,7 @@
         "y": 4.944151838666582
       },
       "prevControl": {
-        "x": 0.32971530249110376,
+        "x": 0.3297153024911038,
         "y": 4.83655990510083
       },
       "nextControl": {
@@ -52,24 +52,24 @@
         "y": 6.041589561086512
       },
       "prevControl": {
-        "x": 2.509641474721047,
-        "y": 5.48937238568611
+        "x": 2.6660894988160155,
+        "y": 5.549623259497286
       },
       "nextControl": {
-        "x": 3.041032028469752,
-        "y": 6.827010676156583
+        "x": 2.847366548042706,
+        "y": 6.9668801897983395
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.5,
-        "y": 7.623
+        "x": 4.579596678529064,
+        "y": 7.590913404507711
       },
       "prevControl": {
-        "x": 3.428383113987069,
-        "y": 7.720021902743396
+        "x": 3.545234957349378,
+        "y": 7.474544158360471
       },
       "nextControl": null,
       "isLocked": false,
@@ -88,25 +88,12 @@
   ],
   "constraintZones": [
     {
-      "name": "After Depot",
-      "minWaypointRelativePos": 1.5082690187431023,
-      "maxWaypointRelativePos": 2.2403528114663795,
-      "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
-        "maxAngularVelocity": 200.0,
-        "maxAngularAcceleration": 300.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    },
-    {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 3.5,
-      "maxWaypointRelativePos": 3.995589856670343,
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 4.5,
       "constraints": {
         "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
+        "maxAcceleration": 1.0,
         "maxAngularVelocity": 200.0,
         "maxAngularAcceleration": 300.0,
         "nominalVoltage": 12.0,
@@ -117,44 +104,52 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Hood Down",
+      "name": "Spin Intake Rollers",
       "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Stop Spindexer",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Spin Intake Rollers",
-      "waypointRelativePos": 0.899669239250276,
-      "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Spin Intake Rollers"
+        }
+      }
     },
     {
       "name": "Extend Intake",
-      "waypointRelativePos": 0.9,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Start Spindexer",
-      "waypointRelativePos": 4.0,
-      "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend Intake"
+        }
+      }
     },
     {
       "name": "Stop Hood Down",
-      "waypointRelativePos": 4.0,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
     },
     {
-      "name": "Start Intake Seizure",
-      "waypointRelativePos": 4.0,
+      "name": "Stop Spindexer",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Spindexer"
+        }
+      }
+    },
+    {
+      "name": "Start Spindexer",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -175,7 +170,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
