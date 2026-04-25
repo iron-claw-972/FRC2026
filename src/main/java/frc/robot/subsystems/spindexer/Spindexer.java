@@ -2,6 +2,7 @@ package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -89,7 +90,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         }
 
         Logger.recordOutput("HasBalls", spinningAir());
-
     }
 
     public void setMotorVoltages(double voltage) {
@@ -142,6 +142,14 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
     public boolean spinningAir() {
         return getMotorOneStatorCurrent() < 16.0 && getMotorTwoStatorCurrent() < 28.0;
+    }
+
+    public double getMotorOneVelocity() {
+        return inputs.spindexerOneVelocity;
+    }
+
+    public double getMotorTwoVelocity() {
+        return inputs.spindexerTwoVelocity;
     }
 
     @Override

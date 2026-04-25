@@ -35,6 +35,8 @@ public class RunSpindexerWithStop extends Command {
 
     private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
 
+    private final double interval = 0.6; // Change this to make it faster/slower (seconds)
+
     public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -95,16 +97,25 @@ public class RunSpindexerWithStop extends Command {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);
         }
+
+        if ((int) (Timer.getFPGATimestamp() / interval) % 2 == 0) {
+            intake.extend();
+        } else {
+            intake.intermediateExtend();
+        }
+
     }
 
     @Override
     public void end(boolean interrupted) {
         spindexer.stopSpindexer();
         reversing = false;
+
+        intake.extend();
     }
 
     @Override
     public boolean isFinished() {
-        return runTimer.hasElapsed(1.0) && debouncer.calculate(spindexer.spinningAir());
+        return (runTimer.hasElapsed(1.0) && debouncer.calculate(spindexer.spinningAir())) || runTimer.hasElapsed(4.0);
     }
 }
