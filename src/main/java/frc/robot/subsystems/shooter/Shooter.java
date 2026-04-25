@@ -109,8 +109,7 @@ public class Shooter extends SubsystemBase implements ShooterIO {
         // powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         // SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
 
-        // keep this
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        Logger.recordOutput("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
 
     /**

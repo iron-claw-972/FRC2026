@@ -378,14 +378,6 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    double matchTime = DriverStation.getMatchTime();
-    if (matchTime > 0) {
-      if (!Constants.DISABLE_SMART_DASHBOARD) {
-        SmartDashboard.putNumber("Match Time", matchTime);
-      }
-    }
-    if (!Constants.DISABLE_SMART_DASHBOARD) {
-      SmartDashboard.putString("Alliance", DriverStation.getAlliance().map(a -> a.name()).orElse("Unknown"));
-    }
+
   }
 }
