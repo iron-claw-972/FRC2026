@@ -15,13 +15,14 @@ import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 
-public class RunSpindexer extends Command {
+public class RunSpindexerWithStop extends Command {
     private Spindexer spindexer;
     private Turret turret;
     private Hood hood;
     private Intake intake;
 
-    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising); // if there is jam I would think this is 0 -> 1
+    // if there is jam I would think this is 0 -> 1
+    private Debouncer jam_debouncer = new Debouncer(SpindexerConstants.JAM_DEBOUNCE_TIME, DebounceType.kRising);
 
     private boolean reversing = false;
     private boolean wasHoodForcedDown = false;
@@ -30,7 +31,13 @@ public class RunSpindexer extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-    public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
+    private Timer runTimer = new Timer();
+
+    private Debouncer debouncer = new Debouncer(0.3, DebounceType.kRising);
+
+    private final double interval = 0.6; // Change this to make it faster/slower (seconds)
+
+    public RunSpindexerWithStop(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
         this.hood = hood;
@@ -39,31 +46,28 @@ public class RunSpindexer extends Command {
         addRequirements(spindexer);
     }
 
-        // public RunSpindexer(Spindexer spindexer) {
-        // this.spindexer = spindexer;
-        // addRequirements(spindexer);
-    // }
-
     @Override
     public void initialize() {
         wasHoodForcedDown = hood.getHoodForcedDown();
+        runTimer.reset();
+        runTimer.start();
     }
 
     @Override
     public void execute() {
         boolean hoodForcedDown = hood.getHoodForcedDown();
-        
+
         if (wasHoodForcedDown && !hoodForcedDown) {
             spindexer.maxSpindexer();
         }
         wasHoodForcedDown = hoodForcedDown;
-        
+
         if (!turret.atSetpoint() || hoodForcedDown || spindexer.noIndexing) {
             spindexer.stopSpindexer();
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
         }
-        boolean jammed = spindexer.getMotorOneVelocity() < SpindexerConstants.JAM_CURRENT_THRESHOLD && spindexer.getMotorOneStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        boolean jammed = spindexer.getSubsystemStatorCurrent() / 2 > SpindexerConstants.JAM_CURRENT_THRESHOLD;
         Logger.recordOutput("SpindexerJammed", jammed);
         if (jam_debouncer.calculate(jammed)) {
             Logger.recordOutput("SpindexerJammedDebounced", jammed);
@@ -89,19 +93,29 @@ public class RunSpindexer extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
+
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Jamming", reversing);
         }
+
+        if ((int) (Timer.getFPGATimestamp() / interval) % 2 == 0) {
+            intake.extend();
+        } else {
+            intake.intermediateExtend();
+        }
+
     }
 
     @Override
     public void end(boolean interrupted) {
         spindexer.stopSpindexer();
         reversing = false;
+
+        intake.extend();
     }
 
-    // @Override
-    // public boolean isFinished() {
-    //     return false;  // never ends on its own
-    // }
+    @Override
+    public boolean isFinished() {
+        return (runTimer.hasElapsed(1.0) && debouncer.calculate(spindexer.spinningAir())) || runTimer.hasElapsed(4.0);
+    }
 }

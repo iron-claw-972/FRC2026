@@ -11,8 +11,10 @@ public class Music extends Command {
 
     public Music(TalonFX[] motors) {
         orchestra = new Orchestra(Filesystem.getDeployDirectory() + "/chirp/file.chrp");
-        for (TalonFX motor : motors)
+        for (TalonFX motor : motors) {
+            System.out.println(motor.getDescription());
             orchestra.addInstrument(motor);
+        }
     }
 
     @Override
