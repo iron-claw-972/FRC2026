@@ -23,6 +23,7 @@ import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.drive_comm.SysIDDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -151,7 +152,8 @@ public class RobotContainer {
         }
         
         if (drive != null && driver != null) {
-          drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+          // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+          SmartDashboard.putData("SysId Characterization", new SysIDDriveCommand(drive));
         }
         break;
     }
