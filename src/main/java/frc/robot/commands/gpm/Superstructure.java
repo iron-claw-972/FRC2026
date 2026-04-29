@@ -304,13 +304,13 @@ public class Superstructure extends Command {
         turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
         SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
 
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
+        hoodOffset = SmartDashboard.getNumber("OPERATOR: Hood Offset", hoodOffset);
         SmartDashboard.putNumber("OPERATOR: Hood Offset", hoodOffset);
 
-        turretOffset = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
+        phaseDelay = SmartDashboard.getNumber("OPERATOR: Phase Delay", phaseDelay);
         SmartDashboard.putNumber("OPERATOR: Phase Delay", phaseDelay);
 
-        turretOffset = SmartDashboard.getNumber("OPERATOR: ToF Adjustments", TOFAdjustment);
+        TOFAdjustment = SmartDashboard.getNumber("OPERATOR: ToF Adjustments", TOFAdjustment);
         SmartDashboard.putNumber("OPERATOR: ToF Adjustments", TOFAdjustment);
     }
 

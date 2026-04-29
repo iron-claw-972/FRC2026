@@ -65,7 +65,7 @@ public class VisionConstants {
         /**
          * The maximum distance to the tag to use
          */
-        public static final double MAX_DISTANCE = 6;
+        public static final double MAX_DISTANCE = 3.5;
 
         /** If vision should use manual calculations (yawFunction-based vs referencePose-based). Changed to false to support gyro bias correction. */
         public static final boolean USE_MANUAL_CALCULATIONS = false;
