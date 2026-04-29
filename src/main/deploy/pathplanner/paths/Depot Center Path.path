@@ -20,11 +20,11 @@
         "y": 4.9871886120996445
       },
       "prevControl": {
-        "x": 0.1575682087781738,
+        "x": 0.15756820877817385,
         "y": 4.216722182324977
       },
       "nextControl": {
-        "x": 0.1575682087781738,
+        "x": 0.15756820877817382,
         "y": 5.41755634638197
       },
       "isLocked": false,
@@ -52,7 +52,7 @@
         "y": 7.408
       },
       "prevControl": {
-        "x": 0.932230130486359,
+        "x": 0.9322301304863592,
         "y": 7.41876631079478
       },
       "nextControl": null,
@@ -92,8 +92,19 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "Extend Intake",
+      "waypointRelativePos": 0.5027563395810313,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Extend Intake"
+        }
+      }
+    },
+    {
       "name": "Spin Intake Rollers",
-      "waypointRelativePos": 0.9988974641675645,
+      "waypointRelativePos": 0.502756339581041,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -103,24 +114,13 @@
       }
     },
     {
-      "name": "Stop Spindexer",
-      "waypointRelativePos": 1.0,
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 2.8974641675854422,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
         "data": {
-          "name": "Stop Spindexer"
-        }
-      }
-    },
-    {
-      "name": "Extend Intake",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Extend Intake"
+          "name": "Stop Hood Down"
         }
       }
     },
@@ -132,17 +132,6 @@
         "type": "named",
         "data": {
           "name": "Start Spindexer"
-        }
-      }
-    },
-    {
-      "name": "Stop Hood Down",
-      "waypointRelativePos": 3.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Hood Down"
         }
       }
     }

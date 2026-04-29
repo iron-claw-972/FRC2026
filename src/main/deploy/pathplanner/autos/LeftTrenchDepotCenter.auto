@@ -11,6 +11,18 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Stop Hood Down"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Spindexer"
+          }
+        },
+        {
           "type": "wait",
           "data": {
             "waitTime": 2.0

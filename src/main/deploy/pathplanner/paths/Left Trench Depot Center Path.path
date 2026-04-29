@@ -20,11 +20,11 @@
         "y": 6.622586002372479
       },
       "prevControl": {
-        "x": 0.10377224199288315,
+        "x": 0.10377224199288312,
         "y": 7.93520759193357
       },
       "nextControl": {
-        "x": 0.10377224199288304,
+        "x": 0.10377224199288308,
         "y": 5.953350337515722
       },
       "isLocked": false,
@@ -36,8 +36,8 @@
         "y": 4.61061684460261
       },
       "prevControl": {
-        "x": 0.2616461704685724,
-        "y": 4.489491887606174
+        "x": 0.2616461704685635,
+        "y": 4.489491887606168
       },
       "nextControl": {
         "x": 1.1796915776986958,
@@ -52,7 +52,7 @@
         "y": 5.923238434163701
       },
       "prevControl": {
-        "x": 0.9099310791445863,
+        "x": 0.9099310791445864,
         "y": 5.2840857560171
       },
       "nextControl": {
@@ -123,17 +123,6 @@
       }
     },
     {
-      "name": "Stop Spindexer",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Stop Spindexer"
-        }
-      }
-    },
-    {
       "name": "Spin Intake Rollers",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
@@ -156,6 +145,17 @@
       }
     },
     {
+      "name": "Stop Hood Down",
+      "waypointRelativePos": 3.801543550165381,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Hood Down"
+        }
+      }
+    },
+    {
       "name": "Start Spindexer",
       "waypointRelativePos": 4.0,
       "endWaypointRelativePos": null,
@@ -163,17 +163,6 @@
         "type": "named",
         "data": {
           "name": "Start Spindexer"
-        }
-      }
-    },
-    {
-      "name": "Stop Hood Down",
-      "waypointRelativePos": 4.0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Stop Hood Down"
         }
       }
     }
