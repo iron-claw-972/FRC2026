@@ -193,7 +193,7 @@ public class Drivetrain extends SubsystemBase {
             SmartDashboard.putData("Field", field);
         }
 
-        addMusic();
+        // addMusic();
 
     }
 
@@ -201,17 +201,17 @@ public class Drivetrain extends SubsystemBase {
         poseEstimator.resetTranslation(pose);
     }
 
-    public void addMusic() {
-        ArrayList<TalonFX> motors = new ArrayList<>();
-        for (Module m: modules) {
-            motors.add(m.getMotors()[0]);
-            motors.add(m.getMotors()[1]);
-        }
+    // public void addMusic() {
+    //     ArrayList<TalonFX> motors = new ArrayList<>();
+    //     for (Module m: modules) {
+    //         motors.add(m.getMotors()[0]);
+    //         motors.add(m.getMotors()[1]);
+    //     }
 
-        TalonFX[] f = new TalonFX[8];
+    //     TalonFX[] f = new TalonFX[8];
         
-        SmartDashboard.putData("Chirp", new Music(motors.toArray(f)));
-    }
+    //     // SmartDashboard.putData("Chirp", new Music(motors.toArray(f)));
+    // }
 
     public void close() {
         // close each of the modules
