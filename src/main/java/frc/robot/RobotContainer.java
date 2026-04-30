@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.ChoreoPathCommand;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.drive_comm.SysIDDriveCommand;
@@ -76,6 +78,8 @@ public class RobotContainer {
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
+  // choreo auto factory
+  AutoFactory autoFactory ; 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
@@ -88,6 +92,7 @@ public class RobotContainer {
 
       SmartDashboard.putNumber("Match Time", 0.0);
     }
+
 
     // Filling the SendableChooser on SmartDashboard
 
@@ -129,6 +134,23 @@ public class RobotContainer {
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
+
+        // choreo auto factory init
+        
+      autoFactory = new AutoFactory(
+            drive::getPose,
+            drive::resetOdometry,
+            sample -> drive.setChassisSpeeds(sample.getChassisSpeeds(), false),
+            true,
+            drive,
+            (trajectory, startOrFinish) -> {
+              Logger.recordOutput(
+                  "Autos/Trajectory", trajectory.getPoses());
+              Logger.recordOutput("Autos/StartingOrFinishing", startOrFinish);
+          });
+
+        // warmup command for choreo, prevents lag on auto startup
+        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd());
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
@@ -325,6 +347,8 @@ public class RobotContainer {
     addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
     addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
     addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
+
+    addAuto("testChoreo", new ChoreoPathCommand("test.traj", true, autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

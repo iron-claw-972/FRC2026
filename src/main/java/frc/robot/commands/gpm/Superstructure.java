@@ -84,8 +84,8 @@ public class Superstructure extends Command {
     }
 
     public void updateSetpoints(Pose2d drivepose) {
-		Pose2d turretPosition = drivepose.transformBy(
-				new Transform2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.toTranslation2d(), Rotation2d.kZero));
+    		Pose2d turretPosition = drivepose.transformBy(
+    				new Transform2d(TurretConstants.DISTANCE_FROM_ROBOT_CENTER.toTranslation2d(), Rotation2d.kZero));
         
         // If the robot is moving, adjust the target position based on velocity
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
