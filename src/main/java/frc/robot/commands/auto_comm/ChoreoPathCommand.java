@@ -16,17 +16,17 @@ import frc.robot.subsystems.turret.Turret;
 
 public class ChoreoPathCommand {
 
-    private Intake intake;
-    private Spindexer spindexer;
-    private Turret turret;
-    private Hood hood;
+  private Intake intake;
+  private Spindexer spindexer;
+  private Turret turret;
+  private Hood hood;
 
-    public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret, Hood hood) {
-        this.intake = intake;
-        this.spindexer = spindexer;
-        this.turret = turret;
-        
-    }
+  public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret, Hood hood) {
+    this.intake = intake;
+    this.spindexer = spindexer;
+    this.turret = turret;
+
+  }
 
   public static Command basicTrajectoryAuto(String pathName, boolean resetOdemetry, AutoFactory factory) {
     Command command = factory.trajectoryCmd(pathName);
@@ -55,7 +55,7 @@ public class ChoreoPathCommand {
     liberalSwipe.done()
         .onTrue(Commands.sequence(
             new InstantCommand(() -> {
-                hood.forceHoodDown(false);
+              hood.forceHoodDown(false);
             }),
             new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
             new InstantCommand(() -> {
@@ -68,7 +68,7 @@ public class ChoreoPathCommand {
     shallowSwipe.done()
         .onTrue(Commands.sequence(
             new InstantCommand(() -> {
-                hood.forceHoodDown(false);
+              hood.forceHoodDown(false);
             }),
             new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
             new InstantCommand(() -> {
@@ -83,7 +83,7 @@ public class ChoreoPathCommand {
   }
 
   public AutoRoutine rightLiberal(AutoFactory factory) {
-    AutoRoutine routine = factory.newRoutine("leftLiberal");
+    AutoRoutine routine = factory.newRoutine("rightLiberal");
 
     AutoTrajectory liberalSwipe = routine.trajectory("liberal", 0).mirrorY();
     AutoTrajectory shallowSwipe = routine.trajectory("liberal", 1).mirrorY();
@@ -105,6 +105,70 @@ public class ChoreoPathCommand {
     shallowSwipe.done()
         .onTrue(Commands.sequence(
             new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine leftShallow(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("leftShallow");
+
+    AutoTrajectory shallowSwipe = routine.trajectory("shallowSwipe");
+
+    routine.active().onTrue(
+        Commands.sequence(
+            shallowSwipe.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    shallowSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine rightShallow(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("rightShallow");
+
+    AutoTrajectory shallowSwipe = routine.trajectory("shallowSwipe").mirrorY();
+
+    routine.active().onTrue(
+        Commands.sequence(
+            shallowSwipe.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    shallowSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
             shallowSwipe.cmd()));
 
     return routine;
