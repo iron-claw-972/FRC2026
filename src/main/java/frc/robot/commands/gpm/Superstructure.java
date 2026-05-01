@@ -159,11 +159,6 @@ public class Superstructure extends Command {
             Logger.recordOutput("Turret/Target Pose", target);
             Logger.recordOutput("Lookahead Pose", lookaheadPose);
         }
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putNumber("Time of flight", timeOfFlight);
-            SmartDashboard.putNumber("Turret X-Velocity", turretVelocityX);
-            SmartDashboard.putNumber("Turret Y-Velocity", turretVelocityY);
-        }
 
         // Subtract the rotational angle of the robot from the setpoint
         double adjustedTurretSetpoint = MathUtil.angleModulus(turretAngle.getRadians() - drivepose.getRotation().getRadians());
