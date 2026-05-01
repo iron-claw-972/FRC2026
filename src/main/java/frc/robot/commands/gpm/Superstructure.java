@@ -97,45 +97,53 @@ public class Superstructure extends Command {
         double turretVelocityY =
             fieldRelVel.vyMetersPerSecond;
 
-        double timeOfFlight = 0;
-        Pose2d lookaheadPose = turretPosition;
+        double timeOfFlight;
+        Pose2d lookaheadPose;
 
-        /*
-         * Loop (max 20) until lookaheadPose converges BECAUSE -->
-         * If you're 8m away (t = 1.0s) and moving at 2m/s towards target, you calculate for 6m (t = 0.8s)
-         * At 6m, we run assuming t = 0.8 but then the 6m isn't correct since it was derived using t = 1.0s
-         * So we make a bunch of guesses until it converges
-         * Early exit when change < 1mm to avoid unnecessary iterations
-         */
-        for (int i = 0; i < 20; i++) {
-            Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
-            
-            Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
-                FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
+        Translation2d translationToTarget = target.minus(turretPosition.getTranslation());
+        double distanceToTarget = translationToTarget.getNorm();
+        
+        Translation2d unitToTarget = translationToTarget.div(distanceToTarget);
+        
+        // positive = moving away, negative = moving toward
+        // https://en.wikipedia.org/wiki/Dot_product#Physics
+        // dot product of two vectors is same as magnitude(a) * magnitude(b) * cos(theta) if theta is distance between the vecs
+        // this means that the dot product is also the magnitude of the sum of the vectors
+        double velocityTowardTarget = 
+            new Translation2d(turretVelocityX, turretVelocityY).dot(unitToTarget);
+        
+        Translation3d turret3d = new Translation3d(turretPosition.getX(), turretPosition.getY(), 
+            TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
 
-            goalState = ShooterPhysics.getShotParams(
+        // if not aim at hub, aima t ground
+        Translation3d target3d = new Translation3d(target.getX(), target.getY(),
+            target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
+            FieldConstants.getHubTranslation().getZ() : 0.0);
+
+        goalState = ShooterPhysics.getShotParams(
             Translation2d.kZero,
-            target3d.minus(lookahead3d),
+            target3d.minus(turret3d),
             2.0);
 
-            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
-            double offsetX = turretVelocityX * timeOfFlight;
-            double offsetY = turretVelocityY * timeOfFlight;
-            Pose2d newLookaheadPose =
-                new Pose2d(
-                    turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
-                    turretPosition.getRotation());
-            
-            // early exit if converged (change < 1mm)
-            if (i > 0 && lookaheadPose.getTranslation().getDistance(newLookaheadPose.getTranslation()) < 0.001) {
-                lookaheadPose = newLookaheadPose;
-                break;
-            }
-            lookaheadPose = newLookaheadPose;
+        // tof = distance / (projectile_speed - velocity_toward_target)
+        double projectileSpeedHorizontal = goalState.exitVel() * Math.cos(goalState.pitch());
+        double speedDifference = projectileSpeedHorizontal - velocityTowardTarget;
+        
+        //cant be dividing by zero, or approaching infinity, that would be bad (≧︿≦)
+        if (speedDifference <= 0.1) {
+            timeOfFlight = goalState.timeOfFlight();
+        } else {
+            timeOfFlight = distanceToTarget / speedDifference;
         }
+        
+        timeOfFlight *= TOFAdjustment.get();
+        
+        double offsetX = turretVelocityX * timeOfFlight;
+        double offsetY = turretVelocityY * timeOfFlight;
+        lookaheadPose = new Pose2d(
+            turretPosition.getTranslation().plus(new Translation2d(offsetX, offsetY)),
+            turretPosition.getRotation());
 
-        // Get the field angle relative to the target pose
         turretAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
         if (lastTurretAngle == null) {
             lastTurretAngle = turretAngle;
