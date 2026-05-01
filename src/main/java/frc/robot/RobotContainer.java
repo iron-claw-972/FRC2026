@@ -11,6 +11,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
@@ -300,6 +301,10 @@ public class RobotContainer {
     }
   }
 
+  public void addChoreoAuto(String name, AutoRoutine auto) {
+    choreoAutoChooser.addCmd(name, auto::cmd);
+  }
+
   /**
    * Initialize the SendableChooser on the SmartDashboard.
    * Fill the SendableChooser with available Commands.
@@ -357,6 +362,7 @@ public class RobotContainer {
     addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
     addAuto("testChoreo", ChoreoPathCommand.basicTrajectoryAuto("test.traj", true, autoFactory));
+    addChoreoAuto("choreoLiberalLeft", ChoreoPathCommand.leftConservative(autoFactory, intake, spindexer, turret, hood));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
@@ -396,7 +402,8 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    return autoChooser.getSelected();
+    // return autoChooser.getSelected();
+    return choreoAutoChooser.selectedCommand();
   }
 
   public void logComponents() {

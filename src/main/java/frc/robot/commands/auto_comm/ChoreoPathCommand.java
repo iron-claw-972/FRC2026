@@ -21,6 +21,10 @@ import frc.robot.subsystems.turret.Turret;
 
 public class ChoreoPathCommand {
 
+    public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret) {
+        
+    }
+
   public static Command basicTrajectoryAuto(String pathName, boolean resetOdemetry, AutoFactory factory) {
     Command command = factory.trajectoryCmd(pathName);
 
