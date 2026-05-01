@@ -203,7 +203,7 @@ public class RobotContainer {
         autoFactory.bind("hoodDown", new InstantCommand(() -> hood.forceHoodDown(true)));
 
         // warmup command for choreo, prevents lag on auto startup
-        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd());
+        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd().ignoringDisable(true));
   }
 
   /**
