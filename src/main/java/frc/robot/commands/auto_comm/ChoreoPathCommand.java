@@ -111,6 +111,99 @@ public class ChoreoPathCommand {
 
   }
 
+  
+  public AutoRoutine leftConservative(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("leftConservative");
+
+    AutoTrajectory liberalSwipe = routine.trajectory("conservative", 0);
+    AutoTrajectory shallowSwipe = routine.trajectory("conservative", 1);
+
+    routine.active().onTrue(
+        Commands.sequence(
+            liberalSwipe.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            liberalSwipe.cmd()));
+
+    liberalSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    shallowSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine rightConservative(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("rightConservative");
+
+    AutoTrajectory liberalSwipe = routine.trajectory("conservative", 0).mirrorY();
+    AutoTrajectory shallowSwipe = routine.trajectory("conservative", 1).mirrorY();
+
+    routine.active().onTrue(
+        Commands.sequence(
+            liberalSwipe.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            liberalSwipe.cmd()));
+
+    liberalSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    shallowSwipe.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
   public AutoRoutine leftShallow(AutoFactory factory) {
     AutoRoutine routine = factory.newRoutine("leftShallow");
 

@@ -366,6 +366,10 @@ public class RobotContainer {
     addAuto("testChoreo", ChoreoPathCommand.basicTrajectoryAuto("test.traj", true, autoFactory));
     addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
     addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
+    addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
+    addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
+    addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
+    addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
