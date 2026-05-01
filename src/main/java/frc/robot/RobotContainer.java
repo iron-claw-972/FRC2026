@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -77,7 +78,8 @@ public class RobotContainer {
 
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
-
+  private final AutoChooser choreoAutoChooser = new AutoChooser();
+  
   // choreo auto factory
   AutoFactory autoFactory ; 
   /**
