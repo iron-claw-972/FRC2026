@@ -21,7 +21,15 @@ import frc.robot.subsystems.turret.Turret;
 
 public class ChoreoPathCommand {
 
-    public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret) {
+    private Intake intake;
+    private Spindexer spindexer;
+    private Turret turret;
+    private Hood hood;
+
+    public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret, Hood hood) {
+        this.intake = intake;
+        this.spindexer = spindexer;
+        this.turret = turret;
         
     }
 
@@ -33,12 +41,40 @@ public class ChoreoPathCommand {
         command);
   }
 
-  public static AutoRoutine leftConservative(AutoFactory factory, Intake intake, Spindexer spindexer, Turret turret,
-      Hood hood) {
+  public AutoRoutine leftLiberal(AutoFactory factory) {
     AutoRoutine routine = factory.newRoutine("leftLiberal");
 
     AutoTrajectory liberalSwipe = routine.trajectory("liberal", 0);
     AutoTrajectory shallowSwipe = routine.trajectory("liberal", 1);
+
+    routine.active().onTrue(
+        Commands.sequence(
+            liberalSwipe.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+            }),
+            liberalSwipe.cmd()));
+
+    liberalSwipe.done()
+        .onTrue(Commands.sequence(
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            shallowSwipe.cmd()));
+
+    shallowSwipe.done()
+        .onTrue(Commands.sequence(
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine rightLiberal(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("leftLiberal");
+
+    AutoTrajectory liberalSwipe = routine.trajectory("liberal", 0).mirrorY();
+    AutoTrajectory shallowSwipe = routine.trajectory("liberal", 1).mirrorY();
 
     routine.active().onTrue(
         Commands.sequence(

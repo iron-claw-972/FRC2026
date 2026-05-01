@@ -361,11 +361,15 @@ public class RobotContainer {
     addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
     addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
+    ChoreoPathCommand choreo = new ChoreoPathCommand(intake, spindexer, turret, hood);
+
     addAuto("testChoreo", ChoreoPathCommand.basicTrajectoryAuto("test.traj", true, autoFactory));
-    addChoreoAuto("choreoLiberalLeft", ChoreoPathCommand.leftConservative(autoFactory, intake, spindexer, turret, hood));
+    addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
+    addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
+    SmartDashboard.putData("Choreo auto chooser", choreoAutoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
