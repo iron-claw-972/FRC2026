@@ -350,7 +350,7 @@ public class RobotContainer {
     addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
     addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
-    addAuto("testChoreo", new ChoreoPathCommand("test.traj", true, autoFactory));
+    addAuto("testChoreo", ChoreoPathCommand.basicTrajectoryAuto("test.traj", true, autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
