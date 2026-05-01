@@ -31,10 +31,10 @@ public class ChoreoPathCommand {
 
   public static AutoRoutine leftConservative(AutoFactory factory, Intake intake, Spindexer spindexer, Turret turret,
       Hood hood) {
-    AutoRoutine routine = factory.newRoutine("leftConservative");
+    AutoRoutine routine = factory.newRoutine("leftLiberal");
 
-    AutoTrajectory liberalSwipe = routine.trajectory("liberal");
-    AutoTrajectory shallowSwipe = routine.trajectory("shallowSwipe");
+    AutoTrajectory liberalSwipe = routine.trajectory("liberal", 0);
+    AutoTrajectory shallowSwipe = routine.trajectory("liberal", 1);
 
     routine.active().onTrue(
         Commands.sequence(

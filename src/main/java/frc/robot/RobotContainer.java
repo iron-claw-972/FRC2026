@@ -137,22 +137,7 @@ public class RobotContainer {
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
 
-        // choreo auto factory init
-        
-      autoFactory = new AutoFactory(
-            drive::getPose,
-            drive::resetOdometry,
-            sample -> drive.setChassisSpeeds(sample.getChassisSpeeds(), false),
-            true,
-            drive,
-            (trajectory, startOrFinish) -> {
-              Logger.recordOutput(
-                  "Autos/Trajectory", trajectory.getPoses());
-              Logger.recordOutput("Autos/StartingOrFinishing", startOrFinish);
-          });
-
-        // warmup command for choreo, prevents lag on auto startup
-        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd());
+        initChoreo();
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
@@ -198,6 +183,27 @@ public class RobotContainer {
     if (!Constants.DISABLE_SMART_DASHBOARD) {
       SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
     }
+  }
+
+  private void initChoreo() {
+        // choreo auto factory init
+      	autoFactory = new AutoFactory(
+            drive::getPose,
+            drive::resetOdometry,
+            sample -> drive.setChassisSpeeds(sample.getChassisSpeeds(), false),
+            true,
+            drive,
+            (trajectory, startOrFinish) -> {
+              Logger.recordOutput(
+                  "Autos/Trajectory", trajectory.getPoses());
+              Logger.recordOutput("Autos/StartingOrFinishing", startOrFinish);
+          });
+
+        autoFactory.bind("hoodUp", new InstantCommand(() -> hood.forceHoodDown(false)));
+        autoFactory.bind("hoodDown", new InstantCommand(() -> hood.forceHoodDown(true)));
+
+        // warmup command for choreo, prevents lag on auto startup
+        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd());
   }
 
   /**
