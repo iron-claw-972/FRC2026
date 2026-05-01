@@ -26,6 +26,11 @@ public class TurretIOTalonFX implements TurretIO {
     config.Slot0.kV = 0.12; // Adjusted kV for the gear ratio
     config.Slot0.kD = 0.0; // The "Braking" term to stop overshoot
 
+    CurrentLimitsConfigs limitsConfigs = new CurrentLimitsConfigs();
+    limitsConfigs.StatorCurrentLimit = TurretConstants.STATOR_CURRENT_LIMIT;
+    limitsConfigs.SupplyCurrentLimit = TurretConstants.SUPPLY_CURRENT_LIMIT;
+    motor.getConfigurator().apply(limitsConfigs);
+
     var mm = config.MotionMagic;
     mm.MotionMagicCruiseVelocity = Units.radiansToRotations(TurretConstants.MAX_VELOCITY) * TurretConstants.GEAR_RATIO;
     mm.MotionMagicAcceleration = Units.radiansToRotations(TurretConstants.MAX_ACCELERATION)
@@ -41,7 +46,8 @@ public class TurretIOTalonFX implements TurretIO {
     inputs.positionDeg = Units.rotationsToDegrees(motor.getPosition().getValueAsDouble()) / TurretConstants.GEAR_RATIO;
     inputs.velocityRadPerSec = Units.rotationsToRadians(motor.getVelocity().getValueAsDouble())
         / TurretConstants.GEAR_RATIO;
-    inputs.motorCurrent = motor.getStatorCurrent().getValueAsDouble();
+    inputs.motorStatorCurrent = motor.getStatorCurrent().getValueAsDouble();
+    inputs.motorSupplyCurrent = motor.getSupplyCurrent().getValueAsDouble();
     inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
 
   }
@@ -69,12 +75,13 @@ public class TurretIOTalonFX implements TurretIO {
         .withSupplyCurrentLimitEnable(true)
         .withSupplyCurrentLimit(limit);
 
-    if (limit == TurretConstants.NORMAL_CURRENT_LIMIT) {
-      limits.SupplyCurrentLowerLimit = TurretConstants.CALIBRATION_CURRENT_LIMIT;
+    if (limit == TurretConstants.SUPPLY_CURRENT_LIMIT) {
+      limits.SupplyCurrentLowerLimit = TurretConstants.SUPPLY_CURRENT_LIMIT * .5;
       limits.SupplyCurrentLowerTime = 1.0; // Set to lower limit if over 1 second
     }
 
     motor.getConfigurator().apply(limits);
+
   }
 
 }

@@ -19,7 +19,6 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.spindexer.SpindexerConstants;
 import frc.robot.subsystems.turret.Turret;
 import lib.controllers.PS5Controller;
 import lib.controllers.PS5Controller.DPad;
@@ -30,15 +29,15 @@ import lib.controllers.PS5Controller.PS5Button;
  * Driver controls for the PS5 controller
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
-  private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
-  private final BooleanSupplier slowModeSupplier = () -> false;
-  private boolean intakeBoolean = true;
-  private Command autoShoot = null;
-  private Shooter shooter;
-  private Turret turret;
-  private Hood hood;
-  private Intake intake;
-  private Spindexer spindexer;
+    private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
+    private final BooleanSupplier slowModeSupplier = () -> false;
+    private boolean intakeBoolean = true;
+    private Command autoShoot = null;
+    private Shooter shooter;
+    private Turret turret;
+    private Hood hood;
+    private Intake intake;
+    private Spindexer spindexer;
 
   public PS5ControllerDriverConfig(
             Drivetrain drive,
@@ -46,8 +45,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             Turret turret,
             Hood hood,
             Intake intake,
-            Spindexer spindexer
-            ) {
+            Spindexer spindexer) {
         super(drive);
         this.shooter = shooter;
         this.turret = turret;
@@ -99,17 +97,6 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
       controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
           .alongWith(new InstantCommand(() -> intakeBoolean = true)));
 
-      // Calibration: you can now calibrate easily using this button
-      if (hood != null && intake != null) {
-        controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-          intake.calibrate();
-          hood.calibrate();
-        }, intake, hood)).onFalse(new InstantCommand(() -> {
-          intake.stopCalibrating();
-          hood.stopCalibrating();
-        }, intake, hood));
-      }
-
       // Stop intake roller
       controller.get(DPad.DOWN).onTrue(new InstantCommand(() -> {
         if (intakeBoolean) {
@@ -130,41 +117,23 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
           new RunSpindexer(spindexer, turret, hood, intake));
     }
 
-    // Auto shoot
-    if (turret != null && hood != null && shooter != null && spindexer != null) {
-      autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
-      controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
-    }
+        // Auto shoot
+        if (turret != null && hood != null && shooter != null && spindexer != null) {
+            autoShoot = new Superstructure(turret, getDrivetrain(), hood, shooter, spindexer);
+            controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
+        }
 
-    // Hood
-    if (hood != null) {
-      // Set the hood down -- for safety measures under trench
-      controller.get(DPad.LEFT).onTrue(new InstantCommand(() -> {
-        hood.forceHoodDown(true);
-      }, hood)).onFalse(new InstantCommand(() -> {
-        hood.forceHoodDown(false);
-      }));
+    
+        // Hood
+        if (hood != null) {
+            // Set the hood down -- for safety measures under trench
+            controller.get(DPad.LEFT).onTrue(new InstantCommand(()->{
+                hood.forceHoodDown(true);
+            }, hood)).onFalse(new InstantCommand(()->{
+                hood.forceHoodDown(false);
+            }));
+        }
     }
-
-    // shoot focus mode: reduces drive current
-    if (spindexer != null) {
-      controller.get(PS5Button.RB).onTrue(new InstantCommand(() -> shootFocus(true)))
-          .onFalse(new InstantCommand(() -> shootFocus(false)));
-    }
-  }
-
-  private void shootFocus(boolean turnOn) {
-    if (turnOn) {
-      System.out.println("Shooting is now Focused");
-      spindexer.setNewCurrentLimit(SpindexerConstants.currentLimit);
-      drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT,
-          DriveConstants.DRIVE_PEAK_CURRENT_LIMIT * 0.25);
-    } else {
-      System.out.println("Shooting back to normal (From focus)");
-      spindexer.setNewCurrentLimit(SpindexerConstants.currentLimit);
-      drive.applyNewModuleCurrents(DriveConstants.STEER_PEAK_CURRENT_LIMIT, DriveConstants.DRIVE_PEAK_CURRENT_LIMIT);
-    }
-  }
 
   @Override
   public double getRawSideTranslation() {

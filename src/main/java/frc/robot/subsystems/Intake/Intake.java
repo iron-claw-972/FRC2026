@@ -4,15 +4,11 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
 
-  private boolean calibrating = false;
-  private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
+    private boolean calibrating = false;
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final IntakeIO io;
@@ -45,7 +41,7 @@ public class Intake extends SubsystemBase {
    */
   public static double rotationsToInches(double motorRotations) {
     // circumference of the rack pinion
-    double circ = 2 * Math.PI * 0.5;
+    double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
     double pinionRotations = motorRotations / IntakeConstants.GEAR_RATIO;
     double inches = pinionRotations * circ;
     return inches;
@@ -58,7 +54,7 @@ public class Intake extends SubsystemBase {
    * @return motor rotations
    */
   public static double inchesToRotations(double inches) {
-    double circ = 2 * Math.PI * 0.5;
+    double circ = 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION;
     double pinionRotations = inches / circ;
     double motorRotations = pinionRotations * IntakeConstants.GEAR_RATIO;
     return motorRotations;
@@ -139,23 +135,23 @@ public class Intake extends SubsystemBase {
     io.close();
   }
 
-  /**
-   * Starts calibrating by running it backwards
-   */
-  public void calibrate() {
-    setCurrentLimits(IntakeConstants.CALIBRATING_CURRENT_LIMITS);
-    calibrating = true;
-  }
+//   /**
+//    * Starts calibrating by running it backwards
+//    */
+//   public void calibrate() {
+//     setNewCurrentLimit(IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS, IntakeConstants.CALIBRATING_CURRENT_LIMITS);
+//     calibrating = true;
+//   }
 
-  /**
-   * Stops, zeros, and moves it to retract position
-   */
-  public void stopCalibrating() {
-    zeroMotors();
-    setCurrentLimits(IntakeConstants.EXTENDER_CURRENT_LIMITS);
-    calibrating = false;
-    retract();
-  }
+//   /**
+//    * Stops, zeros, and moves it to retract position
+//    */
+//   public void stopCalibrating() {
+//     zeroMotors();
+//     setNewCurrentLimit(IntakeConstants.STATOR_CURRENT_EXTENDER_LIMIT, IntakeConstants.SUPPLY_CURRENT_EXTENDER_LIMIT, IntakeConstants.STATOR_ROLLER_CURRENT_LIMIT, IntakeConstants.SUPPLY_ROLLER_CURRENT_LIMIT);
+//     calibrating = false;
+//     retract();
+//   }
 
   /**
    * sets supply and stator current limits

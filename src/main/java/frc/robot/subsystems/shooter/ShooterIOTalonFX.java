@@ -56,8 +56,10 @@ public class ShooterIOTalonFX implements ShooterIO {
         * ShooterConstants.SHOOTER_LAUNCH_DIAMETER / 2;
     inputs.shooterSpeedRight = Units.rotationsToRadians(shooterMotorRight.getVelocity().getValueAsDouble())
         * ShooterConstants.SHOOTER_LAUNCH_DIAMETER / 2;
-    inputs.shooterCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
-    inputs.shooterCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+    inputs.shooterStatorCurrentLeft = shooterMotorLeft.getStatorCurrent().getValueAsDouble();
+    inputs.shooterStatorCurrentRight = shooterMotorRight.getStatorCurrent().getValueAsDouble();
+    inputs.shooterSupplyCurrentLeft = shooterMotorLeft.getSupplyCurrent().getValueAsDouble();
+    inputs.shooterSupplyCurrentRight = shooterMotorRight.getSupplyCurrent().getValueAsDouble();
 
   }
 

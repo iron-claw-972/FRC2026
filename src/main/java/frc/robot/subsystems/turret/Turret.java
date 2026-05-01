@@ -6,8 +6,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -20,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.ModifiedCRT;
 
 public class Turret extends SubsystemBase {
 	// Super low magnitude filter for the position to make it less jittery
@@ -33,7 +30,6 @@ public class Turret extends SubsystemBase {
 	public boolean locked = false;
 
 	private boolean calibrating;
-	private Debouncer calibrationDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
 	/* ---------------- Hardware ---------------- */
 
@@ -56,21 +52,15 @@ public class Turret extends SubsystemBase {
 
 	private final MotionMagicVoltage mmVoltageRequest = new MotionMagicVoltage(0);
 
-	ModifiedCRT crt;
-
 	/* ---------------- Constructor ---------------- */
 
 	public Turret(TurretIO io) {
 		this.io = io;
 
-		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
-
 		lastGoalRad = 0.0;
 
 		if (!Constants.DISABLE_SMART_DASHBOARD) {
 			SmartDashboard.putData("Turret Mech", mech);
-			SmartDashboard.putData("Start turret calibration", new InstantCommand(() -> calibrate()));
-			SmartDashboard.putData("Stop turret calibration", new InstantCommand(() -> stopCalibrating()));
 
 			SendableChooser<InstantCommand> turretTestChooser = new SendableChooser<>();
 			turretTestChooser.setDefaultOption("Turn to 0",
@@ -182,20 +172,11 @@ public class Turret extends SubsystemBase {
 		// Multiply goal velocity by kV
 		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
-		if (calibrating) {
-			io.setMotorRaw(0.05);
-			boolean calibrated = Math
-					.abs(inputs.motorCurrent) >= TurretConstants.CALIBRATION_CURRENT_THRESHOLD;
-			if (calibrationDebouncer.calculate(calibrated)) {
-				stopCalibrating();
-			}
-		} else {
-			// Sets motor control with feedforward
-			io.setControl(mmVoltageRequest
-					.withPosition(motorGoalRotations)
-					.withFeedForward(robotTurnCompensation)
-					.withEnableFOC(true));
-		}
+		// Sets motor control with feedforward
+		io.setControl(mmVoltageRequest
+				.withPosition(motorGoalRotations)
+				.withFeedForward(robotTurnCompensation)
+				.withEnableFOC(true));
 
 		if (!Constants.DISABLE_LOGGING) {
 			Logger.recordOutput("Turret/Voltage", inputs.motorVoltage);
@@ -242,17 +223,5 @@ public class Turret extends SubsystemBase {
 		if (value < 0)
 			value += 1.0;
 		return value;
-	}
-
-	private void calibrate() {
-		setCurrentLimits(TurretConstants.CALIBRATION_CURRENT_LIMIT);
-		calibrating = true;
-	}
-
-	private void stopCalibrating() {
-		io.setMotorRaw(Units.degreesToRotations(TurretConstants.CALIBRATION_OFFSET) * TurretConstants.GEAR_RATIO);
-		setCurrentLimits(TurretConstants.NORMAL_CURRENT_LIMIT);
-		calibrating = false;
-		setFieldRelativeTarget(new Rotation2d(Units.degreesToRadians(TurretConstants.CALIBRATION_OFFSET)), 0.0);
 	}
 }

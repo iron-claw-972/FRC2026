@@ -59,6 +59,11 @@ public class Spindexer extends SubsystemBase {
             io.setControl(new DutyCycleOut(power).withEnableFOC(true));
         }
 
+        if (state == SpindexerState.REVERSE) {
+            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT);
+        } else {
+            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT);
+        }
 
         // scale threshold based on power
         double velocityThreshold = SpindexerConstants.spindexerVelocityWithBall * power;
@@ -106,7 +111,11 @@ public class Spindexer extends SubsystemBase {
     }
 
     public double getStatorCurrent() {
-        return inputs.spindexerOneCurrent + inputs.spindexerTwoCurrent;
+        return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
+    }
+
+    public double getSubsystemStatorCurrent() {
+        return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
     }
 
     public void setNewCurrentLimit(double newCurrentLimit) {

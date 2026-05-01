@@ -63,9 +63,10 @@ public class Superstructure extends Command {
 
     private LoggedNetworkNumber hoodOffset = new LoggedNetworkNumber("OPERATOR: Hood Offset", 0.0);
 
-    private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("OPERATOR: Turret Offset", 0.0);
+    private double turretOffset = 0.0;
 
     private double distanceFromTarget = 0.0;
+    private double shuttlingTOFMultiplier = 0.8;
 
     // private double TOFAdjustment = 0.85;
     // private double TOFAdjustment = 1.1;
@@ -111,11 +112,12 @@ public class Superstructure extends Command {
          * So we make a bunch of guesses until it converges
          * Early exit when change < 1mm to avoid unnecessary iterations
          */
+        boolean shuttling = target.equals(FieldConstants.getHubTranslation().toTranslation2d());
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
+                shuttling ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
@@ -123,7 +125,13 @@ public class Superstructure extends Command {
             target3d.minus(lookahead3d),
             2.0);
 
-            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
+            if (!shuttling) {
+                timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
+            } else {
+                double distance = target.getDistance(lookaheadPose.getTranslation());
+                timeOfFlight = distance * shuttlingTOFMultiplier;
+            }
+
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             Pose2d newLookaheadPose =
@@ -166,7 +174,7 @@ public class Superstructure extends Command {
 
         // Shortest path
         double error = MathUtil.inputModulus(Units.radiansToDegrees(adjustedTurretSetpoint) - Units.radiansToDegrees(turret.getPositionRad()), -180, 180);
-        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset.get();
+        double potentialSetpoint = Units.radiansToDegrees(turret.getPositionRad()) + error + turretOffset;
 
         // Stay within physical limits -- if shortest path is past max angle, we go long way around
         if (potentialSetpoint > TurretConstants.MAX_ANGLE) {
@@ -198,7 +206,7 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose.exp(
+        drivepose = drivepose.exp(
             new Twist2d(
                 robotRelVel.vxMetersPerSecond * phaseDelay.get(),
                 robotRelVel.vyMetersPerSecond * phaseDelay.get(),
@@ -231,12 +239,12 @@ public class Superstructure extends Command {
 
     // aim more left
     public void bumpUpTurretOffset() {
-        turretOffset.set(turretOffset.get() + 2.5); //2.5 deg
+        turretOffset += 2.5; //2.5 deg
     }
 
     // aim more right
     public void bumpDownTurretOffset() {
-        turretOffset.set(turretOffset.get() - 2.5); //2.5 deg
+        turretOffset -= 2.5; //2.5 deg
     }
 
     @Override
@@ -247,6 +255,12 @@ public class Superstructure extends Command {
 
         updateDrivePose();
         updateSetpoints(drivepose);
+
+        turretOffset = SmartDashboard.getNumber("OPERATOR: Turret Offset", turretOffset);
+        SmartDashboard.putNumber("OPERATOR: Turret Offset", turretOffset);
+
+        shuttlingTOFMultiplier = SmartDashboard.getNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
+        SmartDashboard.putNumber("Shuttling TOF Multiplier", shuttlingTOFMultiplier);
 
         if (phaseManager.isIdle()) {
             underLadder();
@@ -265,9 +279,6 @@ public class Superstructure extends Command {
                 hood.setFieldRelativeTarget(Rotation2d.fromDegrees(ShotInterpolation.newHoodMap.get(distanceFromTarget)), hoodVelocity);
             }
             
-            double x = drivepose.getX(); // compared as meters
-            double y = drivepose.getY();
-
             // if (FieldConstants.underTrench(x, y)) {
             //     System.out.println("Hood forced down");
             // } else {

@@ -21,6 +21,7 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -477,5 +478,27 @@ public class Module implements ModuleIO {
 
   public TalonFX[] getMotors() {
     return new TalonFX[] { angleMotor, driveMotor };
+  }
+
+  public void setNewCurrentLimit(double steerCurrentStator, double steerCurrentSupply, double driveCurrentStator,
+      double driveCurrentSupply) {
+    CurrentLimitsConfigs steerConfig = new CurrentLimitsConfigs();
+    // steer
+    steerConfig.SupplyCurrentLimitEnable = DriveConstants.STEER_ENABLE_CURRENT_LIMIT;
+    steerConfig.SupplyCurrentLimit = steerCurrentSupply;
+    steerConfig.SupplyCurrentLowerLimit = steerCurrentSupply;
+    steerConfig.StatorCurrentLimit = steerCurrentStator;
+    steerConfig.SupplyCurrentLowerTime = DriveConstants.STEER_PEAK_CURRENT_DURATION;
+    angleMotor.getConfigurator().apply(steerConfig); // apply
+
+    // drive
+    CurrentLimitsConfigs driveConfig = new CurrentLimitsConfigs();
+    driveConfig.SupplyCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+    driveConfig.SupplyCurrentLimit = driveCurrentSupply;
+    driveConfig.SupplyCurrentLowerLimit = driveCurrentSupply;
+    driveConfig.SupplyCurrentLowerTime = DriveConstants.DRIVE_PEAK_CURRENT_DURATION;
+    driveConfig.StatorCurrentLimit = driveCurrentStator;
+    driveConfig.StatorCurrentLimitEnable = DriveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+    driveMotor.getConfigurator().apply(driveConfig); // apply
   }
 }

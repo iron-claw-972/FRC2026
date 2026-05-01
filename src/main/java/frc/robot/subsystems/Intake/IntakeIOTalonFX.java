@@ -13,7 +13,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
-import frc.robot.constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
 
@@ -70,9 +69,9 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     // config the current limits (low value for testing)
     config.CurrentLimits
-        .withStatorCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
+        .withStatorCurrentLimit(IntakeConstants.STATOR_CURRENT_EXTENDER_LIMIT)
         .withStatorCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(IntakeConstants.EXTENDER_CURRENT_LIMITS)
+        .withSupplyCurrentLimit(IntakeConstants.SUPPLY_CURRENT_EXTENDER_LIMIT)
         .withSupplyCurrentLimitEnable(true);
 
     // config Slot 0 PID params
@@ -102,7 +101,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
 
     CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-    limitConfig.StatorCurrentLimit = IntakeConstants.NORMAL_CURRENT_LIMIT;
+    limitConfig.StatorCurrentLimit = IntakeConstants.STATOR_ROLLER_CURRENT_LIMIT;
     limitConfig.StatorCurrentLimitEnable = true;
     leftMotor.getConfigurator().apply(limitConfig);
     rightMotor.getConfigurator().apply(limitConfig);

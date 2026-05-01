@@ -19,7 +19,7 @@ public class SpindexerIOTalonFX implements SpindexerIO {
     CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
     limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_SPIKE_LIMIT;
     limitConfig.StatorCurrentLimitEnable = true;
-    limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.currentLimit;
+    limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
     limitConfig.SupplyCurrentLowerTime = 1.5;
     motorOne.getConfigurator().apply(limitConfig);
     motorTwo.getConfigurator().apply(limitConfig);
@@ -33,9 +33,9 @@ public class SpindexerIOTalonFX implements SpindexerIO {
   @Override
   public void updateInputs(SpindexerIOInputs inputs) {
     inputs.spindexerOneVelocity = motorOne.getVelocity().getValueAsDouble();
-    inputs.spindexerOneCurrent = motorOne.getStatorCurrent().getValueAsDouble();
+    inputs.spindexerOneStatorCurrent = motorOne.getStatorCurrent().getValueAsDouble();
     inputs.spindexerTwoVelocity = motorTwo.getVelocity().getValueAsDouble();
-    inputs.spindexerTwoCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
+    inputs.spindexerTwoStatorCurrent = motorTwo.getStatorCurrent().getValueAsDouble();
   }
 
   @Override

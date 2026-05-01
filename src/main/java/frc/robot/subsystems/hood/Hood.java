@@ -97,6 +97,7 @@ public class Hood extends SubsystemBase {
 			goalVelocityRadPerSec = 0.0;
 		}
 
+
 		double setpointRad = goalAngle.getRadians();
 
 		// calculate shortest angular delta
@@ -127,9 +128,6 @@ public class Hood extends SubsystemBase {
 			boolean atZero = Math
 					.abs(inputs.motorCurrent) >= HoodConstants.CALIBRATION_CURRENT_THRESHOLD;
 			boolean calibrated = calibrateDebouncer.calculate(atZero);
-			if (calibrated) {
-				stopCalibrating();
-			}
 		} else {
 			// Set control with feedforward
 			io.setMotorControl(mmVoltageRequest
@@ -145,24 +143,12 @@ public class Hood extends SubsystemBase {
 		}
 	}
 
-	public void calibrate() {
-		calibrating = true;
-		setCurrentLimits(HoodConstants.CALIBRATING_CURRENT_LIMIT);
-	}
-
-	public void stopCalibrating() {
-		io.setPositionRaw(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
-		goalAngle = new Rotation2d(Units.degreesToRadians(HoodConstants.MAX_ANGLE));
-		setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
-		calibrating = false;
-	}
-
 	/**
 	 * sets supply and stator current limits
 	 * 
 	 * @param limitAmps the current limit for stator and supply current
 	 */
-	public void setCurrentLimits(double limitAmps) {
-		io.setCurrentLimits(limitAmps);
+	public void setCurrentLimits(double stator, double supply) {
+		io.setCurrentLimits(stator, supply);
 	}
 }

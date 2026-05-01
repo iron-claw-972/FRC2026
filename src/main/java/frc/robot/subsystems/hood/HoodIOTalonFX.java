@@ -32,7 +32,7 @@ public class HoodIOTalonFX implements HoodIO {
     mm.MotionMagicJerk = 0; // Set to > 0 for "S-Curve" smoothing if needed
     motor.getConfigurator().apply(config);
 
-    setCurrentLimits(HoodConstants.NORMAL_CURRENT_LIMIT);
+    setCurrentLimits(HoodConstants.STATOR_CURRENT_LIMIT, HoodConstants.SUPPLY_CURRENT_LIMIT);
 
     motor.setPosition(Units.degreesToRotations(HoodConstants.MAX_ANGLE) * HoodConstants.HOOD_GEAR_RATIO);
   }
@@ -69,12 +69,12 @@ public class HoodIOTalonFX implements HoodIO {
    * @param limitAmps the current limit for stator and supply current
    */
   @Override
-  public void setCurrentLimits(double limitAmps) {
+  public void setCurrentLimits(double stator, double supply) {
     CurrentLimitsConfigs limits = new CurrentLimitsConfigs()
         .withStatorCurrentLimitEnable(true)
-        .withStatorCurrentLimit(limitAmps)
+        .withStatorCurrentLimit(stator)
         .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(limitAmps);
+        .withSupplyCurrentLimit(supply);
 
     motor.getConfigurator().apply(limits);
   }
