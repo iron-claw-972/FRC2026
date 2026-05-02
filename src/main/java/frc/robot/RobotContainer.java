@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
-import frc.robot.commands.auto_comm.ChoreoPathCommand;
+import frc.robot.commands.auto_comm.ChoreoPathCommandBuilder;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.drive_comm.SysIDDriveCommand;
@@ -361,9 +361,9 @@ public class RobotContainer {
     addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
     addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
-    ChoreoPathCommand choreo = new ChoreoPathCommand(intake, spindexer, turret, hood);
+    ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
 
-    addAuto("testChoreo", ChoreoPathCommand.basicTrajectoryAuto("test.traj", true, autoFactory));
+    addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
     addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
     addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
     addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));

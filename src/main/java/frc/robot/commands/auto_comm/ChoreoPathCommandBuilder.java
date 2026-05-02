@@ -14,14 +14,14 @@ import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
 
-public class ChoreoPathCommand {
+public class ChoreoPathCommandBuilder {
 
   private Intake intake;
   private Spindexer spindexer;
   private Turret turret;
   private Hood hood;
 
-  public ChoreoPathCommand(Intake intake, Spindexer spindexer, Turret turret, Hood hood) {
+  public ChoreoPathCommandBuilder(Intake intake, Spindexer spindexer, Turret turret, Hood hood) {
     this.intake = intake;
     this.spindexer = spindexer;
     this.turret = turret;
