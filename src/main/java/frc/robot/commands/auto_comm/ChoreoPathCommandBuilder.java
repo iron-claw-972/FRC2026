@@ -111,7 +111,6 @@ public class ChoreoPathCommandBuilder {
 
   }
 
-  
   public AutoRoutine leftConservative(AutoFactory factory) {
     AutoRoutine routine = factory.newRoutine("leftConservative");
 
@@ -263,6 +262,40 @@ public class ChoreoPathCommandBuilder {
               hood.forceHoodDown(true);
             }),
             shallowSwipe.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine leftSuperShuttling(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("leftSuperShuttling");
+
+    AutoTrajectory shuttlingTrajectory = routine.trajectory("superShuttling");
+
+    routine.active().onTrue(Commands.sequence(
+        shuttlingTrajectory.resetOdometry(),
+        new InstantCommand(() -> {
+          intake.extend();
+          intake.spinStart();
+        }),
+        shuttlingTrajectory.cmd()));
+
+    return routine;
+
+  }
+
+  public AutoRoutine rightSuperShuttling(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("rightSuperShuttling");
+
+    AutoTrajectory shuttlingTrajectory = routine.trajectory("superShuttling").mirrorY();
+
+    routine.active().onTrue(Commands.sequence(
+        shuttlingTrajectory.resetOdometry(),
+        new InstantCommand(() -> {
+          intake.extend();
+          intake.spinStart();
+        }),
+        shuttlingTrajectory.cmd()));
 
     return routine;
 
