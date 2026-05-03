@@ -295,4 +295,33 @@ public class ChoreoPathCommandBuilder {
     return routine;
 
   }
+
+  public AutoRoutine rightSuperShuttling(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("rightSuperShuttling");
+    
+    AutoTrajectory shuttlingTrajectory = routine.trajectory("superShuttling").mirrorY();
+    
+    routine.active().onTrue(Commands.sequence(
+        shuttlingTrajectory.resetOdometry(),
+        new InstantCommand(() -> {
+          intake.extend();
+          intake.spinStart();
+        }),
+        shuttlingTrajectory.cmd()));
+
+    shuttlingTrajectory.done().onTrue(Commands.sequence(
+        new InstantCommand(() -> {
+          hood.forceHoodDown(false);
+        }),
+        new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+        new InstantCommand(() -> {
+          intake.extend();
+          intake.spinStart();
+          hood.forceHoodDown(true);
+        }),
+        shuttlingTrajectory.cmd()));
+
+    return routine;
+
+  }
 }
