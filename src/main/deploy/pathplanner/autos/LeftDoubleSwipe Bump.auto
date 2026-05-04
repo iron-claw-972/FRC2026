@@ -31,25 +31,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LeftConservativeSwipe1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Hood Down"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Start Spindexer"
+            "pathName": "Left Swipe1 Bump"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 2.0
           }
         },
         {
@@ -115,7 +103,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 1.5
           }
         },
         {
@@ -127,7 +115,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         }
       ]

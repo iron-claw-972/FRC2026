@@ -18,10 +18,12 @@ public class LogCommand extends Command {
 
     @Override
     public void execute() {
-        boolean current = HubActive.isHubActive();
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("HubActive", current);
+        if (Constants.DISABLE_LOGGING) {
+            return;
         }
+
+        boolean current = HubActive.isHubActive();
+        Logger.recordOutput("HubActive", current);
         
         if (current && !hubActive) {
             Elastic.sendNotification(new Notification(NotificationLevel.INFO, "HUB ACTIVE", ""));
