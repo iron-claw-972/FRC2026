@@ -62,7 +62,7 @@ public class DefaultDriveCommand extends Command {
         sideTranslation *= allianceReversal;
 
         ChassisSpeeds driverInput = new ChassisSpeeds(forwardTranslation, sideTranslation, rotation);
-        ChassisSpeeds corrected = DriverAssist.calculate(swerve, driverInput, swerve.getDesiredPose(), true);
+        ChassisSpeeds corrected = DriverAssist.calculate(swerve, driverInput, swerve.getDesiredPose(), true); //literally does nothing rn
 
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("TrenchAlign", swerve.getTrenchAlign());
