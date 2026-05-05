@@ -88,6 +88,14 @@ public class Vision {
       if (RobotBase.isSimulation()) {
         questNav.setVersionCheckEnabled(false);
       }
+
+      questNav.onConnected(() -> System.out.println("[QuestNav] Headset connected"));
+      questNav.onDisconnected(() -> DriverStation.reportWarning("[QuestNav] Headset disconnected", false));
+      questNav.onTrackingAcquired(() -> System.out.println("[QuestNav] Tracking acquired"));
+      questNav.onTrackingLost(() -> DriverStation.reportWarning("[QuestNav] Tracking lost", false));
+      questNav.onLowBattery(20, level -> DriverStation.reportWarning("[QuestNav] Battery low: " + level + "%", false));
+      questNav.onCommandSuccess(response -> System.out.println("[QuestNav] Command succeeded: " + response.getCommandId()));
+      questNav.onCommandFailure(response -> DriverStation.reportError("[QuestNav] Command failed: " + response.getErrorMessage(), false));
     }
 
     if(VisionConstants.ENABLED){
@@ -364,6 +372,13 @@ public class Vision {
     if (VisionConstants.QUESTNAV_ENABLED) {
       double now = Timer.getFPGATimestamp();
       questNav.commandPeriodic();
+
+        Logger.recordOutput("QuestNav/Connected", questNav.isConnected());
+        Logger.recordOutput("QuestNav/Tracking", questNav.isTracking());
+        Logger.recordOutput("QuestNav/Latency", questNav.getLatency());
+        questNav.getBatteryPercent().ifPresent(b -> Logger.recordOutput("QuestNav/Battery%", b));
+        questNav.getTrackingLostCounter().ifPresent(c -> Logger.recordOutput("QuestNav/TrackingLostCount", c));
+
       for (PoseFrame frame : questNav.getAllUnreadPoseFrames()) {
         if (frame.isTracking()) {
           double timestamp = frame.dataTimestamp();
