@@ -37,6 +37,8 @@ import frc.robot.constants.FieldConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.MathUtils;
+import gg.questnav.questnav.PoseFrame;
+import gg.questnav.questnav.QuestNav;
 
 // Vision and it's commands are adapted from Iron Claw's FRC2023
 public class Vision {
@@ -47,7 +49,7 @@ public class Vision {
   private NetworkTableEntry objectDistance;
   private NetworkTableEntry objectClass;
   private NetworkTableEntry cameraIndex;
-  
+
   // A list of the cameras on the robot.
   private ArrayList<VisionCamera> cameras = new ArrayList<>();
 
@@ -57,6 +59,9 @@ public class Vision {
 
   // Array of tags to use, null or empty array to use all tags
   private int[] onlyUse = null;
+
+  // QuestNav VIO fusion
+  private QuestNav questNav;
 
   /**
    * Creates a new instance of Vision and sets up the cameras and field layout
@@ -77,6 +82,13 @@ public class Vision {
 
     // Sets the origin to the right side of the blue alliance wall
     FieldConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+
+    if (VisionConstants.QUESTNAV_ENABLED) {
+      questNav = new QuestNav();
+      if (RobotBase.isSimulation()) {
+        questNav.setVersionCheckEnabled(false);
+      }
+    }
 
     if(VisionConstants.ENABLED){
       // Puts the cameras in an array list
@@ -105,7 +117,6 @@ public class Vision {
       Logger.recordOutput("AprilTags", tags);
     }
   }
-
 
   /**
    * Get the horizontal offsets from the crosshair to the targets
@@ -350,6 +361,34 @@ public class Vision {
       }
     }
 
+    if (VisionConstants.QUESTNAV_ENABLED) {
+      double now = Timer.getFPGATimestamp();
+      questNav.commandPeriodic();
+      for (PoseFrame frame : questNav.getAllUnreadPoseFrames()) {
+        if (frame.isTracking()) {
+          double timestamp = frame.dataTimestamp();
+          // skip future or stale measurements
+          if (timestamp > now || timestamp < now - 1.0)
+            continue;
+
+          Pose3d questPose = frame.questPose3d();
+          if (questPose == null)
+            continue;
+
+          Pose2d robotPose2d = questPose
+              .transformBy(VisionConstants.ROBOT_TO_QUEST.inverse())
+              .toPose2d();
+
+          if (onField(robotPose2d)) {
+            poseEstimator.addVisionMeasurement(
+                robotPose2d,
+                timestamp,
+                VisionConstants.QUESTNAV_STD_DEVS);
+          }
+        }
+      }
+    }
+
     sawTag = false;
 
     // An array list of poses returned by different cameras
@@ -399,12 +438,30 @@ public class Vision {
       DriverStation.reportWarning("Camera index "+index+" is out of bounds", false);
     }
   }
+
   /**
    * Sets the cameras to only use April tag in the specified array
    * @param ids The ids of the tags to use, null or empty array to use all
    */
   public void onlyUse(int[] ids){
     onlyUse = ids;
+  }
+
+  /**
+   * Sets the robot pose for QuestNav VIO fusion.
+   * 
+   * @param robotPose The robot's pose in the field frame.
+   */
+  public void setRobotPose(Pose2d robotPose) {
+    if (robotPose == null)
+      return;
+
+    if (questNav != null) {
+      Pose3d questPose = new Pose3d(robotPose)
+          .transformBy(VisionConstants.ROBOT_TO_QUEST);
+
+      questNav.setPose(questPose);
+    }
   }
 
   /**
