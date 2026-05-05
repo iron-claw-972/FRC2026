@@ -668,6 +668,9 @@ public class Drivetrain extends SubsystemBase {
         currentHeading = pose.getRotation().getRadians();
         poseEstimator.resetPosition(gyroInputs.yawPosition, getModulePositions(), pose);
         modulePoses.reset();
+        if (vision != null) {
+            vision.setRobotPose(pose);
+        }
     }
 
     /**

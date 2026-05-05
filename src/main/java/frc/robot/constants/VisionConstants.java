@@ -198,4 +198,28 @@ public class VisionConstants {
         public static final String[] ORANGEPI_HOSTNAMES = { "photonfront.local", "photonback.local" };
         public static final String ORANGEPI_USERNAME = "pi";
         public static final String ORANGEPI_PASSWORD = "raspberry";
+
+        /**
+         * Enable QuestNav fusion (set to true when headset is installed)
+         */
+        public static final boolean QUESTNAV_ENABLED = false;
+
+        /**
+         * Robot center to Quest headset transform (X fwd, Y left, Z up; meters)
+         */
+        public static final Transform3d ROBOT_TO_QUEST = new Transform3d(
+                Units.inchesToMeters(0.0),
+                Units.inchesToMeters(0.0),
+                Units.inchesToMeters(0),
+                new Rotation3d()
+        );
+
+        /**
+         * Measurement noise (meters, radians).
+         */
+        public static final Matrix<N3, N1> QUESTNAV_STD_DEVS = VecBuilder.fill(
+                0.02,
+                0.02,
+                0.087
+        );
 }
