@@ -80,9 +80,9 @@ public class RobotContainer {
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
   private final AutoChooser choreoAutoChooser = new AutoChooser();
-  
+
   // choreo auto factory
-  AutoFactory autoFactory ; 
+  AutoFactory autoFactory ;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
@@ -122,7 +122,7 @@ public class RobotContainer {
         turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
-      
+
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -160,14 +160,14 @@ public class RobotContainer {
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
-        
+
         if (drive != null && driver != null) {
           // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
           SmartDashboard.putData("SysId Characterization", new SysIDDriveCommand(drive));
         }
         break;
     }
-    
+
 
 	if (intake != null && hood != null && turret != null)
 		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
@@ -346,7 +346,7 @@ public class RobotContainer {
 
 
     DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
-    
+
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
     String rightDynamicLiberalDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
