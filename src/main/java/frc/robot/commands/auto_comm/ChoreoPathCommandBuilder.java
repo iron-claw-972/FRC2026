@@ -27,6 +27,7 @@ public class ChoreoPathCommandBuilder {
     this.intake = intake;
     this.spindexer = spindexer;
     this.turret = turret;
+    this.hood = hood;
 
   }
 
