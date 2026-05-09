@@ -13,6 +13,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -191,7 +192,7 @@ public class RobotContainer {
       	autoFactory = new AutoFactory(
             drive::getPose,
             drive::resetOdometry,
-            sample -> drive.setChassisSpeeds(sample.getChassisSpeeds(), false),
+            sample -> drive.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(sample.getChassisSpeeds(), drive.getYaw()), false),
             true,
             drive,
             (trajectory, startOrFinish) -> {
