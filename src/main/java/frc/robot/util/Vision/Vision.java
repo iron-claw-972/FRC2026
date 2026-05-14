@@ -1,6 +1,7 @@
 package frc.robot.util.Vision;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
@@ -16,6 +17,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,6 +27,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -58,6 +62,10 @@ public class Vision {
   // Array of tags to use, null or empty array to use all tags
   private int[] onlyUse = null;
 
+  // Index by tag ID, index 0 is unused.
+  // 1.0 is default,  >1 trusts more, 0-1 trusts less, <=0 disables
+  private final double[] tagWeights;
+
   /**
    * Creates a new instance of Vision and sets up the cameras and field layout
    */
@@ -77,6 +85,8 @@ public class Vision {
 
     // Sets the origin to the right side of the blue alliance wall
     FieldConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+    tagWeights = new double[FieldConstants.field.getTags().size() + 1];
+    Arrays.fill(tagWeights, 1.0);
 
     if(VisionConstants.ENABLED){
       // Puts the cameras in an array list
@@ -363,11 +373,36 @@ public class Vision {
       poseEstimator.addVisionMeasurement(
         estimatedPose.estimatedPose.toPose2d(),
         estimatedPose.timestampSeconds,
-        slipped ? VisionConstants.VISION_STD_DEVS_2 : VisionConstants.VISION_STD_DEVS
+        getVisionStdDevsForPose(estimatedPose, slipped)
       );
       sawTag = true;
     }
     return estimatedPoses;
+  }
+
+  private Matrix<N3, N1> getVisionStdDevsForPose(EstimatedRobotPose estimatedPose, boolean slipped) {
+    Matrix<N3, N1> baseStdDevs = slipped ? VisionConstants.VISION_STD_DEVS_2 : VisionConstants.VISION_STD_DEVS;
+
+    if (estimatedPose == null || estimatedPose.targetsUsed == null || estimatedPose.targetsUsed.isEmpty()) {
+      return baseStdDevs;
+    }
+
+    double weightSum = 0.0;
+    int weightCount = 0;
+    for (PhotonTrackedTarget target : estimatedPose.targetsUsed) {
+      double weight = getTagWeight(target.getFiducialId());
+      if (weight > 0.0) {
+        weightSum += weight;
+        weightCount++;
+      }
+    }
+
+    if (weightCount == 0) {
+      return baseStdDevs.times(1e6);
+    }
+
+    double averageWeight = weightSum / weightCount;
+    return baseStdDevs.times(1.0 / averageWeight);
   }
 
   /**
@@ -405,6 +440,36 @@ public class Vision {
    */
   public void onlyUse(int[] ids){
     onlyUse = ids;
+  }
+
+  /**
+   * Sets the weighting for an AprilTag
+   * @param id AprilTag id
+   * @param weight Tag weight (1.0 = default, >1 more trust, 0-1 less trust, <=0 disable)
+   */
+  public void setTagWeight(int id, double weight) {
+    if (id <= 0 || id >= tagWeights.length) {
+      DriverStation.reportWarning("Vision.setTagWeight: AprilTag id " + id + " is out of bounds", false); //we should use these more often
+      return;
+    }
+    tagWeights[id] = weight;
+  }
+
+  /**
+   * Gets the weight of an AprilTag
+   * @param id AprilTag id
+   * @return Tag weight (default 1 if out of range)
+   */
+  public double getTagWeight(int id) {
+    if (id <= 0 || id >= tagWeights.length) {
+      return 1.0;
+    }
+    return tagWeights[id];
+  }
+
+  /** Clears all custom AprilTag weights */
+  public void clearTagWeights() {
+    Arrays.fill(tagWeights, 1.0);
   }
 
   /**
@@ -691,6 +756,9 @@ public class Vision {
     public boolean useTag(int id){
       // Never use tags that don't exist
       if(id <= 0 || id > FieldConstants.field.getTags().size()){
+        return false;
+      }
+      if(getTagWeight(id) <= 0){
         return false;
       }
       // Return false if it is in the list of tags to ignore

@@ -702,6 +702,26 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
+     * Sets weight for an AprilTag
+     * 1.0 is default, >1 trusts more, 0-1 trusts less, <=0 disables
+     *
+     * @param id AprilTag id
+     * @param weight weight to apply for this tag
+     */
+    public void setAprilTagWeight(int id, double weight) {
+        if (vision != null) {
+            vision.setTagWeight(id, weight);
+        }
+    }
+
+    /** Clears all custom AprilTag weights */
+    public void clearAprilTagWeights() {
+        if (vision != null) {
+            vision.clearTagWeights();
+        }
+    }
+
+    /**
      * Returns if vision has seen an April tag in the last frame
      * 
      * @return true if vision saw a tag last frame or if vision is disabled
