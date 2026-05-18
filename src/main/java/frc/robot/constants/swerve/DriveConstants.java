@@ -148,10 +148,10 @@ public class DriveConstants {
     
         /* Drive Motor PID Values */
         public static final double[] P_VALUES = {
-            0.3,
-            0.3,
-            0.3,
-            0.3
+            0.13838,
+            0.11603,
+            0.069499,
+            0.14351
         };
         public static final double[] I_VALUES = {
             0,
@@ -168,22 +168,22 @@ public class DriveConstants {
         /* Drive Motor Characterization Values
          * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
         public static final double[] S_VALUES = {
-            0.11,
-            0.11,
-            0.11,
-            0.11
+            0.14796,
+            0.15192,
+            0.10228,
+            0.027129
         };
         public static final double[] V_VALUES = {
-            0.11079,
-            0.10718,
-            0.11009,
-            0.1164
+            0.13813,
+            0.13594,
+            0.13699,
+            0.13146
         };
         public static final double[] A_VALUES = {
-            0.005482,
-            0.0049593,
-            0.010156,
-            0.0065708
+            0.015773,
+            0.017122,
+            0.025264,
+            0.038392
         };
         /* Ramp values for drive motors in open loop driving. */
         // Open loop prevents throttle from changing too quickly.
