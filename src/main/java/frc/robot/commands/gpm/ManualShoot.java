@@ -130,8 +130,8 @@ public class ManualShoot extends Command {
       // the hub
 
       Translation2d x = drivepose.getTranslation().plus(
-          new Translation2d(0, 1).rotateBy(operator.getLeftRotation())
-        ).times(operator.getLeftTrigger() * SmartDashboard.getNumber("Manual Shooting Power Scale", 1.0));
+          new Translation2d(0, 1).rotateBy(operator.getLeftRotation()))
+          .times(operator.getLeftTrigger() * SmartDashboard.getNumber("Manual Shooting Power Scale", 1.0));
 
       Translation3d target3d = new Translation3d(x);
 
@@ -268,7 +268,10 @@ public class ManualShoot extends Command {
   public void execute() {
     // Phase manager stuff
     phaseManager.update(drivepose, shooter, turret);
-    target = phaseManager.getTarget(drivepose);
+    // target = phaseManager.getTarget(drivepose);
+    target = drivepose.getTranslation().plus(
+        new Translation2d(0, 1).rotateBy(operator.getLeftRotation()))
+        .times(operator.getLeftTrigger() * SmartDashboard.getNumber("Manual Shooting Power Scale", 1.0));
 
     updateDrivePose();
     updateSetpoints(drivepose);
