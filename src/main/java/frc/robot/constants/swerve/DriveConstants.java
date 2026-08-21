@@ -296,10 +296,20 @@ public class DriveConstants {
                 DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
+            } else if (robotId == RobotId.Pancake) {
+                STEER_OFFSET_FRONT_LEFT = 14.55+180;
+                STEER_OFFSET_FRONT_RIGHT = 285.65;
+                STEER_OFFSET_BACK_LEFT = 129.55;
+                STEER_OFFSET_BACK_RIGHT = 107.85+180;
+
+                ROBOT_MASS = 50;
+                WHEEL_MOI = 0.000326 * ROBOT_MASS;
+
+                MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
 
             } else{
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK4i(DRIVE_GEAR_RATIO);
                 
             }
         }
-}
+    }

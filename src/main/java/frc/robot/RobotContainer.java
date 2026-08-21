@@ -106,6 +106,13 @@ public class RobotContainer {
       case Pancake:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
+        driver.configureControls();
+        
+        if (drive != null && driver != null) {
+          drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+        }
+
+        break;
 
       case TwinBot:
 
