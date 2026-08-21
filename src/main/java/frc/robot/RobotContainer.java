@@ -103,12 +103,11 @@ public class RobotContainer {
 
       default:
 
-      case TwinBot:
-
       case Pancake:
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
-        break;
+
+      case TwinBot:
 
 
       case PrimeJr: // AKA Valence
