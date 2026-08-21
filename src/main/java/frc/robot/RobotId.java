@@ -12,7 +12,7 @@ public enum RobotId {
     Default,
     PrimeJr, WaffleHouse, TwinBot, SwerveCompetition, Vertigo, Vivace, Phil, BetaBot,
     ClassBot1, ClassBot2, ClassBot3, ClassBot4,
-    TestBed1, TestBed2;
+    TestBed1, TestBed2, Pancake;
 
     /** The key used to access the RobotId name in the RoboRIO's persistent memory. */
     public static final String ROBOT_ID_KEY = "RobotId";
