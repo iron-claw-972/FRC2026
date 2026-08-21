@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
         // safety margin, limits velocity to .75 free speed
-        maxVelocity = 0.75 * maxFreeSpeed;
+        maxVelocity = 1.0 * maxFreeSpeed; //safety is for people with no pit team
         maxAcceleration = maxVelocity / 0.25;
 
         // ----Rollers

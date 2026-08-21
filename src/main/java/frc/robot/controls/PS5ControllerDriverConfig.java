@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Robot;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.ReverseMotors;
@@ -94,7 +95,7 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Make the intake go in and out while shooting
             controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
-                .alongWith(new InstantCommand(()-> intakeBoolean = true)));
+                    .alongWith(new InstantCommand(() -> intakeBoolean = true)));
 
             // Calibration: you can now calibrate easily using this button
             if (hood != null && intake != null) {
@@ -108,11 +109,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }
 
             // Stop intake roller
-            controller.get(DPad.DOWN).onTrue(new InstantCommand(()->{
-                if(intakeBoolean){
+            controller.get(DPad.DOWN).onTrue(new InstantCommand(() -> {
+                if (intakeBoolean) {
                     intake.spinStart();
                     intakeBoolean = false;
-                } else{
+                } else {
                     intake.spinStop();
                     intakeBoolean = true;
                 }
@@ -123,9 +124,10 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
         if (spindexer != null && turret != null && hood != null && intake != null) {
 
             // Toggle spindexer
-            controller.get(PS5Button.LEFT_TRIGGER).toggleOnTrue(
-                new RunSpindexer(spindexer, turret, hood, intake)
-            );
+            controller.get(PS5Button.LEFT_TRIGGER).onTrue(
+                    new ParallelCommandGroup(new InstantCommand(() -> hood.forceHoodDown(false), hood),
+                            new RunSpindexer(spindexer, turret, hood, intake)))
+                    .onFalse(new InstantCommand(() -> hood.forceHoodDown(true), hood));
         }
 
         // Auto shoot
@@ -134,15 +136,14 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             controller.get(PS5Button.SQUARE).toggleOnTrue(autoShoot);
         }
 
-    
         // Hood
         if (hood != null) {
             // Set the hood down -- for safety measures under trench
-            controller.get(DPad.LEFT).onTrue(new InstantCommand(()->{
-                hood.forceHoodDown(true);
-            }, hood)).onFalse(new InstantCommand(()->{
-                hood.forceHoodDown(false);
-            }));
+            // controller.get(DPad.LEFT).onTrue(new InstantCommand(()->{
+            // hood.forceHoodDown(true);
+            // }, hood)).onFalse(new InstantCommand(()->{
+            // hood.forceHoodDown(false);
+            // }));
         }
     }
 
