@@ -103,19 +103,17 @@ public class RobotContainer {
 
       default:
 
-      case Pancake:
+      case BetaBot: // AKA "Pancake"
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         driver.configureControls();
-        
+
         if (drive != null && driver != null) {
           drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         }
-
         break;
 
       case TwinBot:
-
 
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
@@ -129,10 +127,6 @@ public class RobotContainer {
         hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
-
-      case BetaBot: // AKA "Pancake"
-        vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
-        // fall-through
 
       case Vivace:
 
@@ -163,17 +157,18 @@ public class RobotContainer {
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
-        
+
         if (drive != null && driver != null) {
           drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
         }
         break;
     }
 
-	if (intake != null && hood != null && turret != null)
-		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
-    // This is really annoying so it's disabled
-    DriverStation.silenceJoystickConnectionWarning(true);
+    if (intake != null && hood != null && turret != null)
+      // CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake,
+      // turret)); (no more crt for this)
+      // This is really annoying so it's disabled
+      DriverStation.silenceJoystickConnectionWarning(true);
 
     CommandScheduler.getInstance().schedule(new LogCommand());
 
@@ -328,8 +323,7 @@ public class RobotContainer {
       return new DoNothing();
     }
     ParallelCommandGroup defaultShoot = new ParallelCommandGroup(
-      new RunSpindexer(spindexer, turret, hood, intake)
-    );
+        new RunSpindexer(spindexer, turret, hood, intake));
     return defaultShoot;
   }
 
