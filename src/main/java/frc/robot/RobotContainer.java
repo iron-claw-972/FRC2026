@@ -64,7 +64,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
-  // private LED led = null;
+  private LED led = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -106,7 +106,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
+        led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
