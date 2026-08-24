@@ -30,7 +30,7 @@ import lib.controllers.PS5Controller.PS5Button;
  */
 public class PS5ControllerDriverConfig extends BaseDriverConfig {
     private final PS5Controller controller = new PS5Controller(Constants.DRIVER_JOY);
-    private final BooleanSupplier slowModeSupplier = () -> false;
+    private BooleanSupplier slowModeSupplier = () -> false;
     private boolean intakeBoolean = true;
     private Command autoShoot = null;
     private Shooter shooter;
@@ -125,10 +125,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
             // Toggle spindexer
             controller.get(PS5Button.LEFT_TRIGGER).onTrue(
-                    new ParallelCommandGroup(new InstantCommand(() -> hood.forceHoodDown(false), hood),
-                            new RunSpindexer(spindexer, turret, hood, intake)))
-                    .onFalse(new InstantCommand(() -> hood.forceHoodDown(true), hood));
-        }
+                new ParallelCommandGroup(new InstantCommand(() -> {
+                  slowModeSupplier = () -> true;
+                  hood.forceHoodDown(false);
+                }, hood),
+                    new RunSpindexer(spindexer, turret, hood, intake)))
+                .onFalse(new InstantCommand(() -> {
+                  hood.forceHoodDown(true);
+                  slowModeSupplier = () -> false;
+                }, hood));
+          }
 
         // Auto shoot
         if (turret != null && hood != null && shooter != null && spindexer != null) {
