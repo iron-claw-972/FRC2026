@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -284,7 +285,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
      * @param speed duty cycle in the range [-1, 1]
      */
     public void spin(double speed) {
-        rollerMotor.set(speed);
+        rollerMotor.setControl(new VoltageOut(speed * 12));
     }
 
     public double getSpeed() {
