@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -66,10 +65,6 @@ public class Superstructure extends Command {
     private LoggedNetworkNumber turretOffset = new LoggedNetworkNumber("/Tuning/OPERATOR/Turret Offet",0.0);
 
     private double distanceFromTarget = 0.0;
-    private LoggedNetworkNumber shuttlingTOFMultiplier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shuttling TOF Multiplier",0.8);
-
-    // private double TOFAdjustment = 0.85;
-    // private double TOFAdjustment = 1.1;
     private LoggedNetworkNumber TOFAdjustment = new LoggedNetworkNumber("/Tuning/OPERATOR/TOF Adjustment", 1.1);
 
     public Superstructure(Turret turret, Drivetrain drivetrain, Hood hood, Shooter shooter, Spindexer spindexer) {
@@ -112,12 +107,11 @@ public class Superstructure extends Command {
          * So we make a bunch of guesses until it converges
          * Early exit when change < 1mm to avoid unnecessary iterations
          */
-        boolean shuttling = target.equals(FieldConstants.getHubTranslation().toTranslation2d());
         for (int i = 0; i < 20; i++) {
             Translation3d lookahead3d = new Translation3d(lookaheadPose.getX(), lookaheadPose.getY(), TurretConstants.DISTANCE_FROM_ROBOT_CENTER.getZ());
             
             Translation3d target3d = new Translation3d(target.getX(), target.getY(),
-                shuttling ?
+                target.equals(FieldConstants.getHubTranslation().toTranslation2d()) ?
                 FieldConstants.getHubTranslation().getZ() : 0.0); // Height of 0 if it's not the hub
 
             goalState = ShooterPhysics.getShotParams(
@@ -125,13 +119,7 @@ public class Superstructure extends Command {
             target3d.minus(lookahead3d),
             2.0);
 
-            if (!shuttling) {
-                timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
-            } else {
-                double distance = target.getDistance(lookaheadPose.getTranslation());
-                timeOfFlight = distance * shuttlingTOFMultiplier.get();
-            }
-
+            timeOfFlight = goalState.timeOfFlight() * TOFAdjustment.get();
             double offsetX = turretVelocityX * timeOfFlight;
             double offsetY = turretVelocityY * timeOfFlight;
             Pose2d newLookaheadPose =
@@ -206,11 +194,11 @@ public class Superstructure extends Command {
         ChassisSpeeds robotRelVel = drivetrain.getChassisSpeeds();
 
         // Add a phase delay extrapolation component for latency delay
-        drivepose = drivepose.exp(
-            new Twist2d(
-                robotRelVel.vxMetersPerSecond * phaseDelay.get(),
-                robotRelVel.vyMetersPerSecond * phaseDelay.get(),
-                robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
+        // drivepose = drivepose.exp(
+        //     new Twist2d(
+        //         robotRelVel.vxMetersPerSecond * phaseDelay.get(),
+        //         robotRelVel.vyMetersPerSecond * phaseDelay.get(),
+        //         robotRelVel.omegaRadiansPerSecond * phaseDelay.get()));
     }
 
     /**

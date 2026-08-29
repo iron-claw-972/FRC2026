@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.VecBuilder;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -28,6 +30,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.Music;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.GyroBiasConstants;
@@ -189,6 +192,25 @@ public class Drivetrain extends SubsystemBase {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putData("Field", field);
         }
+
+        addMusic();
+
+    }
+
+    public void setPose(Translation2d pose) {
+        poseEstimator.resetTranslation(pose);
+    }
+
+    public void addMusic() {
+        ArrayList<TalonFX> motors = new ArrayList<>();
+        for (Module m: modules) {
+            motors.add(m.getMotors()[0]);
+            motors.add(m.getMotors()[1]);
+        }
+
+        TalonFX[] f = new TalonFX[8];
+        
+        SmartDashboard.putData("Chirp", new Music(motors.toArray(f)));
     }
 
     public void close() {
