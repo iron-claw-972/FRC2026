@@ -31,9 +31,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
         // configure current limit
         CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
-        limitConfig.StatorCurrentLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
+        limitConfig.StatorCurrentLimit = SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT;
         limitConfig.StatorCurrentLimitEnable = true;
-        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT;
+        limitConfig.SupplyCurrentLowerLimit = SpindexerConstants.SUPPLY_CURRENT_LIMIT;
         limitConfig.SupplyCurrentLimitEnable = true;
         motorOne.getConfigurator().apply(limitConfig);
         motorTwo.getConfigurator().apply(limitConfig);
@@ -53,6 +53,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         CUSTOM,
     }
 
+    private SpindexerState pastState = SpindexerState.STOPPED;
+
     @Override
     public void periodic() {
         updateInputs();
@@ -68,10 +70,13 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
             setMotorVoltages(power);
         }
 
-        if (state == SpindexerState.REVERSE) {
-            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_REVERSE_STATOR_LIMIT);
-        } else {
-            setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
+        if (state != pastState) {
+            if (state == SpindexerState.REVERSE) {
+                setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_REVERSE_STATOR_LIMIT);
+            } else {
+                setNewCurrentLimit(SpindexerConstants.SUPPLY_CURRENT_LIMIT, SpindexerConstants.CURRENT_FORWARD_STATOR_LIMIT);
+            }
+            pastState = state;
         }
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
@@ -82,6 +87,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         if (!Constants.DISABLE_SMART_DASHBOARD) {
             SmartDashboard.putBoolean("Spindexer Reversing", state == SpindexerState.REVERSE);
         }
+
+        Logger.recordOutput("HasBalls", spinningAir());
     }
 
     public void setMotorVoltages(double voltage) {
@@ -120,8 +127,28 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
         return inputs.spindexerOneStatorCurrent + inputs.spindexerTwoStatorCurrent;
     }
 
+    public double getMotorOneStatorCurrent() {
+        return inputs.spindexerOneStatorCurrent;
+    }
+
+    public double getMotorTwoStatorCurrent() {
+        return inputs.spindexerTwoStatorCurrent;
+    }
+
     public double getSubsystemSupplyCurrent() {
         return inputs.spindexerOneSupplyCurrent + inputs.spindexerTwoSupplyCurrent;
+    }
+
+    public boolean spinningAir() {
+        return getMotorOneStatorCurrent() < 16.0 && getMotorTwoStatorCurrent() < 28.0;
+    }
+
+    public double getMotorOneVelocity() {
+        return inputs.spindexerOneVelocity;
+    }
+
+    public double getMotorTwoVelocity() {
+        return inputs.spindexerTwoVelocity;
     }
 
     @Override

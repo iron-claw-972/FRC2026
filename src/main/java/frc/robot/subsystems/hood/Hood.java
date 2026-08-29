@@ -36,7 +36,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 	private boolean calibrating = false;
 	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
-	private boolean forceHoodDown = false;
+	private boolean forceHoodDown = true;
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 

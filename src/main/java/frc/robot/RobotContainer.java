@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
@@ -34,7 +35,6 @@ import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -64,10 +64,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
-  private LED led = null;
-
-  // this is inside addAuto()
-  // private Command auto = new DoNothing();
+  // private LED led = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -103,10 +100,13 @@ public class RobotContainer {
 
       default:
 
+      case TwinBot:
+
+
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        led = new LED();
+        // led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
@@ -114,8 +114,6 @@ public class RobotContainer {
         shooter = new Shooter();
         hood = new Hood();
       
-      case TwinBot:
-
       case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
@@ -157,6 +155,7 @@ public class RobotContainer {
         }
         break;
     }
+    
 
 	if (intake != null && hood != null && turret != null)
 		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
@@ -241,6 +240,11 @@ public class RobotContainer {
         hood.forceHoodDown(false);
       }));
     }
+
+    NamedCommands.registerCommand("After Depot", new InstantCommand());
+    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    NamedCommands.registerCommand("Depot", new InstantCommand());
+    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
@@ -250,6 +254,15 @@ public class RobotContainer {
     }
     // is this the right one??
     catch (AutoBuilderException e) {
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
+  }
+
+  public void addAuto(String name, Command auto) {
+    try {
+      autoChooser.addOption(name, auto);
+    } catch (AutoBuilderException e){
       e.printStackTrace();
       System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
     }
@@ -271,6 +284,11 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+    String leftBumpDepotCenter = "LeftBumpDepotCenter";
+    String leftTrenchDepotCenter = "LeftTrenchDepotCenter";
+    String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
@@ -283,6 +301,28 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
+    addAuto(leftBumpDepotCenter);
+    addAuto(leftTrenchDepotCenter);
+    addAuto(depotCenterPath);
+
+
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+    
+    // names
+    String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
+    String rightDynamicLiberalDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
+    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleConservativeSwipe";
+    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleConservativeSwipe";
+    // String leftDynamicShallowDoubleSwipe = "LeftDynamicShallowDoubleSwipe";
+    // String rightDynamicShallowDoubleSwipe = "RightDynamicShallowDoubleSwipe";
+
+    // add commands
+    addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
+    addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
+    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
+    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
@@ -337,14 +377,6 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    double matchTime = DriverStation.getMatchTime();
-    if (matchTime > 0) {
-      if (!Constants.DISABLE_SMART_DASHBOARD) {
-        SmartDashboard.putNumber("Match Time", matchTime);
-      }
-    }
-    if (!Constants.DISABLE_SMART_DASHBOARD) {
-      SmartDashboard.putString("Alliance", DriverStation.getAlliance().map(a -> a.name()).orElse("Unknown"));
-    }
+
   }
 }

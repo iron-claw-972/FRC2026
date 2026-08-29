@@ -63,9 +63,10 @@ public class VisionConstants {
         public static final double MAX_POSE_DIFFERENCE = 0.2;
 
         /**
-         * The maximum distance to the tag to use
+         * The maximum distance to the tag to use (meters)
          */
-        public static final double MAX_DISTANCE = 6;
+        // TODO: test MAX_DISTANCE limit, original = 6m
+        public static final double MAX_DISTANCE = 3.5;
 
         /** If vision should use manual calculations (yawFunction-based vs referencePose-based). Changed to false to support gyro bias correction. */
         public static final boolean USE_MANUAL_CALCULATIONS = false;

@@ -82,7 +82,7 @@ public class EMABreaker extends SubsystemBase {
 
         // total stuff
         Logger.recordOutput("Breaker/TotalCurrent", current);
-        Logger.recordOutput("Breaker/OverCurrent", isInWarning());
+        Logger.recordOutput("Breaker/CurrentWarning", isInWarning());
     }
 
     public double getAverageCurrentDraw(int[] ports) {

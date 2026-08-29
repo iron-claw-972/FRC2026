@@ -181,9 +181,9 @@ public class FieldConstants {
       return FieldZone.TRENCH_BUMP;
     }
 
-    if (underLadder(drivepose)) {
-      return FieldZone.UNDER_LADDER;
-    }
+    // if (underLadder(drivepose)) {
+    //   return FieldZone.UNDER_LADDER;
+    // }
 
     if (x > FieldConstants.RED_ALLIANCE_LINE - (DriveConstants.ROBOT_WIDTH_WITH_BUMPERS) / 2) {
       return (Robot.getAlliance() == Alliance.Red) ? FieldZone.ALLIANCE : FieldZone.OPPOSITION;
