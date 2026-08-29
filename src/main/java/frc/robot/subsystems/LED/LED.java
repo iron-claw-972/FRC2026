@@ -2,10 +2,12 @@ package frc.robot.subsystems.LED;
 
 import java.util.Optional;
 
+import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.configs.CANdleConfigurator;
 import com.ctre.phoenix6.configs.CANdleFeaturesConfigs;
 import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ColorFlowAnimation;
+import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.controls.FireAnimation;
 import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.RgbFadeAnimation;
@@ -33,7 +35,7 @@ import frc.robot.util.HubActive;
 public class LED extends SubsystemBase {
 
 	private CANdle candle;
-	public static final int stripLength = 67;
+	public static final int stripLength = 25;
 
 	/// Hz
 	public static final int FLASH_RATE = 4;
@@ -74,13 +76,17 @@ public class LED extends SubsystemBase {
 		SmartDashboard.putData("LED Twinkle", new InstantCommand(() -> setTwinkle()).ignoringDisable(true));
 		SmartDashboard.putData("LED Color Flow", new InstantCommand(() -> setColorFlow()).ignoringDisable(true));
 		SmartDashboard.putData("LED Color Team Reset", new InstantCommand(() -> setColor()).ignoringDisable(true));
+		SmartDashboard.putData("LED Test", new InstantCommand(() -> {
+			candle.clearAllAnimations();
+			candle.setControl(new SolidColor(0, 7).withColor(new RGBWColor(Color.kRed)));
+		}).ignoringDisable(true));
 	}
 
 	public void setColor() {
 		var alliance = DriverStation.getAlliance();
 		if (alliance.isEmpty()) {
 			color = Color.kOrangeRed;
-		} else if (alliance.get() == Alliance.Red) {
+		} else if (alliance.get() == Alliance.Red) {	
 			color = Color.kRed;
 		} else if (alliance.get() == Alliance.Blue) {
 			color = Color.kBlue;
@@ -158,7 +164,7 @@ public class LED extends SubsystemBase {
 
 	public void lightsOff() {
 		candle.clearAllAnimations();
-		candle.setControl(new SolidColor(8 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
+		candle.setControl(new SolidColor(0 , 8 + stripLength).withColor(new RGBWColor(0, 0, 0, 0)));
 	}
 	
 
