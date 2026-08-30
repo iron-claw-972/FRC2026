@@ -56,6 +56,9 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     slot0.kV = 0.11;
     slot0.kA = 0.0;
 
+    configs.MotionMagic.MotionMagicAcceleration = 999;
+    configs.MotionMagic.MotionMagicJerk = 0;
+
     motorOne.getConfigurator().apply(configs);
     motorTwo.getConfigurator().apply(configs);
     motorOne.getConfigurator().apply(limitConfig);
@@ -106,11 +109,6 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
 
   @Override
   public void periodic() {
-    tuner.periodic();
-
-  }
-
-  public void periodicDEATH() {
     updateInputs();
     Logger.processInputs("Spindexer", inputs);
 
@@ -146,8 +144,10 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
   }
 
   public void setMotorVoltages(double voltage) {
-    motorOne.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
-    motorTwo.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
+    // motorOne.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
+    // motorTwo.setControl(new VoltageOut(voltage * 12).withEnableFOC(true));
+    motorOne.setControl(velocityRequest.withVelocity(voltage * SpindexerConstants.MAX_RPM));
+    motorTwo.setControl(velocityRequest.withVelocity(voltage * SpindexerConstants.MAX_RPM));
   }
 
   public void maxSpindexer() {

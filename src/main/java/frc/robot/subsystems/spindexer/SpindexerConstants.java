@@ -14,4 +14,5 @@ public class SpindexerConstants {
     public static final double JAM_VELOCITY_THRESHOLD = 10.0; // A
     public static final double JAM_DEBOUNCE_TIME = 0.3; // seconds
     public static final double REVERSE_DEBOUNCE_TIME = 0.25; // seconds
+    public static final double MAX_RPM = 140;
 }
