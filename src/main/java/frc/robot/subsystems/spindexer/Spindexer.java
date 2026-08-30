@@ -1,26 +1,21 @@
 package frc.robot.subsystems.spindexer;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.IdConstants;
@@ -52,13 +47,13 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     TalonFXConfiguration configs = new TalonFXConfiguration();
     // units = amperes
     Slot0Configs slot0 = configs.Slot0;
-    slot0.kP = 2.0;
+    slot0.kP = 10.0;
     slot0.kI = 0.0;
     slot0.kD = 0.0;
 
     // start with feedforward at zero for tuning
-    slot0.kS = 0.0;
-    slot0.kV = 0.0;
+    slot0.kS = 9.0;
+    slot0.kV = 0.11;
     slot0.kA = 0.0;
 
     motorOne.getConfigurator().apply(configs);
@@ -66,6 +61,8 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     motorOne.getConfigurator().apply(limitConfig);
     motorTwo.getConfigurator().apply(limitConfig);
     motorTwo.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+
+    tuner = new SpindexerTuning(motorOne, motorTwo);
 
     if (!Constants.DISABLE_SMART_DASHBOARD) {
       SmartDashboard.putData("Spindexer Run Forward", new InstantCommand(() -> maxSpindexer()));
@@ -105,12 +102,12 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     return motorOne.getTorqueCurrent().getValueAsDouble();
   }
 
-  private final SpindexerTuning tuner = new SpindexerTuning(motorOne, motorTwo);
+  private SpindexerTuning tuner;
 
   @Override
   public void periodic() {
-    motorTwo.setControl(new Follower(IdConstants.SPINDEXER_ONE_ID, MotorAlignmentValue.Opposed));
     tuner.periodic();
+
   }
 
   public void periodicDEATH() {
