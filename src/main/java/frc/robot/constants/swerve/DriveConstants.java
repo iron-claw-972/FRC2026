@@ -130,8 +130,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 50;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
@@ -199,7 +199,7 @@ public class DriveConstants {
         public static final boolean INVERT_GYRO = false; // Make sure gyro is CCW+ CW-
     
         public static final double SLOW_DRIVE_FACTOR = 0.2;
-        public static final double SLOW_ROT_FACTOR = 0.1;
+        public static final double SLOW_ROT_FACTOR = 0.2;
     
         public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
     
