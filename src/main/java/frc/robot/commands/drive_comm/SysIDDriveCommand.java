@@ -5,6 +5,8 @@
 package frc.robot.commands.drive_comm;
 
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
@@ -27,7 +29,7 @@ public class SysIDDriveCommand extends SequentialCommandGroup {
             Units.Volts.of(0.5).per(Units.Seconds),
             Units.Volts.of(3),
             Units.Seconds.of(5),
-            (x)->SignalLogger.writeString("state", x.toString())
+            (state) -> Logger.recordOutput("SysIdTestState", state.toString())
         );
         Rotation2d[] angles = {
             Rotation2d.fromDegrees(0),//-45-180
