@@ -83,7 +83,7 @@ public class RobotContainer {
   private final AutoChooser choreoAutoChooser = new AutoChooser();
 
   // choreo auto factory
-  AutoFactory autoFactory ;
+  AutoFactory autoFactory;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
@@ -371,6 +371,12 @@ public class RobotContainer {
     addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
     addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
     addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
+    addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
+    addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
+    addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
+    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);

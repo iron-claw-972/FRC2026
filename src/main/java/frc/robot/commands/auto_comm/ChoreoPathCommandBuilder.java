@@ -331,4 +331,166 @@ public class ChoreoPathCommandBuilder {
     return routine;
 
   }
+
+/**
+ * doubleConservativeKousha 
+ * @param factory AutoFactory
+ * @param right boolean True for right auto, false for left
+ * @return AutoRoutine
+ */
+  public AutoRoutine doubleConservativeKousha(AutoFactory factory, boolean right) {
+    AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "doubleConservativeKousha");
+
+    AutoTrajectory swipe1 = right ? routine.trajectory("doubleConservativeKousha", 0).mirrorY()
+        : routine.trajectory("doubleConservativeKousha", 0);
+    AutoTrajectory swipe2 = right ? routine.trajectory("doubleConservativeKousha", 1).mirrorY()
+        : routine.trajectory("doubleConservativeKousha", 1);
+    AutoTrajectory centerSprint = right ? routine.trajectory("doubleConservativeKousha", 2).mirrorY()
+        : routine.trajectory("doubleConservativeKousha", 2);
+
+    routine.active().onTrue(
+        Commands.sequence(
+            swipe1.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            swipe1.cmd()));
+
+    swipe1.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            swipe2.cmd()));
+
+    swipe2.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            centerSprint.cmd()));
+
+    return routine;
+
+  }
+
+/**
+ * depotKousha 
+ * @param factory AutoFactory
+ * @param right boolean True for right auto, false for left
+ * @return AutoRoutine
+ */
+  public AutoRoutine depotKousha(AutoFactory factory, boolean right) {
+    AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "depotKousha");
+
+    AutoTrajectory getDepot = right ? routine.trajectory("depotKousha", 0).mirrorY()
+        : routine.trajectory("depotKousha", 0);
+    AutoTrajectory shootToTrench = right ? routine.trajectory("depotKousha", 1).mirrorY()
+        : routine.trajectory("depotKousha", 1);
+    AutoTrajectory centerSprint = right ? routine.trajectory("depotKousha", 2).mirrorY()
+        : routine.trajectory("depotKousha", 2);
+
+    routine.active().onTrue(
+        Commands.sequence(
+            getDepot.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            getDepot.cmd()));
+
+    getDepot.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            Commands.race(
+                new RunSpindexer(spindexer, turret, hood, intake),
+                new IntakeMovementCommand(intake),
+                shootToTrench.cmd())));
+
+    shootToTrench.done()
+        .onTrue(Commands.parallel(
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            centerSprint.cmd()));
+
+    return routine;
+
+  }
+
+/**
+ * doubleLiberalKousha 
+ * @param factory AutoFactory
+ * @param right boolean True for right auto, false for left
+ * @return AutoRoutine
+ */
+  public AutoRoutine doubleLiberalKousha(AutoFactory factory, boolean right) {
+    AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "doubleLiberalKousha");
+
+    AutoTrajectory swipe1 = right ? routine.trajectory("doubleLiberalKousha", 0).mirrorY()
+        : routine.trajectory("doubleLiberalKousha", 0);
+    AutoTrajectory swipe2 = right ? routine.trajectory("doubleLiberalKousha", 1).mirrorY()
+        : routine.trajectory("doubleLiberalKousha", 1);
+    AutoTrajectory centerSprint = right ? routine.trajectory("doubleLiberalKousha", 2).mirrorY()
+        : routine.trajectory("doubleLiberalKousha", 2);
+
+    routine.active().onTrue(
+        Commands.sequence(
+            swipe1.resetOdometry(),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            swipe1.cmd()));
+
+    swipe1.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            swipe2.cmd()));
+
+    swipe2.done()
+        .onTrue(Commands.sequence(
+            new InstantCommand(() -> {
+              hood.forceHoodDown(false);
+            }),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            new InstantCommand(() -> {
+              intake.extend();
+              intake.spinStart();
+              hood.forceHoodDown(true);
+            }),
+            centerSprint.cmd()));
+
+    return routine;
+
+  }
+
 }
