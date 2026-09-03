@@ -163,7 +163,7 @@ public class RobotContainer {
         }
 
         if (drive != null && driver != null) {
-          // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+          drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
           SmartDashboard.putData("SysId Characterization", new SysIDDriveCommand(drive));
         }
         break;
