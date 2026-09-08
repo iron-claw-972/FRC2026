@@ -160,46 +160,86 @@ public class Turret extends SubsystemBase implements TurretIO{
 		updateInputs();
 		Logger.processInputs("Turret", inputs);
 
-		// Position extrapolation
-		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT; 
-    	double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
+// Position extrapolation
+double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT;
 
-		//Continuous wrap selection
-		double best = lastGoalRad;
-		boolean found = false;
+double futureRobotAngle =
+        goalAngle.getRadians()
+        + (goalVelocityRadPerSec * lookAheadSeconds);
 
-		for (int i = -2; i <= 2; i++) {
-			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
-			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE) || candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
-				continue;
+// Continuous wrap selection
+double minAngleRad =
+        Units.degreesToRadians(TurretConstants.MIN_ANGLE);
 
-			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
-				best = candidate;
-				found = true;
-			}
-		}
+double maxAngleRad =
+        Units.degreesToRadians(TurretConstants.MAX_ANGLE);
 
-		lastGoalRad = best;
+double bestAngle = lastGoalRad;
+boolean foundValidAngle = false;
 
-		// calculate shortest angular delta
-		double delta = best - lastRawSetpoint;
-		
-		// filter delta
-		double filteredDelta = setpointFilter.calculate(delta);
-		
-		// apply filtered range
-		lastFilteredRad += filteredDelta;
-		lastRawSetpoint = best;
-		best = lastFilteredRad;
+for (int i = -2; i <= 2; i++) {
+    double candidateAngle =
+            futureRobotAngle + (2.0 * Math.PI * i);
 
-		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
+    if (candidateAngle < minAngleRad
+            || candidateAngle > maxAngleRad) {
+        continue;
+    }
 
-		// Clamp position setpoint to min and max angles
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations, Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO, Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
-			
-		// Multiply goal velocity by kV
-		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
+    if (!foundValidAngle
+            || Math.abs(candidateAngle - lastGoalRad)
+                    < Math.abs(bestAngle - lastGoalRad)) {
+
+        bestAngle = candidateAngle;
+        foundValidAngle = true;
+    }
+}
+
+if (foundValidAngle) {
+    lastGoalRad = bestAngle;
+}
+
+// Calculate setpoint change
+double delta = bestAngle - lastRawSetpoint;
+
+// Filter setpoint change
+double filteredDelta = setpointFilter.calculate(delta);
+
+// Apply filtered change
+lastFilteredRad += filteredDelta;
+lastRawSetpoint = bestAngle;
+
+// Final filtered setpoint
+double finalSetpointRad = lastFilteredRad;
+
+// Convert radians to motor rotations
+double motorGoalRotations =
+        Units.radiansToRotations(finalSetpointRad)
+        * TurretConstants.GEAR_RATIO;
+
+// Motor rotation limits
+double minMotorRotations =
+        Units.degreesToRotations(TurretConstants.MIN_ANGLE)
+        * TurretConstants.GEAR_RATIO;
+
+double maxMotorRotations =
+        Units.degreesToRotations(TurretConstants.MAX_ANGLE)
+        * TurretConstants.GEAR_RATIO;
+
+// Clamp motor setpoint
+motorGoalRotations = MathUtil.clamp(
+        motorGoalRotations,
+        minMotorRotations,
+        maxMotorRotations
+);
+
+// Velocity feedforward compensation
+double robotTurnCompensation =
+        goalVelocityRadPerSec
+        * TurretConstants.FEEDFORWARD_KV
+        * TurretConstants.GEAR_RATIO;
+
+
 
 		// Sets motor control with feedforward
 		motor.setControl(mmVoltageRequest
