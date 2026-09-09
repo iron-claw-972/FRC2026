@@ -239,8 +239,6 @@ double robotTurnCompensation =
         * TurretConstants.FEEDFORWARD_KV
         * TurretConstants.GEAR_RATIO;
 
-
-
 		// Sets motor control with feedforward
 		motor.setControl(mmVoltageRequest
 		.withPosition(motorGoalRotations)
