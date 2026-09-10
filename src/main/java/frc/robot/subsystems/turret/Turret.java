@@ -173,8 +173,7 @@ public class Turret extends SubsystemBase implements TurretIO {
 		Logger.processInputs("Turret", inputs);
 
 		// Position extrapolation
-		double lookAheadSeconds = TurretConstants.EXTRAPOLATION_TIME_CONSTANT;
-		double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * lookAheadSeconds);
+		double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * TurretConstants.EXTRAPOLATION_TIME_CONSTANT);
 
 		// Continuous wrap selection
 		double best = lastGoalRad;
