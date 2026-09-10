@@ -10,9 +10,9 @@ public class SpindexerConstants {
     public static final double CURRENT_FORWARD_STATOR_LIMIT = 150.0;
     public static final double CURRENT_REVERSE_STATOR_LIMIT = 20.0;
     public static final double CURRENT_TIME_LIMIT = 1.0; //s
-    public static final double JAM_CURRENT_THRESHOLD = 10.0; // A
-    public static final double JAM_VELOCITY_THRESHOLD = 10.0; // A
-    public static final double JAM_DEBOUNCE_TIME = 0.3; // seconds
+    public static final double JAM_CURRENT_THRESHOLD = 78.0; // A, 20 empty
+    public static final double JAM_VELOCITY_THRESHOLD = 5.0; // rps, 85 empty
+    public static final double JAM_DEBOUNCE_TIME = 0.2; // seconds
     public static final double REVERSE_DEBOUNCE_TIME = 0.25; // seconds
-    public static final double MAX_RPM = 120;
+    public static final double MAX_RPM = 60;
 }
