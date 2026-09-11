@@ -3,6 +3,7 @@ package frc.robot.commands.auto_comm;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -332,12 +333,13 @@ public class ChoreoPathCommandBuilder {
 
   }
 
-/**
- * doubleConservativeKousha 
- * @param factory AutoFactory
- * @param right boolean True for right auto, false for left
- * @return AutoRoutine
- */
+  /**
+   * doubleConservativeKousha
+   * 
+   * @param factory AutoFactory
+   * @param right   boolean True for right auto, false for left
+   * @return AutoRoutine
+   */
   public AutoRoutine doubleConservativeKousha(AutoFactory factory, boolean right) {
     AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "doubleConservativeKousha");
 
@@ -388,12 +390,13 @@ public class ChoreoPathCommandBuilder {
 
   }
 
-/**
- * depotKousha 
- * @param factory AutoFactory
- * @param right boolean True for right auto, false for left
- * @return AutoRoutine
- */
+  /**
+   * depotKousha
+   * 
+   * @param factory AutoFactory
+   * @param right   boolean True for right auto, false for left
+   * @return AutoRoutine
+   */
   public AutoRoutine depotKousha(AutoFactory factory, boolean right) {
     AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "depotKousha");
 
@@ -437,12 +440,13 @@ public class ChoreoPathCommandBuilder {
 
   }
 
-/**
- * doubleLiberalKousha 
- * @param factory AutoFactory
- * @param right boolean True for right auto, false for left
- * @return AutoRoutine
- */
+  /**
+   * doubleLiberalKousha
+   * 
+   * @param factory AutoFactory
+   * @param right   boolean True for right auto, false for left
+   * @return AutoRoutine
+   */
   public AutoRoutine doubleLiberalKousha(AutoFactory factory, boolean right) {
     AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "doubleLiberalKousha");
 
@@ -491,6 +495,28 @@ public class ChoreoPathCommandBuilder {
 
     return routine;
 
+  }
+
+  public AutoRoutine testAuto(AutoFactory factory) {
+    AutoRoutine routine = factory.newRoutine("test");
+
+    AutoTrajectory traj1 = routine.trajectory("test", 0);
+    AutoTrajectory traj2 = routine.trajectory("test", 1);
+    AutoTrajectory traj3 = routine.trajectory("test", 2);
+    AutoTrajectory traj4 = routine.trajectory("test", 3);
+
+    routine.active().onTrue(Commands.sequence(traj1.resetOdometry(), traj1.cmd()));
+
+    traj1.done().onTrue(Commands.parallel(traj2.cmd(), new InstantCommand(() -> {
+      intake.extend();
+    }, intake)));
+    traj2.done().onTrue(Commands.sequence(traj3.cmd()));
+    traj3.done().onTrue(Commands.sequence(traj4.cmd()));
+    traj4.done().onTrue(Commands.sequence(new InstantCommand(() -> {
+      intake.retract();
+    }, intake)));
+
+    return routine;
   }
 
 }
