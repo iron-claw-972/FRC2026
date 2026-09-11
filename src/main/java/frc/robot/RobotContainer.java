@@ -43,7 +43,6 @@ import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.spindexer.Spindexer;
@@ -135,7 +134,7 @@ public class RobotContainer {
       case Phil: // AKA "IHOP"
 
       case Vertigo: // AKA "French Toast"
-        drive = new Drivetrain(vision, new GyroIOPigeon2());
+        drive = new Drivetrain(vision);
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
 

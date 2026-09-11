@@ -42,6 +42,7 @@ import frc.robot.util.PhoenixOdometryThread;
 import lib.CTREModuleState;
 
 
+@Deprecated
 public class Module implements ModuleIO{
     private final ModuleType type;
     

@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 /** 
@@ -49,9 +50,10 @@ public class SwerveModulePose {
         SwerveModuleState[] states = drive.getModuleStates();
         double currentRotation = drive.getYaw().getRadians();
         double chassisRotation = currentRotation - prevRotation;
+        SwerveModulePosition[] positions = drive.getModulePositions();
 
         for(int i = 0; i<4; i++){
-            double position = drive.getModules()[i].getPosition().distanceMeters;
+            double position = positions[i].distanceMeters;
             double distance = position - dist[i];
             dist[i] = position;
             

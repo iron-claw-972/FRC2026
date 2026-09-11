@@ -30,6 +30,7 @@ import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.PhoenixOdometryThread;
 
 /** IO implementation for Pigeon 2. */
+@Deprecated
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon =
       new Pigeon2(
