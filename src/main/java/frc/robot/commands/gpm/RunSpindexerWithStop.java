@@ -101,7 +101,7 @@ public class RunSpindexerWithStop extends Command {
         if ((int) (Timer.getFPGATimestamp() / interval) % 2 == 0) {
             intake.extend();
         } else {
-            intake.intermediateExtend();
+            // intake.intermediateExtend();
         }
 
     }

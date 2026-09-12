@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DoNothing;
+import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
@@ -340,7 +342,7 @@ public class ChoreoPathCommandBuilder {
    * @param right   boolean True for right auto, false for left
    * @return AutoRoutine
    */
-  public AutoRoutine doubleConservativeKousha(AutoFactory factory, boolean right) {
+  public AutoRoutine doubleConservativeKousha(AutoFactory factory, boolean right, Drivetrain drive) {
     AutoRoutine routine = factory.newRoutine(right ? "right" : "left" + "doubleConservativeKousha");
 
     AutoTrajectory swipe1 = right ? routine.trajectory("doubleConservativeKousha", 0).mirrorY()
@@ -365,7 +367,8 @@ public class ChoreoPathCommandBuilder {
             new InstantCommand(() -> {
               hood.forceHoodDown(false);
             }),
-            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+            Commands.parallel(new DriveToPose(drive, () -> swipe2.getInitialPose().get()),
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake))),
             new InstantCommand(() -> {
               intake.extend();
               intake.spinStart();
@@ -378,7 +381,9 @@ public class ChoreoPathCommandBuilder {
             new InstantCommand(() -> {
               hood.forceHoodDown(false);
             }),
-            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake)),
+                        Commands.parallel(new DriveToPose(drive, () -> swipe2.getInitialPose().get()),
+
+            new RunSpindexerWithStop(spindexer, turret, hood, intake).raceWith(new IntakeMovementCommand(intake))),
             new InstantCommand(() -> {
               intake.extend();
               intake.spinStart();
@@ -518,5 +523,7 @@ public class ChoreoPathCommandBuilder {
 
     return routine;
   }
+
+
 
 }

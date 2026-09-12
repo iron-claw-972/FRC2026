@@ -375,8 +375,8 @@ public class RobotContainer {
     addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
     addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
     addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
-    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
-    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true, drive));
+    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false, drive));
     addChoreoAuto("test", choreo.testAuto(autoFactory));
 
     // put the Chooser on the SmartDashboard
