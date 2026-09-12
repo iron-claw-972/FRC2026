@@ -17,6 +17,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -38,8 +39,12 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.MathUtils;
 
-// Vision and it's commands are adapted from Iron Claw's FRC2023
 public class Vision {
+  @FunctionalInterface
+  public interface VisionMeasurementConsumer {
+    void accept(Pose2d pose, double timestampSeconds,
+        Matrix<edu.wpi.first.math.numbers.N3, edu.wpi.first.math.numbers.N1> standardDeviations);
+  }
   private NetworkTable objectDetectionTable;
 
   private NetworkTableEntry xOffset;
@@ -58,28 +63,20 @@ public class Vision {
   // Array of tags to use, null or empty array to use all tags
   private int[] onlyUse = null;
 
-  /**
-   * Creates a new instance of Vision and sets up the cameras and field layout
-   */
   public Vision(ArrayList<Pair<String, Transform3d>> camList) {
-    // Initialize object_detection NetworkTable
     objectDetectionTable = NetworkTableInstance.getDefault().getTable("object_detection");
 
-    // From the object detection NetworkTable, get the entries
     objectDistance = objectDetectionTable.getEntry("distance");
     xOffset = objectDetectionTable.getEntry("x_offset");
     yOffset = objectDetectionTable.getEntry("y_offset");
     objectClass = objectDetectionTable.getEntry("class");
     cameraIndex = objectDetectionTable.getEntry("index");
 
-    // Start NetworkTables server
     NetworkTableInstance.getDefault().startServer();
 
-    // Sets the origin to the right side of the blue alliance wall
     FieldConstants.field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
 
     if(VisionConstants.ENABLED){
-      // Puts the cameras in an array list
       for (int i = 0; i < camList.size(); i++) {
         cameras.add(new VisionCamera(camList.get(i).getFirst(), camList.get(i).getSecond()));
       }
@@ -365,6 +362,34 @@ public class Vision {
         estimatedPose.timestampSeconds,
         slipped ? VisionConstants.VISION_STD_DEVS_2 : VisionConstants.VISION_STD_DEVS
       );
+      sawTag = true;
+    }
+    return estimatedPoses;
+  }
+
+  public ArrayList<EstimatedRobotPose> updateOdometry(
+      Pose2d referencePose,
+      DoubleUnaryOperator yawFunction,
+      boolean slipped,
+      VisionMeasurementConsumer measurementConsumer) {
+    if (VisionConstants.ENABLED_SIM && RobotBase.isSimulation() && visionSim != null) {
+      visionSim.update(referencePose);
+    }
+
+    sawTag = false;
+    ArrayList<EstimatedRobotPose> estimatedPoses = getEstimatedPoses(referencePose, yawFunction);
+    double now = Timer.getFPGATimestamp();
+    for (EstimatedRobotPose estimatedPose : estimatedPoses) {
+      Pose2d pose = estimatedPose.estimatedPose.toPose2d();
+      double timestamp = estimatedPose.timestampSeconds;
+      if (timestamp < 0 || timestamp > now || now - timestamp > 1.0 || !onField(pose)) {
+        continue;
+      }
+
+      measurementConsumer.accept(
+          pose,
+          timestamp,
+          slipped ? VisionConstants.VISION_STD_DEVS_2 : VisionConstants.VISION_STD_DEVS);
       sawTag = true;
     }
     return estimatedPoses;

@@ -6,6 +6,10 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +37,22 @@ public class GeneratedDrivetrain extends TunerConstants.TunerSwerveDrivetrain im
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> setControl(requestSupplier.get()));
+    }
+
+    @Override
+    public void addVisionMeasurement(Pose2d pose, double timestampSeconds) {
+        super.addVisionMeasurement(pose, Utils.fpgaToCurrentTime(timestampSeconds));
+    }
+
+    @Override
+    public void addVisionMeasurement(
+            Pose2d pose,
+            double timestampSeconds,
+            Matrix<N3, N1> standardDeviations) {
+        super.addVisionMeasurement(
+                pose,
+                Utils.fpgaToCurrentTime(timestampSeconds),
+                standardDeviations);
     }
 
     private void startSimThread() {

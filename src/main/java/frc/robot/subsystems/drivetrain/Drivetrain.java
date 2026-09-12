@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.Constants;
+import frc.robot.constants.VisionConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.EqualsUtil;
 import frc.robot.util.SwerveModulePose;
@@ -58,7 +59,7 @@ public class Drivetrain extends GeneratedDrivetrain {
     private final PIDController rotationController =
             new PIDController(DriveConstants.HEADING_P, 0, DriveConstants.HEADING_D);
 
-    private final SwerveModulePose modulePoses;
+    private SwerveModulePose modulePoses;
     private final Field2d field = new Field2d();
 
     private Supplier<Pose2d> desiredPoseSupplier = () -> null;
@@ -71,9 +72,14 @@ public class Drivetrain extends GeneratedDrivetrain {
     private boolean trenchAlign;
     private double centerOfMassHeight;
     private double previousAngularVelocity;
+    private Vision vision;
+    private boolean visionEnabled;
+    private boolean slipped;
 
-    public Drivetrain(Vision ignoredVision) {
+    public Drivetrain(Vision vision) {
         this();
+        this.vision = vision;
+        this.visionEnabled = VisionConstants.ENABLED;
     }
 
     public Drivetrain() {
@@ -83,7 +89,12 @@ public class Drivetrain extends GeneratedDrivetrain {
                 TunerConstants.FrontRight,
                 TunerConstants.BackLeft,
                 TunerConstants.BackRight);
+        vision = null;
+        visionEnabled = false;
+        initialize();
+    }
 
+    private void initialize() {
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
         rotationController.setTolerance(Units.degreesToRadians(0.25), Units.degreesToRadians(0.25));
         modulePoses = new SwerveModulePose(this, DriveConstants.MODULE_LOCATIONS);
@@ -106,6 +117,9 @@ public class Drivetrain extends GeneratedDrivetrain {
 
     @Override
     public void periodic() {
+        if (vision != null && visionEnabled) {
+            updateOdometryVision();
+        }
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Odometry/Robot", getPose());
             Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
@@ -149,8 +163,18 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void updateOdometryVision() {
-        // Vision measurements are intentionally disabled during the Phoenix migration.
+        if (vision == null || !visionEnabled) {
+            return;
+        }
+        vision.updateInputs();
+        vision.updateOdometry(
+                getPose(),
+                timestamp -> getPose().getRotation().getRadians(),
+                slipped,
+                (pose, timestamp, standardDeviations) ->
+                        addVisionMeasurement(pose, timestamp, standardDeviations));
         modulePoses.update();
+        slipped = modulePoses.slipped();
     }
 
     public void stop() {
@@ -237,7 +261,7 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void setVisionEnabled(boolean enabled) {
-        // TODO will work on vision once this is tested and works
+        visionEnabled = enabled && vision != null && VisionConstants.ENABLED;
     }
 
     private boolean isAlign = false;
@@ -301,11 +325,13 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void onlyUseTags(int[] ids) {
-        // TODO once again, will incorporate vision in a later commit, if this works
+        if (vision != null) {
+            vision.onlyUse(ids);
+        }
     }
 
     public boolean canSeeTag() {
-        return true; //TODO
+        return vision != null && vision.canSeeTag();
     }
 
     public Pose2d getPoseAt(double timestamp) {
