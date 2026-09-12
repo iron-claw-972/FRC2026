@@ -67,7 +67,7 @@ public class RunSpindexerWithStop extends Command {
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
         }
-        boolean jammed = spindexer.getSubsystemStatorCurrent() / 2 > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        boolean jammed = spindexer.getMotorOneVelocity() < SpindexerConstants.JAM_VELOCITY_THRESHOLD && spindexer.getMotorOneStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
         Logger.recordOutput("SpindexerJammed", jammed);
         if (jam_debouncer.calculate(jammed)) {
             Logger.recordOutput("SpindexerJammedDebounced", jammed);
