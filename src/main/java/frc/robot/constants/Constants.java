@@ -70,9 +70,9 @@ public class Constants {
     public static final int MANUAL_JOY = 3;
     public static final double DEFAULT_DEADBAND = 0.00005;
 
-    public static final double TRANSLATIONAL_DEADBAND = 0.01;
+    public static final double TRANSLATIONAL_DEADBAND = 0.05;
     
-    public static final double ROTATION_DEADBAND = 0.01;
+    public static final double ROTATION_DEADBAND = 0.05;
     
     public static final double HEADING_DEADBAND = 0.05;
     public static final double HEADING_SLEWRATE = 10;

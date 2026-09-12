@@ -191,17 +191,12 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
-        ChassisSpeeds discretized = ChassisSpeeds.discretize(
-                chassisSpeeds.vxMetersPerSecond,
-                chassisSpeeds.vyMetersPerSecond,
-                chassisSpeeds.omegaRadiansPerSecond,
-                Constants.LOOP_TIME);
-        SwerveModuleState[] states = DriveConstants.KINEMATICS.toSwerveModuleStates(discretized);
+        SwerveModuleState[] states = DriveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.MAX_SPEED);
-        currentSetpoint = new SwerveSetpoint(discretized, states);
+        currentSetpoint = new SwerveSetpoint(chassisSpeeds, states);
 
         SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds()
-                .withSpeeds(discretized)
+                .withSpeeds(chassisSpeeds)
                 .withDriveRequestType(
                         isOpenLoop
                                 ? SwerveModule.DriveRequestType.OpenLoopVoltage

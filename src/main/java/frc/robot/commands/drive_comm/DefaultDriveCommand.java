@@ -125,7 +125,7 @@ public class DefaultDriveCommand extends Command {
                     speeds.vyMetersPerSecond,
                     speeds.omegaRadiansPerSecond,
                     true,
-                    false);
+                    true);
         }
     }
 }

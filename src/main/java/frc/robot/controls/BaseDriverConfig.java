@@ -31,18 +31,29 @@ public abstract class BaseDriverConfig {
     }
 
     public double getForwardTranslation() {
-        double forward = getRawForwardTranslation();
-        return forward * DriveConstants.MAX_SPEED * Math.min(1,RobotController.getBatteryVoltage()/12) * MathUtil.applyDeadband(Math.sqrt(forward*forward + Math.pow(getRawSideTranslation(), 2)), Constants.TRANSLATIONAL_DEADBAND);
+        return shapeStick(getRawForwardTranslation())
+                * DriveConstants.MAX_SPEED
+                * batteryVoltageScale();
     }
 
     public double getSideTranslation() {
-        double side = getRawSideTranslation();
-        return side * DriveConstants.MAX_SPEED * Math.min(1,RobotController.getBatteryVoltage()/12) * MathUtil.applyDeadband(Math.sqrt(side*side + Math.pow(getRawForwardTranslation(), 2)), Constants.TRANSLATIONAL_DEADBAND);
+        return shapeStick(getRawSideTranslation())
+                * DriveConstants.MAX_SPEED
+                * batteryVoltageScale();
     }
 
     public double getRotation() {
-        return MathUtils.expoMS(MathUtil.applyDeadband(getRawRotation(), Constants.ROTATION_DEADBAND), 2)
-                * DriveConstants.MAX_ANGULAR_SPEED * Math.min(1, RobotController.getBatteryVoltage()/12);
+        return shapeStick(getRawRotation())
+                * DriveConstants.MAX_ANGULAR_SPEED
+                * batteryVoltageScale();
+    }
+
+    private static double shapeStick(double value) {
+        return MathUtil.applyDeadband(value, Constants.TRANSLATIONAL_DEADBAND);
+    }
+
+    private static double batteryVoltageScale() {
+        return Math.min(1.0, RobotController.getBatteryVoltage() / Constants.ROBOT_VOLTAGE);
     }
 
     public double getHeading() {
