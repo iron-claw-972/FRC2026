@@ -49,7 +49,7 @@ public class DefaultDriveCommand extends Command {
     public void execute() {
         double forwardTranslation = driver.getForwardTranslation();
         double sideTranslation = driver.getSideTranslation();
-        double rotation = -driver.getRotation();
+        double rotation = driver.getRotation();
 
         double slowFactor = driver.getIsSlowMode() ? DriveConstants.SLOW_DRIVE_FACTOR : 1;
 

@@ -1,5 +1,7 @@
 package frc.robot.constants.swerve;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -227,10 +229,10 @@ public class DriveConstants {
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
             } else if(robotId == RobotId.TwinBot){
-                STEER_OFFSET_FRONT_LEFT = 131.201172;
-                STEER_OFFSET_FRONT_RIGHT = 247.324219;
-                STEER_OFFSET_BACK_LEFT = 39.814463;
-                STEER_OFFSET_BACK_RIGHT = 294.873047;
+                STEER_OFFSET_FRONT_LEFT = Units.rotationsToDegrees(-0.01904296875); //131.201172;
+                STEER_OFFSET_FRONT_RIGHT = Units.rotationsToDegrees(0.0478515625); //247.324219;
+                STEER_OFFSET_BACK_LEFT = Units.rotationsToDegrees(-0.04541015625); //39.814463;
+                STEER_OFFSET_BACK_RIGHT = Units.rotationsToDegrees(-0.491455078125); //294.873047;
                 
                 // MK5n gear ratio 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;

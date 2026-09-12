@@ -80,13 +80,13 @@ public final class TunerConstants {
                             TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>()
                     .withDriveMotorGearRatio(DriveConstants.DRIVE_GEAR_RATIO)
                     .withSteerMotorGearRatio(DriveConstants.STEER_GEAR_RATIO)
-                    .withCouplingGearRatio(0.0) //TODO add this, we didn't actually compensate for this in our prev code
+                    .withCouplingGearRatio(4.5) //TODO add this, we didn't actually compensate for this in our prev code
                     .withWheelRadius(DriveConstants.WHEEL_RADIUS)
                     .withSteerMotorGains(steerGains)
                     .withDriveMotorGains(driveGains)
                     .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                     .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                    .withSlipCurrent(Amps.of(DriveConstants.DRIVE_PEAK_CURRENT_LIMIT))
+                    .withSlipCurrent(Amps.of(28))
                     .withSpeedAt12Volts(MetersPerSecond.of(DriveConstants.MAX_SPEED))
                     .withDriveMotorType(DriveMotorArrangement.TalonFX_Integrated)
                     .withSteerMotorType(SteerMotorArrangement.TalonFX_Integrated)
