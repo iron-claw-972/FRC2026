@@ -118,6 +118,7 @@ public class DefaultDriveCommand extends Command {
                     speeds.vxMetersPerSecond,
                     speeds.vyMetersPerSecond,
                     swerve.getAlignAngle(),
+                    true,
                     true);
         } else {
             swerve.drive(

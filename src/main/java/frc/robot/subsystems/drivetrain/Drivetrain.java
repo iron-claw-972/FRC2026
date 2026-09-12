@@ -33,6 +33,7 @@ import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.EqualsUtil;
 import frc.robot.util.SwerveModulePose;
 import frc.robot.util.SwerveStuff.SwerveSetpoint;
+import frc.robot.util.SwerveStuff.SwerveSetpointGenerator;
 import frc.robot.util.Vision.Vision;
 
 /**
@@ -51,6 +52,7 @@ public class Drivetrain extends GeneratedDrivetrain {
                     new SwerveModuleState(),
                     new SwerveModuleState()
             });
+    private final SwerveSetpointGenerator setpointGenerator = new SwerveSetpointGenerator();
 
     private final PIDController xController =
             new PIDController(DriveConstants.TRANSLATIONAL_P, 0, DriveConstants.TRANSLATIONAL_D);
@@ -150,12 +152,21 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void driveHeading(double xSpeed, double ySpeed, double heading, boolean fieldRelative) {
+        driveHeading(xSpeed, ySpeed, heading, fieldRelative, true);
+    }
+
+    public void driveHeading(
+            double xSpeed,
+            double ySpeed,
+            double heading,
+            boolean fieldRelative,
+            boolean isOpenLoop) {
         double rot = rotationController.calculate(getYaw().getRadians(), heading);
         ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, rot);
         if (fieldRelative) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getYaw());
         }
-        setChassisSpeeds(speeds, false);
+        setChassisSpeeds(speeds, isOpenLoop);
     }
 
     public void driveWithPID(double x, double y, double rot) {
@@ -191,12 +202,25 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop) {
-        SwerveModuleState[] states = DriveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+        ChassisSpeeds appliedSpeeds = chassisSpeeds;
+        if (isOpenLoop) {
+            currentSetpoint = setpointGenerator.generateSetpoint(
+                    DriveConstants.TELEOP_MODULE_LIMITS,
+                    centerOfMassHeight,
+                    currentSetpoint,
+                    chassisSpeeds,
+                    Constants.LOOP_TIME);
+            appliedSpeeds = currentSetpoint.chassisSpeeds();
+        }
+
+        SwerveModuleState[] states = DriveConstants.KINEMATICS.toSwerveModuleStates(appliedSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.MAX_SPEED);
-        currentSetpoint = new SwerveSetpoint(chassisSpeeds, states);
+        if (!isOpenLoop) {
+            currentSetpoint = new SwerveSetpoint(appliedSpeeds, states);
+        }
 
         SwerveRequest.ApplyRobotSpeeds request = new SwerveRequest.ApplyRobotSpeeds()
-                .withSpeeds(chassisSpeeds)
+                .withSpeeds(appliedSpeeds)
                 .withDriveRequestType(
                         isOpenLoop
                                 ? SwerveModule.DriveRequestType.OpenLoopVoltage

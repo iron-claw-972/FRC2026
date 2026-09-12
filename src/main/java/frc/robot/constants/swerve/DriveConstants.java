@@ -63,6 +63,13 @@ public class DriveConstants {
         // The maximum amount a drive motor can accelerate, independant of friction
         // This does nothing if greater than LINEAR_ACCEL
         public static final double MAX_DRIVE_ACCEL = MAX_LINEAR_ACCEL;
+        /**
+         * Teleop wheel acceleration limit. This is intentionally below the maximum
+         * traction estimate so a high-speed heading change does not exceed the
+         * available tire force.
+         */
+        public static final double TELEOP_DRIVE_ACCEL = 7.0;
+        public static final double TELEOP_STATIC_FRICTION = 0.8;
         // The maximum angular acceleration of the robot
         public static final double MAX_ANGULAR_ACCEL = MAX_LINEAR_ACCEL / TRACK_WIDTH * Math.sqrt(2);
     
@@ -204,6 +211,11 @@ public class DriveConstants {
         public static final double SLOW_ROT_FACTOR = 0.2;
     
         public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
+        public static final ModuleLimits TELEOP_MODULE_LIMITS = new ModuleLimits(
+            MAX_SPEED,
+            TELEOP_DRIVE_ACCEL,
+            TELEOP_STATIC_FRICTION,
+            Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
     
         /**
          * Updates the constants if the RobotId is not the default SwerveCompetition robot.
