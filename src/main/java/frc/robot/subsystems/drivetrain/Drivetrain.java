@@ -100,19 +100,13 @@ public class Drivetrain extends GeneratedDrivetrain {
         modulePoses = new SwerveModulePose(this, DriveConstants.MODULE_LOCATIONS);
 
         PathPlannerLogging.setLogActivePathCallback(activePath -> {
-            if (!Constants.DISABLE_LOGGING) {
-                Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
-            }
+            Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[0]));
         });
         PathPlannerLogging.setLogTargetPoseCallback(targetPose -> {
-            if (!Constants.DISABLE_LOGGING) {
-                Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-            }
+            Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putData("Field", field);
-        }
+        SmartDashboard.putData("Field", field);
     }
 
     @Override
@@ -120,10 +114,22 @@ public class Drivetrain extends GeneratedDrivetrain {
         if (vision != null && visionEnabled) {
             updateOdometryVision();
         }
-        if (!Constants.DISABLE_LOGGING) {
-            Logger.recordOutput("Odometry/Robot", getPose());
-            Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+
+        Logger.recordOutput("Odometry/Robot", getPose());
+        Logger.recordOutput("Odometry/module poses", modulePoses.getModulePoses());
+
+        double[] offsets = {DriveConstants.STEER_OFFSET_FRONT_LEFT, DriveConstants.STEER_OFFSET_FRONT_RIGHT, DriveConstants.STEER_OFFSET_BACK_LEFT, DriveConstants.STEER_OFFSET_BACK_RIGHT};
+        var modulePosesss = modulePoses.getModulePoses();
+        for (int i = 3; i >= 0; i--) {
+            offsets[i] = offsets[i] + modulePosesss[i].getRotation().getDegrees();
         }
+        for (int i = 0; i < 4; i++) {
+            Logger.recordOutput("Drivetrain/Module" + i + "/AbsoluteEncoderPositionDegrees",
+                Units.rotationsToDegrees(getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble()));
+        }
+        Logger.recordOutput("Odometry/offset poses", offsets);
+
+        
         modulePoses.update();
         field.setRobotPose(getPose());
     }
