@@ -86,7 +86,7 @@ public final class TunerConstants {
                     .withDriveMotorGains(driveGains)
                     .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                     .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                    .withSlipCurrent(Amps.of(28))
+                    .withSlipCurrent(Amps.of(50))
                     .withSpeedAt12Volts(MetersPerSecond.of(DriveConstants.MAX_SPEED))
                     .withDriveMotorType(DriveMotorArrangement.TalonFX_Integrated)
                     .withSteerMotorType(SteerMotorArrangement.TalonFX_Integrated)

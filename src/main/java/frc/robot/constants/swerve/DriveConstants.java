@@ -68,8 +68,8 @@ public class DriveConstants {
          * traction estimate so a high-speed heading change does not exceed the
          * available tire force.
          */
-        public static final double TELEOP_DRIVE_ACCEL = 7.0;
-        public static final double TELEOP_STATIC_FRICTION = 0.8;
+        public static final double TELEOP_DRIVE_ACCEL = 16.5;
+        public static final double TELEOP_STATIC_FRICTION = 1.0;
         // The maximum angular acceleration of the robot
         public static final double MAX_ANGULAR_ACCEL = MAX_LINEAR_ACCEL / TRACK_WIDTH * Math.sqrt(2);
     
@@ -222,10 +222,10 @@ public class DriveConstants {
          */
         public static void update(RobotId robotId) {
             if (robotId == RobotId.PrimeJr) {
-                STEER_OFFSET_FRONT_LEFT = -8.235165 + 180;//-44.591163; // module zero
-                STEER_OFFSET_FRONT_RIGHT = -161.391135 - 3.10812 + 2.021484; // module one
-                STEER_OFFSET_BACK_LEFT = -196.350408 - 3.103486 + 3.076172; // module two
-                STEER_OFFSET_BACK_RIGHT = -4.544887 - 0.196921 - 2.92258 + 9.84375; // module three
+                STEER_OFFSET_FRONT_LEFT = -8.235165 + 180 - 180;//-44.591163; // module zero
+                STEER_OFFSET_FRONT_RIGHT = -161.391135 - 3.10812 + 2.021484 -180; // module one
+                STEER_OFFSET_BACK_LEFT = -196.350408 - 3.103486 + 3.076172 - 180; // module two
+                STEER_OFFSET_BACK_RIGHT = -4.544887 - 0.196921 - 2.92258 + 9.84375 - 180; // module three
                 
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
@@ -241,7 +241,7 @@ public class DriveConstants {
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
             } else if(robotId == RobotId.TwinBot){
-                STEER_OFFSET_FRONT_LEFT = Units.rotationsToDegrees(-0.01904296875); //131.201172;
+                STEER_OFFSET_FRONT_LEFT = Units.rotationsToDegrees(-0.01904296875); //131.201172
                 STEER_OFFSET_FRONT_RIGHT = Units.rotationsToDegrees(0.0478515625); //247.324219;
                 STEER_OFFSET_BACK_LEFT = Units.rotationsToDegrees(-0.04541015625); //39.814463;
                 STEER_OFFSET_BACK_RIGHT = Units.rotationsToDegrees(-0.491455078125); //294.873047;

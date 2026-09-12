@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DoNothing;
+import frc.robot.commands.drive_comm.DriveToPose;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.RunSpindexer;
 import frc.robot.commands.gpm.RunSpindexerWithStop;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.turret.Turret;
@@ -491,6 +493,20 @@ public class ChoreoPathCommandBuilder {
 
     return routine;
 
+  }
+
+  public AutoRoutine testAuto(AutoFactory factory, Drivetrain drive) {
+    AutoRoutine routine = factory.newRoutine("test");
+
+    AutoTrajectory traj = routine.trajectory("test");
+
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
+    
+
+
+
+
+    return routine;
   }
 
 }

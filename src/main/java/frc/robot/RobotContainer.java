@@ -113,15 +113,15 @@ public class RobotContainer {
 
 
       case PrimeJr: // AKA Valence
-        spindexer = new Spindexer();
-        intake = new Intake();
+        // spindexer = new Spindexer();
+        // intake = new Intake();
         // led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
-        turret = new Turret();
-        shooter = new Shooter();
-        hood = new Hood();
+        // turret = new Turret();
+        // shooter = new Shooter();
+        // hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -328,24 +328,24 @@ public class RobotContainer {
     String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
-    addAuto(leftSideAuto);
-    addAuto(rightSideAuto);
-    addAuto(shootOnlyAuto);
-    addAuto(leftConservativeSwipe);
-    addAuto(leftLiberalSwipe);
-    addAuto(rightLiberalSwipe);
-    addAuto(leftLiberalSwipeTranslation);
-    addAuto(leftDoNothing);
-    addAuto(rightDoNothing);
-    addAuto(centerDoNothing);
-    addAuto(leftShallowDoubleSwipe);
-    addAuto(rightShallowDoubleSwipe);
-    addAuto(leftBumpDepotCenter);
-    addAuto(leftTrenchDepotCenter);
-    addAuto(depotCenterPath);
+    // addAuto(leftSideAuto);
+    // addAuto(rightSideAuto);
+    // addAuto(shootOnlyAuto);
+    // addAuto(leftConservativeSwipe);
+    // addAuto(leftLiberalSwipe);
+    // addAuto(rightLiberalSwipe);
+    // addAuto(leftLiberalSwipeTranslation);
+    // addAuto(leftDoNothing);
+    // addAuto(rightDoNothing);
+    // addAuto(centerDoNothing);
+    // addAuto(leftShallowDoubleSwipe);
+    // addAuto(rightShallowDoubleSwipe);
+    // addAuto(leftBumpDepotCenter);
+    // addAuto(leftTrenchDepotCenter);
+    // addAuto(depotCenterPath);
 
 
-    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+    // DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
 
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
@@ -356,26 +356,27 @@ public class RobotContainer {
     // String rightDynamicShallowDoubleSwipe = "RightDynamicShallowDoubleSwipe";
 
     // add commands
-    addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
-    addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
-    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
-    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
+    // addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
+    // addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
+    // addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
+    // addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
     ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
 
-    addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
-    addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
-    addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
-    addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
-    addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
-    addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
-    addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
-    addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
-    addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
-    addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
-    addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
-    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
-    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
+    // addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
+    // addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
+    // addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
+    // addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
+    // addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
+    // addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
+    // addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
+    // addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
+    // addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
+    // addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
+    // addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
+    // addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
+    // addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
+    addChoreoAuto("test", choreo.testAuto(autoFactory, drive));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
