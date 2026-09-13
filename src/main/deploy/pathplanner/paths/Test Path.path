@@ -8,68 +8,52 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.2871769368561905,
-        "y": 0.61862682376559
+        "x": 6.8463736325232265,
+        "y": 0.7249033296553149
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.173167259786476,
-        "y": 0.6189561091340454
+        "x": 7.968742586002373,
+        "y": 1.0600830367734273
       },
       "prevControl": {
-        "x": 7.9452942125794745,
-        "y": 0.5161267633392016
+        "x": 7.478401460896605,
+        "y": 0.6029216658359398
       },
       "nextControl": {
-        "x": 8.401040306993478,
-        "y": 0.7217854549288892
+        "x": 8.506302159099532,
+        "y": 1.561267740268689
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.323795966785292,
-        "y": 4.3954329774614465
+        "x": 7.968742586002373,
+        "y": 3.97582443653618
       },
       "prevControl": {
-        "x": 8.754163701067617,
-        "y": 4.083416370106762
+        "x": 8.83528623582794,
+        "y": 3.5450623635621596
       },
       "nextControl": {
-        "x": 8.022105058879356,
-        "y": 4.614158885693249
+        "x": 7.397577202793027,
+        "y": 4.259752873992024
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.2042348754448415,
-        "y": 2.684721233689205
+        "x": 6.559288256227758,
+        "y": 3.1904033214709373
       },
       "prevControl": {
-        "x": 7.676615114046238,
-        "y": 2.836633480529032
-      },
-      "nextControl": {
-        "x": 4.848576512455518,
-        "y": 2.5448517200474488
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.7074970344009497,
-        "y": 2.566370106761566
-      },
-      "prevControl": {
-        "x": 3.5420927580669876,
-        "y": 2.172473471852166
+        "x": 6.899587768431004,
+        "y": 3.612722697863787
       },
       "nextControl": null,
       "isLocked": false,
@@ -93,7 +77,20 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Extend Intake",
+      "waypointRelativePos": 0.19289827255278869,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Spin Intake Rollers",
+      "waypointRelativePos": 0.2677543186180392,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.5,
@@ -104,7 +101,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 52.54942176826329
+    "rotation": 52.549421768263294
   },
   "reversed": false,
   "folder": "week 5 (new stuff)",
