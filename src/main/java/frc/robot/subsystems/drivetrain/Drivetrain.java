@@ -498,20 +498,29 @@ public class Drivetrain extends GeneratedDrivetrain {
 
     PIDController autoXController = new PIDController(10, 0.0, 0.0); //these are velocity controllers, not position
     PIDController autoYController = new PIDController(10, 0.0, 0.0);
-    PIDController autoHeadingController = new PIDController(7.5, 0.0, 0.0);
+    PIDController autoHeadingController = new PIDController(2.5, 0.0, 0.0);
 
     public void followTrajectory(SwerveSample sample) {
         // Get the current pose of the robot
         Pose2d pose = getPose();
 
         // Generate the next speeds for the robot
+        var x = autoXController.calculate(pose.getX(), sample.x);
+        var y = autoYController.calculate(pose.getX(), sample.y);
+        var rot = autoHeadingController.calculate(pose.getRotation().getRadians(), sample.heading);
+        Logger.recordOutput("Autos/Vx", x);
+        Logger.recordOutput("Autos/Vy", y);
+        Logger.recordOutput("Autos/Vrot", rot);
+        Logger.recordOutput("Autos/TVx", sample.x);
+        Logger.recordOutput("Autos/TVy", sample.y);
+        Logger.recordOutput("Autos/TVrot", sample.heading);
         ChassisSpeeds speeds = new ChassisSpeeds(
-            sample.vx + autoXController.calculate(pose.getX(), sample.x),
-            sample.vy + autoYController.calculate(pose.getY(), sample.y),
-            sample.omega + autoHeadingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.vx + x,
+            sample.vy + y,
+            sample.omega + rot
         );
 
         // Apply the generated speeds
-        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()), false);
+        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getYaw()), false);
     }
 }

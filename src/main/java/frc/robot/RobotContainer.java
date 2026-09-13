@@ -113,15 +113,15 @@ public class RobotContainer {
 
 
       case PrimeJr: // AKA Valence
-        // spindexer = new Spindexer();
-        // intake = new Intake();
+        spindexer = new Spindexer();
+        intake = new Intake();
         // led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
-        // turret = new Turret();
-        // shooter = new Shooter();
-        // hood = new Hood();
+        turret = new Turret();
+        shooter = new Shooter();
+        hood = new Hood();
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -241,44 +241,44 @@ public class RobotContainer {
 
     if (intake != null) {
 
-      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
-        intake.extend();
-      }));
-      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
-      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
-      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
-      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
+      // NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
+      //   intake.extend();
+      // }));
+      // NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
+      // NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
+      // NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
+      // NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
 
-      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
-        seizing = true;
-        CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
-      }));
-      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
-        seizing = false;
-      }));
+      // NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
+      //   seizing = true;
+      //   CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
+      // }));
+      // NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
+      //   seizing = false;
+      // }));
     }
 
-    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
-      Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
-      NamedCommands.registerCommand("Start Spindexer",
-          new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
-      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
-    }
+    // if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
+    //   Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
+    //   NamedCommands.registerCommand("Start Spindexer",
+    //       new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
+    //   NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
+    // }
 
-    if (hood != null) {
+    // if (hood != null) {
 
-      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
-        hood.forceHoodDown(true);
-      }));
-      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
-        hood.forceHoodDown(false);
-      }));
-    }
+    //   NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+    //     hood.forceHoodDown(true);
+    //   }));
+    //   NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+    //     hood.forceHoodDown(false);
+    //   }));
+    // }
 
-    NamedCommands.registerCommand("After Depot", new InstantCommand());
-    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
-    NamedCommands.registerCommand("Depot", new InstantCommand());
-    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
+    // NamedCommands.registerCommand("After Depot", new InstantCommand());
+    // NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    // NamedCommands.registerCommand("Depot", new InstantCommand());
+    // NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
@@ -329,6 +329,7 @@ public class RobotContainer {
     String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
+    addAuto("test");
     // addAuto(leftSideAuto);
     // addAuto(rightSideAuto);
     // addAuto(shootOnlyAuto);
@@ -346,7 +347,7 @@ public class RobotContainer {
     // addAuto(depotCenterPath);
 
 
-    // DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
 
     // names
     String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
@@ -364,19 +365,19 @@ public class RobotContainer {
 
     ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
 
-    // addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
-    // addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
-    // addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
-    // addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
-    // addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
-    // addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
-    // addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
-    // addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
-    // addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
-    // addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
-    // addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
-    // addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
-    // addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
+    addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
+    addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
+    addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
+    addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
+    addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
+    addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
+    addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
+    addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
+    addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
+    addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
+    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
     addChoreoAuto("test", choreo.testAuto(autoFactory, drive));
 
     // put the Chooser on the SmartDashboard
@@ -418,8 +419,8 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    // return autoChooser.getSelected();
-    return choreoAutoChooser.selectedCommand();
+    return autoChooser.getSelected();
+    // return choreoAutoChooser.selectedCommand();
   }
 
   public void logComponents() {

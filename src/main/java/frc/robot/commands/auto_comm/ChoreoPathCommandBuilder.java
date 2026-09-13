@@ -500,10 +500,10 @@ public class ChoreoPathCommandBuilder {
 
     AutoTrajectory traj = routine.trajectory("test");
 
-    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), traj.cmd()));
-    
-
-
+    routine.active().onTrue(Commands.sequence(traj.resetOdometry(), new InstantCommand(() -> {
+      intake.extend();
+      intake.spinStart();
+    }, intake), traj.cmd()));
 
 
     return routine;

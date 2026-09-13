@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.42896797153025,
-        "y": 7.655468564650059
+        "x": 4.461245551601425,
+        "y": 7.633950177935944
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.801595217095044,
-        "y": 6.510923411540405
+        "x": 6.683230441756154,
+        "y": 7.341395262028162
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.194685646500595,
-        "y": 5.772609727164888
+        "x": 7.484578884934758,
+        "y": 7.3757295373665475
       },
       "prevControl": {
-        "x": 9.176240918430604,
-        "y": 6.710214763038332
+        "x": 7.321013338953467,
+        "y": 7.564796488915046
       },
       "nextControl": {
-        "x": 7.473819691577701,
-        "y": 5.084021352313167
+        "x": 7.64814443091605,
+        "y": 7.186662585818049
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.965112692763939,
-        "y": 5.353001186239621
+        "x": 7.64596678529063,
+        "y": 4.997947805456701
       },
       "prevControl": {
-        "x": 4.500675461892897,
-        "y": 5.5286443358904505
+        "x": 7.457945912176471,
+        "y": 6.337141102890512
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,21 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 200.0,
+        "maxAngularAcceleration": 300.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -58,13 +72,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -46.123302714075294
+    "rotation": -88.28164199834457
   },
   "reversed": false,
   "folder": "week 5 (new stuff)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
