@@ -69,6 +69,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 			SmartDashboard.putData("force hood down", new InstantCommand(() -> forceHoodDown(true)));
 			SmartDashboard.putData("unforce hood", new InstantCommand(() -> forceHoodDown(false)));
 		}
+		
 	}
 
 	/**
