@@ -109,8 +109,6 @@ public class DriveConstants {
         // Heading PID.
         public static final double HEADING_P = 5.5;
         public static final double HEADING_D = 0;
-        public static final double AUTO_HEADING_P = 5.5;
-        public static final double AUTO_HEADING_D = 0;
     
         public static final double HEADING_TOLERANCE = Units.degreesToRadians(1.5);
     
@@ -118,8 +116,6 @@ public class DriveConstants {
         // TODO: Tune this better (low priority since we aren't using it in 2025)
         public static final double TRANSLATIONAL_P = 1;
         public static final double TRANSLATIONAL_D = 0.001;
-        public static final double AUTO_TRANSLATIONAL_P = 1;
-        public static final double AUTO_TRANSLATIONAL_D = 0.001;
     
         //The PIDs for PathPlanner Command
         public static final double PATH_PLANNER_HEADING_P = 3.5/2;
