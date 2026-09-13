@@ -100,6 +100,7 @@ public class Drivetrain extends GeneratedDrivetrain {
     private void initialize() {
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
         rotationController.setTolerance(Units.degreesToRadians(0.25), Units.degreesToRadians(0.25));
+        autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
         modulePoses = new SwerveModulePose(this, DriveConstants.MODULE_LOCATIONS);
 
         PathPlannerLogging.setLogActivePathCallback(activePath -> {
@@ -506,7 +507,7 @@ public class Drivetrain extends GeneratedDrivetrain {
 
         // Generate the next speeds for the robot
         var x = autoXController.calculate(pose.getX(), sample.x);
-        var y = autoYController.calculate(pose.getX(), sample.y);
+        var y = autoYController.calculate(pose.getY(), sample.y);
         var rot = autoHeadingController.calculate(pose.getRotation().getRadians(), sample.heading);
         Logger.recordOutput("Autos/Vx", x);
         Logger.recordOutput("Autos/Vy", y);
