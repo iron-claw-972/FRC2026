@@ -112,6 +112,7 @@ public class RobotContainer {
       case TwinBot:
 
 
+      case SwerveCompetition:
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
@@ -123,7 +124,7 @@ public class RobotContainer {
         shooter = new Shooter();
         hood = new Hood();
 
-      case SwerveCompetition: // AKA "Vantage"
+      // case SwerveCompetition: // AKA "Vantage"
 
       case BetaBot: // AKA "Pancake"
         vision = new Vision(VisionConstants.APRIL_TAG_CAMERAS);
@@ -241,44 +242,44 @@ public class RobotContainer {
 
     if (intake != null) {
 
-      // NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
-      //   intake.extend();
-      // }));
-      // NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
-      // NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
-      // NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
-      // NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
+      NamedCommands.registerCommand("Extend Intake", new InstantCommand(() -> {
+        intake.extend();
+      }));
+      NamedCommands.registerCommand("Retract Intake", new InstantCommand(() -> intake.retract()));
+      NamedCommands.registerCommand("Intermediate Extend", new InstantCommand(() -> intake.intermediateExtend()));
+      NamedCommands.registerCommand("Spin Intake Rollers", new InstantCommand(() -> intake.spinStart()));
+      NamedCommands.registerCommand("Stop Intake Rollers", new InstantCommand(() -> intake.spinStop()));
 
-      // NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
-      //   seizing = true;
-      //   CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
-      // }));
-      // NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
-      //   seizing = false;
-      // }));
+      NamedCommands.registerCommand("Start Intake Seizure", new InstantCommand(() -> {
+        seizing = true;
+        CommandScheduler.getInstance().schedule(new IntakeMovementCommand(intake).until(() -> !seizing));
+      }));
+      NamedCommands.registerCommand("Stop Intake Seizure", new InstantCommand(() -> {
+        seizing = false;
+      }));
     }
 
-    // if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
-    //   Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
-    //   NamedCommands.registerCommand("Start Spindexer",
-    //       new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
-    //   NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
-    // }
+    if (turret != null && drive != null && hood != null && shooter != null && spindexer != null && intake != null) {
+      Command runSpindexer = new RunSpindexer(spindexer, turret, hood, intake);
+      NamedCommands.registerCommand("Start Spindexer",
+          new InstantCommand(() -> CommandScheduler.getInstance().schedule(runSpindexer)));
+      NamedCommands.registerCommand("Stop Spindexer", new InstantCommand(() -> runSpindexer.cancel()));
+    }
 
-    // if (hood != null) {
+    if (hood != null) {
 
-    //   NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
-    //     hood.forceHoodDown(true);
-    //   }));
-    //   NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
-    //     hood.forceHoodDown(false);
-    //   }));
-    // }
+      NamedCommands.registerCommand("Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(true);
+      }));
+      NamedCommands.registerCommand("Stop Hood Down", new InstantCommand(() -> {
+        hood.forceHoodDown(false);
+      }));
+    }
 
-    // NamedCommands.registerCommand("After Depot", new InstantCommand());
-    // NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
-    // NamedCommands.registerCommand("Depot", new InstantCommand());
-    // NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
+    NamedCommands.registerCommand("After Depot", new InstantCommand());
+    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    NamedCommands.registerCommand("Depot", new InstantCommand());
+    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
