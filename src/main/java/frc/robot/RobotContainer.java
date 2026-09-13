@@ -329,7 +329,7 @@ public class RobotContainer {
     String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
-    addAuto("test");
+    // addAuto("test");
     // addAuto(leftSideAuto);
     // addAuto(rightSideAuto);
     // addAuto(shootOnlyAuto);
@@ -419,8 +419,8 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    return autoChooser.getSelected();
-    // return choreoAutoChooser.selectedCommand();
+    // return autoChooser.getSelected();
+    return choreoAutoChooser.selectedCommand();
   }
 
   public void logComponents() {

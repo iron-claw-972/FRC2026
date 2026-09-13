@@ -271,7 +271,7 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public double getAngularRate(int id) {
-        return getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
+        return Units.degreesToRadians(getPigeon2().getAngularVelocityZWorld().getValueAsDouble());
     }
 
     public SwerveModulePosition[] getModulePositions() {

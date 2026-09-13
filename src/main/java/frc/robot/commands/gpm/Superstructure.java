@@ -254,7 +254,7 @@ public class Superstructure extends Command {
             if (spindexer.noIndexing) {
                 spindexer.noIndexing = false;
             }
-            turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), (turretVelocity - drivetrain.getAngularRate(2)) * .1);
+            turret.setFieldRelativeTarget(Rotation2d.fromDegrees(turretSetpoint), (turretVelocity - drivetrain.getAngularRate(2)));
 
             boolean shuttling = !target.equals(FieldConstants.getHubTranslation().toTranslation2d()); // if we're aiming at the hub, we're not shuttling
 
