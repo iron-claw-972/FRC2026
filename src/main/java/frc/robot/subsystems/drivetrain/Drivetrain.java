@@ -362,7 +362,7 @@ public class Drivetrain extends GeneratedDrivetrain {
     }
 
     public Pose2d getPoseAt(double timestamp) {
-        return getPose();
+        return getPose(); //TODO
     }
 
     public double headingControl(double rot, double xSpeed, double ySpeed) {
