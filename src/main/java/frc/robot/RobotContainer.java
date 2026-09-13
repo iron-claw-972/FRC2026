@@ -418,8 +418,8 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    // return autoChooser.getSelected();
-    return choreoAutoChooser.selectedCommand();
+    return autoChooser.getSelected();
+    // return choreoAutoChooser.selectedCommand();
   }
 
   public void logComponents() {
