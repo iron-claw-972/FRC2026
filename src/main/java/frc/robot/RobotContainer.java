@@ -191,7 +191,8 @@ public class RobotContainer {
       	autoFactory = new AutoFactory(
             drive::getPose,
             drive::resetOdometry,
-            sample -> drive.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(sample.getChassisSpeeds(), drive.getYaw()), false),
+            // sample -> drive.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(sample.getChassisSpeeds(), drive.getYaw()), false),
+            drive::followTrajectory,
             true,
             drive,
             (trajectory, startOrFinish) -> {

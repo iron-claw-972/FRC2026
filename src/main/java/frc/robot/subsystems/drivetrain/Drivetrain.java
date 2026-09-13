@@ -15,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -60,6 +61,12 @@ public class Drivetrain extends GeneratedDrivetrain {
             new PIDController(DriveConstants.TRANSLATIONAL_P, 0, DriveConstants.TRANSLATIONAL_D);
     private final PIDController rotationController =
             new PIDController(DriveConstants.HEADING_P, 0, DriveConstants.HEADING_D);
+    private final PIDController AutoXController =
+            new PIDController(DriveConstants.AUTO_TRANSLATIONAL_P, 0, DriveConstants.AUTO_TRANSLATIONAL_D);
+    private final PIDController AutoYController =
+            new PIDController(DriveConstants.AUTO_TRANSLATIONAL_P, 0, DriveConstants.AUTO_TRANSLATIONAL_D);
+    private final PIDController AutoRotationController =
+            new PIDController(DriveConstants.AUTO_HEADING_P, 0, DriveConstants.AUTO_HEADING_D);
 
     private SwerveModulePose modulePoses;
     private final Field2d field = new Field2d();
@@ -493,5 +500,20 @@ public class Drivetrain extends GeneratedDrivetrain {
             total += getModule(i).getDriveMotor().getSupplyCurrent().getValueAsDouble();
         }
         return total;
+    }
+
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + rotationController.calculate(pose.getRotation().getRadians(), sample.heading)
+        );
+
+        // Apply the generated speeds
+        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()), true);
     }
 }
