@@ -41,6 +41,7 @@ import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.GyroIOPigeon2;
@@ -70,7 +71,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
-  // private LED led = null;
+  private LED led = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -116,7 +117,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
-        // led = new LED();
+        led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
