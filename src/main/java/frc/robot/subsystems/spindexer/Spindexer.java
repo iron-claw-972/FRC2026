@@ -167,7 +167,7 @@ public class Spindexer extends SubsystemBase implements SpindexerIO {
     state = SpindexerState.CUSTOM;
   }
 
-  public void setNewCurrentLimit(double stator, double supply) {
+  public void setNewCurrentLimit(double supply, double stator) {
     CurrentLimitsConfigs limitConfig = new CurrentLimitsConfigs();
     limitConfig.StatorCurrentLimit = stator;
     limitConfig.StatorCurrentLimitEnable = true;
