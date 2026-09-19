@@ -19,12 +19,12 @@ public class TurretSysIDCommand extends SequentialCommandGroup {
 
   public TurretSysIDCommand(Turret turret) {
     config = new Config(
-        Units.Volts.of(0.2).per(Units.Seconds),
-        Units.Volts.of(1),
-        Units.Seconds.of(5),
+        Units.Volts.of(1.0).per(Units.Seconds),
+        Units.Volts.of(2),
+        Units.Seconds.of(2.5),
         (state) -> Logger.recordOutput("SysIdTestState", state.toString()));
     sysId = new SysId(
-        "Drivetrain",
+        "Turret",
         x -> {
           turret.setVoltage(x);
         },
