@@ -14,8 +14,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.commands.drive_comm.SysIDDriveCommand;
+import frc.robot.commands.misc.TurretSysIDCommand;
 import frc.robot.constants.Constants;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -118,6 +122,9 @@ public class Turret extends SubsystemBase implements TurretIO {
 		SmartDashboard.putData("Set Locked", new InstantCommand(() -> {
 			locked = !locked;
 		}));
+
+		SmartDashboard.putData("SysID Tuning", new TurretSysIDCommand(this));
+
 		// motor.setPosition(Units.degreesToRotations(238.86) *
 		// TurretConstants.GEAR_RATIO);
 
@@ -169,71 +176,71 @@ public class Turret extends SubsystemBase implements TurretIO {
 
 	@Override
 	public void periodic() {
-		updateInputs();
-		Logger.processInputs("Turret", inputs);
+		// updateInputs();
+		// Logger.processInputs("Turret", inputs);
 
-		// Position extrapolation
-		double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * TurretConstants.EXTRAPOLATION_TIME_CONSTANT);
+		// // Position extrapolation
+		// double futureRobotAngle = goalAngle.getRadians() + (goalVelocityRadPerSec * TurretConstants.EXTRAPOLATION_TIME_CONSTANT);
 
-		// Continuous wrap selection
-		double best = lastGoalRad;
-		boolean found = false;
+		// // Continuous wrap selection
+		// double best = lastGoalRad;
+		// boolean found = false;
 
-		for (int i = -2; i <= 2; i++) {
-			double candidate = futureRobotAngle + 2.0 * Math.PI * i;
-			if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE)
-					|| candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
-				continue;
+		// for (int i = -2; i <= 2; i++) {
+		// 	double candidate = futureRobotAngle + 2.0 * Math.PI * i;
+		// 	if (candidate < Units.degreesToRadians(TurretConstants.MIN_ANGLE)
+		// 			|| candidate > Units.degreesToRadians(TurretConstants.MAX_ANGLE))
+		// 		continue;
 
-			if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
-				best = candidate;
-				found = true;
-			}
-		}
+		// 	if (!found || Math.abs(candidate - lastGoalRad) < Math.abs(best - lastGoalRad)) {
+		// 		best = candidate;
+		// 		found = true;
+		// 	}
+		// }
 
-		lastGoalRad = best;
+		// lastGoalRad = best;
 
-		// calculate shortest angular delta
-		double delta = best - lastRawSetpoint;
+		// // calculate shortest angular delta
+		// double delta = best - lastRawSetpoint;
 
-		// filter delta
-		double filteredDelta = setpointFilter.calculate(delta);
+		// // filter delta
+		// double filteredDelta = setpointFilter.calculate(delta);
 
-		// apply filtered range
-		lastFilteredRad += filteredDelta;
-		lastRawSetpoint = best;
-		best = lastFilteredRad;
+		// // apply filtered range
+		// lastFilteredRad += filteredDelta;
+		// lastRawSetpoint = best;
+		// best = lastFilteredRad;
 
-		// Tells the Kraken to get to this position using 1000Hz profile
-		double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
+		// // Tells the Kraken to get to this position using 1000Hz profile
+		// double motorGoalRotations = Units.radiansToRotations(best) * TurretConstants.GEAR_RATIO;
 
-		// Clamp position setpoint to min and max angles
-		motorGoalRotations = MathUtil.clamp(motorGoalRotations,
-				Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO,
-				Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
+		// // Clamp position setpoint to min and max angles
+		// motorGoalRotations = MathUtil.clamp(motorGoalRotations,
+		// 		Units.degreesToRotations(TurretConstants.MIN_ANGLE) * TurretConstants.GEAR_RATIO,
+		// 		Units.degreesToRotations(TurretConstants.MAX_ANGLE) * TurretConstants.GEAR_RATIO);
 
-		// Multiply goal velocity by kV
-		double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
+		// // Multiply goal velocity by kV
+		// double robotTurnCompensation = goalVelocityRadPerSec * TurretConstants.FEEDFORWARD_KV * TurretConstants.GEAR_RATIO;
 
-		// Sets motor control with feedforward
-		motor.setControl(mmVoltageRequest
-				.withPosition(motorGoalRotations)
-				.withFeedForward(robotTurnCompensation)
-				.withEnableFOC(true));
+		// // Sets motor control with feedforward
+		// motor.setControl(mmVoltageRequest
+		// 		.withPosition(motorGoalRotations)
+		// 		.withFeedForward(robotTurnCompensation)
+		// 		.withEnableFOC(true));
 
-		if (!Constants.DISABLE_LOGGING) {
-			Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
-			Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
-		}
+		// if (!Constants.DISABLE_LOGGING) {
+		// 	Logger.recordOutput("Turret/Voltage", motor.getMotorVoltage().getValue());
+		// 	Logger.recordOutput("Turret/setpointDeg", goalAngle.getDegrees());
+		// }
 
-		// --- Visualization ---
-		ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
+		// // --- Visualization ---
+		// ligament.setAngle(Units.radiansToDegrees(getPositionRad()));
 
-		if (!Constants.DISABLE_SMART_DASHBOARD) {
-			SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
-			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
-			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
-		}
+		// if (!Constants.DISABLE_SMART_DASHBOARD) {
+		// 	SmartDashboard.putNumber("Turret position", Units.radiansToDegrees(getPositionRad()));
+		// 	SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
+		// 	SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
+		// }
 	}
 
 	/* ---------------- Simulation ---------------- */
@@ -276,4 +283,19 @@ public class Turret extends SubsystemBase implements TurretIO {
 	public double getSubsystemSupplyCurrent() {
 		return inputs.motorSupplyCurrent;
 	}
+
+	
+
+	public void setVoltage(Voltage x) {
+		if (getPositionDeg() < TurretConstants.MIN_ANGLE || getPositionDeg() > TurretConstants.MAX_ANGLE) {
+			motor.setVoltage(x.in(edu.wpi.first.units.Units.Volts));
+		} else {
+			motor.set(0);
+		}
+	}
+
+	public void setBegin() {
+		motor.setPosition(Units.degreesToRotations(TurretConstants.MIN_ANGLE));
+	}
 }
+
