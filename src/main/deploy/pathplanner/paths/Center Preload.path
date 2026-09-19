@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 3.041032028469752,
-        "y": 5.761850533807828
+        "x": 1.7284104389086603,
+        "y": 6.525753262158957
       },
       "prevControl": {
-        "x": 1.6549211951015999,
-        "y": 6.9736320942118875
+        "x": 1.104377224199289,
+        "y": 7.354211150652431
       },
       "nextControl": null,
       "isLocked": false,
@@ -103,32 +103,7 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Stop Hood Down",
-      "waypointRelativePos": 0.04798464491362655,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Extend Intake",
-      "waypointRelativePos": 0.39347408829173997,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Spin Intake Rollers",
-      "waypointRelativePos": 0.4971209213051797,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Start Spindexer",
-      "waypointRelativePos": 2.4500959692898365,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.5,

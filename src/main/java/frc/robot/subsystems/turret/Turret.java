@@ -234,6 +234,9 @@ public class Turret extends SubsystemBase implements TurretIO {
 			SmartDashboard.putBoolean("Turret Calibrated", !calibrating);
 			SmartDashboard.putBoolean("Turret At Setpoint", atSetpoint());
 		}
+
+		Logger.recordOutput("Turret/TargetSetpoint", goalAngle.getDegrees());
+		Logger.recordOutput("Turret/ActualPos", inputs.positionDeg);
 	}
 
 	/* ---------------- Simulation ---------------- */

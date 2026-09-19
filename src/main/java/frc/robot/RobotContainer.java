@@ -346,6 +346,7 @@ public class RobotContainer {
     addAuto(leftTrenchDepotCenter);
     addAuto(depotCenterPath);
     addAuto("CenterPreload");
+    addAuto("RightConservativeDoubleSwipe");
 
 
     DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
