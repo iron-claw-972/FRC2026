@@ -89,9 +89,7 @@ public class RunSpindexer extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putBoolean("Spindexer Jamming", reversing);
-        }
+        Logger.recordOutput("Spindexer Jamming", reversing);
     }
 
     @Override

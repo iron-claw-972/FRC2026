@@ -4,15 +4,15 @@ public class SpindexerConstants {
     public static final double spindexerVelocityWithBall = 6.0; // rps (for counting balls)
     public static final double SUPPLY_CURRENT_LIMIT = 80; // A
     public static final double spindexerForwardVoltage = 1.00; // Volts (set low for testing)
-    public static final double spindexerReverseVoltage = -1.00; // Volts
+    public static final double spindexerReverseVoltage = -1.30; // not Volts
     public static final double GEAR_RATIO = 27.0; // unused & both motors have same gearing
 
     public static final double CURRENT_FORWARD_STATOR_LIMIT = 150.0;
-    public static final double CURRENT_REVERSE_STATOR_LIMIT = 30.0;
+    public static final double CURRENT_REVERSE_STATOR_LIMIT = 70.0;
     public static final double CURRENT_TIME_LIMIT = 1.0; //s
-    public static final double JAM_CURRENT_THRESHOLD = 78.0; // A, 20 empty
+    public static final double JAM_CURRENT_THRESHOLD = 148.0; // A, 20 empty
     public static final double JAM_VELOCITY_THRESHOLD = 5.0; // rps, 85 empty
-    public static final double JAM_DEBOUNCE_TIME = 0.3; // seconds
+    public static final double JAM_DEBOUNCE_TIME = 0.8; // seconds
     public static final double REVERSE_DEBOUNCE_TIME = 0.35; // seconds
     public static final double MAX_RPM = 60;
 }

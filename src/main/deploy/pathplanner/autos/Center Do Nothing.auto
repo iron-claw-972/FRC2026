@@ -39,6 +39,18 @@
           "data": {
             "name": "Start Spindexer"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Retract Intake"
+          }
         }
       ]
     }
