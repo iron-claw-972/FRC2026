@@ -130,8 +130,8 @@ public class DriveConstants {
         public static final double STEER_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean STEER_ENABLE_CURRENT_LIMIT = true;
     
-        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 40;
-        public static final int DRIVE_PEAK_CURRENT_LIMIT = 40;
+        public static final int DRIVE_CONTINUOUS_CURRENT_LIMIT = 50;
+        public static final int DRIVE_PEAK_CURRENT_LIMIT = 60;
         public static final double DRIVE_PEAK_CURRENT_DURATION = 0.01;
         public static final boolean DRIVE_ENABLE_CURRENT_LIMIT = true;
     
@@ -199,7 +199,7 @@ public class DriveConstants {
         public static final boolean INVERT_GYRO = false; // Make sure gyro is CCW+ CW-
     
         public static final double SLOW_DRIVE_FACTOR = 0.2;
-        public static final double SLOW_ROT_FACTOR = 0.1;
+        public static final double SLOW_ROT_FACTOR = 0.2;
     
         public static final ModuleLimits MODULE_LIMITS = new ModuleLimits(MAX_SPEED, MAX_DRIVE_ACCEL, COSF, Units.rotationsPerMinuteToRadiansPerSecond(Constants.MAX_RPM / STEER_GEAR_RATIO));
     
@@ -208,10 +208,15 @@ public class DriveConstants {
          */
         public static void update(RobotId robotId) {
             if (robotId == RobotId.PrimeJr) {
-                STEER_OFFSET_FRONT_LEFT = 188.26+180;
-                STEER_OFFSET_FRONT_RIGHT = 162.71+180+180;
-                STEER_OFFSET_BACK_LEFT = 196.69+180;
-                STEER_OFFSET_BACK_RIGHT = 357.90+180+180;
+                STEER_OFFSET_FRONT_LEFT = 187.64+180; // module zero
+                STEER_OFFSET_FRONT_RIGHT = 162+180+180; // module one
+                STEER_OFFSET_BACK_LEFT = 196.3+180; // module two
+                STEER_OFFSET_BACK_RIGHT = 357+180+180; // module three        
+                // STEER_OFFSET_FRONT_LEFT = -72.173728;
+                // STEER_OFFSET_FRONT_RIGHT = 11.126474;
+                // STEER_OFFSET_BACK_LEFT = -104.404723;
+                // public STEER_OFFSET_BACK_RIGHT = 119.826452;
+
                 
                 // MK5n 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;
@@ -226,11 +231,11 @@ public class DriveConstants {
 
                 MODULE_CONSTANTS = COTSFalconSwerveConstants.SDSMK5n(DRIVE_GEAR_RATIO);
 
-            } else if(robotId == RobotId.WaffleHouse){
-                STEER_OFFSET_FRONT_LEFT = 300.058594 - 350 + 180;
-                STEER_OFFSET_FRONT_RIGHT = 65.654297 + 180;
-                STEER_OFFSET_BACK_LEFT = 38.232422 + 180 + 180;
-                STEER_OFFSET_BACK_RIGHT = 116.279297 + 180;
+            } else if(robotId == RobotId.TwinBot){
+                STEER_OFFSET_FRONT_LEFT = 131.201172;
+                STEER_OFFSET_FRONT_RIGHT = 247.324219;
+                STEER_OFFSET_BACK_LEFT = 39.814463;
+                STEER_OFFSET_BACK_RIGHT = 294.873047;
                 
                 // MK5n gear ratio 
                 INVERT_STEER_MOTOR = InvertedValue.CounterClockwise_Positive;

@@ -50,7 +50,7 @@ public class ShotInterpolation {
         shooterVelocityMap.put(3.00, 14.0 * 1.075);
         shooterVelocityMap.put(4.00, 15.5 * 1.075);
         shooterVelocityMap.put(5.00, 17.0 * 1.05);
-        shooterVelocityMap.put(5.60, 18.0 * 1.05);
+        shooterVelocityMap.put(5.60, 18.0 * 1.05 * 1.05);
         shooterVelocityMap.put(25.0, 43.44 * 1.05);
 
 

@@ -36,7 +36,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 	private boolean calibrating = false;
 	private Debouncer calibrateDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
-	private boolean forceHoodDown = false;
+	private boolean forceHoodDown = true;
 
     private HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
 
@@ -69,6 +69,7 @@ public class Hood extends SubsystemBase implements HoodIO {
 			SmartDashboard.putData("force hood down", new InstantCommand(() -> forceHoodDown(true)));
 			SmartDashboard.putData("unforce hood", new InstantCommand(() -> forceHoodDown(false)));
 		}
+		
 	}
 
 	/**

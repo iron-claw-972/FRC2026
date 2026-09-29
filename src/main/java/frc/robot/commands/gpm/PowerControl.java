@@ -9,8 +9,8 @@ public class PowerControl extends Command {
     // my beautiful power control subsystems
     private EMABreaker breaker;
     private Battery battery;
+    // TODO: add subsystems back when implementing logic:
     // the real subsystems
-    // TODO: implement current limit logic for these subsystems
     // private Drivetrain drivetrain;
     // private Shooter shooter;
     // private Turret turret;
@@ -32,7 +32,6 @@ public class PowerControl extends Command {
     public PowerControl(
         EMABreaker breaker, // pc
         Battery battery // pc
-        // TODO: add subsystems back when implementing logic:
         // Drivetrain drivetrain, // main draw
         // Shooter shooter, // aiming (vital)
         // Turret turret, // aiming
@@ -42,7 +41,6 @@ public class PowerControl extends Command {
     ) {
         this.breaker = breaker;
         this.battery = battery;
-        // TODO: add these back when implementing logic:
         // this.drivetrain = drivetrain;
         // this.shooter = shooter;
         // this.turret = turret;

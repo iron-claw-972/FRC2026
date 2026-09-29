@@ -9,7 +9,11 @@ import com.pathplanner.lib.auto.AutoBuilderException;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -21,7 +25,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.LogCommand;
+import frc.robot.commands.auto_comm.ChoreoPathCommandBuilder;
+import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.drive_comm.SysIDDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
 import frc.robot.commands.gpm.RunSpindexer;
@@ -66,9 +73,6 @@ public class RobotContainer {
   private Intake intake = null;
   private LED led = null;
 
-  // this is inside addAuto()
-  // private Command auto = new DoNothing();
-
   // Controllers are defined here
   private BaseDriverConfig driver = null;
   private Operator operator = null;
@@ -77,7 +81,10 @@ public class RobotContainer {
 
   // auto Command selection
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final AutoChooser choreoAutoChooser = new AutoChooser();
 
+  // choreo auto factory
+  AutoFactory autoFactory;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    * <p>
@@ -91,6 +98,7 @@ public class RobotContainer {
       SmartDashboard.putNumber("Match Time", 0.0);
     }
 
+
     // Filling the SendableChooser on SmartDashboard
 
     // dispatch on the robot
@@ -103,6 +111,9 @@ public class RobotContainer {
 
       default:
 
+      case TwinBot:
+
+
       case PrimeJr: // AKA Valence
         spindexer = new Spindexer();
         intake = new Intake();
@@ -113,8 +124,6 @@ public class RobotContainer {
         turret = new Turret();
         shooter = new Shooter();
         hood = new Hood();
-      
-      case TwinBot:
 
       case SwerveCompetition: // AKA "Vantage"
 
@@ -130,6 +139,8 @@ public class RobotContainer {
         drive = new Drivetrain(vision, new GyroIOPigeon2());
         driver = new PS5ControllerDriverConfig(drive, shooter, turret, hood, intake, spindexer);
         operator = new Operator(drive);
+
+        initChoreo();
 
         // Detected objects need access to the drivetrain
         DetectedObject.setDrive(drive);
@@ -151,12 +162,14 @@ public class RobotContainer {
         if (turret != null) {
           turret.setDefaultCommand(new Superstructure(turret, drive, hood, shooter, spindexer));
         }
-        
+
         if (drive != null && driver != null) {
           drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+          SmartDashboard.putData("SysId Characterization", new SysIDDriveCommand(drive));
         }
         break;
     }
+
 
 	if (intake != null && hood != null && turret != null)
 		// CommandScheduler.getInstance().schedule(new HardstopWarning(hood, intake, turret)); (no more crt for this)
@@ -173,6 +186,27 @@ public class RobotContainer {
     if (!Constants.DISABLE_SMART_DASHBOARD) {
       SmartDashboard.putData("Shutdown Orange Pis", new ShutdownAllPis());
     }
+  }
+
+  private void initChoreo() {
+        // choreo auto factory init
+      	autoFactory = new AutoFactory(
+            drive::getPose,
+            drive::resetOdometry,
+            sample -> drive.setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(sample.getChassisSpeeds(), drive.getYaw()), false),
+            true,
+            drive,
+            (trajectory, startOrFinish) -> {
+              Logger.recordOutput(
+                  "Autos/Trajectory", trajectory.getPoses());
+              Logger.recordOutput("Autos/StartingOrFinishing", startOrFinish);
+          });
+
+        autoFactory.bind("hoodUp", new InstantCommand(() -> hood.forceHoodDown(false)));
+        autoFactory.bind("hoodDown", new InstantCommand(() -> hood.forceHoodDown(true)));
+
+        // warmup command for choreo, prevents lag on auto startup
+        CommandScheduler.getInstance().schedule(autoFactory.warmupCmd().ignoringDisable(true));
   }
 
   /**
@@ -241,6 +275,11 @@ public class RobotContainer {
         hood.forceHoodDown(false);
       }));
     }
+
+    NamedCommands.registerCommand("After Depot", new InstantCommand());
+    NamedCommands.registerCommand("Constraints Zone", new InstantCommand());
+    NamedCommands.registerCommand("Depot", new InstantCommand());
+    NamedCommands.registerCommand("Reset Spindexer", new InstantCommand());
   }
 
   public void addAuto(String name) {
@@ -253,6 +292,19 @@ public class RobotContainer {
       e.printStackTrace();
       System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
     }
+  }
+
+  public void addAuto(String name, Command auto) {
+    try {
+      autoChooser.addOption(name, auto);
+    } catch (AutoBuilderException e){
+      e.printStackTrace();
+      System.out.println("HELLOOOO AUTO \"" + name + "\" NOT FOUND");
+    }
+  }
+
+  public void addChoreoAuto(String name, AutoRoutine auto) {
+    choreoAutoChooser.addCmd(name, auto::cmd);
   }
 
   /**
@@ -271,6 +323,11 @@ public class RobotContainer {
     String leftDoNothing = "Left Do Nothing";
     String rightDoNothing = "Right Do Nothing";
     String centerDoNothing = "Center Do Nothing";
+    String leftShallowDoubleSwipe = "LeftShallowDoubleSwipe";
+    String rightShallowDoubleSwipe = "RightShallowDoubleSwipe";
+    String leftBumpDepotCenter = "LeftBumpDepotCenter";
+    String leftTrenchDepotCenter = "LeftTrenchDepotCenter";
+    String depotCenterPath = "DepotCenterPath";
 
     autoChooser.setDefaultOption("Default", getDefaultAuto());
     addAuto(leftSideAuto);
@@ -283,9 +340,51 @@ public class RobotContainer {
     addAuto(leftDoNothing);
     addAuto(rightDoNothing);
     addAuto(centerDoNothing);
+    addAuto(leftShallowDoubleSwipe);
+    addAuto(rightShallowDoubleSwipe);
+    addAuto(leftBumpDepotCenter);
+    addAuto(leftTrenchDepotCenter);
+    addAuto(depotCenterPath);
+    addAuto("CenterPreload");
+    addAuto("RightConservativeDoubleSwipe");
+
+
+    DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
+
+    // names
+    String leftDynamicLiberalDoubleSwipe = "LeftDynamicDoubleLiberalSwipe";
+    String rightDynamicLiberalDoubleSwipe = "RightDynamicDoubleLiberalSwipe";
+    String leftDynamicConservativeDoubleSwipe = "LeftDynamicDoubleConservativeSwipe";
+    String rightDynamicConservativeDoubleSwipe = "RightDynamicDoubleConservativeSwipe";
+    // String leftDynamicShallowDoubleSwipe = "LeftDynamicShallowDoubleSwipe";
+    // String rightDynamicShallowDoubleSwipe = "RightDynamicShallowDoubleSwipe";
+
+    // add commands
+    addAuto(leftDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(true));
+    addAuto(rightDynamicLiberalDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleLiberalSwipe(false));
+    addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
+    addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
+
+    ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
+
+    addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
+    addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
+    addChoreoAuto("choreoLiberalRight", choreo.rightLiberal(autoFactory));
+    addChoreoAuto("choreoConservativeLeft", choreo.leftConservative(autoFactory));
+    addChoreoAuto("choreoConservativeRight", choreo.rightConservative(autoFactory));
+    addChoreoAuto("choreoShallowLeft", choreo.leftShallow(autoFactory));
+    addChoreoAuto("choreoShallowRight", choreo.rightShallow(autoFactory));
+    addChoreoAuto("choreoDepotKoushaRight", choreo.depotKousha(autoFactory, true));
+    addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
+    addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
+    addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true, drive));
+    addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false, drive));
+    addChoreoAuto("test", choreo.testAuto(autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
+    SmartDashboard.putData("Choreo auto chooser", choreoAutoChooser);
   }
 
   public static BooleanSupplier getAllianceColorBooleanSupplier() {
@@ -323,6 +422,7 @@ public class RobotContainer {
 
   public Command getAutoCommand() {
     return autoChooser.getSelected();
+    // return choreoAutoChooser.selectedCommand();
   }
 
   public void logComponents() {
@@ -337,14 +437,6 @@ public class RobotContainer {
   }
 
   public void periodic() {
-    double matchTime = DriverStation.getMatchTime();
-    if (matchTime > 0) {
-      if (!Constants.DISABLE_SMART_DASHBOARD) {
-        SmartDashboard.putNumber("Match Time", matchTime);
-      }
-    }
-    if (!Constants.DISABLE_SMART_DASHBOARD) {
-      SmartDashboard.putString("Alliance", DriverStation.getAlliance().map(a -> a.name()).orElse("Unknown"));
-    }
+
   }
 }

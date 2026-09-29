@@ -1,5 +1,7 @@
 package frc.robot.commands.gpm;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,7 +30,6 @@ public class RunSpindexer extends Command {
 
     private double storedIntakeSpeed = 0.0;
 
-    
     public RunSpindexer(Spindexer spindexer, Turret turret, Hood hood, Intake intake) {
         this.spindexer = spindexer;
         this.turret = turret;
@@ -62,8 +63,11 @@ public class RunSpindexer extends Command {
             reversing = false;
             return; // this is so the balls don't fly out when unaligned
         }
-        boolean jammed = spindexer.getSubsystemStatorCurrent() / 2 > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        boolean jammed = spindexer.getMotorOneVelocity() < SpindexerConstants.JAM_VELOCITY_THRESHOLD && spindexer.getMotorOneStatorCurrent() > SpindexerConstants.JAM_CURRENT_THRESHOLD;
+        Logger.recordOutput("SpindexerJammed", jammed);
         if (jam_debouncer.calculate(jammed)) {
+            Logger.recordOutput("SpindexerJammedDebounced", jammed);
+
             reversing = true;
             reverseTimer.reset();
             reverseTimer.start();
@@ -85,9 +89,7 @@ public class RunSpindexer extends Command {
                 intake.spin(storedIntakeSpeed);
             }
         }
-        if (!Constants.DISABLE_SMART_DASHBOARD) {
-            SmartDashboard.putBoolean("Spindexer Jamming", reversing);
-        }
+        Logger.recordOutput("Spindexer Jamming", reversing);
     }
 
     @Override

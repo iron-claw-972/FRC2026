@@ -31,7 +31,7 @@ public class PathGroupLoader {
                 if (file.isFile() && file.getName().contains(".")) {
                     try {
                         long startTime = System.nanoTime();
-                        String name = file.getName().substring(0, file.getName().indexOf("."));
+                        String name = file.getName().substring(0, file.getName().lastIndexOf("."));
                         // pathGroups.put(name, PathPlannerAuto.getPathGroupFromAutoFile(name));
                         pathGroups.put(name, PathPlannerPath.fromPathFile(name));
                         double time = (System.nanoTime() - startTime) / 1000000.0;

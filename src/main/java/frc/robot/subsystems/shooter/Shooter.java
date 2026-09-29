@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -34,7 +35,8 @@ public class Shooter extends SubsystemBase implements ShooterIO {
 
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-    double powerModifier = 1.00;
+    // private LoggedNetworkNumber powerModifier = new LoggedNetworkNumber("/Tuning/OPERATOR/Shooter Modifier", 1.0);
+    private double powerModifier = 1.0;
 
     public Shooter() {
         updateInputs();
@@ -104,11 +106,11 @@ public class Shooter extends SubsystemBase implements ShooterIO {
             SmartDashboard.putBoolean("Shooter At Speed", atTargetSpeed());
             SmartDashboard.putBoolean("Shooter Running", shooterTargetSpeed > 0);
         }
+        
         powerModifier = SmartDashboard.getNumber("OPERATOR: Shooter Power Modifier", powerModifier);
         SmartDashboard.putNumber("OPERATOR: Shooter Power Modifier", powerModifier);
 
-        // keep this
-        SmartDashboard.putString("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
+        Logger.recordOutput("WON AUTO?", (HubActive.wonAuto()) ? "WON" : "LOST");
     }
 
     /**

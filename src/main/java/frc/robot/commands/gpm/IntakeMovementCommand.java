@@ -6,7 +6,7 @@ import frc.robot.subsystems.Intake.Intake;
 
 public class IntakeMovementCommand extends Command {
     private final Intake intake;
-    private final double interval = 0.6; // Change this to make it faster/slower (seconds)
+    private final double interval = 0.7; // Change this to make it faster/slower (seconds)
 
     public IntakeMovementCommand(Intake intake) {
         this.intake = intake;

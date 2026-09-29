@@ -24,10 +24,9 @@ public class TurretConstants {
 
 	public static final double EXTRAPOLATION_TIME_CONSTANT = 0.06;
 
-	public static final double FEEDFORWARD_KV = 0.02
-    ;
+	public static final double FEEDFORWARD_KV = 0.02;
 
-    public static final double STATOR_CURRENT_LIMIT = 40.0; // A
-    public static final double SUPPLY_CURRENT_LIMIT = 40.0; // A
+    public static final double STATOR_CURRENT_LIMIT = 80.0; // A
+    public static final double SUPPLY_CURRENT_LIMIT = 50.0; // A
 
 }

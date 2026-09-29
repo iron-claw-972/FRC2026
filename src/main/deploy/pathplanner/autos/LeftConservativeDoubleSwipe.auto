@@ -31,7 +31,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ConservativeSwipe1"
+            "pathName": "LeftConservativeSwipe1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Hood Down"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Spindexer"
           }
         },
         {
