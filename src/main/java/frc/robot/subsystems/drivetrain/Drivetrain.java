@@ -122,12 +122,16 @@ public class Drivetrain extends GeneratedDrivetrain {
 
         double[] offsets = {DriveConstants.STEER_OFFSET_FRONT_LEFT, DriveConstants.STEER_OFFSET_FRONT_RIGHT, DriveConstants.STEER_OFFSET_BACK_LEFT, DriveConstants.STEER_OFFSET_BACK_RIGHT};
         var modulePosesss = modulePoses.getModulePoses();
-        for (int i = 3; i >= 0; i--) {
+        for (int i = 0; i <= 3; i++) {
             offsets[i] = offsets[i] + modulePosesss[i].getRotation().getDegrees();
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i <= 3; i++) {
             Logger.recordOutput("Drivetrain/Module" + i + "/AbsoluteEncoderPositionDegrees",
                 Units.rotationsToDegrees(getModule(i).getEncoder().getAbsolutePosition().getValueAsDouble()));
+            Logger.recordOutput("Drivetrain/Module" + i + "/StatorCurrent",
+                getModule(i).getDriveMotor().getStatorCurrent(true).getValueAsDouble());
+            Logger.recordOutput("Drivetrain/Module" + i + "/VelocityRps",
+                getModule(i).getDriveMotor().getVelocity(true).getValueAsDouble());
         }
         Logger.recordOutput("Odometry/offset poses", offsets);
 

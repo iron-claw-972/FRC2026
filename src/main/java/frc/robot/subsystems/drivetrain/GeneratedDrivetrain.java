@@ -13,6 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
@@ -30,6 +31,9 @@ public class GeneratedDrivetrain extends TunerConstants.TunerSwerveDrivetrain im
             com.ctre.phoenix6.swerve.SwerveDrivetrainConstants drivetrainConstants,
             com.ctre.phoenix6.swerve.SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
+
+        CommandScheduler.getInstance().registerSubsystem(this);
+
         if (Utils.isSimulation()) {
             startSimThread();
         }

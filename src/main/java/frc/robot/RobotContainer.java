@@ -28,6 +28,7 @@ import frc.robot.commands.LogCommand;
 import frc.robot.commands.auto_comm.ChoreoPathCommandBuilder;
 import frc.robot.commands.auto_comm.DynamicAutoBuilder;
 import frc.robot.commands.drive_comm.DefaultDriveCommand;
+import frc.robot.commands.drive_comm.SlipCurrentCalibration;
 import frc.robot.commands.drive_comm.SysIDDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
 import frc.robot.commands.gpm.LockedShoot;
@@ -41,6 +42,7 @@ import frc.robot.controls.BaseDriverConfig;
 import frc.robot.controls.Operator;
 import frc.robot.controls.PS5ControllerDriverConfig;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.LED.LED;
 import frc.robot.subsystems.PowerControl.EMABreaker;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.hood.Hood;
@@ -69,7 +71,7 @@ public class RobotContainer {
   private Hood hood = null;
   private Spindexer spindexer = null;
   private Intake intake = null;
-  // private LED led = null;
+  private LED led = null;
 
   // Controllers are defined here
   private BaseDriverConfig driver = null;
@@ -115,7 +117,7 @@ public class RobotContainer {
       case PrimeJr: // AKA Valence
         // spindexer = new Spindexer();
         // intake = new Intake();
-        // led = new LED();
+        led = new LED();
         breaker = new EMABreaker();
 
       case WaffleHouse: // AKA Betabot
@@ -162,8 +164,8 @@ public class RobotContainer {
         }
 
         if (drive != null && driver != null) {
-          drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
-          SmartDashboard.putData("SysId Characterization", new SysIDDriveCommand(drive));
+          // drive.setDefaultCommand(new DefaultDriveCommand(drive, driver));
+          SmartDashboard.putData("Drive Slip Characterization", new SlipCurrentCalibration(drive, driver));
         }
         break;
     }
@@ -343,6 +345,8 @@ public class RobotContainer {
     // addAuto(leftBumpDepotCenter);
     // addAuto(leftTrenchDepotCenter);
     // addAuto(depotCenterPath);
+    // addAuto("CenterPreload");
+    // addAuto("RightConservativeDoubleSwipe");
 
 
     // DynamicAutoBuilder dynamicAutoBuilder = new DynamicAutoBuilder(spindexer, turret, hood, intake);
@@ -361,7 +365,7 @@ public class RobotContainer {
     // addAuto(leftDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(true));
     // addAuto(rightDynamicConservativeDoubleSwipe, dynamicAutoBuilder.getDynamicDoubleConservativeSwipe(false));
 
-    ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
+    // ChoreoPathCommandBuilder choreo = new ChoreoPathCommandBuilder(intake, spindexer, turret, hood);
 
     // addAuto("testChoreo", ChoreoPathCommandBuilder.basicTrajectoryAuto("test.traj", true, autoFactory));
     // addChoreoAuto("choreoLiberalLeft", choreo.leftLiberal(autoFactory));
@@ -374,9 +378,9 @@ public class RobotContainer {
     // addChoreoAuto("choreoDepotKoushaLeft", choreo.depotKousha(autoFactory, false));
     // addChoreoAuto("choreoDoubleLiberalKoushaRight", choreo.doubleLiberalKousha(autoFactory, true));
     // addChoreoAuto("choreoDoubleLiberalKoushaLeft", choreo.doubleLiberalKousha(autoFactory, false));
-    // addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true));
-    // addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false));
-    addChoreoAuto("test", choreo.testAuto(autoFactory, drive));
+    // addChoreoAuto("choreoDoubleConservativeKoushaRight", choreo.doubleConservativeKousha(autoFactory, true, drive));
+    // addChoreoAuto("choreoDoubleConservativeKoushaLeft", choreo.doubleConservativeKousha(autoFactory, false, drive));
+    // addChoreoAuto("test", choreo.testAuto(autoFactory));
 
     // put the Chooser on the SmartDashboard
     SmartDashboard.putData("Auto chooser", autoChooser);
