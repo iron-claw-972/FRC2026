@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -194,6 +195,8 @@ public class Drivetrain extends SubsystemBase {
         }
 
         // addMusic();
+
+        autoHeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     }
 
@@ -867,5 +870,22 @@ public class Drivetrain extends SubsystemBase {
         setModuleStates(new SwerveModuleState[] {
                 state, state, state, state
         }, false);
+    }
+
+    private final PIDController autoXController = new PIDController(5.0, 0.0, 0.0);
+    private final PIDController autoYController = new PIDController(5.0, 0.0, 0.0);
+    private final PIDController autoHeadingController = new PIDController(1.5, 0.0, 0.0);
+
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next velocities for the robot
+        double vx = sample.vx + autoXController.calculate(pose.getX(), sample.x);
+        double vy = sample.vy + autoYController.calculate(pose.getY(), sample.y);
+        double vrot = sample.omega + autoHeadingController.calculate(pose.getRotation().getRadians(), sample.heading);
+
+        // Apply the generated velocities
+        drive(vx, vy, vrot, true, false);
     }
 }
