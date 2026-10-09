@@ -228,6 +228,14 @@ public class Drivetrain extends SubsystemBase {
         for (var module : modules) {
             module.periodic();
         }
+        if (RobotBase.isSimulation()) {
+            ChassisSpeeds simulatedSpeeds =
+                DriveConstants.KINEMATICS.toChassisSpeeds(getModuleStates());
+
+            gyroIO.updateSim(
+                simulatedSpeeds.omegaRadiansPerSecond,
+                Constants.LOOP_TIME);
+        }
         odometryLock.unlock();
         // Update odometry
         double[] sampleTimestamps = gyroInputs.odometryYawTimestamps; // All signals are sampled together

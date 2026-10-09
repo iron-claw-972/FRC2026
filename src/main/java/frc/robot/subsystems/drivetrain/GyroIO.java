@@ -30,6 +30,7 @@ public interface GyroIO {
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
   }
 
+  default void updateSim(double omegaRadPerSec, double dt) {}
   public default void updateInputs(GyroIOInputs inputs) {}
 
   /** returns the yaw status signal for time-synced odometry. */

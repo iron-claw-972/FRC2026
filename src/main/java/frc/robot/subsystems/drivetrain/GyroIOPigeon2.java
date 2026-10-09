@@ -25,6 +25,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.constants.IdConstants;
 import frc.robot.constants.swerve.DriveConstants;
 import frc.robot.util.PhoenixOdometryThread;
@@ -52,6 +53,14 @@ public class GyroIOPigeon2 implements GyroIO {
     pigeon.optimizeBusUtilization();
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
+  }
+
+  @Override
+  public void updateSim(double omegaRadPerSec, double dt) {
+      if (RobotBase.isSimulation()) {
+          pigeon.getSimState().addYaw(
+              Units.radiansToDegrees(omegaRadPerSec * dt));
+      }
   }
 
   @Override

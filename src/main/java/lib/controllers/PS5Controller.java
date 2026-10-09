@@ -1,6 +1,7 @@
 package lib.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.function.BooleanSupplier;
@@ -97,6 +98,19 @@ public class PS5Controller extends Controller {
     }
 
     public double get(PS5Axis axis) {
+        if (RobotBase.isSimulation()) {
+            int simAxis = switch (axis) {
+                case LEFT_X -> 0;
+                case LEFT_Y -> 1;
+                case LEFT_TRIGGER -> 2;
+                case RIGHT_TRIGGER -> 3;
+                case RIGHT_X -> 4;
+                case RIGHT_Y -> 5;
+            };
+
+            return controller.getRawAxis(simAxis);
+        }
+
         return controller.getRawAxis(axis.id);
     }
 

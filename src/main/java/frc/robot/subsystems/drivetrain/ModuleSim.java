@@ -77,17 +77,22 @@ public class ModuleSim extends Module {
      * @param desiredState Desired state with speed and angle.
      * @param isOpenLoop   whether to use closed/open loop control for drive velocity
      */
+    @Override
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        if(!DriveConstants.DISABLE_DEADBAND_AND_OPTIMIZATION){
-            // If the module isn't moving, don't rotate it
+        if (!DriveConstants.DISABLE_DEADBAND_AND_OPTIMIZATION) {
             if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
+                this.desiredState = desiredState;
                 currentSpeed = 0;
                 return;
             }
-            // Optimize the reference state to avoid spinning further than 90 degrees
-            desiredState = CTREModuleState.optimize(desiredState, new Rotation2d(currentSteerPositionRad));
+
+            desiredState = CTREModuleState.optimize(
+                desiredState,
+                new Rotation2d(currentSteerPositionRad)
+            );
         }
 
+        this.desiredState = desiredState;
         currentSpeed = desiredState.speedMetersPerSecond;
         currentSteerPositionRad = desiredState.angle.getRadians();
     }
