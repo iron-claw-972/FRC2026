@@ -225,6 +225,7 @@ public class Drivetrain extends SubsystemBase {
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
             module.periodic();
+        }
         if (RobotBase.isSimulation()) {
             double omegaRadPerSec =
                 DriveConstants.KINEMATICS
@@ -232,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
                     .omegaRadiansPerSecond;
 
             gyroIO.updateSim(omegaRadPerSec, Constants.LOOP_TIME);
-}
+
         }
         odometryLock.unlock();
         // Update odometry
