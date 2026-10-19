@@ -65,7 +65,11 @@ public class ModuleSim extends Module {
         inputs.odometryDrivePositionsRad =
             new double[]{inputs.drivePositionRad*DriveConstants.DRIVE_GEAR_RATIO};
         inputs.odometryTurnPositions =
-            new Rotation2d[]{inputs.turnPosition};
+            new Rotation2d[] {
+            new Rotation2d(
+                currentSteerPositionRad
+                    * DriveConstants.MODULE_CONSTANTS.angleGearRatio)
+            };
         timestampQueue.clear();
         drivePositionQueue.clear();
         turnPositionQueue.clear();
