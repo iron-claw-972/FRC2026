@@ -31,6 +31,7 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+  public default void updateSim(double omegaRadPerSec, double dt) {}
 
   /** returns the yaw status signal for time-synced odometry. */
   public StatusSignal<?> getYawSignal();

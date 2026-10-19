@@ -1,7 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.VecBuilder;
@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.Music;
 import frc.robot.constants.Constants;
 import frc.robot.constants.FieldConstants;
 import frc.robot.constants.GyroBiasConstants;
@@ -42,9 +41,8 @@ import frc.robot.util.PhoenixOdometryThread;
 import frc.robot.util.SwerveModulePose;
 import frc.robot.util.SwerveStuff.SwerveSetpoint;
 import frc.robot.util.SwerveStuff.SwerveSetpointGenerator;
-import frc.robot.util.Vision.Vision;
 import frc.robot.util.Vision.GyroBiasEstimator;
-import org.photonvision.EstimatedRobotPose;
+import frc.robot.util.Vision.Vision;
 
 /**
  * Represents a swerve drive style drivetrain.
@@ -227,6 +225,14 @@ public class Drivetrain extends SubsystemBase {
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
             module.periodic();
+        if (RobotBase.isSimulation()) {
+            double omegaRadPerSec =
+                DriveConstants.KINEMATICS
+                    .toChassisSpeeds(getModuleStates())
+                    .omegaRadiansPerSecond;
+
+            gyroIO.updateSim(omegaRadPerSec, Constants.LOOP_TIME);
+}
         }
         odometryLock.unlock();
         // Update odometry
