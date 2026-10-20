@@ -1,9 +1,13 @@
 {
-  "name": "Iron Claw 2026",
+  "name": "Valence",
   "isFTC": false,
    "rotations": [
     {
       "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
       "degrees": 90
     }
   ],
