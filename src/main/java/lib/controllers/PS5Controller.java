@@ -1,6 +1,7 @@
 package lib.controllers;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.util.function.BooleanSupplier;
@@ -54,17 +55,17 @@ public class PS5Controller extends Controller {
     public enum PS5Axis {
         LEFT_X(0),
         LEFT_Y(1),
-        RIGHT_X(2),
+        RIGHT_X(RobotBase.isSimulation() ? 4 : 2),
         /**
          * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully
          * pressed
          */
-        LEFT_TRIGGER(3),
+        LEFT_TRIGGER(RobotBase.isSimulation() ? 2 : 3),
         /**
          * note: ps5 controller trigger goes from -1 when unpressed, to 1 when fully
          * pressed
          */
-        RIGHT_TRIGGER(4),
+        RIGHT_TRIGGER(RobotBase.isSimulation() ? 3 : 4),
         RIGHT_Y(5);
 
         public final int id;
