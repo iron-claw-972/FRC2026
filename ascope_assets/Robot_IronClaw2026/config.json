@@ -1,0 +1,11 @@
+{
+  "name": "Iron Claw 2026",
+  "isFTC": false,
+   "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    }
+  ],
+  "position": [0, 0, 0]
+}
