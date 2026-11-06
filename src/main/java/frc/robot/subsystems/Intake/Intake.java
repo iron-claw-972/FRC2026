@@ -11,6 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -69,7 +72,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     public Intake() {
      
         // get the maximum free speed
-        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
+        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO * (2.0 * Math.PI * IntakeConstants.RADIUS_RACK_PINION);
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
         // safety margin, limits velocity to .75 free speed
@@ -102,7 +105,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // config Slot 0 PID params
         var extenderSlot0Configs = config.Slot0;
-        extenderSlot0Configs.kP = 0.5;
+        extenderSlot0Configs.kP = 0.05;
         extenderSlot0Configs.kI = 0.0;
         extenderSlot0Configs.kD = 0.0;
         extenderSlot0Configs.kV = 0.0;
@@ -154,9 +157,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
             // Extender simulation
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
+            leftMotor.getSimState().setSupplyVoltage(12.0);
 
             // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
-            double drumRadiusMeters = Units.inchesToMeters(1.0);
+            double drumRadiusMeters = Units.inchesToMeters(IntakeConstants.RADIUS_RACK_PINION);
             double minHeightMeters = Units.inchesToMeters(0.0);
             double maxHeightMeters = Units.inchesToMeters(IntakeConstants.MAX_EXTENSION);
             // start retracted
@@ -179,8 +183,10 @@ public class Intake extends SubsystemBase implements IntakeIO{
     }
 
     public void periodic() {
-        double inchExtension = getPosition();
+        updateInputs();
         
+        double inchExtension = getPosition();
+
         if (!Constants.DISABLE_LOGGING) {
             Logger.recordOutput("Intake/Setpoint", setpointInches);     
         }
@@ -194,8 +200,27 @@ public class Intake extends SubsystemBase implements IntakeIO{
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
         }
+        Logger.recordOutput("Intake/MeasuredPosition", inputs.leftPosition);
 
-        updateInputs();
+        // AdvantageScope 3D intake visualization
+        double extensionMeters = Units.inchesToMeters(getPosition());
+
+
+        Pose3d intakePose = new Pose3d(
+            new Translation3d(
+                extensionMeters,
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(0)
+            ),
+            new Rotation3d()
+        );
+
+
+        Logger.recordOutput(
+            "Components",
+            new Pose3d[] { intakePose }
+        );
+
         Logger.processInputs("Intake", inputs);
 
         if (!Constants.DISABLE_SMART_DASHBOARD) {
@@ -204,34 +229,52 @@ public class Intake extends SubsystemBase implements IntakeIO{
         }
     }
 
-    public void simulationPeriodic(){
-        // get the applied motor voltage
-        double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
+    public void simulationPeriodic() {
+        // Extender simulation
+        double extenderVoltage =
+            rightMotor.getMotorVoltage().getValueAsDouble();
 
-        // tell the simulator that voltage
-        intakeSim.setInputVoltage(voltage);
-        // run the siimulation
-        intakeSim.update(0.02);
+        intakeSim.setInputVoltage(-extenderVoltage);
+        intakeSim.update(0.020);
 
-        // get the simulation result
         double metersExtend = intakeSim.getPositionMeters();
         double inchesExtend = Units.metersToInches(metersExtend);
-        double motorRotations = inchesToRotations(inchesExtend);
 
-        // set the motor to that position
+        double motorRotations = -inchesToRotations(inchesExtend);
+
+        double inchesPerSecond =
+            Units.metersToInches(intakeSim.getVelocityMetersPerSecond());
+
+        double motorRps = -inchesToRotations(inchesPerSecond);
+
+        // Update both simulated encoders
         rightMotor.getSimState().setRawRotorPosition(motorRotations);
+        leftMotor.getSimState().setRawRotorPosition(motorRotations);
 
-        // update the display
+        rightMotor.getSimState().setRotorVelocity(motorRps);
+        leftMotor.getSimState().setRotorVelocity(motorRps);
+
         robotExtension.setLength(inchesExtend);
 
-        // simulate roller
-        voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
-        rollerSim.setInputVoltage(voltage);
+        // Roller simulation
+        double rollerVoltage = rollerMotor.getMotorVoltage().getValueAsDouble();
+
+        rollerSim.setInputVoltage(rollerVoltage);
         rollerSim.update(0.020);
 
-        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
+        double rollerVelocity =
+            Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec())
+            * IntakeConstants.ROLLER_GEARING;
 
-        rollerMotor.getSimState().setRotorVelocity(velocity);
+        rollerMotor.getSimState().setRotorVelocity(rollerVelocity);
+
+        // Logging
+        Logger.recordOutput("Intake/Sim/RightEncoderRotations", rightMotor.getPosition().getValueAsDouble());
+        Logger.recordOutput("Intake/Sim/LeftEncoderRotations", leftMotor.getPosition().getValueAsDouble());
+        Logger.recordOutput("Intake/Sim/RightMotorVoltage", rightMotor.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput( "Intake/Sim/LeftMotorVoltage",leftMotor.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("Intake/Sim/Position", inchesExtend);
+        Logger.recordOutput("Intake/Sim/ExtenderVoltage", extenderVoltage);
     }
 
     /**
@@ -369,7 +412,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         CurrentLimitsConfigs limitConfigExtender = new CurrentLimitsConfigs();
         limitConfigExtender.StatorCurrentLimit = statorExtenders;
         limitConfigExtender.StatorCurrentLimitEnable = true;
-        limitConfigExtender.SupplyCurrentLimit = statorExtenders;
+        limitConfigExtender.SupplyCurrentLimit = supplyExtenders;        
         limitConfigExtender.SupplyCurrentLimitEnable = true;
         leftMotor.getConfigurator().apply(limitConfigExtender);
         rightMotor.getConfigurator().apply(limitConfigExtender);
@@ -393,8 +436,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     @Override
     public void updateInputs() {
-        inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
-        inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
+        inputs.leftPosition = -rotationsToInches(leftMotor.getPosition().getValueAsDouble());
+        inputs.rightPosition = -rotationsToInches(rightMotor.getPosition().getValueAsDouble());
         inputs.leftStatorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightStatorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
         inputs.leftSupplyCurrent = leftMotor.getSupplyCurrent().getValueAsDouble();

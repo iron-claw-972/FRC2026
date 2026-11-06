@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.commands.drive_comm.SysIDDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
@@ -74,8 +75,12 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Intake
         if (intake != null) {
-            // Toggle intake
-            controller.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+              Trigger rightTrigger = new Trigger(
+           () -> controller.get(PS5Axis.RIGHT_TRIGGER) > 0.5
+           );
+
+
+            rightTrigger.onTrue(new InstantCommand(() -> {
                 if (intakeBoolean) {
                     intake.extend();
                     intake.spinStart();
@@ -87,38 +92,52 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                 }
             }, intake));
 
+            //     // Toggle intake
+            //     rightTrigger.onTrue(new InstantCommand(() -> {
+            //         if (intakeBoolean) {
+            //             intake.extend();
+            //             intake.spinStart();
+            //             intakeBoolean = false;
+            //         } else {
+            //             intake.intermediateExtend();
+            //             intake.spinStop();
+            //             intakeBoolean = true;
+            //         }
+            //     }, intake));
+
+
             // Retract if hold for 2 seconds
-            controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
+            rightTrigger.debounce(2.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
                 intake.spinStop();
             }, intake));
 
-            // Make the intake go in and out while shooting
-            controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
-                    .alongWith(new InstantCommand(() -> intakeBoolean = true)));
+            // // Make the intake go in and out while shooting
+            // controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
+            //         .alongWith(new InstantCommand(() -> intakeBoolean = true)));
 
-            // Calibration: you can now calibrate easily using this button
-            if (hood != null && intake != null) {
-                controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
-                    intake.calibrate();
-                    hood.calibrate();
-                }, intake, hood)).onFalse(new InstantCommand(() -> {
-                    intake.stopCalibrating();
-                    hood.stopCalibrating();
-                }, intake, hood));
-            }
+            // // Calibration: you can now calibrate easily using this button
+            // if (hood != null && intake != null) {
+            //     controller.get(PS5Button.PS).onTrue(new InstantCommand(() -> {
+            //         intake.calibrate();
+            //         hood.calibrate();
+            //     }, intake, hood)).onFalse(new InstantCommand(() -> {
+            //         intake.stopCalibrating();
+            //         hood.stopCalibrating();
+            //     }, intake, hood));
+            // }
 
-            // Stop intake roller
-            controller.get(DPad.DOWN).onTrue(new InstantCommand(() -> {
-                if (intakeBoolean) {
-                    intake.spinStart();
-                    intakeBoolean = false;
-                } else {
-                    intake.spinStop();
-                    intakeBoolean = true;
-                }
-            }));
+            // // Stop intake roller
+            // controller.get(DPad.DOWN).onTrue(new InstantCommand(() -> {
+            //     if (intakeBoolean) {
+            //         intake.spinStart();
+            //         intakeBoolean = false;
+            //     } else {
+            //         intake.spinStop();
+            //         intakeBoolean = true;
+            //     }
+            // }));
         }
 
         // Spindexer
