@@ -226,20 +226,26 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     public void simulationPeriodic(){
         // get the applied motor voltage
-        double voltage = rightMotor.getMotorVoltage().getValueAsDouble();
+        double entenderVoltage =
+        rightMotor.getMotorVoltage().getValueAsDouble();
 
         // tell the simulator that voltage
-        intakeSim.setInputVoltage(voltage);
+        intakeSim.setInputVoltage(-entenderVoltage);
         // run the siimulation
         intakeSim.update(0.02);
 
         // get the simulation result
         double metersExtend = intakeSim.getPositionMeters();
         double inchesExtend = Units.metersToInches(metersExtend);
-        double motorRotations = inchesToRotations(inchesExtend);
+        double motorRotations = -inchesToRotations(inchesExtend);
+
+        double inchesPerSecond = Units.metersToInches(intakeSim.getVelocityMetersPerSecond());
+
+        double motorRps = -inchesToRotations(inchesPerSecond);
 
         // set the motor to that position
         rightMotor.getSimState().setRawRotorPosition(motorRotations);
+        
 
         // update the display
         robotExtension.setLength(inchesExtend);
