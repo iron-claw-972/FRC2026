@@ -1,5 +1,5 @@
 {
-  "name": "Valence",
+  "name": "Valence ISgoing",
   "isFTC": false,
   "rotations": [
     {
@@ -14,7 +14,7 @@
   ],
   "position": [0, 0, 0],
   "components":
-  [
+[
     {
       "zeroedRotations": 
        [
@@ -24,7 +24,7 @@
          },
          {
            "axis": "z",
-           "degrees: 90
+           "degrees": 90
          }
        ],
        "zeroedPosition": [-0.27, 0, 0]
