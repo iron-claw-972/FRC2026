@@ -88,7 +88,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         var slot0Configs = rollerConfig.Slot0;
         slot0Configs.kP = 5.0;
         slot0Configs.kI = 0.0;
-        slot0Configs.kD = 0.1;
+        slot0Configs.kD = 0.0;
         slot0Configs.kV = 0.0;
         slot0Configs.kA = 0.0;
 
@@ -107,7 +107,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         var extenderSlot0Configs = config.Slot0;
         extenderSlot0Configs.kP = 0.05;
         extenderSlot0Configs.kI = 0.0;
-        extenderSlot0Configs.kD = 0.1;
+        extenderSlot0Configs.kD = 0.0;
         extenderSlot0Configs.kV = 0.0;
         extenderSlot0Configs.kA = 0.0;
 
@@ -157,6 +157,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
             // Extender simulation
             // the supply voltage should change with load....
             rightMotor.getSimState().setSupplyVoltage(12.0);
+            leftMotor.getSimState().setSupplyVoltage(12.0);
 
             // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
             double drumRadiusMeters = Units.inchesToMeters(1.0);
