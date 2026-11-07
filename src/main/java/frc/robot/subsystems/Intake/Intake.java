@@ -245,19 +245,27 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // set the motor to that position
         rightMotor.getSimState().setRawRotorPosition(motorRotations);
+        leftMotor.getSimState().setRawRotorPosition(motorRotations);
+
+        rightMotor.getSimState().setRotorVelocity(motorRps);
+        leftMotor.getSimState().setRotorVelocity(motorRps);
         
 
         // update the display
         robotExtension.setLength(inchesExtend);
 
         // simulate roller
-        voltage = rollerMotor.getMotorVoltage().getValueAsDouble();
-        rollerSim.setInputVoltage(voltage);
+        double rollerVoltage = rollerMotor.getMotorVoltage().getValueAsDouble();
+        rollerSim.setInputVoltage(rollerVoltage);
         rollerSim.update(0.020);
 
-        double velocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
+        double rollerVelocity = Units.radiansToRotations(rollerSim.getAngularVelocityRadPerSec()) * IntakeConstants.ROLLER_GEARING;
 
-        rollerMotor.getSimState().setRotorVelocity(velocity);
+        rollerMotor.getSimState().setRotorVelocity(rollerVelocity);
+
+       
+
+
     }
 
     /**
@@ -395,7 +403,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
         CurrentLimitsConfigs limitConfigExtender = new CurrentLimitsConfigs();
         limitConfigExtender.StatorCurrentLimit = statorExtenders;
         limitConfigExtender.StatorCurrentLimitEnable = true;
-        limitConfigExtender.SupplyCurrentLimit = statorExtenders;
+        limitConfigExtender.SupplyCurrentLimit = supplyExtenders;
         limitConfigExtender.SupplyCurrentLimitEnable = true;
         leftMotor.getConfigurator().apply(limitConfigExtender);
         rightMotor.getConfigurator().apply(limitConfigExtender);
@@ -419,8 +427,8 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
     @Override
     public void updateInputs() {
-        inputs.leftPosition = rotationsToInches(leftMotor.getPosition().getValueAsDouble());
-        inputs.rightPosition = rotationsToInches(rightMotor.getPosition().getValueAsDouble());
+        inputs.leftPosition = -rotationsToInches(leftMotor.getPosition().getValueAsDouble());
+        inputs.rightPosition = -rotationsToInches(rightMotor.getPosition().getValueAsDouble());
         inputs.leftStatorCurrent = leftMotor.getStatorCurrent().getValueAsDouble();
         inputs.rightStatorCurrent = rightMotor.getStatorCurrent().getValueAsDouble();
         inputs.leftSupplyCurrent = leftMotor.getSupplyCurrent().getValueAsDouble();
