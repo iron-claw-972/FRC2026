@@ -11,6 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
@@ -194,6 +197,23 @@ public class Intake extends SubsystemBase implements IntakeIO{
             leftMotor.set(-0.1);
             rightMotor.set(-0.1);
         }
+        Logger.recordOutput("Intake/MeasuredPosition", inputs.leftPosition);
+
+        double extensionMeters = Units.inchesToMeters(getPosition());
+
+        Pose3d intakePose = new Pose3d(
+            new Translation3d(
+                extensionMeters,
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(0)
+                ),
+                new Rotation3d()
+            );
+
+            Logger.recordOutput(
+                "Components",
+                new Pose3d[] { intakePose }
+            );
 
         updateInputs();
         Logger.processInputs("Intake", inputs);
