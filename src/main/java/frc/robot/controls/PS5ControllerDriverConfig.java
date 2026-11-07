@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.commands.drive_comm.SysIDDriveCommand;
 import frc.robot.commands.gpm.IntakeMovementCommand;
@@ -74,8 +75,11 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
 
         // Intake
         if (intake != null) {
-            // Toggle intake
-            controller.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+              Trigger rightTrigger = new Trigger(
+           () -> controller.get(PS5Axis.RIGHT_TRIGGER) > 0.5
+           );
+
+            rightTrigger.onTrue(new InstantCommand(() -> {
                 if (intakeBoolean) {
                     intake.extend();
                     intake.spinStart();
@@ -86,6 +90,19 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
                     intakeBoolean = true;
                 }
             }, intake));
+            
+            // Toggle intake
+           /* controller.get(PS5Button.RIGHT_TRIGGER).onTrue(new InstantCommand(() -> {
+                if (intakeBoolean) {
+                    intake.extend();
+                    intake.spinStart();
+                    intakeBoolean = false;
+                } else {
+                    intake.intermediateExtend();
+                    intake.spinStop();
+                    intakeBoolean = true;
+                }
+            }, intake)); */
 
             // Retract if hold for 2 seconds
             controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
