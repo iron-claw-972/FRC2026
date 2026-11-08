@@ -68,7 +68,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
     private boolean calibrating = false;
 
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-
     public Intake() {
      
         // get the maximum free speed
@@ -84,9 +83,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // Build the configuration for the roller
         TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
 
+        //Tunables.publish("kP", P);
+        //Tunables.publish("kI", I);
+        //Tunables.publish("kD", D);
         // config Slot 0 PID params
+    
         var slot0Configs = rollerConfig.Slot0;
-        slot0Configs.kP = 5.0;
+        slot0Configs.kP = 0.0;
         slot0Configs.kI = 0.0;
         slot0Configs.kD = 0.0;
         slot0Configs.kV = 0.0;
@@ -105,7 +108,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
         // config Slot 0 PID params
         var extenderSlot0Configs = config.Slot0;
-        extenderSlot0Configs.kP = 0.05;
+        extenderSlot0Configs.kP = 0.0;
         extenderSlot0Configs.kI = 0.0;
         extenderSlot0Configs.kD = 0.0;
         extenderSlot0Configs.kV = 0.0;
@@ -229,6 +232,13 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // get the applied motor voltage
         double entenderVoltage =
         rightMotor.getMotorVoltage().getValueAsDouble();
+        //SmartDashboard.putNumber("Intake kP", P);
+        //SmartDashboard.putNumber("Intake kI", I);
+        //SmartDashboard.putNumber("Intake kD", D);
+
+        //SmartDashboard.getNumber("Intake kP", P);
+        //SmartDashboard.getNumber("Intake kI", I);
+        //SmartDashboard.getNumber("Intake kD", D);
 
         // tell the simulator that voltage
         intakeSim.setInputVoltage(-entenderVoltage);

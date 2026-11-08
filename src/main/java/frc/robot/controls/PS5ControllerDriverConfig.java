@@ -105,11 +105,16 @@ public class PS5ControllerDriverConfig extends BaseDriverConfig {
             }, intake)); */
 
             // Retract if hold for 2 seconds
-            controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
+            rightTrigger.debounce(2.0).onTrue(new InstantCommand(() -> {
                 intake.retract();
                 intakeBoolean = true;
                 intake.spinStop();
             }, intake));
+            //controller.get(PS5Button.RIGHT_TRIGGER).debounce(2.0).onTrue(new InstantCommand(() -> {
+             //   intake.retract();
+             //   intakeBoolean = true;
+             //   intake.spinStop();
+//            }, intake));
 
             // Make the intake go in and out while shooting
             controller.get(DPad.UP).whileTrue(new IntakeMovementCommand(intake)
