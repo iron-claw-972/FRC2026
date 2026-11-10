@@ -117,7 +117,9 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // configure MotionMagic
         MotionMagicConfigs motionMagicConfigs = config.MotionMagic;
 
+        //Basically becomes Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ (2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION)^2
         motionMagicConfigs.MotionMagicCruiseVelocity =  IntakeConstants.GEAR_RATIO * maxVelocity/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
+        //Basically becomes Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ (((2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION)^2)*0.25)
         motionMagicConfigs.MotionMagicAcceleration = IntakeConstants.GEAR_RATIO * maxAcceleration/IntakeConstants.RADIUS_RACK_PINION/Math.PI/2;
 
         rightMotor.getConfigurator().apply(config);
