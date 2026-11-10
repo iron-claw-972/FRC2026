@@ -71,7 +71,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     public Intake() {
      
         // get the maximum free speed
-        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ IntakeConstants.GEAR_RATIO;
+        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ (IntakeConstants.GEAR_RATIO  * 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION);
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
         // safety margin, limits velocity to .75 free speed
@@ -163,7 +163,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
             leftMotor.getSimState().setSupplyVoltage(12.0);
 
             // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
-            double drumRadiusMeters = Units.inchesToMeters(1.0);
+            double drumRadiusMeters = Units.inchesToMeters(IntakeConstants.RADIUS_RACK_PINION);
             double minHeightMeters = Units.inchesToMeters(0.0);
             double maxHeightMeters = Units.inchesToMeters(IntakeConstants.MAX_EXTENSION);
             // start retracted
@@ -232,13 +232,6 @@ public class Intake extends SubsystemBase implements IntakeIO{
         // get the applied motor voltage
         double entenderVoltage =
         rightMotor.getMotorVoltage().getValueAsDouble();
-        //SmartDashboard.putNumber("Intake kP", P);
-        //SmartDashboard.putNumber("Intake kI", I);
-        //SmartDashboard.putNumber("Intake kD", D);
-
-        //SmartDashboard.getNumber("Intake kP", P);
-        //SmartDashboard.getNumber("Intake kI", I);
-        //SmartDashboard.getNumber("Intake kD", D);
 
         // tell the simulator that voltage
         intakeSim.setInputVoltage(-entenderVoltage);
