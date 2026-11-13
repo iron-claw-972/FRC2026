@@ -71,7 +71,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
     public Intake() {
      
         // get the maximum free speed
-        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ (IntakeConstants.GEAR_RATIO  * 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION);
+        double maxFreeSpeed = Units.radiansToRotations(dcMotorExtend.freeSpeedRadPerSec)/ (IntakeConstants.GEAR_RATIO); // * 2 * Math.PI * IntakeConstants.RADIUS_RACK_PINION);
 
         // max free speed (rot/s) = motor free speed (rad/s to rot/s)/ gear ratio
         // safety margin, limits velocity to .75 free speed
@@ -166,6 +166,7 @@ public class Intake extends SubsystemBase implements IntakeIO{
 
             // rack pinion is 10 teeth and 10 DP for a radius of 1 inches
             double drumRadiusMeters = Units.inchesToMeters(IntakeConstants.RADIUS_RACK_PINION);
+            //double drumRadiusMeters = Units.inchesToMeters(1.0);
             double minHeightMeters = Units.inchesToMeters(0.0);
             double maxHeightMeters = Units.inchesToMeters(IntakeConstants.MAX_EXTENSION);
             // start retracted
